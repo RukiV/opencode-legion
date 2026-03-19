@@ -10,13 +10,14 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
     "types": [
       // "bun-types",
       "jest",
+      "zod",
       "node"
     ]
   },

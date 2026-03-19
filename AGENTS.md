@@ -23,12 +23,14 @@ Load these rules/skills based on context:
 ## Commands
 
 ```bash
+# Type check TypeScript (validation only, no build output)
+pnpm run typecheck
+
 # Build (outputs to dist/)
 pnpm run build
-
-# Type check Typescript File
-pnpm run typecheck
 ```
+
+> **Note:** When validating TypeScript types, only run `pnpm run typecheck`. No need to run `pnpm run build`.
 
 ## Plugin Rules
 

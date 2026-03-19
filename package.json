@@ -18,7 +18,7 @@
     "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
     "build": "tsc",
     "test": "echo bun test",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly",
     "clean": "ynpx rimraf -rf dist",
     "prepublishOnly": "node --run clean && node --run build"
   },
