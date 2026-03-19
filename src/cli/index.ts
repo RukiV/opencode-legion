@@ -3,36 +3,29 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { getBanner } from "../hooks";
-
-const PLUGIN_NAME = "opencode-arise";
-const OPENCODE_CONFIG_PATHS = [
-  join(process.env.HOME ?? "", ".config/opencode/opencode.json"),
-  join(process.env.HOME ?? "", ".config/opencode/opencode.jsonc"),
-];
-
-function findOpencodeConfig(): string | null {
-  for (const path of OPENCODE_CONFIG_PATHS) {
-    if (existsSync(path)) return path;
-  }
-  return null;
-}
+import {
+	PLUGIN_NAME,
+	findOpencodeConfig,
+	getOpencodeConfigDir,
+	getAriseConfigPath,
+} from "../config/paths";
 
 function parseJsonc(content: string): unknown {
   // More robust JSONC parsing:
   // 1. Remove single-line comments (but not inside strings)
   // 2. Remove multi-line comments
   // 3. Remove trailing commas
-  
+
   let result = "";
   let inString = false;
   let inSingleLineComment = false;
   let inMultiLineComment = false;
   let i = 0;
-  
+
   while (i < content.length) {
     const char = content[i];
     const nextChar = content[i + 1];
-    
+
     if (inSingleLineComment) {
       if (char === "\n") {
         inSingleLineComment = false;
@@ -41,7 +34,7 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (inMultiLineComment) {
       if (char === "*" && nextChar === "/") {
         inMultiLineComment = false;
@@ -51,7 +44,7 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (inString) {
       result += char;
       if (char === "\\") {
@@ -66,7 +59,7 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     // Not in string or comment
     if (char === '"') {
       inString = true;
@@ -74,32 +67,32 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (char === "/" && nextChar === "/") {
       inSingleLineComment = true;
       i += 2;
       continue;
     }
-    
+
     if (char === "/" && nextChar === "*") {
       inMultiLineComment = true;
       i += 2;
       continue;
     }
-    
+
     result += char;
     i++;
   }
-  
+
   // Remove trailing commas
   result = result.replace(/,(\s*[}\]])/g, "$1");
-  
+
   return JSON.parse(result);
 }
 
 function addPluginToConfig(configPath: string): boolean {
   let content: string;
-  
+
   try {
     content = readFileSync(configPath, "utf-8");
   } catch (err) {
@@ -107,9 +100,9 @@ function addPluginToConfig(configPath: string): boolean {
     console.error(`  Error: ${err instanceof Error ? err.message : err}`);
     return false;
   }
-  
+
   let config: Record<string, unknown>;
-  
+
   try {
     config = parseJsonc(content) as Record<string, unknown>;
   } catch (err) {
@@ -145,8 +138,8 @@ function addPluginToConfig(configPath: string): boolean {
 }
 
 function createDefaultAriseConfig(): void {
-  const configDir = join(process.env.HOME ?? "", ".config/opencode");
-  const configPath = join(configDir, "opencode-arise.json");
+	const configDir = getOpencodeConfigDir();
+	const configPath = getAriseConfigPath();
 
   if (existsSync(configPath)) {
     console.log(`✓ opencode-arise.json already exists`);
@@ -181,7 +174,8 @@ function install(): void {
     process.exit(1);
   }
 
-  const success = addPluginToConfig(configPath);
+  // TypeScript narrowing: configPath is guaranteed to be string here after check
+  const success = addPluginToConfig(configPath!);
   if (!success) {
     process.exit(1);
   }
@@ -205,31 +199,38 @@ function doctor(): void {
 
   const configPath = findOpencodeConfig();
   if (!configPath) {
-    console.log("✗ OpenCode config not found");
-    process.exit(1);
+    console.log(`✗ OpenCode config not found: ${configPath}`);
+    // process.exit(1);
   }
-  console.log(`✓ OpenCode config: ${configPath}`);
+  else
+  {
+    console.log(`✓ OpenCode config: ${configPath}`);
 
-  try {
-    const content = readFileSync(configPath, "utf-8");
-    const config = parseJsonc(content) as Record<string, unknown>;
-    const plugins = (config.plugin as string[]) ?? [];
+    try
+    {
+      const content = readFileSync(configPath, "utf-8");
+      const config = parseJsonc(content) as Record<string, unknown>;
+      const plugins = (config.plugin as string[]) ?? [];
 
-    if (plugins.includes(PLUGIN_NAME)) {
-      console.log(`✓ ${PLUGIN_NAME} is registered`);
-    } else {
-      console.log(`✗ ${PLUGIN_NAME} is NOT registered`);
-      console.log(`  Run: bunx ${PLUGIN_NAME} install`);
+      if (plugins.includes(PLUGIN_NAME))
+      {
+        console.log(`✓ ${PLUGIN_NAME} is registered`);
+      } else
+      {
+        console.log(`✗ ${PLUGIN_NAME} is NOT registered`);
+        console.log(`  Run: bunx ${PLUGIN_NAME} install`);
+      }
+    } catch (err)
+    {
+      console.log(`✗ Failed to read config:`, err instanceof Error ? err.message : err);
     }
-  } catch (err) {
-    console.log(`✗ Failed to read config:`, err instanceof Error ? err.message : err);
   }
 
-  const ariseConfigPath = join(process.env.HOME ?? "", ".config/opencode/opencode-arise.json");
+  const ariseConfigPath = getAriseConfigPath();
   if (existsSync(ariseConfigPath)) {
-    console.log(`✓ opencode-arise.json exists`);
+    console.log(`✓ opencode-arise.json exists: ${ariseConfigPath}`);
   } else {
-    console.log(`○ opencode-arise.json not found (optional)`);
+    console.log(`○ opencode-arise.json not found (optional): ${ariseConfigPath}`);
   }
 
   console.log("\n✅ Doctor check complete");
