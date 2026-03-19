@@ -1,7 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName } from "./config/schema";
-import { CONFIG_FILENAME, getAriseConfigPaths } from "./config/paths";
+import { getAriseConfigPaths } from "./config/paths";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import {
   createAriseBannerHook,
@@ -17,6 +17,7 @@ import {
   createBackgroundStatusTool,
   createBackgroundCancelTool,
 } from "./tools";
+import { Bun } from './utils/bun-shim';
 
 type JsonObject = Record<string, unknown>;
 

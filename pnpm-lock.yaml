@@ -1,0 +1,298 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@opencode-ai/plugin':
+        specifier: ^1.2.27
+        version: 1.2.27
+      '@opencode-ai/sdk':
+        specifier: ^1.2.27
+        version: 1.2.27
+      fs-extra:
+        specifier: ^11.3.4
+        version: 11.3.4
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/bun':
+        specifier: ^1.3.11
+        version: 1.3.11
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
+      '@types/node':
+        specifier: ^25.5.0
+        version: 25.5.0
+      bun:
+        specifier: ^1.3.11
+        version: 1.3.11
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      xx2:
+        specifier: npm:opencode-arise@^0.1.6
+        version: opencode-arise@0.1.6(bun@1.3.11)
+      xxxx:
+        specifier: github:bluelovers/opencode-arise#pr/issues-2-001
+        version: opencode-arise@https://codeload.github.com/bluelovers/opencode-arise/tar.gz/1cb5c92d35dcac4892b49332df64812b0b25195d(bun@1.3.11)
+
+packages:
+
+  '@opencode-ai/plugin@1.2.27':
+    resolution: {integrity: sha512-h+8Bw9v9nghMg7T+SUCTzxlIhOrsTqXW7U0HVLGQST5DjbN7uyCUM51roZWZ8LRjGxzbzFhvPnY1bj8i+ioZyw==}
+
+  '@opencode-ai/sdk@1.2.27':
+    resolution: {integrity: sha512-Wk0o/I+Fo+wE3zgvlJDs8Fb67KlKqX0PrV8dK5adSDkANq6r4Z25zXJg2iOir+a8ntg3rAcpel1OY4FV/TwRUA==}
+
+  '@oven/bun-darwin-aarch64@1.3.11':
+    resolution: {integrity: sha512-/8IzqSu4/OWGRs7Fs2ROzGVwJMFTBQkgAp6sAthkBYoN7OiM4rY/CpPVs2X9w9N1W61CHSkEdNKi8HrLZKfK3g==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@oven/bun-darwin-x64-baseline@1.3.11':
+    resolution: {integrity: sha512-CYjIHWaQG7T4phfjErHr6BiXRs0K/9DqMeiohJmuYSBF+H2m56vFslOenLCguGYQL9jeiiCZBeoVCpwjxZrMgQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oven/bun-darwin-x64@1.3.11':
+    resolution: {integrity: sha512-TT7eUihnAzxM2tlZesusuC75PAOYKvUBgVU/Nm/lakZ/DpyuqhNkzUfcxSgmmK9IjVWzMmezLIGZl16XGCGJng==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@oven/bun-linux-aarch64-musl@1.3.11':
+    resolution: {integrity: sha512-jBwYCLG5Eb+PqtFrc3Wp2WMYlw1Id75gUcsdP+ApCOpf5oQhHxkFWCjZmcDoioDmEhMWAiM3wtwSrTlPg+sI6Q==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oven/bun-linux-aarch64@1.3.11':
+    resolution: {integrity: sha512-8XMLyRNxHF4jfLajkWt+F8UDxsWbzysyxQVMZKUXwoeGvaxB0rVd07r3YbgDtG8U6khhRFM3oaGp+CQ0whwmdA==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-baseline@1.3.11':
+    resolution: {integrity: sha512-KZlf1jKtf4jai8xiQv/0XRjxVVhHnw/HtUKtLdOeQpTOQ1fQFhLoz2FGGtVRd0LVa/yiRbSz9HlWIzWlmJClng==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-musl-baseline@1.3.11':
+    resolution: {integrity: sha512-J+qz4Al05PrNIOdj7xsWVTyx0c/gjUauG5nKV3Rrx0Q+5JO+1pPVlnfNmWbOF9pKG4f3IGad8KXJUfGMORld+Q==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64-musl@1.3.11':
+    resolution: {integrity: sha512-ADImD4yCHNpqZu718E2chWcCaAHvua90yhmpzzV6fF4zOhwkGGbPCgUWmKyJ83uz+DXaPdYxX0ttDvtolrzx3Q==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-linux-x64@1.3.11':
+    resolution: {integrity: sha512-z3GFCk1UBzDOOiEBHL32lVP7Edi26BhOjKb6bIc0nRyabbRiyON4++GR0zmd/H5zM5S0+UcXFgCGnD+b8avTLw==}
+    cpu: [x64]
+    os: [linux]
+
+  '@oven/bun-windows-aarch64@1.3.11':
+    resolution: {integrity: sha512-UOdkwScHRkGPz+n9ZJU7sTkTvqV7rD1SLCLaru1xH8WRsV7tDorPqNCzEN1msOIiPRK825nvAtEm9UsomO1GsA==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@oven/bun-windows-x64-baseline@1.3.11':
+    resolution: {integrity: sha512-cCsXK9AQ9Zf18QlVnbrFu2IKfr4sf2sfbErkF2jfCzyCO9Bnhl0KRx63zlN+Ni1xU7gcBLAssgcui5R400N2eA==}
+    cpu: [x64]
+    os: [win32]
+
+  '@oven/bun-windows-x64@1.3.11':
+    resolution: {integrity: sha512-E51tyWDP1l0CbjZYhiUxhDGPaY8Hf5YBREx0PHBff1LM1/q3qsJ6ZvRUa8YbbOO0Ax9QP6GHjD9vf3n6bXZ7QA==}
+    cpu: [x64]
+    os: [win32]
+
+  '@types/bun@1.3.11':
+    resolution: {integrity: sha512-5vPne5QvtpjGpsGYXiFyycfpDF2ECyPcTSsFBMa0fraoxiQyMJ3SmuQIGhzPg2WJuWxVBoxWJ2kClYTcw/4fAg==}
+
+  '@types/fs-extra@11.0.4':
+    resolution: {integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==}
+
+  '@types/jsonfile@6.1.4':
+    resolution: {integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==}
+
+  '@types/node@25.5.0':
+    resolution: {integrity: sha512-jp2P3tQMSxWugkCUKLRPVUpGaL5MVFwF8RDuSRztfwgN1wmqJeMSbKlnEtQqU8UrhTmzEmZdu2I6v2dpp7XIxw==}
+
+  bun-types@1.3.11:
+    resolution: {integrity: sha512-1KGPpoxQWl9f6wcZh57LvrPIInQMn2TQ7jsgxqpRzg+l0QPOFvJVH7HmvHo/AiPgwXy+/Thf6Ov3EdVn1vOabg==}
+
+  bun@1.3.11:
+    resolution: {integrity: sha512-AvXWYFO6j/ZQ7bhGm4X6eilq2JHsDVC90ZM32k2B7/srhC2gs3Sdki1QTbwrdRCo8o7eT+167vcB1yzOvPdbjA==}
+    cpu: [arm64, x64]
+    os: [darwin, linux, win32]
+    hasBin: true
+
+  fs-extra@11.3.4:
+    resolution: {integrity: sha512-CTXd6rk/M3/ULNQj8FBqBWHYBVYybQ3VPBw0xGKFe3tuH7ytT6ACnvzpIQ3UZtB8yvUKC2cXn1a+x+5EVQLovA==}
+    engines: {node: '>=14.14'}
+
+  graceful-fs@4.2.11:
+    resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
+
+  jsonfile@6.2.0:
+    resolution: {integrity: sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==}
+
+  opencode-arise@0.1.6:
+    resolution: {integrity: sha512-+xMhJ9nwnM+mCv2MhlOvIeaIUiIVlkhowvbLAHmFYQRbmMEQBTOeAqGeChabDSPDy+F3AQR3j+kAfLEWLOOe0g==}
+    hasBin: true
+    peerDependencies:
+      bun: '>=1.0.0'
+
+  opencode-arise@https://codeload.github.com/bluelovers/opencode-arise/tar.gz/1cb5c92d35dcac4892b49332df64812b0b25195d:
+    resolution: {tarball: https://codeload.github.com/bluelovers/opencode-arise/tar.gz/1cb5c92d35dcac4892b49332df64812b0b25195d}
+    version: 0.1.6
+    hasBin: true
+    peerDependencies:
+      bun: '>=1.0.0'
+
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
+
+  universalify@2.0.1:
+    resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
+    engines: {node: '>= 10.0.0'}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+  zod@4.1.8:
+    resolution: {integrity: sha512-5R1P+WwQqmmMIEACyzSvo4JXHY5WiAFHRMg+zBZKgKS+Q1viRa0C1hmUKtHltoIFKtIdki3pRxkmpP74jnNYHQ==}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
+snapshots:
+
+  '@opencode-ai/plugin@1.2.27':
+    dependencies:
+      '@opencode-ai/sdk': 1.2.27
+      zod: 4.1.8
+
+  '@opencode-ai/sdk@1.2.27': {}
+
+  '@oven/bun-darwin-aarch64@1.3.11':
+    optional: true
+
+  '@oven/bun-darwin-x64-baseline@1.3.11':
+    optional: true
+
+  '@oven/bun-darwin-x64@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-aarch64-musl@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-aarch64@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-x64-baseline@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-x64-musl-baseline@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-x64-musl@1.3.11':
+    optional: true
+
+  '@oven/bun-linux-x64@1.3.11':
+    optional: true
+
+  '@oven/bun-windows-aarch64@1.3.11':
+    optional: true
+
+  '@oven/bun-windows-x64-baseline@1.3.11':
+    optional: true
+
+  '@oven/bun-windows-x64@1.3.11':
+    optional: true
+
+  '@types/bun@1.3.11':
+    dependencies:
+      bun-types: 1.3.11
+
+  '@types/fs-extra@11.0.4':
+    dependencies:
+      '@types/jsonfile': 6.1.4
+      '@types/node': 25.5.0
+
+  '@types/jsonfile@6.1.4':
+    dependencies:
+      '@types/node': 25.5.0
+
+  '@types/node@25.5.0':
+    dependencies:
+      undici-types: 7.18.2
+
+  bun-types@1.3.11:
+    dependencies:
+      '@types/node': 25.5.0
+
+  bun@1.3.11:
+    optionalDependencies:
+      '@oven/bun-darwin-aarch64': 1.3.11
+      '@oven/bun-darwin-x64': 1.3.11
+      '@oven/bun-darwin-x64-baseline': 1.3.11
+      '@oven/bun-linux-aarch64': 1.3.11
+      '@oven/bun-linux-aarch64-musl': 1.3.11
+      '@oven/bun-linux-x64': 1.3.11
+      '@oven/bun-linux-x64-baseline': 1.3.11
+      '@oven/bun-linux-x64-musl': 1.3.11
+      '@oven/bun-linux-x64-musl-baseline': 1.3.11
+      '@oven/bun-windows-aarch64': 1.3.11
+      '@oven/bun-windows-x64': 1.3.11
+      '@oven/bun-windows-x64-baseline': 1.3.11
+
+  fs-extra@11.3.4:
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.2.0
+      universalify: 2.0.1
+
+  graceful-fs@4.2.11: {}
+
+  jsonfile@6.2.0:
+    dependencies:
+      universalify: 2.0.1
+    optionalDependencies:
+      graceful-fs: 4.2.11
+
+  opencode-arise@0.1.6(bun@1.3.11):
+    dependencies:
+      '@opencode-ai/plugin': 1.2.27
+      '@opencode-ai/sdk': 1.2.27
+      bun: 1.3.11
+      zod: 3.25.76
+
+  opencode-arise@https://codeload.github.com/bluelovers/opencode-arise/tar.gz/1cb5c92d35dcac4892b49332df64812b0b25195d(bun@1.3.11):
+    dependencies:
+      '@opencode-ai/plugin': 1.2.27
+      '@opencode-ai/sdk': 1.2.27
+      bun: 1.3.11
+      zod: 4.3.6
+
+  typescript@5.9.3: {}
+
+  undici-types@7.18.2: {}
+
+  universalify@2.0.1: {}
+
+  zod@3.25.76: {}
+
+  zod@4.1.8: {}
+
+  zod@4.3.6: {}
