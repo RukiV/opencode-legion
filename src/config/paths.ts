@@ -7,8 +7,21 @@
  */
 
 import { existsSync } from "fs";
+import { homedir } from "os";
 import { resolve } from "path";
-import { join } from "path";
+
+/**
+ * 取得使用者主目錄
+ * Get user home directory
+ *
+ * 使用 os.homedir() 確保跨平台相容性
+ * Use os.homedir() for cross-platform compatibility
+ *
+ * @returns {string} 使用者主目錄路徑
+ */
+function getHomeDir(): string {
+	return homedir();
+}
 
 /**
  * OpenCode 插件名稱
@@ -29,8 +42,8 @@ export const CONFIG_FILENAME = "opencode-arise.json";
  * @type {string[]}
  */
 export const OPENCODE_CONFIG_PATHS = [
-	join(process.env.HOME ?? "", ".config/opencode/opencode.json"),
-	join(process.env.HOME ?? "", ".config/opencode/opencode.jsonc"),
+	resolve(getHomeDir(), ".config/opencode/opencode.json"),
+	resolve(getHomeDir(), ".config/opencode/opencode.jsonc"),
 ];
 
 /**
@@ -40,7 +53,7 @@ export const OPENCODE_CONFIG_PATHS = [
  * @returns {string} OpenCode 配置目錄路徑
  */
 export function getOpencodeConfigDir(): string {
-	return resolve(process.env.HOME ?? "", ".config/opencode");
+	return resolve(getHomeDir(), ".config/opencode");
 }
 
 /**
