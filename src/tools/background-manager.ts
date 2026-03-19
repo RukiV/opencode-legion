@@ -1,7 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import type { ShadowName } from "../config/schema";
-import { DEFAULT_POLL_INTERVAL } from "../config/schema";
+import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
 
 export interface BackgroundTask {
   id: string;
@@ -14,6 +14,7 @@ export interface BackgroundTask {
   completedAt?: number;
   result?: string;
   error?: string;
+  retryCount: number;
 }
 
 export class BackgroundManager {
@@ -21,15 +22,46 @@ export class BackgroundManager {
   private ctx: PluginInput;
   private defaultPollInterval: number;
   private getPollInterval?: (agentName?: ShadowName) => number;
+  private getRetryDelayIncrement?: (agentName?: ShadowName) => number;
+  private getRetryDelayMax?: (agentName?: ShadowName) => number;
 
-  constructor(ctx: PluginInput, pollIntervalOrGetter: number | ((agentName?: ShadowName) => number) = DEFAULT_POLL_INTERVAL) {
+  constructor(
+    ctx: PluginInput,
+    pollIntervalOrGetter: number | ((agentName?: ShadowName) => number) = DEFAULT_POLL_INTERVAL,
+    retryDelayIncrementOrGetter?: number | ((agentName?: ShadowName) => number),
+    retryDelayMaxOrGetter?: number | ((agentName?: ShadowName) => number)
+  ) {
     this.ctx = ctx;
-    // 支援傳入函式或數字
+
+    // 支援傳入函式或數字 - pollInterval
     if (typeof pollIntervalOrGetter === "function") {
       this.getPollInterval = pollIntervalOrGetter;
       this.defaultPollInterval = DEFAULT_POLL_INTERVAL;
     } else {
       this.defaultPollInterval = pollIntervalOrGetter;
+    }
+
+    // retryDelayIncrement
+    if (retryDelayIncrementOrGetter !== undefined) {
+      if (typeof retryDelayIncrementOrGetter === "function") {
+        this.getRetryDelayIncrement = retryDelayIncrementOrGetter;
+      } else {
+        // 使用固定值，创建闭包返回
+        this.getRetryDelayIncrement = () => retryDelayIncrementOrGetter;
+      }
+    } else {
+      this.getRetryDelayIncrement = () => DEFAULT_RETRY_DELAY_INCREMENT;
+    }
+
+    // retryDelayMax
+    if (retryDelayMaxOrGetter !== undefined) {
+      if (typeof retryDelayMaxOrGetter === "function") {
+        this.getRetryDelayMax = retryDelayMaxOrGetter;
+      } else {
+        this.getRetryDelayMax = () => retryDelayMaxOrGetter;
+      }
+    } else {
+      this.getRetryDelayMax = () => DEFAULT_RETRY_DELAY_MAX;
     }
   }
 
@@ -63,6 +95,7 @@ export class BackgroundManager {
       description: opts.description,
       status: "running",
       startedAt: Date.now(),
+      retryCount: 0,
     };
 
     this.tasks.set(taskId, task);
@@ -87,9 +120,29 @@ export class BackgroundManager {
   }
 
   private schedulePolling(taskId: string, agentName?: ShadowName): void {
-    const interval = this.getPollInterval
+    const task = this.tasks.get(taskId);
+    if (!task) return;
+
+    // 計算基本輪詢間隔
+    const baseInterval = this.getPollInterval
       ? this.getPollInterval(agentName)
       : this.defaultPollInterval;
+
+    // 計算重試延遲（從第二次失敗開始）
+    let interval = baseInterval;
+    if (task.retryCount > 0) {
+      const increment = this.getRetryDelayIncrement
+        ? this.getRetryDelayIncrement(agentName)
+        : DEFAULT_RETRY_DELAY_INCREMENT;
+      const maxDelay = this.getRetryDelayMax
+        ? this.getRetryDelayMax(agentName)
+        : DEFAULT_RETRY_DELAY_MAX;
+
+      // 遞增量 = retryCount * increment，但最多不超過 maxDelay
+      const additionalDelay = Math.min(task.retryCount * increment, maxDelay);
+      interval = baseInterval + additionalDelay;
+    }
+
     setTimeout(() => this.pollTaskCompletion(taskId), interval);
   }
 
@@ -111,6 +164,8 @@ export class BackgroundManager {
           task.completedAt = Date.now();
           await this.notifyParent(task);
         } else if (status.type === "busy" || status.type === "retry") {
+          // 增加重試次數
+          task.retryCount++;
           this.schedulePolling(taskId, task.shadow as ShadowName);
         }
       } else {

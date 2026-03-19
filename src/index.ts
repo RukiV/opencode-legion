@@ -1,6 +1,6 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName, getPollInterval } from "./config/schema";
+import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/schema";
 import { getAriseConfigPaths } from "./config/paths";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import {
@@ -77,9 +77,16 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
   const config = await loadAriseConfig(ctx);
 
   // Initialize background manager
-  // 傳遞 getPollInterval 函式，讓每個 agent 可有專屬的 poll_interval
+  // 傳遞 getPollInterval, getRetryDelayIncrement, getRetryDelayMax 函式
   const pollIntervalGetter = (agentName?: ShadowName) => getPollInterval(config, agentName);
-  const backgroundManager = new BackgroundManager(ctx, pollIntervalGetter);
+  const retryDelayIncrementGetter = (agentName?: ShadowName) => getRetryDelayIncrement(config, agentName);
+  const retryDelayMaxGetter = (agentName?: ShadowName) => getRetryDelayMax(config, agentName);
+  const backgroundManager = new BackgroundManager(
+    ctx,
+    pollIntervalGetter,
+    retryDelayIncrementGetter,
+    retryDelayMaxGetter
+  );
 
   // Initialize hooks
   const bannerHook = isHookEnabled(config, "arise-banner") && config.show_banner

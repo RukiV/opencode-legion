@@ -28,6 +28,30 @@ This allows:
 - Agent-specific overrides via `agents.<agent_name>.poll_interval`
 - Centralized default in `DEFAULT_POLL_INTERVAL` constant
 
+## 重試延遲邏輯 / Retry Delay Logic
+
+### 說明
+當 task 狀態為 `busy` 或 `retry` 時，會增加 `retryCount` 並計算下一次輪詢的間隔：
+
+```
+interval = poll_interval + (retryCount * retry_delay_increment)
+         └─ 基本間隔   └─ 第二次失敗後開始遞增，最高不超過 retry_delay_max
+```
+
+### 計算範例
+假設 `poll_interval = 2000`, `retry_delay_increment = 5000`, `retry_delay_max = 60000`：
+
+| 嘗試次數 | retryCount | 間隔（毫秒）| 間隔（秒）|
+|----------|------------|-------------|----------|
+| 1 (初始) | 0 | 2000 | 2s |
+| 2 | 1 | 2000 + 5000 = 7000 | 7s |
+| 3 | 2 | 2000 + 10000 = 12000 | 12s |
+| ... | ... | ... | ... |
+| 13 | 12 | 2000 + 60000 = 62000 | 62s |
+| 14+ | 13+ | 2000 + 60000 = 62000 (最大) | 62s (最大) |
+
+---
+
 ## 問題 / Problem
 
 ### 重構前 / Before
@@ -151,14 +175,20 @@ const backgroundManager = new BackgroundManager(
 ```json
 {
   "background": {
-    "poll_interval": 3000
+    "poll_interval": 3000,
+    "retry_delay_increment": 5000,
+    "retry_delay_max": 60000
   },
   "agents": {
     "beru": {
-      "poll_interval": 1000
+      "poll_interval": 1000,
+      "retry_delay_increment": 3000,
+      "retry_delay_max": 30000
     },
     "tank": {
-      "poll_interval": 8000
+      "poll_interval": 8000,
+      "retry_delay_increment": 10000,
+      "retry_delay_max": 120000
     }
   }
 }
@@ -169,7 +199,11 @@ const backgroundManager = new BackgroundManager(
 | 參數 | 類型 | 預設值 | 說明 |
 |------|------|--------|------|
 | `background.poll_interval` | `number` | `2000` | 全域輪詢間隔（毫秒）|
+| `background.retry_delay_increment` | `number` | `5000` | 全域重試延遲遞增量（毫秒）|
+| `background.retry_delay_max` | `number` | `60000` | 全域重試延遲最大值（毫秒）|
 | `agents.<agent>.poll_interval` | `number` | `background.poll_interval` | Agent 特定輪詢間隔（毫秒）|
+| `agents.<agent>.retry_delay_increment` | `number` | `background.retry_delay_increment` | Agent 特定重試延遲遞增量（毫秒）|
+| `agents.<agent>.retry_delay_max` | `number` | `background.retry_delay_max` | Agent 特定重試延遲最大值（毫秒）|
 
 ### 建議值 / Recommended Values
 

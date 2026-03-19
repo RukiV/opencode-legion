@@ -6,6 +6,18 @@ import { z } from "zod";
  */
 export const DEFAULT_POLL_INTERVAL = 2000;
 
+/**
+ * 重試延遲遞增量預設值（毫秒）
+ * Default retry delay increment in milliseconds
+ */
+export const DEFAULT_RETRY_DELAY_INCREMENT = 5000;
+
+/**
+ * 重試延遲最大值預設值（毫秒）
+ * Default maximum retry delay in milliseconds
+ */
+export const DEFAULT_RETRY_DELAY_MAX = 60000;
+
 export const ShadowName = z.enum([
   "monarch",
   "beru",
@@ -29,6 +41,8 @@ export const AgentOverride = z.object({
   model: z.string().optional(),
   disabled: z.boolean().optional(),
   poll_interval: z.number().optional(),
+  retry_delay_increment: z.number().optional(),
+  retry_delay_max: z.number().optional(),
 });
 
 export const AriseConfigSchema = z.object({
@@ -53,6 +67,8 @@ export const AriseConfigSchema = z.object({
   background: z
     .object({
       poll_interval: z.number().default(DEFAULT_POLL_INTERVAL),
+      retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT),
+      retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX),
     })
     .optional(),
 });
@@ -74,6 +90,8 @@ export const DEFAULT_CONFIG: AriseConfig = {
   },
   background: {
     poll_interval: DEFAULT_POLL_INTERVAL,
+    retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
+    retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
   },
 };
 
@@ -98,4 +116,40 @@ export function getPollInterval(config: AriseConfig, agentName?: ShadowName): nu
 
   // 回退至預設值
   return DEFAULT_POLL_INTERVAL;
+}
+
+/**
+ * 取得重試延遲遞增量的輔助函式
+ * 優先順序：agent.retry_delay_increment -> background.retry_delay_increment -> 預設值
+ *
+ * @param config - AriseConfig 物件
+ * @param agentName - agent 名稱（可選）
+ * @returns 重試延遲遞增量（毫秒）
+ */
+export function getRetryDelayIncrement(config: AriseConfig, agentName?: ShadowName): number {
+  if (agentName && config.agents?.[agentName]?.retry_delay_increment !== undefined) {
+    return config.agents[agentName].retry_delay_increment!;
+  }
+  if (config.background?.retry_delay_increment !== undefined) {
+    return config.background.retry_delay_increment;
+  }
+  return DEFAULT_RETRY_DELAY_INCREMENT;
+}
+
+/**
+ * 取得重試延遲最大值的輔助函式
+ * 優先順序：agent.retry_delay_max -> background.retry_delay_max -> 預設值
+ *
+ * @param config - AriseConfig 物件
+ * @param agentName - agent 名稱（可選）
+ * @returns 重試延遲最大值（毫秒）
+ */
+export function getRetryDelayMax(config: AriseConfig, agentName?: ShadowName): number {
+  if (agentName && config.agents?.[agentName]?.retry_delay_max !== undefined) {
+    return config.agents[agentName].retry_delay_max!;
+  }
+  if (config.background?.retry_delay_max !== undefined) {
+    return config.background.retry_delay_max;
+  }
+  return DEFAULT_RETRY_DELAY_MAX;
 }
