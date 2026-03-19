@@ -19,6 +19,9 @@ import {
   createBackgroundCancelTool,
 } from "./tools";
 import { FakeBun as Bun } from './utils/bun-shim';
+import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/opencode';
+import { EnumAriseTools, IAriseTools } from './tools/tool-names';
+import { createPluginTools } from './tools/plugin-tools';
 
 type JsonObject = Record<string, unknown>;
 
@@ -74,7 +77,7 @@ function isHookEnabled(config: AriseConfig, hookName: HookName): boolean {
   return !(config.disabled_hooks ?? []).includes(hookName);
 }
 
-const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
+const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
   const config = await loadAriseConfig(ctx);
 
   // Initialize background manager
@@ -108,13 +111,7 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
 
   return {
     // Register custom tools
-    tool: {
-      arise_summon: createCallAriseAgentTool(ctx),
-      arise_background: createBackgroundTaskTool(backgroundManager),
-      arise_background_output: createBackgroundOutputTool(backgroundManager),
-      arise_background_status: createBackgroundStatusTool(backgroundManager),
-      arise_background_cancel: createBackgroundCancelTool(backgroundManager),
-    },
+    tool: createPluginTools(ctx, backgroundManager),
 
     async config(opencodeConfig) {
       const cfg = opencodeConfig as JsonObject;

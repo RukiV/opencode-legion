@@ -1,31 +1,14 @@
+import { z, ZodEnum, ZodString, ZodOptional, ZodBoolean } from "zod";
 import { tool, type ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./background-manager";
 import type { ShadowName } from "../config/schema";
+import { EnumAriseTools, ARISE_TOOLS } from "./tool-names";
+import { IPluginToolAriseArgs, IReturnTypeOfPluginTool, IReturnTypeOfPluginToolArise, tool2 } from '../types/opencode';
 
-const BACKGROUND_SHADOWS: ShadowName[] = ["beru", "tank", "bellion"];
-
-export function createBackgroundTaskTool(manager: BackgroundManager): ReturnType<typeof tool> {
-  return tool({
-    description: `Launch a shadow soldier as a background task for parallel execution.
-
-Best for:
-- beru: Parallel codebase exploration
-- tank: Parallel external research
-- bellion: Parallel planning/analysis
-
-Returns a task_id immediately. Use arise_background_output to get results later.`,
-
-    args: {
-      shadow: tool.schema
-        .enum(BACKGROUND_SHADOWS)
-        .describe("Which shadow to run in background"),
-      prompt: tool.schema
-        .string()
-        .describe("The task for the shadow"),
-      description: tool.schema
-        .string()
-        .describe("Short description (3-5 words)"),
-    },
+export function createBackgroundTaskTool(manager: BackgroundManager){
+  return tool2<EnumAriseTools.ARISE_BACKGROUND>({
+    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND].description,
+    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND].args,
 
     async execute(args, context: ToolContext) {
       const { shadow, prompt, description } = args;
@@ -52,15 +35,10 @@ Use arise_background_output("${task.id}") when you need the result.`;
   });
 }
 
-export function createBackgroundOutputTool(manager: BackgroundManager): ReturnType<typeof tool> {
-  return tool({
-    description: `Get the output from a background shadow task.`,
-
-    args: {
-      task_id: tool.schema
-        .string()
-        .describe("The task ID from arise_background"),
-    },
+export function createBackgroundOutputTool(manager: BackgroundManager) {
+  return tool2<EnumAriseTools.ARISE_BACKGROUND_OUTPUT>({
+    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_OUTPUT].description,
+    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_OUTPUT].args,
 
     async execute(args) {
       const task = manager.getTask(args.task_id);
@@ -88,16 +66,10 @@ ${task.result ?? "(No output)"}`;
   });
 }
 
-export function createBackgroundStatusTool(manager: BackgroundManager): ReturnType<typeof tool> {
-  return tool({
-    description: "List all background tasks and their status.",
-
-    args: {
-      current_session_only: tool.schema
-        .boolean()
-        .optional()
-        .describe("Only show tasks from current session"),
-    },
+export function createBackgroundStatusTool(manager: BackgroundManager) {
+  return tool2<EnumAriseTools.ARISE_BACKGROUND_STATUS>({
+    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_STATUS].description,
+    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_STATUS].args,
 
     async execute(args, context: ToolContext) {
       let tasks = manager.getAllTasks();
@@ -123,15 +95,10 @@ export function createBackgroundStatusTool(manager: BackgroundManager): ReturnTy
   });
 }
 
-export function createBackgroundCancelTool(manager: BackgroundManager): ReturnType<typeof tool> {
-  return tool({
-    description: "Cancel a running background task.",
-
-    args: {
-      task_id: tool.schema
-        .string()
-        .describe("The task ID to cancel"),
-    },
+export function createBackgroundCancelTool(manager: BackgroundManager) {
+  return tool2<EnumAriseTools.ARISE_BACKGROUND_CANCEL>({
+    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_CANCEL].description,
+    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_CANCEL].args,
 
     async execute(args) {
       const success = await manager.cancelTask(args.task_id);

@@ -2,6 +2,7 @@ import { type Agent } from '@opencode-ai/sdk';
 import type { ITSPickExtra } from 'ts-type';
 import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, type IAllShadowAgentsName } from './shadow-names';
+import { getAriseToolsSection } from '../tools/tool-names';
 
 export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsName> extends ITSPickExtra<Agent, 'description' | 'mode' | 'prompt', 'options'> {
   name: N;
@@ -37,12 +38,7 @@ Your role: Interpret user requests and delegate to your shadow army with MINIMAL
 ## Primary
 - @shadow-monarch - The main orchestrator (only one)
 
-## Tools
-- arise_summon: Invoke a shadow synchronously or in background
-- arise_background: Launch shadow as background task (parallel)
-- arise_background_output: Get result from background task
-- arise_background_status: List all background tasks
-- task: OpenCode's built-in for complex multi-step delegation
+${getAriseToolsSection()}
 
 ## Principles
 1. Assess intent before acting. Don't over-delegate.

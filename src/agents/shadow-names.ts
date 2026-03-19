@@ -76,8 +76,6 @@ export const enum EnumShadowSubAgentsName
 	ShadowSovereign = "shadow-sovereign",
 }
 
-export type IAllShadowAgentsName = EnumShadowAgentsName | EnumShadowSubAgentsName;
-
 /**
  * Shadow agents 陣列 - 使用枚舉值
  * Shadow agents array - using enum values
@@ -89,7 +87,22 @@ export const ALLOWED_SHADOWS = [
 	EnumShadowSubAgentsName.Tusk,
 	EnumShadowSubAgentsName.Tank,
 	EnumShadowSubAgentsName.ShadowSovereign,
-] as const;
+] as const satisfies EnumShadowSubAgentsName[];
+
+export const BACKGROUND_SHADOWS = [
+	EnumShadowSubAgentsName.Beru,
+	EnumShadowSubAgentsName.Tank,
+	EnumShadowSubAgentsName.Bellion,
+] as const satisfies EnumShadowSubAgentsName[];
+
+export type IBackgroundShadowAgentsName = typeof BACKGROUND_SHADOWS[number];
+
+export type IAllShadowAgentsName = EnumShadowAgentsName | EnumShadowSubAgentsName;
+
+export const ALL_SHADOW_AGENTS_NAME = [
+	EnumShadowAgentsName.ShadowMonarch,
+	...ALLOWED_SHADOWS,
+] as const satisfies IAllShadowAgentsName[];
 
 /**
  * IAllowedShadowName - 使用 ITSTypeAndStringLiteral 將枚舉轉換為字面量類型

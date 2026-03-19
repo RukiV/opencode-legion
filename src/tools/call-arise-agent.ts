@@ -3,38 +3,17 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
 import { AUTO_MODEL } from "../config/schema";
 import { SHADOW_AGENTS } from "../agents";
-import { ALLOWED_SHADOWS } from "../agents/shadow-names";
+import { ARISE_TOOLS, EnumAriseTools } from './tool-names';
+import { ALLOWED_SHADOWS, EnumShadowSubAgentsName } from '../agents/shadow-names';
+import { ITSToStringLiteral } from 'ts-type';
+import { z } from 'zod';
+import { tool2 } from '../types/opencode';
 
-export function createCallAriseAgentTool(ctx: PluginInput): ReturnType<typeof tool> {
-  return tool({
-    description: `Invoke a shadow soldier to perform a specific task.
+export function createCallAriseAgentTool(ctx: PluginInput) {
+  return tool2({
+    description: ARISE_TOOLS[EnumAriseTools.ARISE_SUMMON].description,
 
-Available shadows:
-- beru: Fast codebase scout (exploration, grep, file discovery)
-- igris: Precise implementation (code changes, running commands)
-- bellion: Strategic planning (architecture, complex analysis)
-- tusk: UI/UX specialist (frontend, styling, components)
-- tank: External research (docs, web search, examples)
-- shadow-sovereign: Deep reasoning (complex debugging, architecture decisions)
-
-Use run_in_background=true for parallel execution (recommended for exploration/research).
-Use run_in_background=false when you need the result immediately.`,
-
-    args: {
-      shadow: tool.schema
-        .enum(ALLOWED_SHADOWS)
-        .describe("Which shadow to summon"),
-      prompt: tool.schema
-        .string()
-        .describe("The task/question for the shadow (be specific)"),
-      run_in_background: tool.schema
-        .boolean()
-        .describe("true = async (parallel), false = sync (wait for result)"),
-      description: tool.schema
-        .string()
-        .optional()
-        .describe("Short description of the task (for tracking)"),
-    },
+    args: ARISE_TOOLS[EnumAriseTools.ARISE_SUMMON].args,
 
     async execute(args, context) {
       const { shadow, prompt, run_in_background, description } = args;
