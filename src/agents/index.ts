@@ -1,1 +1,1 @@
-export { SHADOW_AGENTS, OPENCODE_OVERRIDES, type ShadowAgent } from "./shadows";
+export { SHADOW_AGENTS, OPENCODE_OVERRIDES, type IShadowAgent } from "./shadows";

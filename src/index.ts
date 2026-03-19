@@ -244,4 +244,4 @@ export default OpencodeArise;
 // OpenCode treats ALL exports as plugin instances and tries to call them.
 // Use "opencode-arise/agents" subpath if you need to import SHADOW_AGENTS.
 export type { AriseConfig } from "./config/schema";
-export type { ShadowAgent } from "./agents/shadows";
+export type { IShadowAgent } from "./agents/shadows";

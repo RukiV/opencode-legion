@@ -1,19 +1,25 @@
-export interface ShadowAgent {
-  name: string;
-  description: string;
-  mode: "primary" | "subagent" | "all";
+import { type Agent } from '@opencode-ai/sdk';
+import type { ITSPickExtra } from 'ts-type';
+import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/opencode';
+import { EnumShadowAgentsName, EnumShadowSubAgentsName, type IAllShadowAgentsName } from './shadow-names';
+
+export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsName> extends ITSPickExtra<Agent, 'description' | 'mode' | 'prompt', 'options'> {
+  name: N;
+  mode: EnumOpencodeAgentMode;
   model: string;
   steps: number;
-  prompt?: string;
-  permission?: Record<string, "allow" | "deny" | "ask">;
-  options?: Record<string, unknown>;
+  permission?: Record<string, EnumOpencodeAgentPermission>;
 }
 
-export const SHADOW_AGENTS: Record<string, ShadowAgent> = {
-  monarch: {
-    name: "monarch",
+export type IShadowAgents = {
+  [P in IAllShadowAgentsName]-?: IShadowAgent<P>;
+};
+
+export const SHADOW_AGENTS: IShadowAgents = {
+  [EnumShadowAgentsName.ShadowMonarch]: {
+    name: EnumShadowAgentsName.ShadowMonarch,
     description: "Shadow Monarch - Orchestrator (Sung Jinwoo)",
-    mode: "primary",
+    mode: EnumOpencodeAgentMode.PRIMARY,
     model: "anthropic/claude-opus-4-5",
     steps: 16,
     prompt: `You are the Shadow Monarch (opencode-arise).
@@ -21,12 +27,15 @@ export const SHADOW_AGENTS: Record<string, ShadowAgent> = {
 Your role: Interpret user requests and delegate to your shadow army with MINIMAL SUFFICIENT effort.
 
 ## Your Shadows (invoke via @mention or arise_summon tool)
-- @beru - Fastest scout. Codebase exploration, file discovery, pattern search.
-- @igris - Loyal knight. Implementation, code changes, running commands.
-- @bellion - Grand Marshal. Complex planning, architecture analysis.
-- @tusk - Creative specialist. UI/UX, frontend work.
-- @tank - Research shadow. External docs, web search, examples.
-- @shadow-sovereign - Full power. Deep reasoning, recovery after failures.
+    - @beru - Fastest scout. Codebase exploration, file discovery, pattern search.
+    - @igris - Loyal knight. Implementation, code changes, running commands.
+    - @bellion - Grand Marshal. Complex planning, architecture analysis.
+    - @tusk - Creative specialist. UI/UX, frontend work.
+    - @tank - Research shadow. External docs, web search, examples.
+    - @shadow-sovereign - Full power. Deep reasoning, recovery after failures.
+
+## Primary
+- @shadow-monarch - The main orchestrator (only one)
 
 ## Tools
 - arise_summon: Invoke a shadow synchronously or in background
@@ -46,15 +55,15 @@ Your role: Interpret user requests and delegate to your shadow army with MINIMAL
 ARISE and lead your shadows to victory.`,
   },
 
-  beru: {
-    name: "beru",
+  [EnumShadowSubAgentsName.Beru]: {
+    name: EnumShadowSubAgentsName.Beru,
     description: "Ant King - Fastest codebase scout",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "anthropic/claude-haiku-4-5",
     steps: 12,
     permission: {
-      edit: "deny",
-      write: "deny",
+      edit: EnumOpencodeAgentPermission.DENY,
+      write: EnumOpencodeAgentPermission.DENY,
     },
     prompt: `You are Beru, the Ant King shadow - fastest scout in the shadow army.
 
@@ -66,10 +75,10 @@ You CANNOT edit files - report findings back to the Monarch.
 Be thorough but fast. Search multiple patterns if needed. Return clear, actionable findings.`,
   },
 
-  igris: {
-    name: "igris",
+  [EnumShadowSubAgentsName.Igris]: {
+    name: EnumShadowSubAgentsName.Igris,
     description: "Loyal Knight - Precise implementation",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "zai-coding-plan/glm-4.7",
     steps: 20,
     prompt: `You are Igris, the loyal knight shadow - precise and reliable implementer.
@@ -85,16 +94,16 @@ Principles:
 Execute with honor.`,
   },
 
-  bellion: {
-    name: "bellion",
+  [EnumShadowSubAgentsName.Bellion]: {
+    name: EnumShadowSubAgentsName.Bellion,
     description: "Grand Marshal - Strategy and planning",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "openai/gpt-5.2",
     steps: 12,
     permission: {
-      edit: "deny",
-      write: "deny",
-      bash: "ask",
+      edit: EnumOpencodeAgentPermission.DENY,
+      write: EnumOpencodeAgentPermission.DENY,
+      bash: EnumOpencodeAgentPermission.ASK,
     },
     prompt: `You are Bellion, Grand Marshal of the shadow army - master strategist.
 
@@ -110,10 +119,10 @@ Output format:
 Think deeply, plan carefully.`,
   },
 
-  tusk: {
-    name: "tusk",
+  [EnumShadowSubAgentsName.Tusk]: {
+    name: EnumShadowSubAgentsName.Tusk,
     description: "Creative shadow - UI/UX specialist",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "google/gemini-3-pro-preview",
     steps: 18,
     prompt: `You are Tusk, the creative shadow - UI/UX and frontend specialist.
@@ -129,15 +138,15 @@ Principles:
 Create with artistry.`,
   },
 
-  tank: {
-    name: "tank",
+  [EnumShadowSubAgentsName.Tank]: {
+    name: EnumShadowSubAgentsName.Tank,
     description: "Research shadow - External knowledge gatherer",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "zai-coding-plan/glm-4.7",
     steps: 18,
     permission: {
-      edit: "deny",
-      write: "deny",
+      edit: EnumOpencodeAgentPermission.DENY,
+      write: EnumOpencodeAgentPermission.DENY,
     },
     prompt: `You are Tank, the research shadow - gatherer of external knowledge.
 
@@ -154,18 +163,18 @@ Return findings in a structured format:
 Research thoroughly, report concisely.`,
   },
 
-  "shadow-sovereign": {
-    name: "shadow-sovereign",
+  [EnumShadowSubAgentsName.ShadowSovereign]: {
+    name: EnumShadowSubAgentsName.ShadowSovereign,
     description: "Full power mode - Deep reasoning and recovery",
-    mode: "subagent",
+    mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "openai/gpt-5.2",
     steps: 24,
     options: {
       reasoningEffort: "high",
     },
     permission: {
-      edit: "deny",
-      write: "deny",
+      edit: EnumOpencodeAgentPermission.DENY,
+      write: EnumOpencodeAgentPermission.DENY,
     },
     prompt: `You are the Shadow Sovereign - the Monarch's full power manifestation.
 
@@ -182,11 +191,11 @@ Your wisdom guides the shadow army through the most challenging battles.`,
 
 export const OPENCODE_OVERRIDES = {
   build: {
-    mode: "all" as const,
+    mode: EnumOpencodeAgentMode.ALL,
     model: "zai-coding-plan/glm-4.7",
   },
   plan: {
-    mode: "all" as const,
+    mode: EnumOpencodeAgentMode.ALL,
     model: "anthropic/claude-opus-4-5",
   },
   explore: {

@@ -15,7 +15,7 @@ export const enum EnumShadowAgentsName
 	 * 負責任務協調與分配
 	 * Orchestration, delegation decisions
 	 */
-	Monarch = 'monarch',
+	ShadowMonarch = 'shadow-monarch',
 }
 
 /**
@@ -75,6 +75,8 @@ export const enum EnumAllowedShadowAgentsName
 	 */
 	ShadowSovereign = "shadow-sovereign",
 }
+
+export type IAllShadowAgentsName = EnumShadowAgentsName | EnumAllowedShadowAgentsName;
 
 /**
  * Shadow agents 陣列 - 使用枚舉值
