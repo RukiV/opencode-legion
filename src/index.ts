@@ -77,7 +77,10 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
   const config = await loadAriseConfig(ctx);
 
   // Initialize background manager
-  const backgroundManager = new BackgroundManager(ctx);
+  const backgroundManager = new BackgroundManager(
+    ctx,
+    config.background?.poll_interval ?? 2000
+  );
 
   // Initialize hooks
   const bannerHook = isHookEnabled(config, "arise-banner") && config.show_banner

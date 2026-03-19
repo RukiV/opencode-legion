@@ -17,9 +17,11 @@ export interface BackgroundTask {
 export class BackgroundManager {
   private tasks: Map<string, BackgroundTask> = new Map();
   private ctx: PluginInput;
+  private pollInterval: number;
 
-  constructor(ctx: PluginInput) {
+  constructor(ctx: PluginInput, pollInterval: number = 2000) {
     this.ctx = ctx;
+    this.pollInterval = pollInterval;
   }
 
   generateTaskId(): string {
@@ -76,7 +78,7 @@ export class BackgroundManager {
   }
 
   private schedulePolling(taskId: string): void {
-    setTimeout(() => this.pollTaskCompletion(taskId), 2000);
+    setTimeout(() => this.pollTaskCompletion(taskId), this.pollInterval);
   }
 
   private async pollTaskCompletion(taskId: string): Promise<void> {

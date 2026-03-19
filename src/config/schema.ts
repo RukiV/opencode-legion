@@ -43,6 +43,11 @@ export const AriseConfigSchema = z.object({
       preserve_todos: z.boolean().default(true),
     })
     .optional(),
+  background: z
+    .object({
+      poll_interval: z.number().default(2000),
+    })
+    .optional(),
 });
 
 export type AriseConfig = z.infer<typeof AriseConfigSchema>;
@@ -59,5 +64,8 @@ export const DEFAULT_CONFIG: AriseConfig = {
   compaction: {
     threshold_percent: 80,
     preserve_todos: true,
+  },
+  background: {
+    poll_interval: 2000,
   },
 };
