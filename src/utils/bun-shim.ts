@@ -199,7 +199,7 @@ function createBunShim(): BunShim {
  * Exports original Bun if available in environment for backup
  */
 // @ts-ignore
-export const OriginalBun = typeof Bun !== "undefined" ? Bun : undefined;
+// export const OriginalBun = typeof Bun !== "undefined" ? Bun : undefined;
 
 /**
  * 預設導出的 Bun 偽裝實例
@@ -208,4 +208,4 @@ export const OriginalBun = typeof Bun !== "undefined" ? Bun : undefined;
  * 可直接使用 `import { Bun } from "./bun-shim"` 取代原始的 `Bun`
  * Can directly use `import { Bun } from "./bun-shim"` to replace original `Bun`
  */
-export const Bun = createBunShim();
+export const FakeBun = createBunShim();

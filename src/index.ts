@@ -17,7 +17,7 @@ import {
   createBackgroundStatusTool,
   createBackgroundCancelTool,
 } from "./tools";
-import { Bun } from './utils/bun-shim';
+import { FakeBun as Bun } from './utils/bun-shim';
 
 type JsonObject = Record<string, unknown>;
 
