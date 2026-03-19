@@ -1,8 +1,9 @@
 import { tool } from "@opencode-ai/plugin";
 import type { PluginInput } from "@opencode-ai/plugin";
-import type { ShadowName } from "../config/schema";
-
-const ALLOWED_SHADOWS: ShadowName[] = ["beru", "igris", "bellion", "tusk", "tank", "shadow-sovereign"];
+import { getSessionModel } from "../config/model-cache";
+import { AUTO_MODEL } from "../config/schema";
+import { SHADOW_AGENTS } from "../agents";
+import { ALLOWED_SHADOWS } from "../agents/shadow-names";
 
 export function createCallAriseAgentTool(ctx: PluginInput): ReturnType<typeof tool> {
   return tool({
@@ -35,7 +36,7 @@ Use run_in_background=false when you need the result immediately.`,
         .describe("Short description of the task (for tracking)"),
     },
 
-    async execute(args) {
+    async execute(args, context) {
       const { shadow, prompt, run_in_background, description } = args;
       const taskDesc = description ?? `${shadow} task`;
 
@@ -50,12 +51,34 @@ Use run_in_background=false when you need the result immediately.`,
           return `[arise] Failed to create session for ${shadow}`;
         }
 
+        // 取得當前會話使用的模型，用於 <auto> 模型替換
+        const parentModel = getSessionModel(context.sessionID);
+
+        // 取得 shadow 預設模型
+        const shadowConfig = SHADOW_AGENTS[shadow];
+        const defaultModel = shadowConfig?.model ?? "";
+
+        // 決定最終使用的模型
+        const effectiveModel = defaultModel === AUTO_MODEL
+          ? parentModel ?? defaultModel  // 若為 <auto> 且有父模型則使用，否則 fallback
+          : defaultModel;
+
+        // 解析模型字串為 providerID 和 modelID
+        let modelBody: { providerID: string; modelID: string } | undefined;
+        if (effectiveModel && effectiveModel !== AUTO_MODEL) {
+          const [providerID, modelID] = effectiveModel.split("/");
+          if (providerID && modelID) {
+            modelBody = { providerID, modelID };
+          }
+        }
+
         if (run_in_background) {
           // Fire and forget - prompt async
           ctx.client.session.promptAsync({
             path: { id: sessionId },
             body: {
               agent: shadow,
+              model: modelBody,
               parts: [{ type: "text", text: prompt }],
             },
           }).catch(() => {});
@@ -71,6 +94,7 @@ The shadow is working. Continue with your work.`;
             path: { id: sessionId },
             body: {
               agent: shadow,
+              model: modelBody,
               parts: [{ type: "text", text: prompt }],
             },
           });

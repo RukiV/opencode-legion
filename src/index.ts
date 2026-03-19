@@ -1,7 +1,8 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/schema";
+import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
 import { getAriseConfigPaths } from "./config/paths";
+import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import {
   createAriseBannerHook,
@@ -134,10 +135,12 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
         const userOverride = config.agents?.[shadowName];
         if (userOverride?.disabled) continue;
 
+        const resolvedModel = shadow.model === AUTO_MODEL ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
+
         agents[name] = {
           description: shadow.description,
           mode: shadow.mode,
-          model: userOverride?.model ?? shadow.model,
+          model: resolvedModel,
           steps: shadow.steps,
           ...(shadow.prompt && { prompt: shadow.prompt }),
           ...(shadow.permission && { permission: shadow.permission }),
@@ -158,6 +161,13 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
           output.output,
           output.metadata as Record<string, unknown>
         );
+      }
+    },
+
+    async "chat.params"(input) {
+      // 緩存當前會話使用的模型
+      if (input.model) {
+        cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
       }
     },
 
@@ -214,6 +224,14 @@ const OpencodeArise: Plugin = async (ctx: PluginInput): Promise<Hooks> => {
           } catch {
             // Ignore errors in todo enforcement
           }
+        }
+      }
+
+      // 清除會話結束時的模型緩存
+      if (event.type === "session.deleted") {
+        const sessionId = (event as { properties?: { sessionID?: string } }).properties?.sessionID;
+        if (sessionId) {
+          clearSessionModel(sessionId);
         }
       }
     },

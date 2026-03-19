@@ -1,6 +1,12 @@
 import { z } from "zod";
 
 /**
+ * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
+ * Special model value that inherits the parent task's model
+ */
+export const AUTO_MODEL = "<auto>";
+
+/**
  * 輪詢間隔預設值（毫秒）
  * Default polling interval in milliseconds
  */
