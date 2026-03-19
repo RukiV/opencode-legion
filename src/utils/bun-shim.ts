@@ -15,7 +15,7 @@ import { pathExists, readFile } from "fs-extra";
  * 模擬 Bun.file() 返回的檔案物件
  * Simulates the file object returned by Bun.file()
  */
-export interface IBunFile {
+interface IBunFile {
 	/**
 	 * 檢查檔案是否存在
 	 * Check if file exists
@@ -87,7 +87,7 @@ class BunShim {
  * 實現 Bun 文件物件的所有必要方法
  * Implements all necessary methods of Bun file object
  */
-class BunFile implements IBunFile {
+export class BunFile implements IBunFile {
 	/** 檔案路徑 / File path */
 	private readonly _path: string;
 

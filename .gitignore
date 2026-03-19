@@ -2,3 +2,12 @@ node_modules/
 dist/
 *.log
 .DS_Store
+nul
+.idea/.gitignore
+.idea/editorJumperProjectSettings.xml
+.idea/jsLibraryMappings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/opencode-arise.iml
+.idea/vcs.xml
+.idea/inspectionProfiles/Project_Default.xml

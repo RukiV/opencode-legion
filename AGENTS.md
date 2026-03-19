@@ -26,7 +26,7 @@ Load these rules/skills based on context:
 # Build (outputs to dist/)
 pnpm run build
 
-# Type check
+# Type check Typescript File
 pnpm run typecheck
 ```
 
