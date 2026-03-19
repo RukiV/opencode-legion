@@ -1,42 +1,53 @@
 # AGENTS.md
 
-This file provides guidance to agents when working with code in this repository.
+Guidance for agents working in this repository.
 
 ## Project Overview
 
-- **Type**: OpenCode plugin (orchestrator harness with Solo Leveling theme)
-- **Runtime**: Bun (but execute .ts files with `tsx` per project rules)
-- **Language**: TypeScript with strict mode
+| Property | Value |
+|----------|-------|
+| **Type** | OpenCode plugin (orchestrator harness with Solo Leveling orchestrator theme) |
+| **Runtime** | `tsx` for .ts files |
+| **Language** | TypeScript (strict mode) |
+| **Package Manager** | pnpm |
 
-## Build & Test Commands
+## Agents Rules/Skills
+
+Load these rules/skills based on context:
+
+| Name | When to Use |
+|-------|-------------|
+| `typescript-naming-convention` | Creating or modifying TypeScript naming |
+| `analyze-code-commenter` | Editing, refactoring, implementing code or comments |
+
+## Commands
 
 ```bash
 # Build (outputs to dist/)
-tsx src/index.ts --help  # CLI help (if needed)
-
-# Run tests (uses bun:test framework, but execute with tsx)
-tsx node_modules/bun/test/bun-test-wrapper.ts  # Or run individual test files
+pnpm run build
 
 # Type check
-tsx -e "import('typescript').then(t => t.createProgram(['src/**/*.ts'], {noEmit:true, strict:true}))"
+pnpm run typecheck
 ```
 
-## Critical Plugin Rules
+## Plugin Rules
 
-1. **MUST export only `default`** - OpenCode calls all exports as plugin functions, so `src/index.ts` must export ONLY the default async function
-2. **Uses Bun APIs** - Code uses `Bun.file()` for config loading (runtime dependency)
+1. **MUST export only `default`** - `src/index.ts` must export ONLY the default async function (OpenCode calls all exports as plugin functions)
+2. **Use FakeBun APIs** - Config loading uses `FakeBun.file()`
 
 ## Configuration
 
-- Config file: `opencode-arise.json`
-- Search paths (local takes precedence):
-  1. `./.opencode/opencode-arise.json` (local)
-  2. `~/.config/opencode/opencode-arise.json` (global)
-- Uses Zod schema validation with `AriseConfigSchema.safeParse()`
+- **Config file**: `opencode-arise.json`
+- **Search paths** (local takes precedence):
+  1. `./.opencode/opencode-arise.json`
+  2. `~/.config/opencode/opencode-arise.json`
+- **Validation**: Zod schema with `AriseConfigSchema.safeParse()`
 
 ## Architecture
 
-- **agents/**: Shadow agents (monarch, beru, igris, bellion, tusk, tank, shadow-sovereign)
-- **hooks/**: Lifecycle hooks (arise-banner, output-shaper, compaction-preserver, todo-enforcer)
-- **tools/**: Custom tools (call-arise-agent, background tasks)
-- **config/**: Schema and path utilities
+```
+agents/     - Shadow agents (monarch, beru, igris, bellion, tusk, tank, shadow-sovereign)
+hooks/      - Lifecycle hooks (arise-banner, output-shaper, compaction-preserver, todo-enforcer)
+tools/      - Custom tools (call-arise-agent, background tasks)
+config/     - Schema and path utilities
+```
