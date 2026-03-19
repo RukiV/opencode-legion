@@ -9,6 +9,25 @@ This refactoring changes the hardcoded polling interval (2 seconds) in the `Back
 
 ---
 
+## 讀取優先順序 / Reading Priority
+
+輪詢間隔的讀取順序如下（從高到低）：
+
+```
+config.agents.<agent_name>.poll_interval  (最高優先)
+        │
+        ▼
+config.background.poll_interval
+        │
+        ▼
+DEFAULT_POLL_INTERVAL (預設 2000ms)  (最低優先)
+```
+
+This allows:
+- Global default via `background.poll_interval`
+- Agent-specific overrides via `agents.<agent_name>.poll_interval`
+- Centralized default in `DEFAULT_POLL_INTERVAL` constant
+
 ## 問題 / Problem
 
 ### 重構前 / Before
@@ -115,7 +134,8 @@ const backgroundManager = new BackgroundManager(
 
 ## 使用方式 / Usage
 
-在 `opencode-arise.json` 中設定輪詢間隔：
+### 全域設定
+在 `opencode-arise.json` 中設定全域輪詢間隔：
 
 ```json
 {
@@ -125,11 +145,31 @@ const backgroundManager = new BackgroundManager(
 }
 ```
 
+### Agent 特定設定
+可以為每個 agent 設定不同的輪詢間隔，覆蓋全域設定：
+
+```json
+{
+  "background": {
+    "poll_interval": 3000
+  },
+  "agents": {
+    "beru": {
+      "poll_interval": 1000
+    },
+    "tank": {
+      "poll_interval": 8000
+    }
+  }
+}
+```
+
 ### 參數說明 / Parameter Description
 
 | 參數 | 類型 | 預設值 | 說明 |
 |------|------|--------|------|
-| `poll_interval` | `number` | `2000` | 輪詢間隔（毫秒）|
+| `background.poll_interval` | `number` | `2000` | 全域輪詢間隔（毫秒）|
+| `agents.<agent>.poll_interval` | `number` | `background.poll_interval` | Agent 特定輪詢間隔（毫秒）|
 
 ### 建議值 / Recommended Values
 

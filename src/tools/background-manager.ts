@@ -1,5 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
+import type { ShadowName } from "../config/schema";
+import { DEFAULT_POLL_INTERVAL } from "../config/schema";
 
 export interface BackgroundTask {
   id: string;
@@ -17,11 +19,18 @@ export interface BackgroundTask {
 export class BackgroundManager {
   private tasks: Map<string, BackgroundTask> = new Map();
   private ctx: PluginInput;
-  private pollInterval: number;
+  private defaultPollInterval: number;
+  private getPollInterval?: (agentName?: ShadowName) => number;
 
-  constructor(ctx: PluginInput, pollInterval: number = 2000) {
+  constructor(ctx: PluginInput, pollIntervalOrGetter: number | ((agentName?: ShadowName) => number) = DEFAULT_POLL_INTERVAL) {
     this.ctx = ctx;
-    this.pollInterval = pollInterval;
+    // 支援傳入函式或數字
+    if (typeof pollIntervalOrGetter === "function") {
+      this.getPollInterval = pollIntervalOrGetter;
+      this.defaultPollInterval = DEFAULT_POLL_INTERVAL;
+    } else {
+      this.defaultPollInterval = pollIntervalOrGetter;
+    }
   }
 
   generateTaskId(): string {
@@ -67,7 +76,7 @@ export class BackgroundManager {
           parts: [{ type: "text", text: opts.prompt }],
         },
       })
-      .then(() => this.schedulePolling(taskId))
+      .then(() => this.schedulePolling(taskId, opts.shadow as ShadowName))
       .catch((err) => {
         task.status = "error";
         task.error = err instanceof Error ? err.message : String(err);
@@ -77,8 +86,11 @@ export class BackgroundManager {
     return task;
   }
 
-  private schedulePolling(taskId: string): void {
-    setTimeout(() => this.pollTaskCompletion(taskId), this.pollInterval);
+  private schedulePolling(taskId: string, agentName?: ShadowName): void {
+    const interval = this.getPollInterval
+      ? this.getPollInterval(agentName)
+      : this.defaultPollInterval;
+    setTimeout(() => this.pollTaskCompletion(taskId), interval);
   }
 
   private async pollTaskCompletion(taskId: string): Promise<void> {
@@ -99,7 +111,7 @@ export class BackgroundManager {
           task.completedAt = Date.now();
           await this.notifyParent(task);
         } else if (status.type === "busy" || status.type === "retry") {
-          this.schedulePolling(taskId);
+          this.schedulePolling(taskId, task.shadow as ShadowName);
         }
       } else {
         // Session not in status map, assume idle

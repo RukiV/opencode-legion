@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+/**
+ * 輪詢間隔預設值（毫秒）
+ * Default polling interval in milliseconds
+ */
+export const DEFAULT_POLL_INTERVAL = 2000;
+
 export const ShadowName = z.enum([
   "monarch",
   "beru",
@@ -22,6 +28,7 @@ export type HookName = z.infer<typeof HookName>;
 export const AgentOverride = z.object({
   model: z.string().optional(),
   disabled: z.boolean().optional(),
+  poll_interval: z.number().optional(),
 });
 
 export const AriseConfigSchema = z.object({
@@ -45,7 +52,7 @@ export const AriseConfigSchema = z.object({
     .optional(),
   background: z
     .object({
-      poll_interval: z.number().default(2000),
+      poll_interval: z.number().default(DEFAULT_POLL_INTERVAL),
     })
     .optional(),
 });
@@ -66,6 +73,29 @@ export const DEFAULT_CONFIG: AriseConfig = {
     preserve_todos: true,
   },
   background: {
-    poll_interval: 2000,
+    poll_interval: DEFAULT_POLL_INTERVAL,
   },
 };
+
+/**
+ * 取得輪詢間隔的輔助函式
+ * 優先順序：agent.poll_interval -> background.poll_interval -> 預設值
+ *
+ * @param config - AriseConfig 物件
+ * @param agentName - agent 名稱（可選）
+ * @returns 輪詢間隔（毫秒）
+ */
+export function getPollInterval(config: AriseConfig, agentName?: ShadowName): number {
+  // 優先檢查 agent 特定的 poll_interval
+  if (agentName && config.agents?.[agentName]?.poll_interval !== undefined) {
+    return config.agents[agentName].poll_interval!;
+  }
+
+  // 檢查全域 background.poll_interval
+  if (config.background?.poll_interval !== undefined) {
+    return config.background.poll_interval;
+  }
+
+  // 回退至預設值
+  return DEFAULT_POLL_INTERVAL;
+}
