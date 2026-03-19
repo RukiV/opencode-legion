@@ -1,4 +1,3 @@
-import { describe, expect, test } from "bun:test";
 import { AriseConfigSchema, DEFAULT_CONFIG } from "./schema";
 
 describe("AriseConfigSchema", () => {

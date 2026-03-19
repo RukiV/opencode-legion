@@ -1,4 +1,3 @@
-import { describe, expect, test } from "bun:test";
 import { createOutputShaperHook } from "./output-shaper";
 import { DEFAULT_CONFIG } from "../config/schema";
 

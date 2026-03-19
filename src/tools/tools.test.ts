@@ -1,4 +1,3 @@
-import { describe, expect, it } from "bun:test";
 import { createCallAriseAgentTool } from "./call-arise-agent";
 import {
   createBackgroundTaskTool,
@@ -33,7 +32,7 @@ const mockCtx = {
 describe("arise_summon tool", () => {
   it("has correct structure", () => {
     const tool = createCallAriseAgentTool(mockCtx);
-    
+
     expect(tool).toBeDefined();
     expect(tool.description).toBeDefined();
     expect(tool.description).toContain("shadow");
@@ -44,7 +43,7 @@ describe("arise_summon tool", () => {
 
   it("has all required args", () => {
     const tool = createCallAriseAgentTool(mockCtx);
-    
+
     expect(tool.args.shadow).toBeDefined();
     expect(tool.args.prompt).toBeDefined();
     expect(tool.args.run_in_background).toBeDefined();
@@ -53,7 +52,7 @@ describe("arise_summon tool", () => {
 
   it("lists all shadows in description", () => {
     const tool = createCallAriseAgentTool(mockCtx);
-    
+
     expect(tool.description).toContain("beru");
     expect(tool.description).toContain("igris");
     expect(tool.description).toContain("bellion");
@@ -69,7 +68,7 @@ describe("Background tools", () => {
   describe("arise_background tool", () => {
     it("has correct structure", () => {
       const tool = createBackgroundTaskTool(backgroundManager);
-      
+
       expect(tool).toBeDefined();
       expect(tool.description).toContain("background");
       expect(tool.args.shadow).toBeDefined();
@@ -82,7 +81,7 @@ describe("Background tools", () => {
   describe("arise_background_output tool", () => {
     it("has correct structure", () => {
       const tool = createBackgroundOutputTool(backgroundManager);
-      
+
       expect(tool).toBeDefined();
       expect(tool.args.task_id).toBeDefined();
       expect(typeof tool.execute).toBe("function");
@@ -91,7 +90,7 @@ describe("Background tools", () => {
     it("returns not found for invalid task_id", async () => {
       const tool = createBackgroundOutputTool(backgroundManager);
       const result = await tool.execute({ task_id: "invalid-id" });
-      
+
       expect(result).toContain("not found");
     });
   });
@@ -99,7 +98,7 @@ describe("Background tools", () => {
   describe("arise_background_status tool", () => {
     it("has correct structure", () => {
       const tool = createBackgroundStatusTool(backgroundManager);
-      
+
       expect(tool).toBeDefined();
       expect(typeof tool.execute).toBe("function");
     });
@@ -108,7 +107,7 @@ describe("Background tools", () => {
       const tool = createBackgroundStatusTool(backgroundManager);
       const mockContext = { sessionID: "test", messageID: "test", agent: "test", abort: new AbortController().signal };
       const result = await tool.execute({ current_session_only: false }, mockContext);
-      
+
       expect(result).toContain("No background tasks");
     });
   });
@@ -116,7 +115,7 @@ describe("Background tools", () => {
   describe("arise_background_cancel tool", () => {
     it("has correct structure", () => {
       const tool = createBackgroundCancelTool(backgroundManager);
-      
+
       expect(tool).toBeDefined();
       expect(tool.args.task_id).toBeDefined();
       expect(typeof tool.execute).toBe("function");
@@ -125,7 +124,7 @@ describe("Background tools", () => {
     it("returns failure for invalid task_id", async () => {
       const tool = createBackgroundCancelTool(backgroundManager);
       const result = await tool.execute({ task_id: "invalid-id" });
-      
+
       expect(result).toContain("Could not cancel");
     });
   });
@@ -134,10 +133,10 @@ describe("Background tools", () => {
 describe("BackgroundManager", () => {
   it("generates unique task IDs", () => {
     const manager = new BackgroundManager(mockCtx);
-    
+
     const id1 = manager.generateTaskId();
     const id2 = manager.generateTaskId();
-    
+
     expect(id1).not.toBe(id2);
     expect(id1).toMatch(/^arise_/);
     expect(id2).toMatch(/^arise_/);
@@ -145,14 +144,14 @@ describe("BackgroundManager", () => {
 
   it("returns undefined for non-existent task", () => {
     const manager = new BackgroundManager(mockCtx);
-    
+
     const task = manager.getTask("non-existent");
     expect(task).toBeUndefined();
   });
 
   it("returns empty array when no tasks", () => {
     const manager = new BackgroundManager(mockCtx);
-    
+
     const tasks = manager.getAllTasks();
     expect(tasks).toEqual([]);
   });

@@ -16,6 +16,7 @@
     "rootDir": "src",
     "types": [
       // "bun-types",
+      "jest",
       "node"
     ]
   },

@@ -1,4 +1,3 @@
-import { describe, expect, it, beforeAll } from "bun:test";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 
@@ -18,19 +17,19 @@ describe("Build output", () => {
 
   it("only exports default", () => {
     const content = readFileSync(distPath, "utf-8");
-    
+
     // Check the export statement at the end of the bundled file
     // Should be: export { src_default as default };
     // Should NOT have other named exports
     const exportMatch = content.match(/export\s*\{([^}]+)\}/);
-    
+
     expect(exportMatch).toBeTruthy();
-    
+
     const exports = exportMatch![1]
       .split(",")
       .map(e => e.trim())
       .filter(e => e.length > 0);
-    
+
     // Should only have default export
     expect(exports.length).toBe(1);
     expect(exports[0]).toContain("default");
@@ -40,7 +39,7 @@ describe("Build output", () => {
     const content = readFileSync(distPath, "utf-8");
     const exportMatch = content.match(/export\s*\{([^}]+)\}/);
     const exportBlock = exportMatch?.[1] ?? "";
-    
+
     // These should NOT be in exports
     expect(exportBlock).not.toContain("SHADOW_AGENTS");
     expect(exportBlock).not.toMatch(/OpencodeArise[^d]/); // Allow "OpencodeArise" only if part of "default"

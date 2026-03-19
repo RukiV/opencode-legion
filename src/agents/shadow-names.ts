@@ -25,7 +25,7 @@ export const enum EnumShadowAgentsName
  * Shadow agent name enum
  * Used to restrict callable shadow agents
  */
-export const enum EnumAllowedShadowAgentsName
+export const enum EnumShadowSubAgentsName
 {
 	/**
 	 * 🐜 Ant King Scout
@@ -76,23 +76,23 @@ export const enum EnumAllowedShadowAgentsName
 	ShadowSovereign = "shadow-sovereign",
 }
 
-export type IAllShadowAgentsName = EnumShadowAgentsName | EnumAllowedShadowAgentsName;
+export type IAllShadowAgentsName = EnumShadowAgentsName | EnumShadowSubAgentsName;
 
 /**
  * Shadow agents 陣列 - 使用枚舉值
  * Shadow agents array - using enum values
  */
 export const ALLOWED_SHADOWS = [
-	EnumAllowedShadowAgentsName.Beru,
-	EnumAllowedShadowAgentsName.Igris,
-	EnumAllowedShadowAgentsName.Bellion,
-	EnumAllowedShadowAgentsName.Tusk,
-	EnumAllowedShadowAgentsName.Tank,
-	EnumAllowedShadowAgentsName.ShadowSovereign,
+	EnumShadowSubAgentsName.Beru,
+	EnumShadowSubAgentsName.Igris,
+	EnumShadowSubAgentsName.Bellion,
+	EnumShadowSubAgentsName.Tusk,
+	EnumShadowSubAgentsName.Tank,
+	EnumShadowSubAgentsName.ShadowSovereign,
 ] as const;
 
 /**
  * IAllowedShadowName - 使用 ITSTypeAndStringLiteral 將枚舉轉換為字面量類型
  * IAllowedShadowName - Use ITSTypeAndStringLiteral to convert enum to literal type
  */
-export type IAllowedShadowName = ITSTypeAndStringLiteral<EnumAllowedShadowAgentsName>;
+export type IAllowedShadowName = ITSTypeAndStringLiteral<EnumShadowSubAgentsName>;

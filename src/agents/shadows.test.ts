@@ -1,28 +1,23 @@
-import { describe, expect, test } from "bun:test";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./shadows";
+import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName } from './shadow-names';
+import { EnumOpencodeAgentMode } from '../types/opencode';
+
+const ALL_SHADOW_AGENTS_NAME = [EnumShadowAgentsName.ShadowMonarch, ...ALLOWED_SHADOWS] as const;
 
 describe("Shadow Agents", () => {
   test("has all expected shadows", () => {
-    const expectedShadows = [
-      "monarch",
-      "beru",
-      "igris",
-      "bellion",
-      "tusk",
-      "tank",
-      "shadow-sovereign",
-    ];
+    const expectedShadows = ALL_SHADOW_AGENTS_NAME;
     for (const name of expectedShadows) {
       expect(SHADOW_AGENTS[name]).toBeDefined();
     }
   });
 
   test("monarch is primary mode", () => {
-    expect(SHADOW_AGENTS.monarch.mode).toBe("primary");
+    expect(SHADOW_AGENTS[EnumShadowAgentsName.ShadowMonarch].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
   });
 
   test("all other shadows are subagent mode", () => {
-    const subagents = ["beru", "igris", "bellion", "tusk", "tank", "shadow-sovereign"];
+    const subagents = ALLOWED_SHADOWS;
     for (const name of subagents) {
       expect(SHADOW_AGENTS[name].mode).toBe("subagent");
     }

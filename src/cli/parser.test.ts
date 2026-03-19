@@ -1,4 +1,3 @@
-import { describe, expect, it } from "bun:test";
 
 // Extract the parseJsonc function for testing
 function parseJsonc(content: string): unknown {
@@ -7,11 +6,11 @@ function parseJsonc(content: string): unknown {
   let inSingleLineComment = false;
   let inMultiLineComment = false;
   let i = 0;
-  
+
   while (i < content.length) {
     const char = content[i];
     const nextChar = content[i + 1];
-    
+
     if (inSingleLineComment) {
       if (char === "\n") {
         inSingleLineComment = false;
@@ -20,7 +19,7 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (inMultiLineComment) {
       if (char === "*" && nextChar === "/") {
         inMultiLineComment = false;
@@ -30,7 +29,7 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (inString) {
       result += char;
       if (char === "\\") {
@@ -44,30 +43,30 @@ function parseJsonc(content: string): unknown {
       i++;
       continue;
     }
-    
+
     if (char === '"') {
       inString = true;
       result += char;
       i++;
       continue;
     }
-    
+
     if (char === "/" && nextChar === "/") {
       inSingleLineComment = true;
       i += 2;
       continue;
     }
-    
+
     if (char === "/" && nextChar === "*") {
       inMultiLineComment = true;
       i += 2;
       continue;
     }
-    
+
     result += char;
     i++;
   }
-  
+
   result = result.replace(/,(\s*[}\]])/g, "$1");
   return JSON.parse(result);
 }
