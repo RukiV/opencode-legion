@@ -6,8 +6,8 @@ import { getBanner } from "../hooks";
 import {
 	PLUGIN_NAME,
 	findOpencodeConfig,
-	getOpencodeConfigDir,
 	getAriseConfigPath,
+	createDefaultAriseConfig,
 } from "../config/paths";
 
 function parseJsonc(content: string): unknown {
@@ -137,30 +137,15 @@ function addPluginToConfig(configPath: string): boolean {
   }
 }
 
-function createDefaultAriseConfig(): void {
-	const configDir = getOpencodeConfigDir();
+function createDefaultAriseConfigHandler(): void {
 	const configPath = getAriseConfigPath();
+	const success = createDefaultAriseConfig(configPath);
 
-  if (existsSync(configPath)) {
-    console.log(`✓ opencode-arise.json already exists`);
-    return;
-  }
-
-  const defaultConfig = {
-    show_banner: true,
-    disabled_shadows: [],
-    disabled_hooks: [],
-  };
-
-  try {
-    if (!existsSync(configDir)) {
-      mkdirSync(configDir, { recursive: true });
-    }
-    writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2), "utf-8");
-    console.log(`✓ Created default config at ${configPath}`);
-  } catch (err) {
-    console.error(`✗ Failed to create config:`, err);
-  }
+	if (success) {
+		console.log(`✓ Created default config at ${configPath}`);
+	} else {
+    console.log(`✓ opencode-arise.json already exists at ${configPath}`);
+	}
 }
 
 function install(): void {
@@ -180,7 +165,7 @@ function install(): void {
     process.exit(1);
   }
 
-  createDefaultAriseConfig();
+  createDefaultAriseConfigHandler();
 
   console.log("\n⚔️  Installation complete!");
   console.log("\n  The Shadow Army awaits. Run 'opencode' to begin.\n");

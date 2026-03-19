@@ -6,9 +6,12 @@
  * Centralized management of all config file path related logic
  */
 
-import { existsSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { homedir } from "os";
 import { resolve } from "path";
+
+import { SHADOW_AGENTS } from "../agents/shadows";
+import { DEFAULT_CONFIG, type AriseConfig } from "./schema";
 
 /**
  * 取得使用者主目錄
@@ -126,4 +129,60 @@ export function hasOpencodeConfig(): boolean {
 export function hasAriseConfig(worktree?: string): boolean {
 	const paths = getAriseConfigPaths(worktree);
 	return paths.some((path) => existsSync(path));
+}
+
+/**
+ * 取得預設 Arise 配置物件
+ * Get default Arise config object
+ *
+ * @returns {AriseConfig} 預設配置物件
+ */
+export function getDefaultAriseConfig(): AriseConfig {
+	// 從 SHADOW_AGENTS 產生預設的 agents 設定
+	// Generate default agents config from SHADOW_AGENTS
+	const defaultAgents = Object.fromEntries(
+		Object.entries(SHADOW_AGENTS).map(([name, agent]) => [
+			name,
+			{ model: agent.model },
+		])
+	) as AriseConfig["agents"];
+
+	return {
+		show_banner: true,
+		disabled_shadows: [],
+		disabled_hooks: [],
+		agents: defaultAgents,
+	};
+}
+
+/**
+ * 建立預設 Arise 配置檔案
+ * Create default Arise config file
+ *
+ * 當配置檔案不存在時，会建立預設配置
+ * Creates default config when config file does not exist
+ *
+ * @param configPath - 自定義配置檔案路徑（可選，預設為全局配置路徑）
+ * @returns {boolean} 是否成功建立配置檔案
+ */
+export function createDefaultAriseConfig(configPath?: string): boolean {
+	const targetPath = configPath || getAriseConfigPath();
+
+	if (existsSync(targetPath)) {
+		return false;
+	}
+
+	const configDir = resolve(targetPath, "..");
+	const defaultConfig = getDefaultAriseConfig();
+
+	try {
+		if (!existsSync(configDir)) {
+			mkdirSync(configDir, { recursive: true });
+		}
+		writeFileSync(targetPath, JSON.stringify(defaultConfig, null, 2), "utf-8");
+		return true;
+	} catch (err) {
+		console.error("✗ Failed to create config:", err);
+		return false;
+	}
 }
