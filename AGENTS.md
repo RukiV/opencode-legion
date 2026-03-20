@@ -46,6 +46,24 @@ pnpm run clean
 pnpm run prepublishOnly
 ```
 
+## Testing Guidelines
+
+- **僅限新建立的測試** - 不需要更動舊有測試的描述
+- **測試描述語言**：
+  - 如果測試描述足夠簡短，可以使用雙語（中文 + 英文）
+  - 否則請使用英文
+- **範例**：
+  ```typescript
+  // ✅ 簡短描述可使用雙語
+  test("monarch is primary mode") { ... }
+  
+  // ✅ 複雜描述使用英文
+  test("should correctly handle nested configuration merging with environment overrides") { ... }
+  
+  // ✅ 舊有測試保持原樣
+  test("has all expected shadows") { ... }
+  ```
+
 ## Code Style Guidelines
 
 ### TypeScript Configuration

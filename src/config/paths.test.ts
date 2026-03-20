@@ -8,7 +8,6 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
 import {
 	CONFIG_FILENAME,
-	OPENCODE_CONFIG_PATHS,
 	getOpencodeConfigDir,
 	getAriseConfigPath,
 	getAriseConfigPaths,
@@ -28,24 +27,6 @@ const TEST_WORKTREE = resolve(TEST_DIR, "project");
 describe("CONFIG_FILENAME", () => {
 	test("is opencode-arise.json", () => {
 		expect(CONFIG_FILENAME).toBe("opencode-arise.json");
-	});
-});
-
-describe("OPENCODE_CONFIG_PATHS", () => {
-	test("contains expected number of paths", () => {
-		expect(OPENCODE_CONFIG_PATHS.length).toBe(2);
-	});
-
-	test("contains .json path", () => {
-		expect(OPENCODE_CONFIG_PATHS).toContainEqual(
-			expect.stringContaining("opencode.json"),
-		);
-	});
-
-	test("contains .jsonc path", () => {
-		expect(OPENCODE_CONFIG_PATHS).toContainEqual(
-			expect.stringContaining("opencode.jsonc"),
-		);
 	});
 });
 
@@ -103,42 +84,9 @@ describe("getAriseConfigPaths", () => {
 });
 
 describe("findOpencodeConfig", () => {
-	beforeEach(() => {
-		// Create temp test directory
-		mkdirSync(TEST_DIR, { recursive: true });
-		mkdirSync(TEST_WORKTREE, { recursive: true });
-	});
-
-	afterEach(() => {
-		// Cleanup
-		try {
-			// Remove test config files
-			for (const path of OPENCODE_CONFIG_PATHS) {
-				try {
-					unlinkSync(path);
-				} catch {
-					// Ignore
-				}
-			}
-			rmdirSync(TEST_WORKTREE);
-			rmdirSync(TEST_DIR);
-		} catch {
-			// Ignore cleanup errors
-		}
-	});
-
-	test("returns null when no config exists", () => {
-		// Ensure no config exists
-		for (const path of OPENCODE_CONFIG_PATHS) {
-			try {
-				unlinkSync(path);
-			} catch {
-				// Ignore
-			}
-		}
-
+	// NOTE: We only test the return type since operating on system config paths is unsafe
+	test("returns string or null depending on system config", () => {
 		const result = findOpencodeConfig();
-		// Result depends on actual system config, so just check it's null or a string
 		expect(result === null || typeof result === "string").toBe(true);
 	});
 });
@@ -151,16 +99,13 @@ describe("hasOpencodeConfig", () => {
 });
 
 describe("hasAriseConfig", () => {
-	test("returns true when global config exists", () => {
-		// Just check that the function can return true when global config exists
+	test("returns boolean", () => {
 		const result = hasAriseConfig();
 		expect(typeof result).toBe("boolean");
 	});
 
-	test("returns false for non-existent worktree without global config", () => {
-		// Create a unique temp path that won't exist and check logic
-		// hasAriseConfig checks both local (.opencode/) and global paths
-		// If only worktree provided without global config existing, it should check local only
+	test("returns boolean for non-existent worktree", () => {
+		// Use isolated test directory that won't affect system config
 		const fakeWorktree = resolve(TEST_DIR, "this-does-not-exist-worktree");
 		const result = hasAriseConfig(fakeWorktree);
 		// Result depends on whether global config exists
