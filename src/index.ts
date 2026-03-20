@@ -1,6 +1,6 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { AriseConfigSchema, DEFAULT_CONFIG, type AriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { AriseConfigSchema, DEFAULT_CONFIG, type IAriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
 import { getAriseConfigPaths } from "./config/paths";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
@@ -27,7 +27,7 @@ type JsonObject = Record<string, unknown>;
 
 const CONFIG_FILENAME = "opencode-arise.json";
 
-async function loadAriseConfig(ctx: PluginInput): Promise<AriseConfig> {
+async function loadAriseConfig(ctx: PluginInput): Promise<IAriseConfig> {
   const paths = getAriseConfigPaths(ctx.worktree);
 
   let merged: JsonObject = { ...DEFAULT_CONFIG };
@@ -73,7 +73,7 @@ function deepMerge(base: JsonObject, override: JsonObject): JsonObject {
   return result;
 }
 
-function isHookEnabled(config: AriseConfig, hookName: HookName): boolean {
+function isHookEnabled(config: IAriseConfig, hookName: HookName): boolean {
   return !(config.disabled_hooks ?? []).includes(hookName);
 }
 
@@ -240,5 +240,5 @@ export default OpencodeArise;
 // NOTE: Do NOT export non-type values from main index.ts!
 // OpenCode treats ALL exports as plugin instances and tries to call them.
 // Use "opencode-arise/agents" subpath if you need to import SHADOW_AGENTS.
-export type { AriseConfig } from "./config/schema";
+export type { IAriseConfig } from "./config/schema";
 export type { IShadowAgent } from "./agents/shadows";

@@ -15,7 +15,7 @@ export const enum EnumShadowAgentsName
 	 * 負責任務協調與分配
 	 * Orchestration, delegation decisions
 	 */
-	ShadowMonarch = 'shadow-monarch',
+	ShadowMonarch = 'monarch',
 }
 
 /**

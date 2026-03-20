@@ -4,3 +4,6 @@ dist
 .DS_Store
 nul
 .idea
+/__root.d.ts
+/__root.js
+/__root.js.map

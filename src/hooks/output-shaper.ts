@@ -1,10 +1,10 @@
-import type { AriseConfig } from "../config/schema";
+import type { IAriseConfig } from "../config/schema";
 
 const DEFAULT_MAX_CHARS = 12000;
 const HEAD_RATIO = 0.7;
 const TAIL_RATIO = 0.2;
 
-export function createOutputShaperHook(config: AriseConfig) {
+export function createOutputShaperHook(config: IAriseConfig) {
   const maxChars = config.output_shaping?.max_chars ?? DEFAULT_MAX_CHARS;
   const preserveErrors = config.output_shaping?.preserve_errors ?? true;
   const headChars = Math.floor(maxChars * HEAD_RATIO);

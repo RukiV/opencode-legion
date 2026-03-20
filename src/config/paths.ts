@@ -11,7 +11,7 @@ import { homedir } from "os";
 import { resolve } from "path";
 
 import { SHADOW_AGENTS } from "../agents/shadows";
-import { DEFAULT_CONFIG, type AriseConfig } from "./schema";
+import { type IAriseConfig } from "./schema";
 
 /**
  * 取得使用者主目錄
@@ -25,12 +25,6 @@ import { DEFAULT_CONFIG, type AriseConfig } from "./schema";
 function getHomeDir(): string {
 	return homedir();
 }
-
-/**
- * OpenCode 插件名稱
- * OpenCode plugin name
- */
-export const PLUGIN_NAME = "opencode-arise";
 
 /**
  * Arise 配置檔案名稱
@@ -135,9 +129,9 @@ export function hasAriseConfig(worktree?: string): boolean {
  * 取得預設 Arise 配置物件
  * Get default Arise config object
  *
- * @returns {AriseConfig} 預設配置物件
+ * @returns {IAriseConfig} 預設配置物件
  */
-export function getDefaultAriseConfig(): AriseConfig {
+export function getDefaultAriseConfig(): IAriseConfig {
 	// 從 SHADOW_AGENTS 產生預設的 agents 設定
 	// Generate default agents config from SHADOW_AGENTS
 	const defaultAgents = Object.fromEntries(
@@ -145,7 +139,7 @@ export function getDefaultAriseConfig(): AriseConfig {
 			name,
 			{ model: agent.model },
 		])
-	) as AriseConfig["agents"];
+	) as IAriseConfig["agents"];
 
 	return {
 		show_banner: true,

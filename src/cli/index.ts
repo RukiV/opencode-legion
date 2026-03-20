@@ -2,13 +2,13 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
-import { getBanner } from "../hooks";
+import { getBanner } from "../hooks/arise-banner";
 import {
-	PLUGIN_NAME,
 	findOpencodeConfig,
 	getAriseConfigPath,
 	createDefaultAriseConfig,
 } from "../config/paths";
+import { PLUGIN_NAME } from '../config/plugin-name';
 
 function parseJsonc(content: string): unknown {
   // More robust JSONC parsing:

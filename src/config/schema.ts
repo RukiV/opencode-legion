@@ -79,9 +79,9 @@ export const AriseConfigSchema = z.object({
     .optional(),
 });
 
-export type AriseConfig = z.infer<typeof AriseConfigSchema>;
+export type IAriseConfig = z.infer<typeof AriseConfigSchema>;
 
-export const DEFAULT_CONFIG: AriseConfig = {
+export const DEFAULT_CONFIG: IAriseConfig = {
   show_banner: true,
   banner_every_session: false,
   disabled_shadows: [],
@@ -109,7 +109,7 @@ export const DEFAULT_CONFIG: AriseConfig = {
  * @param agentName - agent 名稱（可選）
  * @returns 輪詢間隔（毫秒）
  */
-export function getPollInterval(config: AriseConfig, agentName?: ShadowName): number {
+export function getPollInterval(config: IAriseConfig, agentName?: ShadowName): number {
   // 優先檢查 agent 特定的 poll_interval
   if (agentName && config.agents?.[agentName]?.poll_interval !== undefined) {
     return config.agents[agentName].poll_interval!;
@@ -132,7 +132,7 @@ export function getPollInterval(config: AriseConfig, agentName?: ShadowName): nu
  * @param agentName - agent 名稱（可選）
  * @returns 重試延遲遞增量（毫秒）
  */
-export function getRetryDelayIncrement(config: AriseConfig, agentName?: ShadowName): number {
+export function getRetryDelayIncrement(config: IAriseConfig, agentName?: ShadowName): number {
   if (agentName && config.agents?.[agentName]?.retry_delay_increment !== undefined) {
     return config.agents[agentName].retry_delay_increment!;
   }
@@ -150,7 +150,7 @@ export function getRetryDelayIncrement(config: AriseConfig, agentName?: ShadowNa
  * @param agentName - agent 名稱（可選）
  * @returns 重試延遲最大值（毫秒）
  */
-export function getRetryDelayMax(config: AriseConfig, agentName?: ShadowName): number {
+export function getRetryDelayMax(config: IAriseConfig, agentName?: ShadowName): number {
   if (agentName && config.agents?.[agentName]?.retry_delay_max !== undefined) {
     return config.agents[agentName].retry_delay_max!;
   }
