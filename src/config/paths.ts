@@ -6,7 +6,7 @@
  * Centralized management of all config file path related logic
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync, pathExistsSync as existsSync } from "fs-extra";
 import { homedir } from "os";
 import { resolve } from "path";
 
@@ -64,31 +64,6 @@ export function getAriseConfigPath(): string {
 }
 
 /**
- * 取得 Arise 配置檔案搜尋路徑列表
- * Get Arise config file search path list
- *
- * 依序為：
- * 1. 工作目錄下的 .opencode/ 目錄
- * 2. 使用者配置目錄 (~/.config/opencode/)
- *
- * @param worktree - 工作目錄路徑，若為空則只返回全局配置路徑
- * @returns {string[]} 配置檔案搜尋路徑列表（順序：由局部到全局）
- */
-export function getAriseConfigPaths(worktree?: string): string[] {
-	const globalPath = resolve(getOpencodeConfigDir(), CONFIG_FILENAME);
-
-	if (!worktree) {
-		return [globalPath];
-	}
-
-	const localPath = resolve(worktree, ".opencode", CONFIG_FILENAME);
-
-	// 返回順序：先局部（local），後全局（global）
-	// 載入時需要反序（先全局，後局部）
-	return [localPath, globalPath];
-}
-
-/**
  * 查詢 OpenCode 配置檔案路徑
  * Find OpenCode config file path
  *
@@ -123,6 +98,75 @@ export function hasOpencodeConfig(): boolean {
 export function hasAriseConfig(worktree?: string): boolean {
 	const paths = getAriseConfigPaths(worktree);
 	return paths.some((path) => existsSync(path));
+}
+
+/**
+ * Arise 配置路徑核心資訊
+ * Arise config path core information
+ */
+export interface IAriseConfigPathsCore {
+	global: {
+		path: string;
+		exists: boolean;
+	};
+	worktree: {
+		path: string;
+		exists: boolean;
+	} | null;
+}
+
+/**
+ * 取得 Arise 配置路徑核心資訊
+ * Get Arise config paths core information
+ *
+ * Returns path and existence status for both global and worktree configs.
+ * When worktree is not provided, worktree will be null.
+ *
+ * @param worktree - 可選的工作目錄路徑
+ * @returns {IAriseConfigPathsCore} 包含路徑和存在狀態的物件
+ */
+export function _getAriseConfigPathsCore(worktree?: string): IAriseConfigPathsCore {
+	const globalPath = resolve(getOpencodeConfigDir(), CONFIG_FILENAME);
+
+	const result: IAriseConfigPathsCore = {
+		global: {
+			path: globalPath,
+			exists: existsSync(globalPath),
+		},
+		worktree: null,
+	};
+
+	if (worktree) {
+		const localPath = resolve(worktree, ".opencode", CONFIG_FILENAME);
+		result.worktree = {
+			path: localPath,
+			exists: existsSync(localPath),
+		};
+	}
+
+	return result;
+}
+
+/**
+ * 取得 Arise 配置檔案搜尋路徑列表
+ * Get Arise config file search path list
+ *
+ * 依序為：
+ * 1. 工作目錄下的 .opencode/ 目錄
+ * 2. 使用者配置目錄 (~/.config/opencode/)
+ *
+ * @param worktree - 工作目錄路徑，若為空則只返回全局配置路徑
+ * @returns {string[]} 配置檔案搜尋路徑列表（順序：由局部到全局）
+ */
+export function getAriseConfigPaths(worktree?: string): string[] {
+	const core = _getAriseConfigPathsCore(worktree);
+
+	// 返回順序：先局部（worktree），後全局
+	if (core.worktree) {
+		return [core.worktree.path, core.global.path];
+	}
+
+	return [core.global.path];
 }
 
 /**

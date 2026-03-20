@@ -40,9 +40,25 @@ export function parseModelString(
     return undefined;
   }
 
-  const [providerID, modelID] = model.split("/");
+  let [providerID, modelID, ...rest] = model.split("/");
   if (!providerID || !modelID) {
     return undefined;
+  }
+
+  if (rest.length)
+  {
+    for (let n of rest)
+    {
+      if (n?.length)
+      {
+        modelID += '/' + n;
+      }
+      else
+      {
+        // Double slash (//) or trailing slash (/xxx/) produces empty string in split
+        throw new RangeError(`Invalid model string "${model}": empty segment detected (consecutive slashes or leading/trailing slash)`);
+      }
+    }
   }
 
   return { providerID, modelID };
