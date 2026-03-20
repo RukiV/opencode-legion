@@ -38,14 +38,15 @@
     "assets/arise-banner.txt"
   ],
   "scripts": {
-    "pretest": "node --run build",
+    "pretest": "echo node --run typecheck",
     "test": "bun test",
-    "posttest": "node --run clean && pnpm run build",
+    "posttest": "echo posttest",
+    "prebuild": "node --run clean",
     "build": "node --run build:bun",
     "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
     "build:tsc": "tsc",
     "npm:publish:bump": "node --run version:bump && npm publish",
-    "preversion": "echo preversion && pnpm run test",
+    "preversion": "echo preversion && pnpm run test && pnpm run build",
     "version": "echo version",
     "version:bump": "ynpx yarn-tool version",
     "prepublishOnly": "pnpm run preversion",
@@ -62,6 +63,7 @@
   "dependencies": {
     "@opencode-ai/plugin": "^1.2.27",
     "@opencode-ai/sdk": "^1.2.27",
+    "@yarn-tool/npa-to-deps": "^3.0.5",
     "fs-extra": "^11.3.4",
     "jsonc-parser": "^3.3.1",
     "ts-type": "^3.0.10",

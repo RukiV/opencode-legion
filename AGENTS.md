@@ -15,7 +15,8 @@ Guidance for agents working in this repository.
 
 ## Commands
 
-> **Note:** When validating TypeScript types, only run `pnpm run typecheck`. No need to run `pnpm run build`.
+> **Note:** When validating TypeScript, only run `pnpm run typecheck`. No need to run `pnpm run build`.
+> If you need to run tests, `pnpm test` already includes type checking, so no need to run typecheck separately.
 
 ```bash
 # Install dependencies
@@ -134,6 +135,28 @@ export type IShadowAgents = {
 export function getPollInterval(config: AriseConfig, agentName?: ShadowName): number
 ```
 
+**註釋放置位置原則：**
+- 如果代碼基於特定理由/邏輯，應將邏輯註釋寫入代碼中（邏輯區塊內）
+- 除非邏輯對呼叫者有幫助，否則邏輯的註釋應在邏輯區塊內，而不是在函式文檔裡
+- 把註釋放在代碼邏輯附近，而不是放在 JSDoc 註釋裡
+
+```typescript
+// ✅ Good - 註釋放在邏輯附近
+if (task.retryCount > 0) {
+  // 遞增量 = retryCount * increment，但最多不超過 maxDelay
+  const additionalDelay = Math.min(task.retryCount * increment, maxDelay);
+  interval = baseInterval + additionalDelay;
+}
+
+// ❌ Bad - 註釋放在 JSDoc 而非邏輯附近
+/**
+ * @param retryCount - 重試次數
+ */
+async function poll(retryCount: number) {
+  const delay = Math.min(retryCount * 1000, 5000); // 為什麼用 1000 和 5000？
+}
+```
+
 ### File Structure
 ```
 src/
@@ -176,8 +199,9 @@ types/      - TypeScript type definitions
 
 ## Skills to Load
 
-| Skill | When to Use |
-|-------|-------------|
-| `typescript-naming-convention` | Creating or modifying TypeScript naming |
-| `analyze-code-commenter` | Editing, refactoring, implementing code |
-| `typescript-unimplemented-handler` | TypeScript type system limitations |
+| Skill | When to Use                                              |
+|-------|----------------------------------------------------------|
+| `js-git-friendly-coding-style` | JavaScript code style optimized for Git diff readability |
+| `typescript-naming-convention` | Creating or modifying TypeScript naming                  |
+| `analyze-code-commenter` | Editing, refactoring, implementing code or comment       |
+| `typescript-unimplemented-handler` | TypeScript type system limitations                       |

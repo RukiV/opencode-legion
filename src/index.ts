@@ -1,7 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { AriseConfigSchema, DEFAULT_CONFIG, type IAriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
-import { getAriseConfigPaths } from "./config/paths";
+import { type IAriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import {
@@ -18,60 +18,11 @@ import {
   createBackgroundStatusTool,
   createBackgroundCancelTool,
 } from "./tools";
-import { FakeBun as Bun } from './utils/bun-shim';
 import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/opencode';
 import { EnumAriseTools, IAriseTools } from './tools/tool-names';
 import { createPluginTools } from './tools/plugin-tools';
 
 type JsonObject = Record<string, unknown>;
-
-const CONFIG_FILENAME = "opencode-arise.json";
-
-async function loadAriseConfig(ctx: PluginInput): Promise<IAriseConfig> {
-  const paths = getAriseConfigPaths(ctx.worktree);
-
-  let merged: JsonObject = { ...DEFAULT_CONFIG };
-
-  for (const path of paths.reverse()) {
-    try {
-      const file = Bun.file(path);
-      if (await file.exists()) {
-        const content = await file.text();
-        const parsed = JSON.parse(content);
-        merged = deepMerge(merged, parsed);
-      }
-    } catch {
-      // Config file doesn't exist or is invalid, continue
-    }
-  }
-
-  const result = AriseConfigSchema.safeParse(merged);
-  if (!result.success) {
-    console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
-    return DEFAULT_CONFIG;
-  }
-
-  return result.data;
-}
-
-function deepMerge(base: JsonObject, override: JsonObject): JsonObject {
-  const result: JsonObject = { ...base };
-  for (const [key, value] of Object.entries(override)) {
-    if (
-      typeof value === "object" &&
-      value !== null &&
-      !Array.isArray(value) &&
-      typeof result[key] === "object" &&
-      result[key] !== null &&
-      !Array.isArray(result[key])
-    ) {
-      result[key] = deepMerge(result[key] as JsonObject, value as JsonObject);
-    } else {
-      result[key] = value;
-    }
-  }
-  return result;
-}
 
 function isHookEnabled(config: IAriseConfig, hookName: HookName): boolean {
   return !(config.disabled_hooks ?? []).includes(hookName);
