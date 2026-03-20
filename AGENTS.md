@@ -187,6 +187,11 @@ src/
      2. `~/.config/opencode/opencode-arise.json`
    - Validated with Zod schema
 
+4. **Do NOT create re-exports**
+   - Unless explicitly requested by the user
+   - Avoid adding barrel exports (e.g., `export * from './module'`)
+   - Import directly from the source module when needed
+
 ## Architecture
 
 ```
