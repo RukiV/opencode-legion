@@ -7,43 +7,162 @@ Guidance for agents working in this repository.
 | Property | Value |
 |----------|-------|
 | **Type** | OpenCode plugin (orchestrator harness with Solo Leveling orchestrator theme) |
-| **Runtime** | `tsx` for .ts files |
+| **Runtime** | Bun |
 | **Language** | TypeScript (strict mode) |
 | **Package Manager** | pnpm |
-
-## Agents Rules/Skills
-
-Load these rules/skills based on context:
-
-| Name | When to Use |
-|-------|-------------|
-| `typescript-naming-convention` | Creating or modifying TypeScript naming |
-| `analyze-code-commenter` | Editing, refactoring, implementing code or comments |
+| **Testing** | Bun |
+| **Type Safety** | Zod validation |
 
 ## Commands
 
+> **Note:** When validating TypeScript types, only run `pnpm run typecheck`. No need to run `pnpm run build`.
+
 ```bash
+# Install dependencies
+pnpm install
+
 # Type check TypeScript (validation only, no build output)
 pnpm run typecheck
 
 # Build (outputs to dist/)
 pnpm run build
+
+# Run all tests
+pnpm run test
+
+# Run a single test file
+pnpm test -- <test-file-path>
+# Example: pnpm test -- src/index.test.ts
+
+# Run tests matching a pattern
+pnpm test -- --testNamePattern="Shadow Agents"
+pnpm test -- -t "has all expected"
+
+# Clean build output
+pnpm run clean
+
+# Full publish workflow
+pnpm run prepublishOnly
 ```
 
-> **Note:** When validating TypeScript types, only run `pnpm run typecheck`. No need to run `pnpm run build`.
+## Code Style Guidelines
 
-## Plugin Rules
+### TypeScript Configuration
+- **Strict mode enabled** - all strict flags are on
+- **Target**: ES2022
+- **Module**: ESNext with bundler resolution
+- **Always use explicit types** for function parameters and return types
+- **Use `import type`** for type-only imports to improve build performance
 
-1. **MUST export only `default`** - `src/index.ts` must export ONLY the default async function (OpenCode calls all exports as plugin functions)
-2. **Use FakeBun APIs** - Config loading uses `FakeBun.file()`
+### Imports
+```typescript
+// ✅ Good - grouped by external, internal, relative
+import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
+import type { Event } from "@opencode-ai/sdk";
+import { AriseConfigSchema, DEFAULT_CONFIG } from "./config/schema";
+import { getAriseConfigPaths } from "./config/paths";
+import { cacheSessionModel } from "./config/model-cache";
 
-## Configuration
+// ✅ Good - local relative imports
+import { FakeBun as Bun } from './utils/bun-shim';
+import type { ShadowName } from "../config/schema";
 
-- **Config file**: `opencode-arise.json`
-- **Search paths** (local takes precedence):
-  1. `./.opencode/opencode-arise.json`
-  2. `~/.config/opencode/opencode-arise.json`
-- **Validation**: Zod schema with `AriseConfigSchema.safeParse()`
+// ❌ Avoid - mixing type and value imports
+import { type PluginInput, someFunction } from "package";
+```
+
+### Naming Conventions
+| Type | Convention | Example |
+|------|------------|---------|
+| Variables/Functions | camelCase | `getPollInterval`, `backgroundManager` |
+| Types/Classes/Enums | PascalCase | `AriseConfig`, `EnumOpencodeAgentMode` |
+| Constants | SCREAMING_SNAKE_CASE | `DEFAULT_POLL_INTERVAL` |
+| Config properties | snake_case | `poll_interval`, `retry_delay_max` |
+| Enum values | lowercase | `PRIMARY = "primary"`, `DENY = "deny"` |
+
+### Error Handling
+```typescript
+// ✅ Good - empty catch for expected non-critical errors
+try {
+  await ctx.client.tui.showToast({ ... });
+} catch {
+  // TUI might not be available (non-interactive mode)
+}
+
+// ✅ Good - capture error message safely
+.catch((err) => {
+  task.error = err instanceof Error ? err.message : String(err);
+});
+
+// ✅ Good - use safeParse for validation
+const result = AriseConfigSchema.safeParse(merged);
+if (!result.success) {
+  console.warn("[opencode-arise] Invalid config:", result.error.message);
+  return DEFAULT_CONFIG;
+}
+```
+
+### Type Definitions
+```typescript
+// ✅ Good - use Zod for runtime validation
+export const ShadowName = z.enum(["monarch", "beru", "igris"]);
+export type ShadowName = z.infer<typeof ShadowName>;
+
+// ✅ Good - use interfaces for data structures
+export interface BackgroundTask {
+  id: string;
+  status: "running" | "completed" | "error";
+  error?: string;
+}
+
+// ✅ Good - use type for computed/mapped types
+export type IShadowAgents = {
+  [P in IAllShadowAgentsName]-?: IShadowAgent<P>;
+};
+```
+
+### Comments (Bilingual)
+```typescript
+/**
+ * 取得輪詢間隔的輔助函式
+ * Helper function to get polling interval
+ *
+ * @param config - AriseConfig 物件
+ * @param agentName - agent 名稱（可選）
+ * @returns 輪詢間隔（毫秒）
+ */
+export function getPollInterval(config: AriseConfig, agentName?: ShadowName): number
+```
+
+### File Structure
+```
+src/
+├── agents/        # Shadow agent definitions
+├── config/        # Schema and path utilities
+├── hooks/          # Lifecycle hooks
+├── tools/         # Custom tools
+├── types/          # TypeScript type definitions
+├── utils/          # Utility functions
+├── index.ts        # Main entry (MUST export default only)
+└── *.test.ts       # Test files (co-located with source)
+```
+
+## Plugin Rules (CRITICAL)
+
+1. **MUST export ONLY `default`** from `src/index.ts`
+   - OpenCode calls ALL exports as plugin functions
+   - Type exports are fine: `export type { AriseConfig }`
+   - Never export non-type values besides default
+
+2. **Use FakeBun APIs** for file operations
+   - Config loading uses `FakeBun.file()` not native fs
+   - This ensures compatibility with OpenCode's sandboxed environment
+
+3. **Configuration file**: `opencode-arise.json`
+   - Search paths (local takes precedence):
+     1. `./.opencode/opencode-arise.json`
+     2. `~/.config/opencode/opencode-arise.json`
+   - Validated with Zod schema
 
 ## Architecture
 
@@ -52,4 +171,13 @@ agents/     - Shadow agents (monarch, beru, igris, bellion, tusk, tank, shadow-s
 hooks/      - Lifecycle hooks (arise-banner, output-shaper, compaction-preserver, todo-enforcer)
 tools/      - Custom tools (call-arise-agent, background tasks)
 config/     - Schema and path utilities
+types/      - TypeScript type definitions
 ```
+
+## Skills to Load
+
+| Skill | When to Use |
+|-------|-------------|
+| `typescript-naming-convention` | Creating or modifying TypeScript naming |
+| `analyze-code-commenter` | Editing, refactoring, implementing code |
+| `typescript-unimplemented-handler` | TypeScript type system limitations |
