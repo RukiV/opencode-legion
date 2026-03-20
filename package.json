@@ -2,34 +2,6 @@
   "name": "@bluelovers/opencode-arise",
   "version": "0.1.8",
   "description": "Solo Leveling themed orchestrator harness for OpenCode - Arise, Shadow Army!",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "opencode-arise": "dist/cli/index.js"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "scripts": {
-    "bin:self": "bun src/cli/index",
-    "bin:self:js": "bun dist/cli/index.js",
-    "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
-    "build:tsc": "tsc",
-    "build": "node --run build:bun",
-    "pretest": "node --run build",
-    "test": "bun test",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly",
-    "clean": "ynpx rimraf -rf dist",
-    "prepublishOnly": "node --run clean && node --run build"
-  },
-  "files": [
-    "dist",
-    "assets/arise-banner.txt"
-  ],
   "keywords": [
     "opencode",
     "plugin",
@@ -39,16 +11,54 @@
     "solo-leveling",
     "arise"
   ],
-  "author": "moinulmoin",
-  "license": "MIT",
+  "homepage": "https://github.com/moinulmoin/opencode-arise#readme",
+  "bugs": {
+    "url": "https://github.com/moinulmoin/opencode-arise/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/moinulmoin/opencode-arise.git"
   },
-  "bugs": {
-    "url": "https://github.com/moinulmoin/opencode-arise/issues"
+  "license": "MIT",
+  "author": "moinulmoin",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "homepage": "https://github.com/moinulmoin/opencode-arise#readme",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "opencode-arise": "dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "assets/arise-banner.txt"
+  ],
+  "scripts": {
+    "pretest": "node --run build",
+    "test": "bun test",
+    "posttest": "node --run clean && pnpm run build",
+    "build": "node --run build:bun",
+    "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
+    "build:tsc": "tsc",
+    "npm:publish:bump": "node --run version:bump && npm publish",
+    "preversion": "echo preversion && pnpm run test",
+    "version": "echo version",
+    "version:bump": "ynpx yarn-tool version",
+    "prepublishOnly": "pnpm run preversion",
+    "postpublish": "node --run postpublish:changelog && node --run postpublish:git:commit && node --run postpublish:git:tag && node --run postpublish:git:push",
+    "postpublish:changelog": "ynpx --quiet @yarn-tool/changelog && git add ./CHANGELOG.md",
+    "postpublish:git:commit": "git add ./test/__file_snapshots__ & git commit -m \"chore(release): publish\" . & echo postpublish:git:commit",
+    "postpublish:git:push": "git push --follow-tags",
+    "postpublish:git:tag": "ynpx --quiet @yarn-tool/tag",
+    "bin:self": "bun src/cli/index",
+    "bin:self:js": "bun dist/cli/index.js",
+    "clean": "ynpx rimraf -rf dist",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly"
+  },
   "dependencies": {
     "@opencode-ai/plugin": "^1.2.27",
     "@opencode-ai/sdk": "^1.2.27",
