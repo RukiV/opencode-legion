@@ -60,7 +60,7 @@ Use run_in_background=false when you need the result immediately.`,
 
     args: {
       shadow: z
-        .enum(ALLOWED_SHADOWS as ITSToStringLiteral<EnumShadowSubAgentsName>[])
+        .enum(ALLOWED_SHADOWS)
         .describe("Which shadow to summon"),
       prompt: z
         .string()
@@ -87,7 +87,7 @@ Returns a task_id immediately. Use arise_background_output to get results later.
 
     args: {
       shadow: z
-        .enum(BACKGROUND_SHADOWS as any as ITSToStringLiteral<IBackgroundShadowAgentsName>[])
+        .enum(BACKGROUND_SHADOWS)
         .describe("Which shadow to run in background"),
       prompt: z
         .string()
