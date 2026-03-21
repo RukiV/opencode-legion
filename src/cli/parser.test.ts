@@ -1,75 +1,8 @@
+/// <reference types="bun" />
+/// <reference types="bun-types" />
+import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 
-// Extract the parseJsonc function for testing
-function parseJsonc(content: string): unknown {
-  let result = "";
-  let inString = false;
-  let inSingleLineComment = false;
-  let inMultiLineComment = false;
-  let i = 0;
-
-  while (i < content.length) {
-    const char = content[i];
-    const nextChar = content[i + 1];
-
-    if (inSingleLineComment) {
-      if (char === "\n") {
-        inSingleLineComment = false;
-        result += char;
-      }
-      i++;
-      continue;
-    }
-
-    if (inMultiLineComment) {
-      if (char === "*" && nextChar === "/") {
-        inMultiLineComment = false;
-        i += 2;
-        continue;
-      }
-      i++;
-      continue;
-    }
-
-    if (inString) {
-      result += char;
-      if (char === "\\") {
-        result += nextChar ?? "";
-        i += 2;
-        continue;
-      }
-      if (char === '"') {
-        inString = false;
-      }
-      i++;
-      continue;
-    }
-
-    if (char === '"') {
-      inString = true;
-      result += char;
-      i++;
-      continue;
-    }
-
-    if (char === "/" && nextChar === "/") {
-      inSingleLineComment = true;
-      i += 2;
-      continue;
-    }
-
-    if (char === "/" && nextChar === "*") {
-      inMultiLineComment = true;
-      i += 2;
-      continue;
-    }
-
-    result += char;
-    i++;
-  }
-
-  result = result.replace(/,(\s*[}\]])/g, "$1");
-  return JSON.parse(result);
-}
+import { parseJsonc } from "../config/io";
 
 describe("parseJsonc", () => {
   it("parses plain JSON", () => {
@@ -86,7 +19,7 @@ describe("parseJsonc", () => {
 
   it("strips multi-line comments", () => {
     const result = parseJsonc(`{
-      /* this is a 
+      /* this is a
          multi-line comment */
       "foo": "bar"
     }`);
