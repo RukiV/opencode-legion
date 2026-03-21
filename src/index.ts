@@ -5,6 +5,7 @@ import { IAllShadowAgentsName } from "./agents/shadow-names";
 import { EnumHookName } from "./config/hook-names";
 import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
+import { extractTextFromMessageParts, getErrorMessage } from "./utils/message";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import {
   createAriseBannerHook,
@@ -261,10 +262,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
                * Extract text content from message parts
                */
               const recentMessages = messages.data.slice(-5).map((m) => {
-                const textContent = m.parts
-                  ?.filter((p) => p.type === "text")
-                  .map((p) => (p as { type: "text"; text: string }).text ?? "")
-                  .join("\n") ?? "";
+                const textContent = extractTextFromMessageParts(m.parts);
                 return { content: textContent };
               });
 
@@ -281,8 +279,14 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
                 });
               }
             }
-          } catch {
-            // 忽略 TODO 強制執行中的錯誤 / Ignore errors in todo enforcement
+          } catch (error) {
+            ctx.client.app.log?.({
+              body: {
+                service: "arise",
+                level: "warn",
+                message: `TODO enforcement failed: ${getErrorMessage(error)}`,
+              },
+            });
           }
         }
       }

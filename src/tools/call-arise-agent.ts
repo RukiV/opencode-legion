@@ -7,6 +7,7 @@ import { ITSToStringLiteral } from 'ts-type';
 import { z } from 'zod';
 import { tool2 } from '../types/opencode';
 import { resolveModelContext } from '../utils/model-resolver';
+import { extractTextFromMessageParts, getErrorMessage } from '../utils/message';
 
 /**
  * 建立呼叫 Arise Agent 的工具
@@ -89,7 +90,15 @@ export function createCallAriseAgentTool(ctx: PluginInput) {
               model: modelBody,
               parts: [{ type: "text", text: prompt }],
             },
-          }).catch(() => {});
+          }).catch((error) => {
+            ctx.client.app.log?.({
+              body: {
+                service: "arise",
+                level: "error",
+                message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
+              },
+            });
+          });
 
           return `[arise] Summoned ${shadow} in background.
 Task: ${taskDesc}
@@ -137,10 +146,7 @@ The shadow is working. Continue with your work.`;
              * 支援多個 text parts，使用換行連接
              * Supports multiple text parts, joined with newlines
              */
-            const textParts = lastAssistant.parts
-              ?.filter((p) => p.type === "text")
-              .map((p) => (p as { type: "text"; text: string }).text ?? "")
-              .join("\n");
+            const textParts = extractTextFromMessageParts(lastAssistant.parts);
 
             return `[arise] ${shadow} reports:
 
@@ -157,7 +163,7 @@ ${textParts || "(No text response)"}`;
          * 安全地取得錯誤訊息
          * Safely extract error message
          */
-        const message = error instanceof Error ? error.message : String(error);
+        const message = getErrorMessage(error);
         return `[arise] Failed to summon ${shadow}: ${message}`;
       }
     },

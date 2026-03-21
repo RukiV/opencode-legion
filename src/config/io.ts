@@ -6,7 +6,7 @@
  * Centralized management of file read/write operations for opencode-arise.json and opencode.json
  */
 
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs-extra";
 import { npaToDepsValue } from "@yarn-tool/npa-to-deps";
 
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "./plugin-name";

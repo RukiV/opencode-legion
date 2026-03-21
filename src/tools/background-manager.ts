@@ -1,7 +1,8 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import type { ShadowName } from "../config/schema";
 import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
+import { IAllShadowAgentsName } from "../agents/shadow-names";
+import { getErrorMessage } from "../utils/message";
 
 /**
  * 將配置值正規化為 getter 函式
@@ -22,9 +23,9 @@ import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DEL
  * @returns 正規化後的 getter 函式
  */
 function _normalizeToGetter(
-	value: number | ((agentName?: ShadowName) => number) | undefined,
+	value: number | ((agentName?: IAllShadowAgentsName) => number) | undefined,
 	defaultValue: number
-): (agentName?: ShadowName) => number {
+): (agentName?: IAllShadowAgentsName) => number {
 	if (typeof value === "function") {
 		return value;
 	}
@@ -83,11 +84,11 @@ export class BackgroundManager {
   /** 預設輪詢間隔 / Default polling interval */
   private defaultPollInterval: number;
   /** 輪詢間隔取得器（可選，支援 per-agent 設定）/ Polling interval getter (optional, supports per-agent settings) */
-  private getPollInterval?: (agentName?: ShadowName) => number;
+  private getPollInterval?: (agentName?: IAllShadowAgentsName) => number;
   /** 重試延遲遞增量取得器 / Retry delay increment getter */
-  private getRetryDelayIncrement?: (agentName?: ShadowName) => number;
+  private getRetryDelayIncrement?: (agentName?: IAllShadowAgentsName) => number;
   /** 重試延遲最大值取得器 / Max retry delay getter */
-  private getRetryDelayMax?: (agentName?: ShadowName) => number;
+  private getRetryDelayMax?: (agentName?: IAllShadowAgentsName) => number;
 
   /**
    * 建構函式
@@ -100,9 +101,9 @@ export class BackgroundManager {
    */
   constructor(
     ctx: PluginInput,
-    pollIntervalOrGetter: number | ((agentName?: ShadowName) => number) = DEFAULT_POLL_INTERVAL,
-    retryDelayIncrementOrGetter?: number | ((agentName?: ShadowName) => number),
-    retryDelayMaxOrGetter?: number | ((agentName?: ShadowName) => number)
+    pollIntervalOrGetter: number | ((agentName?: IAllShadowAgentsName) => number) = DEFAULT_POLL_INTERVAL,
+    retryDelayIncrementOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
+    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number)
   ) {
     this.ctx = ctx;
 
@@ -222,10 +223,10 @@ export class BackgroundManager {
           parts: [{ type: "text", text: opts.prompt }],
         },
       })
-      .then(() => this.schedulePolling(taskId, opts.shadow as ShadowName))
+      .then(() => this.schedulePolling(taskId, opts.shadow as IAllShadowAgentsName))
       .catch((err) => {
         task.status = "error";
-        task.error = err instanceof Error ? err.message : String(err);
+        task.error = getErrorMessage(err);
         task.completedAt = Date.now();
       });
 
@@ -242,7 +243,7 @@ export class BackgroundManager {
    * @param taskId - 任務 ID
    * @param agentName - Shadow 名稱
    */
-  private schedulePolling(taskId: string, agentName?: ShadowName): void {
+  private schedulePolling(taskId: string, agentName?: IAllShadowAgentsName): void {
     const task = this.tasks.get(taskId);
     if (!task) return;
 
@@ -327,7 +328,7 @@ export class BackgroundManager {
          */
         else if (status.type === "busy" || status.type === "retry") {
           task.retryCount++;
-          this.schedulePolling(taskId, task.shadow as ShadowName);
+          this.schedulePolling(taskId, task.shadow as IAllShadowAgentsName);
         }
       } else {
         /**
@@ -344,7 +345,7 @@ export class BackgroundManager {
       }
     } catch (err) {
       task.status = "error";
-      task.error = err instanceof Error ? err.message : String(err);
+      task.error = getErrorMessage(err);
       task.completedAt = Date.now();
     }
   }
@@ -467,8 +468,14 @@ export class BackgroundManager {
 
     try {
       await this.ctx.client.session.abort({ path: { id: task.sessionId } });
-    } catch {
-      // Ignore abort errors
+    } catch (error) {
+      this.ctx.client.app.log?.({
+        body: {
+          service: "arise",
+          level: "warn",
+          message: `Failed to abort session ${task.sessionId}: ${getErrorMessage(error)}`,
+        },
+      });
     }
 
     task.status = "error";

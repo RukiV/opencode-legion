@@ -4,6 +4,7 @@ import type { BackgroundManager } from "./background-manager";
 import type { ShadowName } from "../config/schema";
 import { EnumAriseTools, ARISE_TOOLS } from "./tool-names";
 import { IPluginToolAriseArgs, IReturnTypeOfPluginTool, IReturnTypeOfPluginToolArise, tool2 } from '../types/opencode';
+import { getErrorMessage, formatDuration } from "../utils/message";
 
 /**
  * 建立背景任務工具
@@ -38,7 +39,7 @@ Description: ${description}
 
 Use arise_background_output("${task.id}") when you need the result.`;
       } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
+        const msg = getErrorMessage(error);
         return `[arise] Failed to launch background task: ${msg}`;
       }
     },
@@ -67,14 +68,12 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
         return `[arise] Task not found: ${args.task_id}`;
       }
 
-      /** 計算任務執行時長 / Calculate task execution duration */
-      const duration = task.completedAt
-        ? Math.round((task.completedAt - task.startedAt) / 1000)
-        : Math.round((Date.now() - task.startedAt) / 1000);
+      /** 格式化任務執行時長 / Format task execution duration */
+      const duration = formatDuration(task.startedAt, task.completedAt);
 
       /** 任務仍在執行中 / Task still running */
       if (task.status === "running") {
-        return `[arise] Task still running (${duration}s). Check again later.`;
+        return `[arise] Task still running (${duration}). Check again later.`;
       }
 
       /** 任務執行失敗 / Task execution failed */
@@ -83,7 +82,7 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
       }
 
       /** 任務成功完成 / Task completed successfully */
-      return `[arise] ${task.shadow} completed (${duration}s):
+      return `[arise] ${task.shadow} completed (${duration}):
 
 ${task.result ?? "(No output)"}`;
     },
@@ -120,11 +119,9 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
 
       /** 格式化任務列表 / Format task list */
       const lines = tasks.map((t) => {
-        const duration = t.completedAt
-          ? Math.round((t.completedAt - t.startedAt) / 1000)
-          : Math.round((Date.now() - t.startedAt) / 1000);
+        const duration = formatDuration(t.startedAt, t.completedAt);
 
-        return `- ${t.id}: ${t.shadow} | ${t.status} | ${t.description} (${duration}s)`;
+        return `- ${t.id}: ${t.shadow} | ${t.status} | ${t.description} (${duration})`;
       });
 
       return `[arise] Background tasks:\n${lines.join("\n")}`;

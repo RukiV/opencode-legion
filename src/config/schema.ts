@@ -62,6 +62,8 @@ export const AgentOverride = z.object({
   retry_delay_increment: z.number().optional(),
   /** 重試延遲最大值（毫秒，可選）/ Max retry delay in ms (optional) */
   retry_delay_max: z.number().optional(),
+  /** 系統提示補充（可選）/ System prompt supplement (optional) */
+  system_prompt_addon: z.string().optional(),
 });
 
 /**
@@ -113,6 +115,15 @@ export const AriseConfigSchema = z.object({
       retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX),
     })
     .optional(),
+  /** 除錯設定（可選）/ Debug settings (optional) */
+  debug: z
+    .object({
+      /** 是否啟用除錯模式（預設 false）/ Enable debug mode (default false) */
+      enabled: z.boolean().default(false),
+      /** 日誌級別（預設 warn）/ Log level (default warn) */
+      level: z.enum(["error", "warn", "info", "debug"]).default("warn"),
+    })
+    .optional(),
 });
 
 /** Arise 配置類型 / Arise configuration type */
@@ -149,6 +160,11 @@ export const DEFAULT_CONFIG: IAriseConfig = {
     poll_interval: DEFAULT_POLL_INTERVAL,
     retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
     retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
+  },
+  /** 除錯設定 / Debug settings */
+  debug: {
+    enabled: false,
+    level: "warn",
   },
 };
 
