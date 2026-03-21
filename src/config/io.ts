@@ -24,15 +24,29 @@ type JsonObject = Record<string, unknown>;
  * 深度合併兩個物件
  * Deep merge two objects
  *
- * @param base - 基礎物件
- * @param override - 覆蓋物件
+ * 遞迴地合併巢狀物件，陣列會被直接替換而非合併
+ * Recursively merges nested objects; arrays are replaced instead of merged
+ *
+ * @param base - 基礎物件（被合併的物件）
+ * @param override - 覆蓋物件（優先使用的值）
  * @returns 合併後的物件
  */
 export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
 {
+	/** 複製基礎物件以避免修改原始資料 / Copy base object to avoid mutating original */
 	const result: JsonObject = { ...base };
+
+	/** 遍歷覆蓋物件的所有鍵值 / Iterate through all key-value pairs in override */
 	for (const [key, value] of Object.entries(override))
 	{
+		/**
+		 * 檢查是否需要遞迴合併
+		 * Check if recursive merge is needed
+		 *
+		 * 條件：
+		 * 1. value 是物件（不是 null，不是陣列）
+		 * 2. result[key] 也是物件（不是 null，不是陣列）
+		 */
 		if (
 			typeof value === "object" &&
 			value !== null &&
@@ -42,10 +56,21 @@ export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
 			!Array.isArray(result[key])
 		)
 		{
+			/**
+			 * 遞迴合併巢狀物件
+			 * Recursively merge nested objects
+			 */
 			result[key] = deepMerge(result[key] as JsonObject, value as JsonObject);
 		}
 		else
 		{
+			/**
+			 * 直接覆蓋值（包含陣列）
+			 * Direct override (including arrays)
+			 *
+			 * 陣列會被整個替換，不進行元素級別的合併
+			 * Arrays are replaced entirely, no element-level merging
+			 */
 			result[key] = value;
 		}
 	}
@@ -59,7 +84,17 @@ export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
  * 支援：
  * - 單行註解 (//)
  * - 多行註解 (/* * /)
- * - 結尾逗號
+ * - 結尾逗號（自動移除）
+ *
+ * 使用狀態機逐字元解析，維護三個狀態標誌：
+ * 1. inString - 目前是否在字串內部
+ * 2. inSingleLineComment - 目前是否在單行註解內
+ * 3. inMultiLineComment - 目前是否在多行註解內
+ *
+ * Uses state machine to parse character by character, maintaining three state flags:
+ * 1. inString - currently inside a string
+ * 2. inSingleLineComment - currently inside a single-line comment
+ * 3. inMultiLineComment - currently inside a multi-line comment
  *
  * @param content - JSONC 內容
  * @returns 解析後的物件
@@ -72,15 +107,30 @@ export function parseJsonc(content: string): unknown
 	let inMultiLineComment = false;
 	let i = 0;
 
+	/**
+	 * 主解析迴圈
+	 * Main parsing loop
+	 *
+	 * 逐字元處理，根據狀態標誌決定如何處理每個字元
+	 * Process each character one by one, deciding how to handle based on state flags
+	 */
 	while (i < content.length)
 	{
 		const char = content[i];
 		const nextChar = content[i + 1];
 
+		/**
+		 * 狀態 1: 單行註解內
+		 * State 1: Inside single-line comment
+		 *
+		 * 跳過所有字元直到遇到換行符
+		 * Skip all characters until newline is encountered
+		 */
 		if (inSingleLineComment)
 		{
 			if (char === "\n")
 			{
+				/** 換行結束單行註解 / Newline ends single-line comment */
 				inSingleLineComment = false;
 				result += char;
 			}
@@ -88,10 +138,18 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/**
+		 * 狀態 2: 多行註解內
+		 * State 2: Inside multi-line comment
+		 *
+		 * 跳過所有字元直到遇到 *+
+		 * Skip all characters until *+
+		 */
 		if (inMultiLineComment)
 		{
 			if (char === "*" && nextChar === "/")
 			{
+				/** 找到 *+ 結束多行註解 / Found *+ to end multi-line comment */
 				inMultiLineComment = false;
 				i += 2;
 				continue;
@@ -100,15 +158,32 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/**
+		 * 狀態 3: 字串內部
+		 * State 3: Inside string
+		 *
+		 * 保留所有字元（包含註解符號），處理轉義序列
+		 * Keep all characters (including comment markers), handle escape sequences
+		 */
 		if (inString)
 		{
 			result += char;
+
+			/**
+			 * 處理轉義序列（如 \"、\\）
+			 * Handle escape sequences (like \", \\)
+			 *
+			 * 轉義時需要將下一個字元一起加入結果
+			 * When escaping, need to include the next character in result
+			 */
 			if (char === "\\")
 			{
 				result += nextChar ?? "";
 				i += 2;
 				continue;
 			}
+
+			/** 雙引號結束字串 / Closing quote ends string */
 			if (char === '"')
 			{
 				inString = false;
@@ -117,6 +192,7 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/** 雙引號開始字串 / Opening quote starts string */
 		if (char === '"')
 		{
 			inString = true;
@@ -125,6 +201,7 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/** 單行註解開始 / Start of single-line comment */
 		if (char === "/" && nextChar === "/")
 		{
 			inSingleLineComment = true;
@@ -132,6 +209,7 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/** 多行註解開始 / Start of multi-line comment */
 		if (char === "/" && nextChar === "*")
 		{
 			inMultiLineComment = true;
@@ -139,12 +217,26 @@ export function parseJsonc(content: string): unknown
 			continue;
 		}
 
+		/** 普通字元，直接保留 / Regular character, keep it */
 		result += char;
 		i++;
 	}
 
+	/**
+	 * 移除結尾逗號
+	 * Remove trailing commas
+	 *
+	 * 正規表達式說明：
+	 * /,(\s*[}\]])/g 匹配逗號後跟空白（可選）再跟 } 或 ]
+	 * Replacement "$1" 只保留 } 或 ]
+	 *
+	 * Regex explanation:
+	 * /,(\s*[}\]])/g matches comma followed by optional whitespace then } or ]
+	 * Replacement "$1" keeps only } or ]
+	 */
 	result = result.replace(/,(\s*[}\]])/g, "$1");
 
+	/** 使用標準 JSON.parse 完成解析 / Use standard JSON.parse to complete parsing */
 	return JSON.parse(result);
 }
 
@@ -218,6 +310,9 @@ export interface IPluginRegistrationResult
  * - npaToDepsValue('@bluelovers/opencode-arise').name => '@bluelovers/opencode-arise'
  * - npaToDepsValue('opencode-arise').name => 'opencode-arise'
  *
+ * 這確保即使是攜帶版本號的插件名稱也能正確匹配
+ * This ensures plugin names with version numbers can be matched correctly
+ *
  * @param name1 - 原始插件名稱（可包含版本或其他修飾符）
  * @param name2 - 比對目標插件名稱
  * @returns 名稱是否匹配
@@ -226,10 +321,24 @@ export function isPluginNameMatch(name1: string, name2: string): boolean
 {
 	try
 	{
+		/**
+		 * 嘗試正規化並比對
+		 * Try to normalize and compare
+		 *
+		 * 成功時比較正規化後的名稱
+		 * Compare normalized names on success
+		 */
 		return npaToDepsValue(name1).name === name2;
 	}
 	catch
 	{
+		/**
+		 * 正規化失敗時使用簡單字串比對
+		 * Fall back to simple string comparison on normalization failure
+		 *
+		 * 這發生在輸入不是有效的 npm 套件名稱時
+		 * This happens when input is not a valid npm package name
+		 */
 		return name1 === name2;
 	}
 }
@@ -257,18 +366,55 @@ export function isPluginNameMatch(name1: string, name2: string): boolean
  * // 取得實際匹配的插件名稱 / Get actual matched plugin names:
  * const matchedNames = result[PLUGIN_NAME]; // string[] | undefined
  */
+/**
+ * 檢查 config.plugin 是否包含指定插件
+ * Check if config.plugin contains the specified plugin(s)
+ *
+ * 使用 O(n*m) 演算法逐一比對插件清單與目標名稱
+ * Uses O(n*m) algorithm to compare plugin list with target names one by one
+ *
+ * @param pluginList - config.plugin 陣列
+ * @param pluginNames - 插件名稱（支援 string 或 string[]）
+ * @returns 以插件名稱為 key 的結果物件，值為 undefined | string[]
+ *
+ * @example
+ * // 返回值為 undefined | string[]
+ * // undefined = 未註冊，string[] = 已註冊（包含實際匹配的插件名）
+ * const result = hasPlugin(pluginList, PLUGIN_NAME);
+ *
+ * // 推薦的驗證方式 / Recommended validation:
+ * if (result[PLUGIN_NAME]?.length) {
+ *   // 插件已註冊
+ * }
+ *
+ * // 取得實際匹配的插件名稱 / Get actual matched plugin names:
+ * const matchedNames = result[PLUGIN_NAME]; // string[] | undefined
+ */
 export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeReadonly<NoInfer<T> | string>, pluginNames: ITSValueOrArrayMaybeReadonly<T>): IReturnHasPlugin<T>
 {
+	/**
+	 * 將 pluginNames 轉換為 Set 以最佳化查詢
+	 * Convert pluginNames to Set for optimized lookup
+	 */
 	const names = new Set(Array.isArray(pluginNames) ? pluginNames : [pluginNames]) as Set<T>;
 	const result: IReturnHasPlugin<T> = {} as any;
 
+	/**
+	 * 雙層迴圈比對插件
+	 * Double loop to match plugins
+	 *
+	 * 外層：遍歷插件清單
+	 * 內層：遍歷目標名稱
+	 */
 	for (const plugin of pluginList)
 	{
 		for (const name of names)
 		{
 			if (isPluginNameMatch(plugin, name))
 			{
+				/** 初始化陣列（使用 ??= 避免覆蓋已存在的匹配）/ Initialize array (using ??= to avoid overwriting existing matches) */
 				result[name] ??= [];
+				/** 記錄實際匹配的插件名稱（可能包含版本號）/ Record actual matched plugin name (may include version) */
 				result[name].push(plugin);
 			}
 		}
@@ -282,6 +428,15 @@ export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeRead
  * Check plugin registration status (including legacy plugin detection)
  *
  * 使用 hasPlugin 一次性查詢 PLUGIN_NAME 和 LEGACY_PLUGIN_NAME
+ * Uses hasPlugin to query PLUGIN_NAME and LEGACY_PLUGIN_NAME in one call
+ *
+ * 舊版插件偵測邏輯：
+ * - 如果一個插件同時匹配新舊名稱，則視為新版
+ * - 只有只匹配舊版名稱的插件才被視為舊版插件
+ *
+ * Legacy plugin detection logic:
+ * - If a plugin matches both new and legacy names, it's considered new
+ * - Only plugins that only match the legacy name are considered legacy plugins
  *
  * @param configPath - OpenCode 配置檔案路徑
  * @returns 註冊結果，包含 success、isRegistered、hasLegacyPlugin、legacyPluginNames
@@ -320,18 +475,27 @@ export function checkPluginRegistration(configPath: string): IPluginRegistration
 	 * 過濾出真正的舊版插件名稱
 	 * Filter to get only legacy plugin names
 	 *
-	 * 從 LEGACY_PLUGIN_NAME 結果中排除與 PLUGIN_NAME 匹配的項目
-	 * 例如：'opencode-arise' 可能同時匹配舊版和新版名稱
-	 * Exclude items matching PLUGIN_NAME from LEGACY_PLUGIN_NAME results
-	 * e.g., 'opencode-arise' may match both legacy and new names
+	 * 從 LEGACY_PLUGIN_NAME 的結果中排除同時匹配 PLUGIN_NAME 的項目
+	 * Exclude items that also match PLUGIN_NAME from LEGACY_PLUGIN_NAME results
+	 *
+	 * 這是關鍵邏輯：
+	 * "@bluelovers/opencode-arise" 同時匹配 PLUGIN_NAME 和 LEGACY_PLUGIN_NAME（因為包含 opencode-arise）
+	 * 但只有當它是舊版格式時（如 "opencode-arise"）才被視為舊版插件
+	 *
+	 * This is the key logic:
+	 * "@bluelovers/opencode-arise" matches both PLUGIN_NAME and LEGACY_PLUGIN_NAME (because it contains opencode-arise)
+	 * But only when it's in legacy format (like "opencode-arise") is it considered a legacy plugin
 	 */
-	const legacyPluginNames = (LEGACY_PLUGIN_NAME !== PLUGIN_NAME as any) && checkResult[LEGACY_PLUGIN_NAME] || [];
+	const legacyPluginNames = checkResult[LEGACY_PLUGIN_NAME]?.filter(
+		(plugin) => !isPluginNameMatch(plugin, PLUGIN_NAME),
+	) ?? [];
+
+	const hasLegacyPlugin = legacyPluginNames.length > 0;
 
 	return {
 		success: true,
 		isRegistered,
-		/** 只有當找到真正的舊版插件名稱時才設為 true / Only true when actual legacy plugin names are found */
-		hasLegacyPlugin: legacyPluginNames.length > 0,
+		hasLegacyPlugin,
 		legacyPluginNames,
 	};
 }
@@ -388,12 +552,15 @@ export function loadAriseConfig(ctx: PluginInput)
 }
 
 /**
- * 使用 Bun.file() 載入 Arise 配置
- * Load Arise config using Bun.file()
+ * 使用 Bun.file() 載入 Arise 配置（非同步版本）
+ * Load Arise config using Bun.file() (async version)
  *
  * 依序搜尋以下路徑並深度合併：
  * 1. ~/.config/opencode/opencode-arise.json (全域)
  * 2. {worktree}/.opencode/opencode-arise.json (局部，優先)
+ *
+ * 使用路徑反轉確保局部設定優先於全域設定
+ * Uses path reversal to ensure local settings take precedence over global settings
  *
  * @param worktree - 工作目錄路徑
  * @returns 解析並驗證後的 AriseConfig
@@ -402,8 +569,16 @@ export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseCo
 {
 	const paths = getAriseConfigPaths(worktree);
 
+	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
 	let merged: JsonObject = { ...DEFAULT_CONFIG };
 
+	/**
+	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）
+	 * Reverse path order to ensure global settings are applied first, local settings override
+	 *
+	 * 例如：paths = [global, local]，reverse 後 = [local, global]
+	 * 合併時 local 會覆蓋 global 的同名設定
+	 */
 	for (const path of paths.reverse())
 	{
 		try
@@ -411,8 +586,10 @@ export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseCo
 			const file = Bun.file(path);
 			if (await file.exists())
 			{
+				/** 讀取並解析配置文件 / Read and parse config file */
 				const content = await file.text();
 				const parsed = JSON.parse(content);
+				/** 深度合併配置 / Deep merge configuration */
 				merged = deepMerge(merged, parsed);
 			}
 		}
@@ -422,9 +599,23 @@ export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseCo
 		}
 	}
 
+	/**
+	 * 使用 Zod schema 驗證合併後的配置
+	 * Validate merged configuration using Zod schema
+	 *
+	 * safeParse 不會拋出異常，只會返回 success/failure
+	 * safeParse doesn't throw, only returns success/failure
+	 */
 	const result = AriseConfigSchema.safeParse(merged);
 	if (!result.success)
 	{
+		/**
+		 * 配置驗證失敗時輸出警告並回退至預設值
+		 * Output warning and fallback to defaults on validation failure
+		 *
+		 * 這確保插件在配置錯誤時仍能正常運作
+		 * This ensures the plugin still works when config has errors
+		 */
 		console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
 		return DEFAULT_CONFIG;
 	}
@@ -433,8 +624,14 @@ export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseCo
 }
 
 /**
- * 使用 fs 同步讀取 Arise 配置
- * Load Arise config using fs (synchronous)
+ * 使用 fs 同步讀取 Arise 配置（同步版本）
+ * Load Arise config using fs (synchronous version)
+ *
+ * 與 loadAriseConfigByPath 功能相同，但使用同步 API
+ * Identical to loadAriseConfigByPath but uses synchronous API
+ *
+ * 適用於需要在同步上下文中載入配置的場景
+ * Useful for scenarios where config needs to be loaded in synchronous context
  *
  * @param worktree - 工作目錄路徑
  * @returns 解析並驗證後的 AriseConfig
@@ -443,16 +640,23 @@ export function loadAriseConfigSync(worktree?: string): IAriseConfig
 {
 	const paths = getAriseConfigPaths(worktree);
 
+	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
 	let merged: JsonObject = { ...DEFAULT_CONFIG };
 
+	/**
+	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）
+	 * Reverse path order to ensure global settings are applied first, local settings override
+	 */
 	for (const path of paths.reverse())
 	{
 		try
 		{
 			if (existsSync(path))
 			{
+				/** 使用 fs.readFileSync 同步讀取 / Use fs.readFileSync for synchronous reading */
 				const content = readFileSync(path, "utf-8");
 				const parsed = JSON.parse(content);
+				/** 深度合併配置 / Deep merge configuration */
 				merged = deepMerge(merged, parsed);
 			}
 		}
@@ -462,9 +666,14 @@ export function loadAriseConfigSync(worktree?: string): IAriseConfig
 		}
 	}
 
+	/**
+	 * 使用 Zod schema 驗證合併後的配置
+	 * Validate merged configuration using Zod schema
+	 */
 	const result = AriseConfigSchema.safeParse(merged);
 	if (!result.success)
 	{
+		/** 配置驗證失敗時輸出警告並回退至預設值 / Output warning and fallback to defaults on validation failure */
 		console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
 		return DEFAULT_CONFIG;
 	}

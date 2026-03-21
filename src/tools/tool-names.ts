@@ -14,7 +14,6 @@ import {
   createBackgroundStatusTool,
   createBackgroundTaskTool,
 } from './background-tools';
-import { IReturnTypeOfPluginToolArise } from '../types/opencode';
 
 /**
  * Arise Tools 列舉 (Enum)
@@ -151,6 +150,3 @@ ${ariseTools}
 - task: OpenCode's built-in for complex multi-step delegation`;
 }
 
-export type IAriseTools = {
-  [k in EnumAriseTools]: IReturnTypeOfPluginToolArise<k>;
-}

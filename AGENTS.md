@@ -262,3 +262,56 @@ types/      - TypeScript type definitions
 | `analyze-code-commenter` | Editing, refactoring, implementing code or comment       |
 | `typescript-unimplemented-handler` | TypeScript type system limitations                       |
 | `test-file-best-practices` | Creating, Editing, refactoring test                   |
+
+---
+
+## Comment Update Rules (防止註解更新錯誤)
+
+### 規則 1：保留原始錯誤資訊
+
+當程式碼包含錯誤碼、錯誤訊息等原始技術資訊時，**只添加翻譯，不刪除**。
+
+```typescript
+// ✅ 正確 - 保留原始錯誤碼和訊息
+/**
+ * 工具建立函式（避免 TypeScript 推導錯誤）
+ * Tool creation function (avoids TypeScript inference errors)
+ *
+ * > error TS2742: 原始錯誤訊息 (保留不刪)
+ */
+
+// ❌ 錯誤 - 刪除原始錯誤資訊
+/**
+ * 工具建立函式
+ * Tool creation function
+ */
+```
+
+### 規則 2：Issue 連結必須驗證相關性
+
+新增 Issue/文件連結前，必須確認內容確實相關。
+
+```
+新增條件：
+1. 已閱讀 Issue 內容
+2. 確認與程式碼問題有直接關聯
+3. 無法確認時 → 不新增，或標註「可能相關，未驗證」
+```
+
+### 規則 3：錯誤訊息的價值
+
+| 資訊類型 | 價值 |
+|----------|------|
+| 錯誤碼 (`TS2742`) | 可搜尋、可引用 |
+| 完整路徑 (`.pnpm/zod@4.1.8/...`) | 有助於定位問題 |
+| 錯誤描述 | 社群已知問題的驗證 |
+
+**這些都不應被視為「冗餘」而刪除。**
+
+### 規則 4：註解更新檢查清單
+
+每次更新他人註解前，確認：
+
+- [ ] 原始註解的技術資訊是否保留？（錯誤碼、版本號、檔案路徑等）
+- [ ] 新增的連結是否已驗證相關性？
+- [ ] 新增內容是否真的與原文相關？

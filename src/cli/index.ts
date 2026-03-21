@@ -1,5 +1,13 @@
 #!/usr/bin/env bun
 
+/**
+ * OpenCode Arise CLI 工具
+ * OpenCode Arise CLI tool
+ *
+ * 提供命令行介面用於安裝和維護 opencode-arise 插件
+ * Provides command line interface for installing and maintaining opencode-arise plugin
+ */
+
 import { existsSync } from "fs";
 import { getBanner } from "../hooks/arise-banner";
 import {
@@ -14,6 +22,13 @@ import {
 } from "../config/io";
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from '../config/plugin-name';
 
+/**
+ * 建立預設 Arise 配置的處理函式
+ * Handler for creating default Arise config
+ *
+ * 如果配置已存在則不會覆蓋
+ * Won't overwrite if config already exists
+ */
 function createDefaultAriseConfigHandler(): void {
 	const configPath = getAriseConfigPath();
 	const success = createDefaultAriseConfig(configPath);
@@ -25,6 +40,22 @@ function createDefaultAriseConfigHandler(): void {
 	}
 }
 
+/**
+ * 安裝命令
+ * Install command
+ *
+ * 執行完整的安裝流程：
+ * 1. 檢查 OpenCode 配置是否存在
+ * 2. 檢查並處理舊版插件
+ * 3. 註冊插件
+ * 4. 建立預設配置
+ *
+ * Performs full installation:
+ * 1. Check if OpenCode config exists
+ * 2. Check and handle legacy plugins
+ * 3. Register plugin
+ * 4. Create default config
+ */
 function install(): void {
 	console.log(getBanner());
 	console.log("\n🌑 Installing opencode-arise...\n");
@@ -50,6 +81,7 @@ function install(): void {
 	 */
 	const checkResult = checkPluginRegistration(configPath);
 
+	/** 顯示舊版插件警告 / Show legacy plugin warning */
 	if (checkResult.hasLegacyPlugin) {
 		console.log(`\n⚠️  Warning: Found legacy plugin name(s):`);
 		for (const legacyName of checkResult.legacyPluginNames) {
@@ -59,9 +91,11 @@ function install(): void {
 		console.log("");
 	}
 
+	/** 檢查是否已註冊 / Check if already registered */
 	if (checkResult.isRegistered) {
 		console.log(`✓ ${PLUGIN_NAME} is already registered`);
 	} else {
+		/** 註冊插件 / Register plugin */
 		const success = registerPlugin(configPath);
 		if (!success) {
 			console.error("✗ Failed to register plugin in config");
@@ -84,6 +118,22 @@ function install(): void {
 	console.log("");
 }
 
+/**
+ * 診斷命令
+ * Doctor command
+ *
+ * 檢查插件安裝狀態：
+ * 1. OpenCode 配置是否存在
+ * 2. 插件是否已註冊
+ * 3. 是否有舊版插件
+ * 4. Arise 配置是否存在
+ *
+ * Checks plugin installation status:
+ * 1. Whether OpenCode config exists
+ * 2. Whether plugin is registered
+ * 3. Whether there are legacy plugins
+ * 4. Whether Arise config exists
+ */
 function doctor(): void {
 	console.log("🔍 Checking opencode-arise installation...\n");
 
@@ -118,6 +168,7 @@ function doctor(): void {
 			console.log(`  Run: bunx opencode-arise install`);
 		}
 
+		/** 顯示舊版插件警告 / Show legacy plugin warning */
 		if (result.hasLegacyPlugin) {
 			console.log(`\n⚠️  Warning: Found legacy plugin name(s):`);
 			for (const legacyName of result.legacyPluginNames) {
@@ -137,6 +188,10 @@ function doctor(): void {
 	console.log("\n✅ Doctor check complete");
 }
 
+/**
+ * 顯示幫助訊息
+ * Show help message
+ */
 function showHelp(): void {
 	console.log(`
 ${getBanner()}
@@ -153,7 +208,13 @@ Examples:
 `);
 }
 
-// Main
+/**
+ * 主程式入口
+ * Main program entry
+ *
+ * 解析命令行參數並執行對應命令
+ * Parse command line arguments and execute corresponding command
+ */
 const args = process.argv.slice(2);
 const command = args[0];
 
@@ -170,6 +231,7 @@ switch (command) {
 		showHelp();
 		break;
 	default:
+		/** 未知命令顯示錯誤和幫助 / Unknown command shows error and help */
 		if (command) {
 			console.error(`Unknown command: ${command}`);
 		}
