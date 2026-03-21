@@ -1,51 +1,51 @@
 /// <reference types="bun" />
 /// <reference types="bun-types" />
-import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
+import { describe, expect, it } from "bun:test";
 
-import { parseJsonc } from "../config/io";
+import { createJsonHandler } from "../utils/jsonc";
 
-describe("parseJsonc", () => {
+describe("createJsonHandler", () => {
   it("parses plain JSON", () => {
-    const result = parseJsonc('{"foo": "bar"}');
-    expect(result).toEqual({ foo: "bar" });
+    const handler = createJsonHandler('{"foo": "bar"}');
+    expect(handler.valueOf()).toEqual({ foo: "bar" });
   });
 
   it("strips single-line comments", () => {
-    const result = parseJsonc(`{
+    const handler = createJsonHandler(`{
       "foo": "bar" // this is a comment
     }`);
-    expect(result).toEqual({ foo: "bar" });
+    expect(handler.valueOf()).toEqual({ foo: "bar" });
   });
 
   it("strips multi-line comments", () => {
-    const result = parseJsonc(`{
+    const handler = createJsonHandler(`{
       /* this is a
          multi-line comment */
       "foo": "bar"
     }`);
-    expect(result).toEqual({ foo: "bar" });
+    expect(handler.valueOf()).toEqual({ foo: "bar" });
   });
 
   it("removes trailing commas", () => {
-    const result = parseJsonc(`{
+    const handler = createJsonHandler(`{
       "foo": "bar",
       "baz": [1, 2, 3,],
     }`);
-    expect(result).toEqual({ foo: "bar", baz: [1, 2, 3] });
+    expect(handler.valueOf()).toEqual({ foo: "bar", baz: [1, 2, 3] });
   });
 
   it("preserves URLs with double slashes in strings", () => {
-    const result = parseJsonc(`{
+    const handler = createJsonHandler(`{
       "url": "https://example.com/path"
     }`);
-    expect(result).toEqual({ url: "https://example.com/path" });
+    expect(handler.valueOf()).toEqual({ url: "https://example.com/path" });
   });
 
   it("handles escaped quotes in strings", () => {
-    const result = parseJsonc(`{
+    const handler = createJsonHandler(`{
       "message": "He said \\"hello\\""
     }`);
-    expect(result).toEqual({ message: 'He said "hello"' });
+    expect(handler.valueOf()).toEqual({ message: 'He said "hello"' });
   });
 
   it("parses real opencode config", () => {
@@ -60,7 +60,8 @@ describe("parseJsonc", () => {
         "submit": "ctrl+enter",
       }
     }`;
-    const result = parseJsonc(config) as Record<string, unknown>;
+    const handler = createJsonHandler(config);
+    const result = handler.valueOf() as Record<string, unknown>;
     expect(result.theme).toBe("dark");
     expect(result.plugin).toEqual(["some-plugin"]);
   });

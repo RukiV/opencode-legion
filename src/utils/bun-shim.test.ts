@@ -137,6 +137,7 @@ describe("BunFile", () => {
 
 			const file = new BunFile(testPath);
 
+			// createJsonHandler throws on parse errors
 			await expect(file.json()).rejects.toThrow();
 		});
 	});

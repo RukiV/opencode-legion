@@ -6,12 +6,13 @@
  * Centralized management of all config file path related logic
  */
 
-import { mkdirSync, writeFileSync, pathExistsSync as existsSync } from "fs-extra";
+import { mkdirSync, writeFileSync, readFileSync, pathExistsSync as existsSync } from "fs-extra";
 import { homedir } from "os";
 import { resolve } from "path";
 
 import { SHADOW_AGENTS } from "../agents/shadows";
 import { type IAriseConfig } from "./schema";
+import { createJsonHandler } from "../utils/jsonc";
 
 /**
  * 取得使用者主目錄
@@ -200,12 +201,18 @@ export function getDefaultAriseConfig(): IAriseConfig {
  * 當配置檔案不存在時，会建立預設配置
  * Creates default config when config file does not exist
  *
+ * ⚠️ 設計說明：
+ * - 假設目標檔案已存在（或即將被建立）
+ * - 使用 JsonHandler 讀取現有內容，合併預設值後寫入
+ * - 這樣可以保留現有檔案的格式與註解
+ *
  * @param configPath - 自定義配置檔案路徑（可選，預設為全局配置路徑）
  * @returns {boolean} 是否成功建立配置檔案
  */
 export function createDefaultAriseConfig(configPath?: string): boolean {
 	const targetPath = configPath || getAriseConfigPath();
 
+	// 檔案已存在時，直接返回 false（不改變原有邏輯）
 	if (existsSync(targetPath)) {
 		return false;
 	}
@@ -217,7 +224,10 @@ export function createDefaultAriseConfig(configPath?: string): boolean {
 		if (!existsSync(configDir)) {
 			mkdirSync(configDir, { recursive: true });
 		}
-		writeFileSync(targetPath, JSON.stringify(defaultConfig, null, 2), "utf-8");
+		// 使用 JsonHandler 建立初始檔案
+		// 使用空物件作為起點，讓 JsonHandler 格式化輸出
+		const handler = createJsonHandler(JSON.stringify(defaultConfig, null, 2));
+		writeFileSync(targetPath, handler.stringify(), "utf-8");
 		return true;
 	} catch (err) {
 		console.error("✗ Failed to create config:", err);

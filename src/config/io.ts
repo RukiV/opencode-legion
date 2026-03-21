@@ -13,6 +13,7 @@ import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "./plugin-name";
 import { AriseConfigSchema, DEFAULT_CONFIG, type IAriseConfig } from "./schema";
 import { findOpencodeConfig, getAriseConfigPaths } from "./paths";
 import { FakeBun as Bun } from "../utils/bun-shim";
+import { createJsonHandler } from "../utils/jsonc";
 
 import type { PluginInput } from '@opencode-ai/plugin';
 import { ITSValueOrArrayMaybeReadonly } from 'ts-type';
@@ -81,165 +82,6 @@ export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
  * 解析 JSONC（帶註解的 JSON）
  * Parse JSONC (JSON with comments)
  *
- * 支援：
- * - 單行註解 (//)
- * - 多行註解 (/* * /)
- * - 結尾逗號（自動移除）
- *
- * 使用狀態機逐字元解析，維護三個狀態標誌：
- * 1. inString - 目前是否在字串內部
- * 2. inSingleLineComment - 目前是否在單行註解內
- * 3. inMultiLineComment - 目前是否在多行註解內
- *
- * Uses state machine to parse character by character, maintaining three state flags:
- * 1. inString - currently inside a string
- * 2. inSingleLineComment - currently inside a single-line comment
- * 3. inMultiLineComment - currently inside a multi-line comment
- *
- * @param content - JSONC 內容
- * @returns 解析後的物件
- */
-export function parseJsonc(content: string): unknown
-{
-	let result = "";
-	let inString = false;
-	let inSingleLineComment = false;
-	let inMultiLineComment = false;
-	let i = 0;
-
-	/**
-	 * 主解析迴圈
-	 * Main parsing loop
-	 *
-	 * 逐字元處理，根據狀態標誌決定如何處理每個字元
-	 * Process each character one by one, deciding how to handle based on state flags
-	 */
-	while (i < content.length)
-	{
-		const char = content[i];
-		const nextChar = content[i + 1];
-
-		/**
-		 * 狀態 1: 單行註解內
-		 * State 1: Inside single-line comment
-		 *
-		 * 跳過所有字元直到遇到換行符
-		 * Skip all characters until newline is encountered
-		 */
-		if (inSingleLineComment)
-		{
-			if (char === "\n")
-			{
-				/** 換行結束單行註解 / Newline ends single-line comment */
-				inSingleLineComment = false;
-				result += char;
-			}
-			i++;
-			continue;
-		}
-
-		/**
-		 * 狀態 2: 多行註解內
-		 * State 2: Inside multi-line comment
-		 *
-		 * 跳過所有字元直到遇到 *+
-		 * Skip all characters until *+
-		 */
-		if (inMultiLineComment)
-		{
-			if (char === "*" && nextChar === "/")
-			{
-				/** 找到 *+ 結束多行註解 / Found *+ to end multi-line comment */
-				inMultiLineComment = false;
-				i += 2;
-				continue;
-			}
-			i++;
-			continue;
-		}
-
-		/**
-		 * 狀態 3: 字串內部
-		 * State 3: Inside string
-		 *
-		 * 保留所有字元（包含註解符號），處理轉義序列
-		 * Keep all characters (including comment markers), handle escape sequences
-		 */
-		if (inString)
-		{
-			result += char;
-
-			/**
-			 * 處理轉義序列（如 \"、\\）
-			 * Handle escape sequences (like \", \\)
-			 *
-			 * 轉義時需要將下一個字元一起加入結果
-			 * When escaping, need to include the next character in result
-			 */
-			if (char === "\\")
-			{
-				result += nextChar ?? "";
-				i += 2;
-				continue;
-			}
-
-			/** 雙引號結束字串 / Closing quote ends string */
-			if (char === '"')
-			{
-				inString = false;
-			}
-			i++;
-			continue;
-		}
-
-		/** 雙引號開始字串 / Opening quote starts string */
-		if (char === '"')
-		{
-			inString = true;
-			result += char;
-			i++;
-			continue;
-		}
-
-		/** 單行註解開始 / Start of single-line comment */
-		if (char === "/" && nextChar === "/")
-		{
-			inSingleLineComment = true;
-			i += 2;
-			continue;
-		}
-
-		/** 多行註解開始 / Start of multi-line comment */
-		if (char === "/" && nextChar === "*")
-		{
-			inMultiLineComment = true;
-			i += 2;
-			continue;
-		}
-
-		/** 普通字元，直接保留 / Regular character, keep it */
-		result += char;
-		i++;
-	}
-
-	/**
-	 * 移除結尾逗號
-	 * Remove trailing commas
-	 *
-	 * 正規表達式說明：
-	 * /,(\s*[}\]])/g 匹配逗號後跟空白（可選）再跟 } 或 ]
-	 * Replacement "$1" 只保留 } 或 ]
-	 *
-	 * Regex explanation:
-	 * /,(\s*[}\]])/g matches comma followed by optional whitespace then } or ]
-	 * Replacement "$1" keeps only } or ]
-	 */
-	result = result.replace(/,(\s*[}\]])/g, "$1");
-
-	/** 使用標準 JSON.parse 完成解析 / Use standard JSON.parse to complete parsing */
-	return JSON.parse(result);
-}
-
 /**
  * 讀取 OpenCode 配置檔案
  * Read OpenCode config file
@@ -258,7 +100,9 @@ export function readOpencodeConfig(configPath?: string): JsonObject | null
 	try
 	{
 		const content = readFileSync(path, "utf-8");
-		return parseJsonc(content) as JsonObject;
+		// 使用 JsonHandler 解析，支援註解和尾隨逗號
+		const handler = createJsonHandler(content);
+		return handler.valueOf() as JsonObject;
 	}
 	catch
 	{
@@ -270,6 +114,9 @@ export function readOpencodeConfig(configPath?: string): JsonObject | null
  * 寫入 OpenCode 配置檔案
  * Write OpenCode config file
  *
+ * 使用 JsonHandler 讀取現有檔案，合併配置後寫入，保留格式與註解
+ * Uses JsonHandler to read existing file, merge config, then write - preserving formatting and comments
+ *
  * @param configPath - 配置檔案路徑
  * @param config - 要寫入的配置物件
  * @returns 是否成功寫入
@@ -278,7 +125,23 @@ export function writeOpencodeConfig(configPath: string, config: JsonObject): boo
 {
 	try
 	{
-		writeFileSync(configPath, JSON.stringify(config, null, 2), "utf-8");
+		// 讀取現有檔案內容（如果存在），否則使用空 JSON
+		// Read existing file content (if exists), otherwise use empty JSON
+		const existingContent = existsSync(configPath)
+			? readFileSync(configPath, "utf-8")
+			: "{}";
+
+		// 使用 JsonHandler 處理，保留格式與註解
+		// Use JsonHandler to preserve formatting and comments
+		const handler = createJsonHandler(existingContent);
+
+		// 設定配置值
+		// Set config values
+		for (const [key, value] of Object.entries(config)) {
+			handler.set([key], value);
+		}
+
+		writeFileSync(configPath, handler.stringify(), "utf-8");
 		return true;
 	}
 	catch
@@ -669,7 +532,9 @@ function _readAndMergeConfigsSync(paths: string[]): JsonObject
 			{
 				/** 使用 fs.readFileSync 同步讀取 / Use fs.readFileSync for synchronous reading */
 				const content = readFileSync(path, "utf-8");
-				const parsed = JSON.parse(content);
+				// 使用 JsonHandler 解析，支援註解和尾隨逗號
+				const handler = createJsonHandler(content);
+				const parsed = handler.valueOf() as JsonObject;
 				/** 深度合併配置 / Deep merge configuration */
 				merged = deepMerge(merged, parsed);
 			}
@@ -725,7 +590,9 @@ async function _readAndMergeConfigsAsync(paths: string[]): Promise<JsonObject>
 			{
 				/** 讀取並解析配置文件 / Read and parse config file */
 				const content = await file.text();
-				const parsed = JSON.parse(content);
+				// 使用 JsonHandler 解析，支援註解和尾隨逗號
+				const handler = createJsonHandler(content);
+				const parsed = handler.valueOf() as JsonObject;
 				/** 深度合併配置 / Deep merge configuration */
 				merged = deepMerge(merged, parsed);
 			}

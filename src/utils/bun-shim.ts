@@ -7,6 +7,7 @@
  */
 
 import { pathExists, readFile } from "fs-extra";
+import { createJsonHandler } from "./jsonc";
 
 /**
  * Bun 文件物件介面
@@ -142,14 +143,16 @@ export class BunFile implements IBunFile {
 	 * 讀取檔案內容為 JSON
 	 * Read file content as JSON
 	 *
-	 * 讀取檔案後自動解析為 JSON
-	 * Reads file and automatically parses as JSON
+	 * 讀取檔案後自動解析為 JSON（支援 JSONC）
+	 * Reads file and automatically parses as JSON (supports JSONC)
 	 *
 	 * @returns Promise<unknown> - 解析後的 JSON 物件
 	 */
 	async json(): Promise<unknown> {
 		const content = await this.text();
-		return JSON.parse(content);
+		// 使用 JsonHandler 解析，支援註解和尾隨逗號
+		const handler = createJsonHandler(content);
+		return handler.valueOf();
 	}
 
 	/**
