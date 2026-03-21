@@ -6,15 +6,18 @@
 
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { BunFile, FakeBun as Bun } from "./bun-shim";
-import { writeFileSync, unlinkSync, mkdirSync, rmdirSync } from "fs";
-import { resolve } from "path";
+import { writeFileSync, unlinkSync, rmdirSync, ensureDirSync } from "fs-extra";
+import { join, resolve } from "path";
+import { __TEST_TEMP } from "../../__root";
 
-const TEST_DIR = resolve(__dirname, "../../../test-temp");
+// ✅ 永遠在 __TEST_TEMP 下建立子資料夾
+// Always create subdirectory under __TEST_TEMP
+const TEST_DIR = join(__TEST_TEMP, "fake-bun");
 
 describe("BunFile", () => {
 	beforeEach(() => {
 		// Create temp directory
-		mkdirSync(TEST_DIR, { recursive: true });
+		ensureDirSync(TEST_DIR);
 	});
 
 	afterEach(() => {

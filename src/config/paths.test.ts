@@ -18,11 +18,14 @@ import {
 	getDefaultAriseConfig,
 	createDefaultAriseConfig,
 } from "./paths";
-import { existsSync, mkdirSync, writeFileSync, unlinkSync, rmdirSync } from "fs";
-import { resolve } from "path";
+import { existsSync, ensureDirSync, writeFileSync, unlinkSync, rmdirSync } from "fs-extra";
+import { join, resolve } from "path";
+import { __TEST_TEMP } from "../../__root";
 
-const TEST_DIR = resolve(__dirname, "../../../test-temp-paths");
-const TEST_WORKTREE = resolve(TEST_DIR, "project");
+// ✅ 永遠在 __TEST_TEMP 下建立子資料夾
+// Always create subdirectory under __TEST_TEMP
+const TEST_DIR = join(__TEST_TEMP, "temp-paths");
+const TEST_WORKTREE = join(TEST_DIR, "project");
 
 describe("CONFIG_FILENAME", () => {
 	test("is opencode-arise.json", () => {
@@ -195,7 +198,7 @@ describe("getDefaultAriseConfig", () => {
 
 describe("createDefaultAriseConfig", () => {
 	beforeEach(() => {
-		mkdirSync(TEST_DIR, { recursive: true });
+		ensureDirSync(TEST_DIR);
 	});
 
 	afterEach(() => {

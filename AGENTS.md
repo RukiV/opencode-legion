@@ -56,13 +56,46 @@ pnpm run prepublishOnly
   ```typescript
   // ✅ 簡短描述可使用雙語
   test("monarch is primary mode") { ... }
-  
+
   // ✅ 複雜描述使用英文
   test("should correctly handle nested configuration merging with environment overrides") { ... }
-  
+
   // ✅ 舊有測試保持原樣
   test("has all expected shadows") { ... }
   ```
+
+### 測試路徑管理 / Test Path Management
+
+使用 `__root.ts` 定義的路徑常數，**禁止使用 `../../../` 相對路徑**。
+
+```typescript
+import { __TEST_TEMP } from "../../__root";
+
+// ✅ 正確 - 永遠在 __TEST_TEMP 下建立子資料夾
+const TEST_DIR = join(__TEST_TEMP, "module-name");
+
+// ❌ 錯誤 - 直接操作 __TEST_TEMP 根目錄
+const TEST_DIR = __TEST_TEMP;
+
+// ❌ 錯誤 - 使用深層相對路徑
+const TEST_DIR = resolve(__dirname, "../../../test-temp");
+```
+
+**目錄結構：**
+```
+test/
+├── fixtures/                 ← 測試資料夾（唯讀），使用 __TEST_FIXTURES
+│   └── ...
+└── temp/                    ← 臨時檔案（可寫），使用 __TEST_TEMP
+    ├── fake-bun/            ← bun-shim.test.ts
+    ├── temp-paths/          ← paths.test.ts
+    └── ...                  ← 未來其他測試
+```
+
+**原則：**
+1. `__TEST_TEMP` 只作為父目錄，**永遠建立子資料夾**
+2. 子資料夾命名與測試模組名稱對應
+3. 每個測試模組使用獨立的子資料夾，隔離性更好
 
 ## Code Style Guidelines
 
@@ -220,11 +253,12 @@ config/     - Schema and path utilities
 types/      - TypeScript type definitions
 ```
 
-## Skills to Load
+## Skills/Rules to Load
 
-| Skill | When to Use                                              |
+| Skill/Rules | When to Use                                              |
 |-------|----------------------------------------------------------|
 | `js-git-friendly-coding-style` | JavaScript code style optimized for Git diff readability |
 | `typescript-naming-convention` | Creating or modifying TypeScript naming                  |
 | `analyze-code-commenter` | Editing, refactoring, implementing code or comment       |
 | `typescript-unimplemented-handler` | TypeScript type system limitations                       |
+| `test-file-best-practices` | Creating, Editing, refactoring test                   |
