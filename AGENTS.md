@@ -315,3 +315,98 @@ types/      - TypeScript type definitions
 - [ ] 原始註解的技術資訊是否保留？（錯誤碼、版本號、檔案路徑等）
 - [ ] 新增的連結是否已驗證相關性？
 - [ ] 新增內容是否真的與原文相關？
+
+### 規則 5：JSDoc 與邏輯區塊的職責分離（防止資訊冗餘）
+
+**核心原則：** JSDoc 描述「契約/意圖」，邏輯區塊描述「實作細節」，兩者不重複。
+
+| 位置 | 應包含 | 不應包含 |
+|------|--------|----------|
+| **JSDoc** | 函式用途、設計邏輯、為什麼這樣設計 | 具體如何實現、程式碼語法細節 |
+| **邏輯區塊** | 具體實作邏輯、技術細節（as any、運算子等） | 為什麼要這樣設計 |
+
+**錯誤示範（資訊冗餘）：**
+```typescript
+/**
+ * 處理資料（錯誤：將實作細節放在 JSDoc）
+ * Process data (wrong: implementation details in JSDoc)
+ *
+ * 使用短路運算實現：(condition && value) || default  ← ❌ 冗餘
+ */
+function process(result) {
+  // 短路運算：(condition && value) || default  ← ✅ 正確位置
+  return condition && value || [];
+}
+```
+
+**正確範例：**
+```typescript
+/**
+ * 從結果中取得舊版插件名稱
+ * Get legacy plugin names from result
+ *
+ * 邏輯說明：
+ * 1. 首先檢查 LEGACY_PLUGIN_NAME 是否與 PLUGIN_NAME 不同
+ * 2. 只有當兩者不同時，才有意義區分「舊版插件」
+ */
+function getLegacyPluginNamesFromResult(result) {
+  /**
+   * 條件判斷：確保新舊插件名稱確實不同
+   *
+   * 使用 `as any` 繞過 TypeScript 推導
+   *
+   * 短路運算實現：(condition && value) || default
+   * - 當 condition 為 true，回傳 value
+   * - 當 condition 為 false，回傳 []
+   */
+  return (LEGACY_PLUGIN_NAME !== PLUGIN_NAME as any) && result[LEGACY_PLUGIN_NAME] || [];
+}
+```
+
+**檢查清單：**
+- [ ] JSDoc 中是否包含「如何實現」的語法細節？（如短路運算、as any）
+- [ ] 邏輯區塊內的註解是否僅描述「實作」，而非重複「設計意圖」？
+- [ ] 同一份資訊是否只出現一次？
+
+### 規則 6：JSDoc 避免意思重複的描述
+
+不需要「標題 + 與標題相同意思的描述」，兩段意思相同的註解只保留一組完整的描述即可。
+
+**❌ 錯誤（意思重複）：**
+```typescript
+/**
+ * 處理資料
+ * Process data
+ *
+ * 此函數用於處理資料
+ * This function is used to process data
+ */
+```
+> 標題「處理資料」與描述「此函數用於處理資料」意思完全相同，屬於冗餘。
+
+**✅ 正確（選擇一組完整的描述）：**
+```typescript
+/**
+ * 此函數用於處理資料
+ * This function is used to process data
+ *
+ * 設計邏輯：...
+ */
+```
+
+**例外情況：**
+當 JSDoc 需要包含多個獨立說明區塊時，可以使用簡短標題：
+
+```typescript
+/**
+ * 工具函式集合
+ * Utility functions collection
+ *
+ * 錯誤處理工具：
+ * Error handling utilities:
+ * ...
+ *
+ * 資料轉換工具：
+ * Data transformation utilities:
+ * ...
+ */

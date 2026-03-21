@@ -20,7 +20,92 @@
 
 import { describe, expect, test } from "bun:test";
 import { PLUGIN_NAME, LEGACY_PLUGIN_NAME } from "./plugin-name";
-import { hasPlugin, isPluginNameMatch } from "./io";
+import { hasPlugin, isPluginNameMatch, getLegacyPluginNamesFromResult, isPluginRegisteredFromResult } from "./io";
+
+/**
+ * isPluginRegisteredFromResult 函數測試
+ * isPluginRegisteredFromResult function tests
+ *
+ * 測試從 hasPlugin 結果中判斷插件是否已註冊的邏輯
+ * Tests logic for checking if plugin is registered from hasPlugin result
+ */
+describe("isPluginRegisteredFromResult", () => {
+	test("已註冊時返回 true", () => {
+		const result = hasPlugin(["@bluelovers/opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+
+		/** 有匹配 PLUGIN_NAME 的插件 / Has plugins matching PLUGIN_NAME */
+		expect(isRegistered).toBe(true);
+	});
+
+	test("未註冊時返回 false", () => {
+		const result = hasPlugin([], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+
+		/** 無匹配 PLUGIN_NAME 的插件 / No plugins matching PLUGIN_NAME */
+		expect(isRegistered).toBe(false);
+	});
+
+	test("只有舊版插件時返回 false", () => {
+		const result = hasPlugin(["opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+
+		/** 舊版插件不視為已註冊新版 / Legacy plugins are not considered registered as new */
+		expect(isRegistered).toBe(false);
+	});
+});
+
+/**
+ * getLegacyPluginNamesFromResult 函數測試
+ * getLegacyPluginNamesFromResult function tests
+ *
+ * 測試從 hasPlugin 結果中取得舊版插件名稱的邏輯
+ * Tests logic for getting legacy plugin names from hasPlugin result
+ */
+describe("getLegacyPluginNamesFromResult", () => {
+	test("有舊版插件時返回陣列", () => {
+		/** 模擬 hasPlugin 返回的結果 / Mock hasPlugin result */
+		const result = hasPlugin(["opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const legacyNames = getLegacyPluginNamesFromResult(result);
+
+		/** 有匹配舊版名稱的插件 / Has plugins matching legacy name */
+		expect(legacyNames).toEqual(["opencode-arise"]);
+	});
+
+	test("只有新版插件時返回空陣列", () => {
+		const result = hasPlugin(["@bluelovers/opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const legacyNames = getLegacyPluginNamesFromResult(result);
+
+		/** Scoped package 只匹配新版，不在 legacy 名稱中 / Scoped package only matches new, not in legacy */
+		expect(legacyNames).toEqual([]);
+	});
+
+	test("同時有新舊插件時只返回舊版", () => {
+		const pluginList = ["opencode-arise", "@bluelovers/opencode-arise"];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const legacyNames = getLegacyPluginNamesFromResult(result);
+
+		/** 函數自動過濾，只返回真正的舊版插件 / Function auto-filters, returns only genuine legacy plugins */
+		expect(legacyNames).toEqual(["opencode-arise"]);
+	});
+
+	test("多個舊版插件時返回所有匹配", () => {
+		const pluginList = ["opencode-arise", "opencode-arise@1.0.0"];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const legacyNames = getLegacyPluginNamesFromResult(result);
+
+		/** 返回所有只匹配舊版名稱的插件 / Returns all plugins only matching legacy name */
+		expect(legacyNames).toEqual(["opencode-arise", "opencode-arise@1.0.0"]);
+	});
+
+	test("空結果時返回空陣列", () => {
+		const result = hasPlugin([], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+		const legacyNames = getLegacyPluginNamesFromResult(result);
+
+		/** 無任何插件時返回空陣列 / Returns empty array when no plugins */
+		expect(legacyNames).toEqual([]);
+	});
+});
 
 /**
  * isPluginNameMatch 函數測試
@@ -149,15 +234,14 @@ describe("hasPlugin", () => {
 describe("checkPluginRegistration 邏輯測試", () => {
 	test("無插件時 isRegistered 為 false", () => {
 		const result = hasPlugin([], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
-		/** 沒有 PLUGIN_NAME 匹配時，視為未註冊 / Not registered when no PLUGIN_NAME match */
-		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
 
 		expect(isRegistered).toBe(false);
 	});
 
 	test("有新版插件時 isRegistered 為 true", () => {
 		const result = hasPlugin(["@bluelovers/opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
-		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
 
 		expect(isRegistered).toBe(true);
 	});
@@ -165,44 +249,22 @@ describe("checkPluginRegistration 邏輯測試", () => {
 	test("舊版插件檢測邏輯 - 只有舊版名稱", () => {
 		const result = hasPlugin(["opencode-arise"], [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
-		/**
-		 * 過濾舊版插件列表（排除同時匹配新版的項目）
-		 * Filter legacy plugin list (exclude items that also match new version)
-		 *
-		 * 這是關鍵邏輯：
-		 * 只有"真正"的舊版插件才會被識別為 legacy
-		 * Only "genuine" legacy plugins are identified as legacy
-		 */
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(plugin) => !isPluginNameMatch(plugin, PLUGIN_NAME),
-		) ?? [];
+		/** 使用工具函數取得舊版插件名稱 / Use utility function to get legacy plugin names */
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
+		/** 只有舊版名稱時，legacyPluginNames 包含該插件 / Only legacy name exists, legacyPluginNames contains it */
 		expect(legacyPluginNames.length).toBeGreaterThan(0);
 		expect(legacyPluginNames).toEqual(["opencode-arise"]);
 	});
 
-	test("舊版插件檢測邏輯 - 有新版時舊版列表為空", () => {
+	test("舊版插件檢測邏輯 - 有新舊插件同時存在", () => {
 		const pluginList = ["opencode-arise", "@bluelovers/opencode-arise"];
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
-		/**
-		 * 過濾舊版插件列表
-		 * Filter legacy plugin list
-		 *
-		 * 邏輯說明：
-		 * - "opencode-arise" 匹配 LEGACY_PLUGIN_NAME
-		 * - "@bluelovers/opencode-arise" 同時匹配 PLUGIN_NAME 和 LEGACY_PLUGIN_NAME
-		 * - 過濾後，"opencode-arise" 被保留因為它不匹配 PLUGIN_NAME
-		 *
-		 * Logic:
-		 * - "opencode-arise" matches LEGACY_PLUGIN_NAME
-		 * - "@bluelovers/opencode-arise" matches both PLUGIN_NAME and LEGACY_PLUGIN_NAME
-		 * - After filtering, "opencode-arise" is kept because it doesn't match PLUGIN_NAME
-		 */
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(plugin) => !isPluginNameMatch(plugin, PLUGIN_NAME),
-		) ?? [];
+		/** 使用工具函數取得舊版插件名稱 / Use utility function to get legacy plugin names */
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
+		/** "opencode-arise" 保留因為它只匹配舊版名稱 / "opencode-arise" is kept because it only matches legacy name */
 		expect(legacyPluginNames).toEqual(["opencode-arise"]);
 	});
 
@@ -210,11 +272,10 @@ describe("checkPluginRegistration 邏輯測試", () => {
 		const pluginList = ["@bluelovers/opencode-arise"];
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
-		/** Scoped package 匹配 PLUGIN_NAME，所以過濾後不存在於 legacyPluginNames / Scoped package matches PLUGIN_NAME, so not in legacyPluginNames after filtering */
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(plugin) => !isPluginNameMatch(plugin, PLUGIN_NAME),
-		) ?? [];
+		/** 使用工具函數取得舊版插件名稱 / Use utility function to get legacy plugin names */
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
+		/** Scoped package 匹配 PLUGIN_NAME，所以不在 legacy 名稱中 / Scoped package matches PLUGIN_NAME, so not in legacy names */
 		expect(legacyPluginNames.length).toBe(0);
 	});
 });
@@ -241,13 +302,65 @@ describe("整合場景測試", () => {
 		const pluginList: string[] = [];
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
-		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(p) => !isPluginNameMatch(p, PLUGIN_NAME),
-		) ?? [];
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
 		/** 未註冊，也沒有舊版插件 / Not registered, no legacy plugins */
 		expect(isRegistered).toBe(false);
+		expect(legacyPluginNames.length).toBe(0);
+	});
+
+	test("場景 2: 正確安裝 - 使用新版名稱", () => {
+		const pluginList = ["@bluelovers/opencode-arise"];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
+
+		/** 插件已註冊，沒有舊版插件 / Plugin registered, no legacy plugins */
+		expect(isRegistered).toBe(true);
+		expect(legacyPluginNames.length).toBe(0);
+	});
+
+	test("場景 3: 舊版插件檢測", () => {
+		const pluginList = ["opencode-arise"];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
+
+		/** 未註冊新版，但有舊版插件 / Not registered new, but has legacy plugin */
+		expect(isRegistered).toBe(false);
+		expect(legacyPluginNames.length).toBe(1);
+		expect(legacyPluginNames).toEqual(["opencode-arise"]);
+	});
+
+	test("場景 4: 同時使用新舊插件", () => {
+		const pluginList = ["opencode-arise", "@bluelovers/opencode-arise"];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
+
+		/** 新版已註冊，舊版仍然存在 / New version registered, legacy still present */
+		expect(isRegistered).toBe(true);
+		expect(legacyPluginNames.length).toBe(1);
+		expect(legacyPluginNames).toEqual(["opencode-arise"]);
+	});
+
+	test("場景 5: 其他插件共存", () => {
+		const pluginList = [
+			"other-plugin",
+			"@bluelovers/opencode-arise",
+			"another-plugin",
+		];
+		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+
+		const isRegistered = isPluginRegisteredFromResult(result, PLUGIN_NAME);
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
+
+		/** 插件已註冊，不影響其他插件 / Plugin registered, doesn't affect other plugins */
+		expect(isRegistered).toBe(true);
 		expect(legacyPluginNames.length).toBe(0);
 	});
 
@@ -263,9 +376,7 @@ describe("整合場景測試", () => {
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
 		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(p) => !isPluginNameMatch(p, PLUGIN_NAME),
-		) ?? [];
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
 		/** 插件已註冊，沒有舊版插件 / Plugin registered, no legacy plugins */
 		expect(isRegistered).toBe(true);
@@ -284,9 +395,7 @@ describe("整合場景測試", () => {
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
 		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(p) => !isPluginNameMatch(p, PLUGIN_NAME),
-		) ?? [];
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
 		/** 未註冊新版，但有舊版插件 / Not registered new, but has legacy plugin */
 		expect(isRegistered).toBe(false);
@@ -306,9 +415,7 @@ describe("整合場景測試", () => {
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
 		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(p) => !isPluginNameMatch(p, PLUGIN_NAME),
-		) ?? [];
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
 		/** 新版已註冊，舊版仍然存在 / New version registered, legacy still present */
 		expect(isRegistered).toBe(true);
@@ -332,9 +439,7 @@ describe("整合場景測試", () => {
 		const result = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
 		const isRegistered = result[PLUGIN_NAME]?.length! > 0;
-		const legacyPluginNames = result[LEGACY_PLUGIN_NAME]?.filter(
-			(p) => !isPluginNameMatch(p, PLUGIN_NAME),
-		) ?? [];
+		const legacyPluginNames = getLegacyPluginNamesFromResult(result);
 
 		/** 插件已註冊，不影響其他插件 / Plugin registered, doesn't affect other plugins */
 		expect(isRegistered).toBe(true);

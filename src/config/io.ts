@@ -424,6 +424,82 @@ export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeRead
 }
 
 /**
+ * 此函數從 hasPlugin 的返回結果判斷指定插件是否已註冊
+ * This function determines if specified plugin is registered from hasPlugin result
+ *
+ * 設計邏輯：
+ * hasPlugin 返回 { [pluginName]: string[] | undefined }
+ * - undefined = 未註冊
+ * - string[]（length > 0）= 已註冊
+ *
+ * Design logic:
+ * hasPlugin returns { [pluginName]: string[] | undefined }
+ * - undefined = not registered
+ * - string[] (length > 0) = registered
+ *
+ * @param result - hasPlugin 函數的返回結果
+ * @param pluginName - 要檢查的插件名稱
+ * @returns 是否已註冊
+ *
+ * @example
+ * const checkResult = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+ * const isRegistered = isPluginRegisteredFromResult(checkResult, PLUGIN_NAME);
+ */
+export function isPluginRegisteredFromResult<T extends string>(result: IReturnHasPlugin<any>, pluginName: T): result is {
+	[key in T]: string[];
+}
+{
+	/**
+	 * 安全取值：undefined?.length 為 undefined，?? 0 轉為 0
+	 * Safe access: undefined?.length is undefined, ?? 0 converts to 0
+	 *
+	 * 當 pluginName 有匹配時，length > 0，回傳 true
+	 * 當 pluginName 無匹配時，length 為 0，回傳 false
+	 */
+	return (result[pluginName]?.length ?? 0) > 0;
+}
+
+/**
+ * 此函數將 hasPlugin 的返回結果轉換為舊版插件名稱陣列
+ * This function converts hasPlugin result to legacy plugin names array
+ *
+ * 邏輯說明：
+ * 1. 首先檢查 LEGACY_PLUGIN_NAME 是否與 PLUGIN_NAME 不同
+ * 2. 只有當兩者不同時，才有意義區分「舊版插件」
+ * 3. 若兩者相同，表示不存在「舊版」的概念，應回傳空陣列
+ *
+ * Logic explanation:
+ * 1. First check if LEGACY_PLUGIN_NAME differs from PLUGIN_NAME
+ * 2. Only when they differ, does it make sense to distinguish "legacy plugins"
+ * 3. If they are the same, there is no "legacy" concept, return empty array
+ *
+ * @param result - hasPlugin 函數的返回結果
+ * @returns 舊版插件名稱陣列
+ *
+ * @example
+ * const checkResult = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
+ * const legacyNames = getLegacyPluginNamesFromResult(checkResult);
+ */
+export function getLegacyPluginNamesFromResult(result: IReturnHasPlugin<string>): string[]
+{
+	/**
+	 * 條件判斷：確保新舊插件名稱確實不同
+	 * Conditional check: ensure new and legacy plugin names are indeed different
+	 *
+	 * 若名稱相同，則不存在「舊版」概念，回傳空陣列
+	 * If names are the same, there is no "legacy" concept, return empty array
+	 *
+	 * 使用 `as any` 繞過 TypeScript 推導
+	 * 因為 TS 知道這兩個 const 永遠不同，但 runtime 可能會變化
+	 *
+	 * 短路運算：(condition && value) || default
+	 * - 當 condition 為 true，回傳 value（legacy 名稱陣列）
+	 * - 當 condition 為 false，回傳 []（預設值）
+	 */
+	return (LEGACY_PLUGIN_NAME !== PLUGIN_NAME as any) && result[LEGACY_PLUGIN_NAME] || [];
+}
+
+/**
  * 檢查插件註冊狀態（含舊版插件偵測）
  * Check plugin registration status (including legacy plugin detection)
  *
@@ -463,32 +539,11 @@ export function checkPluginRegistration(configPath: string): IPluginRegistration
 	/** 一次性檢查新舊插件名稱是否已註冊 / Check both new and legacy plugin names in one call */
 	const checkResult = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
 
-	/**
-	 * 從 hasPlugin 返回值判斷插件是否已註冊
-	 * null = 未註冊，string[] = 已註冊（包含實際使用的插件名）
-	 * Determine if plugin is registered from hasPlugin return value
-	 * null = not registered, string[] = registered (contains actual plugin names used)
-	 */
-	const isRegistered = checkResult[PLUGIN_NAME]?.length! > 0;
+	/** 使用工具函數判斷插件是否已註冊 / Use utility function to check if plugin is registered */
+	const isRegistered = isPluginRegisteredFromResult(checkResult, PLUGIN_NAME);
 
-	/**
-	 * 過濾出真正的舊版插件名稱
-	 * Filter to get only legacy plugin names
-	 *
-	 * 從 LEGACY_PLUGIN_NAME 的結果中排除同時匹配 PLUGIN_NAME 的項目
-	 * Exclude items that also match PLUGIN_NAME from LEGACY_PLUGIN_NAME results
-	 *
-	 * 這是關鍵邏輯：
-	 * "@bluelovers/opencode-arise" 同時匹配 PLUGIN_NAME 和 LEGACY_PLUGIN_NAME（因為包含 opencode-arise）
-	 * 但只有當它是舊版格式時（如 "opencode-arise"）才被視為舊版插件
-	 *
-	 * This is the key logic:
-	 * "@bluelovers/opencode-arise" matches both PLUGIN_NAME and LEGACY_PLUGIN_NAME (because it contains opencode-arise)
-	 * But only when it's in legacy format (like "opencode-arise") is it considered a legacy plugin
-	 */
-	const legacyPluginNames = checkResult[LEGACY_PLUGIN_NAME]?.filter(
-		(plugin) => !isPluginNameMatch(plugin, PLUGIN_NAME),
-	) ?? [];
+	/** 使用工具函數取得舊版插件名稱 / Use utility function to get legacy plugin names */
+	const legacyPluginNames = getLegacyPluginNamesFromResult(checkResult);
 
 	const hasLegacyPlugin = legacyPluginNames.length > 0;
 
