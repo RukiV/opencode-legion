@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { ALL_SHADOW_AGENTS_NAME } from "../agents/shadow-names";
+import { ALL_SHADOW_AGENTS_NAME, IAllShadowAgentsName } from "../agents/shadow-names";
 import { ALLOWED_HOOKS, EnumHookName } from "./hook-names";
+import { IValueNotPartial } from "../types/types";
 
 /**
  * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
@@ -30,14 +31,15 @@ export const DEFAULT_RETRY_DELAY_INCREMENT = 5000;
 export const DEFAULT_RETRY_DELAY_MAX = 60000;
 
 /**
- * 陰影代理名稱列舉
- * Shadow agent name enumeration
+ * Shadow 代理名稱 Zod Schema
+ * Shadow agent name Zod schema
  *
  * 定義所有可用的 Shadow 代理名稱
  * Defines all available Shadow agent names
+ *
+ * @see IAllShadowAgentsName
  */
 export const ShadowName = z.enum(ALL_SHADOW_AGENTS_NAME);
-export type ShadowName = z.infer<typeof ShadowName>;
 
 /**
  * 定義所有可用的生命週期 Hook
@@ -151,6 +153,24 @@ export const DEFAULT_CONFIG: IAriseConfig = {
 };
 
 /**
+ * 配置獲取值型別
+ * Config getter value type
+ *
+ * 邏輯意圖：
+ * 1. 支援從 background 全域設定或 agent 特定設定中讀取值
+ * 2. 巢狀 IValueNotPartial 確保：
+ *    - 外層：最終結果不為 null/undefined
+ *    - 內層：OR 運算前的兩個來源都已排除空值
+ * 3. 使用 keyof 限制只能存取有效的背景設定鍵
+ *
+ * 型別推導過程：
+ * - T 限制為 IAriseConfig["background"] 的鍵（不含 undefined）
+ * - A 為代理名稱，預設為所有代理
+ * - 回傳值 = background[T] | agents[A][T]，兩者皆已排除空值
+ */
+export type ILazyConfigGetterValue<T extends keyof IValueNotPartial<IAriseConfig["background"]>, A extends IAllShadowAgentsName = IAllShadowAgentsName> = IValueNotPartial<IValueNotPartial<IAriseConfig["background"]>[T] | IValueNotPartial<IAriseConfig["agents"]>[IValueNotPartial<A>][T]>;
+
+/**
  * 建立配置 getter 函式的工廠函式
  * Factory function to create config getter functions
  *
@@ -164,11 +184,12 @@ export const DEFAULT_CONFIG: IAriseConfig = {
  * @param defaultValue - 預設值
  * @returns 讀取配置的 getter 函式
  */
-function _createConfigGetter(
-	configKey: "poll_interval" | "retry_delay_increment" | "retry_delay_max",
-	defaultValue: number
-): (config: IAriseConfig, agentName?: ShadowName) => number {
-	return (config: IAriseConfig, agentName?: ShadowName): number =>
+export function _createConfigGetter<T extends keyof Exclude<IAriseConfig["background"], undefined>>(
+	configKey: T,
+	defaultValue: ILazyConfigGetterValue<NoInfer<T>, IAllShadowAgentsName>
+)
+{
+	return <A extends IAllShadowAgentsName = IAllShadowAgentsName>(config: IAriseConfig, agentName?: A): ILazyConfigGetterValue<NoInfer<T>, NoInfer<A>> =>
 	{
 		/**
 		 * 優先檢查 agent 特定的設定
@@ -179,7 +200,7 @@ function _createConfigGetter(
 		 */
 		if (agentName && (config.agents as any)?.[agentName]?.[configKey] !== undefined)
 		{
-			return (config.agents as any)[agentName]![configKey] as number;
+			return (config.agents as any)[agentName]![configKey];
 		}
 
 		/**
@@ -191,7 +212,7 @@ function _createConfigGetter(
 		 */
 		if ((config.background as any)?.[configKey] !== undefined)
 		{
-			return (config.background as any)[configKey] as number;
+			return (config.background as any)[configKey];
 		}
 
 		/**

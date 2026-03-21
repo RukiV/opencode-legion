@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { type IAriseConfig, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { IAllShadowAgentsName } from "./agents/shadow-names";
 import { EnumHookName } from "./config/hook-names";
 import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
@@ -69,9 +70,9 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
    * 讓 BackgroundManager 可以根據配置動態取得各代理的設定
    * Pass getter functions so BackgroundManager can dynamically get each agent's settings
    */
-  const pollIntervalGetter = (agentName?: ShadowName) => getPollInterval(config, agentName);
-  const retryDelayIncrementGetter = (agentName?: ShadowName) => getRetryDelayIncrement(config, agentName);
-  const retryDelayMaxGetter = (agentName?: ShadowName) => getRetryDelayMax(config, agentName);
+  const pollIntervalGetter = (agentName?: IAllShadowAgentsName) => getPollInterval(config, agentName);
+  const retryDelayIncrementGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayIncrement(config, agentName);
+  const retryDelayMaxGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayMax(config, agentName);
   const backgroundManager = new BackgroundManager(
     ctx,
     pollIntervalGetter,
@@ -138,7 +139,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
        */
       const disabledShadows = new Set(config.disabled_shadows ?? []);
       for (const [name, shadow] of Object.entries(SHADOW_AGENTS)) {
-        const shadowName = name as ShadowName;
+        const shadowName = name as IAllShadowAgentsName;
         /** 跳過已停用的 Shadow / Skip disabled shadows */
         if (disabledShadows.has(shadowName)) continue;
 
