@@ -607,53 +607,17 @@ export function loadAriseConfig(ctx: PluginInput)
 }
 
 /**
- * 使用 Bun.file() 載入 Arise 配置（非同步版本）
- * Load Arise config using Bun.file() (async version)
+ * 驗證並返回配置
+ * Validate and return configuration
  *
- * 依序搜尋以下路徑並深度合併：
- * 1. ~/.config/opencode/opencode-arise.json (全域)
- * 2. {worktree}/.opencode/opencode-arise.json (局部，優先)
+ * 內部使用的輔助函式，處理 Zod 驗證和預設值回退邏輯
+ * Internal helper function that handles Zod validation and default fallback logic
  *
- * 使用路徑反轉確保局部設定優先於全域設定
- * Uses path reversal to ensure local settings take precedence over global settings
- *
- * @param worktree - 工作目錄路徑
- * @returns 解析並驗證後的 AriseConfig
+ * @param merged - 合併後的 JsonObject
+ * @returns 驗證後的 IAriseConfig
  */
-export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseConfig>
+function _validateAndMergeConfig(merged: JsonObject): IAriseConfig
 {
-	const paths = getAriseConfigPaths(worktree);
-
-	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
-	let merged: JsonObject = { ...DEFAULT_CONFIG };
-
-	/**
-	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）
-	 * Reverse path order to ensure global settings are applied first, local settings override
-	 *
-	 * 例如：paths = [global, local]，reverse 後 = [local, global]
-	 * 合併時 local 會覆蓋 global 的同名設定
-	 */
-	for (const path of paths.reverse())
-	{
-		try
-		{
-			const file = Bun.file(path);
-			if (await file.exists())
-			{
-				/** 讀取並解析配置文件 / Read and parse config file */
-				const content = await file.text();
-				const parsed = JSON.parse(content);
-				/** 深度合併配置 / Deep merge configuration */
-				merged = deepMerge(merged, parsed);
-			}
-		}
-		catch
-		{
-			// Config file doesn't exist or is invalid, continue
-		}
-	}
-
 	/**
 	 * 使用 Zod schema 驗證合併後的配置
 	 * Validate merged configuration using Zod schema
@@ -679,22 +643,17 @@ export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseCo
 }
 
 /**
- * 使用 fs 同步讀取 Arise 配置（同步版本）
- * Load Arise config using fs (synchronous version)
+ * 讀取並合併配置文件（同步版本）
+ * Read and merge config files (sync version)
  *
- * 與 loadAriseConfigByPath 功能相同，但使用同步 API
- * Identical to loadAriseConfigByPath but uses synchronous API
+ * 內部使用的輔助函式，處理同步路徑遍歷、檔案讀取和深度合併
+ * Internal helper function that handles sync path traversal, file reading and deep merge
  *
- * 適用於需要在同步上下文中載入配置的場景
- * Useful for scenarios where config needs to be loaded in synchronous context
- *
- * @param worktree - 工作目錄路徑
- * @returns 解析並驗證後的 AriseConfig
+ * @param paths - 配置檔案路徑陣列
+ * @returns 合併後的 JsonObject
  */
-export function loadAriseConfigSync(worktree?: string): IAriseConfig
+function _readAndMergeConfigsSync(paths: string[]): JsonObject
 {
-	const paths = getAriseConfigPaths(worktree);
-
 	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
 	let merged: JsonObject = { ...DEFAULT_CONFIG };
 
@@ -721,17 +680,72 @@ export function loadAriseConfigSync(worktree?: string): IAriseConfig
 		}
 	}
 
+	return merged;
+}
+
+/**
+ * 使用 Bun.file() 載入 Arise 配置（非同步版本）
+ * Load Arise config using Bun.file() (async version)
+ *
+ * 依序搜尋以下路徑並深度合併：
+ * 1. ~/.config/opencode/opencode-arise.json (全域)
+ * 2. {worktree}/.opencode/opencode-arise.json (局部，優先)
+ *
+ * 使用路徑反轉確保局部設定優先於全域設定
+ * Uses path reversal to ensure local settings take precedence over global settings
+ *
+ * @param worktree - 工作目錄路徑
+ * @returns 解析並驗證後的 AriseConfig
+ */
+/**
+ * 讀取並合併配置文件（非同步版本）
+ * Read and merge config files (async version)
+ *
+ * 內部使用的輔助函式，處理非同步路徑遍歷、檔案讀取和深度合併
+ * Internal helper function that handles async path traversal, file reading and deep merge
+ *
+ * @param paths - 配置檔案路徑陣列
+ * @returns 合併後的 JsonObject
+ */
+async function _readAndMergeConfigsAsync(paths: string[]): Promise<JsonObject>
+{
+	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
+	let merged: JsonObject = { ...DEFAULT_CONFIG };
+
 	/**
-	 * 使用 Zod schema 驗證合併後的配置
-	 * Validate merged configuration using Zod schema
+	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）
+	 * Reverse path order to ensure global settings are applied first, local settings override
 	 */
-	const result = AriseConfigSchema.safeParse(merged);
-	if (!result.success)
+	for (const path of paths.reverse())
 	{
-		/** 配置驗證失敗時輸出警告並回退至預設值 / Output warning and fallback to defaults on validation failure */
-		console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
-		return DEFAULT_CONFIG;
+		try
+		{
+			const file = Bun.file(path);
+			if (await file.exists())
+			{
+				/** 讀取並解析配置文件 / Read and parse config file */
+				const content = await file.text();
+				const parsed = JSON.parse(content);
+				/** 深度合併配置 / Deep merge configuration */
+				merged = deepMerge(merged, parsed);
+			}
+		}
+		catch
+		{
+			// Config file doesn't exist or is invalid, continue
+		}
 	}
 
-	return result.data;
+	return merged;
+}
+
+export async function loadAriseConfigByPath(worktree?: string): Promise<IAriseConfig>
+{
+	const paths = getAriseConfigPaths(worktree);
+
+	/** 讀取並合併配置（非同步）/ Read and merge config (async) */
+	const merged = await _readAndMergeConfigsAsync(paths);
+
+	/** 驗證並返回配置 / Validate and return config */
+	return _validateAndMergeConfig(merged);
 }

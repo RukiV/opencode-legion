@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { ALL_SHADOW_AGENTS_NAME } from "../agents/shadow-names";
+import { ALLOWED_HOOKS, EnumHookName } from "./hook-names";
 
 /**
  * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
@@ -34,36 +36,16 @@ export const DEFAULT_RETRY_DELAY_MAX = 60000;
  * 定義所有可用的 Shadow 代理名稱
  * Defines all available Shadow agent names
  */
-export const ShadowName = z.enum([
-  "monarch",
-  "beru",
-  "igris",
-  "bellion",
-  "tusk",
-  "tank",
-  "shadow-sovereign",
-]);
+export const ShadowName = z.enum(ALL_SHADOW_AGENTS_NAME);
 export type ShadowName = z.infer<typeof ShadowName>;
 
 /**
- * Hook 名稱列舉
- * Hook name enumeration
- *
  * 定義所有可用的生命週期 Hook
  * Defines all available lifecycle hooks
  */
-export const HookName = z.enum([
-  "arise-banner",
-  "output-shaper",
-  "compaction-preserver",
-  "todo-enforcer",
-]);
-export type HookName = z.infer<typeof HookName>;
+export const HookName = z.enum(ALLOWED_HOOKS);
 
 /**
- * 單一代理的覆寫設定
- * Single agent override configuration
- *
  * 允許針對特定代理覆寫全域預設值
  * Allows overriding global defaults for specific agents
  */
@@ -169,13 +151,60 @@ export const DEFAULT_CONFIG: IAriseConfig = {
 };
 
 /**
- * 取得輪詢間隔的輔助函式
- * 優先順序：agent.poll_interval -> background.poll_interval -> 預設值
+ * 建立配置 getter 函式的工廠函式
+ * Factory function to create config getter functions
  *
- * @param config - AriseConfig 物件
- * @param agentName - agent 名稱（可選）
- * @returns 輪詢間隔（毫秒）
+ * 用於建立讀取配置屬性的標準化 getter
+ * Used to create standardized getters for reading config properties
+ *
+ * 優先順序：agent 特定設定 -> background 全域設定 -> 預設值
+ * Priority: agent-specific setting -> background global setting -> default value
+ *
+ * @param configKey - 配置鍵名稱（snake_case）
+ * @param defaultValue - 預設值
+ * @returns 讀取配置的 getter 函式
  */
+function _createConfigGetter(
+	configKey: "poll_interval" | "retry_delay_increment" | "retry_delay_max",
+	defaultValue: number
+): (config: IAriseConfig, agentName?: ShadowName) => number {
+	return (config: IAriseConfig, agentName?: ShadowName): number =>
+	{
+		/**
+		 * 優先檢查 agent 特定的設定
+		 * First check for agent-specific setting
+		 *
+		 * 允許個別代理覆寫全域設定
+		 * Allows individual agents to override global settings
+		 */
+		if (agentName && (config.agents as any)?.[agentName]?.[configKey] !== undefined)
+		{
+			return (config.agents as any)[agentName]![configKey] as number;
+		}
+
+		/**
+		 * 檢查全域 background 設定
+		 * Check for global background setting
+		 *
+		 * 作為次優先級的全域設定
+		 * As secondary priority global setting
+		 */
+		if ((config.background as any)?.[configKey] !== undefined)
+		{
+			return (config.background as any)[configKey] as number;
+		}
+
+		/**
+		 * 回退至預設值
+		 * Fallback to default value
+		 *
+		 * 確保總是有有效的設定值
+		 * Ensures there's always a valid setting value
+		 */
+		return defaultValue;
+	};
+}
+
 /**
  * 取得輪詢間隔的輔助函式
  * Helper function to get polling interval
@@ -187,47 +216,8 @@ export const DEFAULT_CONFIG: IAriseConfig = {
  * @param agentName - agent 名稱（可選）
  * @returns 輪詢間隔（毫秒）
  */
-export function getPollInterval(config: IAriseConfig, agentName?: ShadowName): number {
-  /**
-   * 優先檢查 agent 特定的 poll_interval
-   * First check for agent-specific poll_interval
-   *
-   * 允許個別代理覆寫全域設定
-   * Allows individual agents to override global settings
-   */
-  if (agentName && config.agents?.[agentName]?.poll_interval !== undefined) {
-    return config.agents[agentName].poll_interval!;
-  }
+export const getPollInterval = _createConfigGetter("poll_interval", DEFAULT_POLL_INTERVAL);
 
-  /**
-   * 檢查全域 background.poll_interval
-   * Check for global background.poll_interval
-   *
-   * 作為次優先級的全域設定
-   * As secondary priority global setting
-   */
-  if (config.background?.poll_interval !== undefined) {
-    return config.background.poll_interval;
-  }
-
-  /**
-   * 回退至預設值
-   * Fallback to default value
-   *
-   * 確保總是有有效的輪詢間隔
-   * Ensures there's always a valid polling interval
-   */
-  return DEFAULT_POLL_INTERVAL;
-}
-
-/**
- * 取得重試延遲遞增量的輔助函式
- * 優先順序：agent.retry_delay_increment -> background.retry_delay_increment -> 預設值
- *
- * @param config - AriseConfig 物件
- * @param agentName - agent 名稱（可選）
- * @returns 重試延遲遞增量（毫秒）
- */
 /**
  * 取得重試延遲遞增量的輔助函式
  * Helper function to get retry delay increment
@@ -239,38 +229,8 @@ export function getPollInterval(config: IAriseConfig, agentName?: ShadowName): n
  * @param agentName - agent 名稱（可選）
  * @returns 重試延遲遞增量（毫秒）
  */
-export function getRetryDelayIncrement(config: IAriseConfig, agentName?: ShadowName): number {
-  /**
-   * 優先檢查 agent 特定的設定
-   * First check for agent-specific setting
-   */
-  if (agentName && config.agents?.[agentName]?.retry_delay_increment !== undefined) {
-    return config.agents[agentName].retry_delay_increment!;
-  }
+export const getRetryDelayIncrement = _createConfigGetter("retry_delay_increment", DEFAULT_RETRY_DELAY_INCREMENT);
 
-  /**
-   * 檢查全域 background.retry_delay_increment
-   * Check for global background.retry_delay_increment
-   */
-  if (config.background?.retry_delay_increment !== undefined) {
-    return config.background.retry_delay_increment;
-  }
-
-  /**
-   * 回退至預設值
-   * Fallback to default value
-   */
-  return DEFAULT_RETRY_DELAY_INCREMENT;
-}
-
-/**
- * 取得重試延遲最大值的輔助函式
- * 優先順序：agent.retry_delay_max -> background.retry_delay_max -> 預設值
- *
- * @param config - AriseConfig 物件
- * @param agentName - agent 名稱（可選）
- * @returns 重試延遲最大值（毫秒）
- */
 /**
  * 取得重試延遲最大值的輔助函式
  * Helper function to get max retry delay
@@ -282,26 +242,4 @@ export function getRetryDelayIncrement(config: IAriseConfig, agentName?: ShadowN
  * @param agentName - agent 名稱（可選）
  * @returns 重試延遲最大值（毫秒）
  */
-export function getRetryDelayMax(config: IAriseConfig, agentName?: ShadowName): number {
-  /**
-   * 優先檢查 agent 特定的設定
-   * First check for agent-specific setting
-   */
-  if (agentName && config.agents?.[agentName]?.retry_delay_max !== undefined) {
-    return config.agents[agentName].retry_delay_max!;
-  }
-
-  /**
-   * 檢查全域 background.retry_delay_max
-   * Check for global background.retry_delay_max
-   */
-  if (config.background?.retry_delay_max !== undefined) {
-    return config.background.retry_delay_max;
-  }
-
-  /**
-   * 回飛至預設值
-   * Fallback to default value
-   */
-  return DEFAULT_RETRY_DELAY_MAX;
-}
+export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_RETRY_DELAY_MAX);

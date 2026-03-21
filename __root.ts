@@ -4,6 +4,7 @@
  * 使用中央化路徑管理，避免相對路徑 ../ 地獄
  * Centralized path management to avoid relative path ../../.. hell
  */
+/// <reference types="node" />
 
 import { join } from "path";
 

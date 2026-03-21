@@ -100,7 +100,7 @@ export type IBackgroundShadowAgentsName = typeof BACKGROUND_SHADOWS[number];
 export type IAllShadowAgentsName = EnumShadowAgentsName | EnumShadowSubAgentsName;
 
 export const ALL_SHADOW_AGENTS_NAME = [
-	EnumShadowAgentsName.ShadowMonarch,
+	EnumShadowAgentsName.ShadowMonarch as const,
 	...ALLOWED_SHADOWS,
 ] as const satisfies IAllShadowAgentsName[];
 

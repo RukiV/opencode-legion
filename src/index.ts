@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { type IAriseConfig, type HookName, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { type IAriseConfig, type ShadowName, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { EnumHookName } from "./config/hook-names";
 import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
@@ -34,8 +35,8 @@ type JsonObject = Record<string, unknown>;
  * @param hookName - Hook 名稱
  * @returns Hook 是否啟用
  */
-function isHookEnabled(config: IAriseConfig, hookName: HookName): boolean {
-  return !(config.disabled_hooks ?? []).includes(hookName);
+function isHookEnabled(config: IAriseConfig, hookName: EnumHookName): boolean {
+  return !config.disabled_hooks?.includes(hookName);
 }
 
 /**
@@ -85,19 +86,19 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
    * 根據配置決定是否啟用各類 Hook
    * Decide whether to enable each hook based on configuration
    */
-  const bannerHook = isHookEnabled(config, "arise-banner") && config.show_banner
+  const bannerHook = isHookEnabled(config, EnumHookName.AriseBanner) && config.show_banner
     ? createAriseBannerHook(ctx)
     : null;
 
-  const outputShaper = isHookEnabled(config, "output-shaper")
+  const outputShaper = isHookEnabled(config, EnumHookName.OutputShaper)
     ? createOutputShaperHook(config)
     : null;
 
-  const compactionPreserver = isHookEnabled(config, "compaction-preserver")
+  const compactionPreserver = isHookEnabled(config, EnumHookName.CompactionPreserver)
     ? createCompactionPreserverHook()
     : null;
 
-  const todoEnforcer = isHookEnabled(config, "todo-enforcer")
+  const todoEnforcer = isHookEnabled(config, EnumHookName.TodoEnforcer)
     ? createTodoEnforcerHook(ctx)
     : null;
 

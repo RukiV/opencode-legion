@@ -4,6 +4,39 @@ import type { ShadowName } from "../config/schema";
 import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
 
 /**
+ * 將配置值正規化為 getter 函式
+ * Normalize config value to getter function
+ *
+ * 內部使用的輔助函式，處理以下轉換：
+ * - 函式：直接返回
+ * - 數字：包裝為返回該數字的函式
+ * - undefined：返回返回預設值的函式
+ *
+ * Internal helper function that handles:
+ * - Function: return directly
+ * - Number: wrap in a function that returns it
+ * - undefined: return a function that returns the default
+ *
+ * @param value - 輸入值（數字、函式或 undefined）
+ * @param defaultValue - 預設值
+ * @returns 正規化後的 getter 函式
+ */
+function _normalizeToGetter(
+	value: number | ((agentName?: ShadowName) => number) | undefined,
+	defaultValue: number
+): (agentName?: ShadowName) => number {
+	if (typeof value === "function") {
+		return value;
+	}
+	if (value !== undefined) {
+		/** 固定值，建立閉包返回 / Fixed value, create closure to return it */
+		return () => value;
+	}
+	/** 使用預設值 / Use default value */
+	return () => defaultValue;
+}
+
+/**
  * 背景任務結構定義
  * Background task structure definition
  *
@@ -79,45 +112,35 @@ export class BackgroundManager {
      *
      * 支援傳入數字（固定值）或函式（動態取得 per-agent 設定）
      * Supports passing number (fixed value) or function (dynamic per-agent settings)
+     *
+     * 特別處理：如果傳入函式，保留 defaultPollInterval 為預設值
+     * Special handling: if function is passed, keep defaultPollInterval as default
      */
     if (typeof pollIntervalOrGetter === "function") {
       this.getPollInterval = pollIntervalOrGetter;
       this.defaultPollInterval = DEFAULT_POLL_INTERVAL;
     } else {
       this.defaultPollInterval = pollIntervalOrGetter;
+      this.getPollInterval = () => pollIntervalOrGetter;
     }
 
     /**
      * 重試延遲遞增量初始化
      * Retry delay increment initialization
      */
-    if (retryDelayIncrementOrGetter !== undefined) {
-      if (typeof retryDelayIncrementOrGetter === "function") {
-        this.getRetryDelayIncrement = retryDelayIncrementOrGetter;
-      } else {
-        /**
-         * 使用固定值，建立閉包返回
-         * Use fixed value, create closure to return it
-         */
-        this.getRetryDelayIncrement = () => retryDelayIncrementOrGetter;
-      }
-    } else {
-      this.getRetryDelayIncrement = () => DEFAULT_RETRY_DELAY_INCREMENT;
-    }
+    this.getRetryDelayIncrement = _normalizeToGetter(
+      retryDelayIncrementOrGetter,
+      DEFAULT_RETRY_DELAY_INCREMENT
+    );
 
     /**
      * 重試延遲最大值初始化
      * Max retry delay initialization
      */
-    if (retryDelayMaxOrGetter !== undefined) {
-      if (typeof retryDelayMaxOrGetter === "function") {
-        this.getRetryDelayMax = retryDelayMaxOrGetter;
-      } else {
-        this.getRetryDelayMax = () => retryDelayMaxOrGetter;
-      }
-    } else {
-      this.getRetryDelayMax = () => DEFAULT_RETRY_DELAY_MAX;
-    }
+    this.getRetryDelayMax = _normalizeToGetter(
+      retryDelayMaxOrGetter,
+      DEFAULT_RETRY_DELAY_MAX
+    );
   }
 
   /**
