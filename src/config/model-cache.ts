@@ -80,3 +80,125 @@ export function clearSessionModel(sessionId: string): void {
 export function clearAllSessionModels(): void {
   sessionModelCache.clear();
 }
+
+// ============================================================
+// Providers Cache / 提供者緩存
+// ============================================================
+
+/**
+ * 提供者資料結構
+ * Provider data structure
+ *
+ * 從 OpenCode SDK config.providers() 取得
+ * Obtained from OpenCode SDK config.providers()
+ */
+export interface CachedProvider {
+  /** 提供者 ID（如 "anthropic"、"openai"） */
+  id: string;
+  /** 提供者名稱 */
+  name?: string;
+  /** 模型映射（key 為模型 ID） */
+  models?: Record<string, {
+    /** 模型 ID */
+    id?: string;
+    /** 模型名稱 */
+    name?: string;
+    /** 模型限制 */
+    limit?: {
+      /** 上下文窗口大小 */
+      context?: number;
+      /** 輸出限制 */
+      output?: number;
+    };
+  }>;
+  /** 是否為預設提供者 */
+  default?: boolean;
+}
+
+/**
+ * 提供者緩存資料結構
+ * Provider cache data structure
+ */
+export interface ProvidersCache {
+  /** 緩存的提供者列表 */
+  providers: CachedProvider[];
+  /** 緩存時間戳 */
+  timestamp: number;
+  /** 過期時間（毫秒），預設 5 分鐘 */
+  expiresIn: number;
+}
+
+/** 提供者緩存（模組級別單例） */
+let providersCache: ProvidersCache | null = null;
+
+/**
+ * 預設緩存過期時間（毫秒）
+ * Default cache expiration time (ms)
+ *
+ * 5 分鐘 = 300000 毫秒
+ */
+export const DEFAULT_PROVIDERS_CACHE_TTL = 5 * 60 * 1000;
+
+/**
+ * 設定提供者緩存
+ * Set providers cache
+ *
+ * @param providers - 提供者列表
+ * @param expiresIn - 過期時間（毫秒），預設 5 分鐘
+ */
+export function setProvidersCache(
+  providers: CachedProvider[],
+  expiresIn: number = DEFAULT_PROVIDERS_CACHE_TTL
+): void {
+  providersCache = {
+    providers,
+    timestamp: Date.now(),
+    expiresIn,
+  };
+}
+
+/**
+ * 取得提供者緩存
+ * Get providers cache
+ *
+ * @param forceRefresh - 是否強制刷新，忽略緩存
+ * @returns 提供者緩存，若過期或不存在則回傳 null
+ */
+export function getProvidersCache(forceRefresh: boolean = false): ProvidersCache | null {
+  if (!providersCache) {
+    return null;
+  }
+
+  // 如果強制刷新，直接返回 null
+  if (forceRefresh) {
+    return null;
+  }
+
+  // 檢查是否過期
+  const now = Date.now();
+  const age = now - providersCache.timestamp;
+
+  if (age > providersCache.expiresIn) {
+    return null;
+  }
+
+  return providersCache;
+}
+
+/**
+ * 檢查提供者緩存是否存在且有效
+ * Check if providers cache exists and is valid
+ *
+ * @returns 是否有效
+ */
+export function hasValidProvidersCache(): boolean {
+  return getProvidersCache() !== null;
+}
+
+/**
+ * 清除提供者緩存
+ * Clear providers cache
+ */
+export function clearProvidersCache(): void {
+  providersCache = null;
+}

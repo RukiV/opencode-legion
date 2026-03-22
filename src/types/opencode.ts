@@ -12,7 +12,8 @@ import { ARISE_TOOLS, EnumAriseTools } from '../tools/tool-names';
 import { IAriseTools } from '../types/types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
 import { type Hooks, PluginInput, tool } from '@opencode-ai/plugin';
-import { ITSOverwrite } from 'ts-type';
+import { ITSOverwrite, ITSRequireAtLeastOne } from 'ts-type';
+import { BackgroundManager } from '../tools/background-manager';
 
 /**
  * Shadow Agent 模式
@@ -23,12 +24,12 @@ import { ITSOverwrite } from 'ts-type';
  * - ALL: 所有模式
  */
 export enum EnumOpencodeAgentMode {
-  /** 主代理模式 - 唯一的主要協調者 / Primary mode - the only main coordinator */
-  PRIMARY = "primary",
-  /** 子代理模式 - 被 Monarch 召喚的 Shadow / Subagent mode - Shadows summoned by Monarch */
-  SUBAGENT = "subagent",
-  /** 所有模式 - 可同時作為主代理和子代理 / All modes - can be both primary and subagent */
-  ALL = "all",
+	/** 主代理模式 - 唯一的主要協調者 / Primary mode - the only main coordinator */
+	PRIMARY = "primary",
+	/** 子代理模式 - 被 Monarch 召喚的 Shadow / Subagent mode - Shadows summoned by Monarch */
+	SUBAGENT = "subagent",
+	/** 所有模式 - 可同時作為主代理和子代理 / All modes - can be both primary and subagent */
+	ALL = "all",
 }
 
 /**
@@ -43,12 +44,12 @@ export enum EnumOpencodeAgentMode {
  * - ASK: 詢問使用者
  */
 export enum EnumOpencodeAgentPermission {
-  /** 允許執行 / Allow execution */
-  ALLOW = "allow",
-  /** 拒絕執行 / Deny execution */
-  DENY = "deny",
-  /** 詢問使用者 / Ask user */
-  ASK = "ask",
+	/** 允許執行 / Allow execution */
+	ALLOW = "allow",
+	/** 拒絕執行 / Deny execution */
+	DENY = "deny",
+	/** 詢問使用者 / Ask user */
+	ASK = "ask",
 }
 
 /**
@@ -59,7 +60,7 @@ export enum EnumOpencodeAgentPermission {
  * Supports both standard Zod and custom Zod types
  */
 export type IZodRawShape = z.ZodRawShape | Readonly<{
-  [k: string]: $ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>;
+	[k: string]: $ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>>;
 }>
 
 /**
@@ -72,12 +73,12 @@ export type IZodRawShape = z.ZodRawShape | Readonly<{
  * @typeParam Args - Zod schema 類型參數
  */
 export type IReturnTypeOfPluginTool<Args extends IZodRawShape> = {
-  /** 工具描述 / Tool description */
-  description: string;
-  /** 工具參數 schema / Tool arguments schema */
-  args: Args;
-  /** 工具執行函式 / Tool execute function */
-  execute(args: z.infer<z.ZodObject<Args>>, context: ToolContext): Promise<string>;
+	/** 工具描述 / Tool description */
+	description: string;
+	/** 工具參數 schema / Tool arguments schema */
+	args: Args;
+	/** 工具執行函式 / Tool execute function */
+	execute(args: z.infer<z.ZodObject<Args>>, context: ToolContext): Promise<string>;
 }
 
 /**
@@ -112,7 +113,7 @@ export function tool2<T extends IZodRawShape>(input: IReturnTypeOfPluginTool<T>)
 export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolArise<NoInfer<T>>): IReturnTypeOfPluginToolArise<T>
 export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolArise<NoInfer<T>>): IReturnTypeOfPluginToolArise<T>
 {
-  return tool(input as any) as any
+	return tool(input as any) as any
 }
 
 /**
@@ -123,7 +124,7 @@ export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolAr
  * Overrides the tool in default Hooks with IAriseTools
  */
 export type IHooks = ITSOverwrite<Hooks, {
-  tool: IAriseTools
+	tool: IAriseTools
 }>
 
 /**
