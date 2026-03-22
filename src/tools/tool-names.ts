@@ -22,7 +22,7 @@ export enum EnumAriseTools {
 	ARISE_BACKGROUND_STATUS = "arise_background_status",
 	/** 取消執行中的背景任務 / Cancel a running background task */
 	ARISE_BACKGROUND_CANCEL = "arise_background_cancel",
-	/** 列出所有可用的模型 / List all available models */
+	/** 列出所有可用的模型 / List all available models @see docs/tools/list-models.md */
 	ARISE_LIST_MODELS = "arise_list_models",
 }
 
@@ -150,6 +150,12 @@ Returns a task_id immediately. Use arise_background_output to get results later.
 				.describe("The task ID to cancel"),
 		},
 	},
+	/**
+	 * 列出所有可用的模型
+	 * List all available models
+	 *
+	 * @see docs/tools/list-models.md
+	 */
 	[EnumAriseTools.ARISE_LIST_MODELS]: {
 		description: `List all available models from configured providers.
 

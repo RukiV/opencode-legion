@@ -15,9 +15,7 @@ import type { PluginInput } from '@opencode-ai/plugin';
  * 建立所有插件工具
  * Create all plugin tools
  *
- * 集中建立並返回所有 Arise 工具
- * Centralized creation and return of all Arise tools
- *
+ * @see docs/tools/list-models.md
  * @param ctx - Plugin 上下文
  * @param backgroundManager - 背景任務管理器
  * @returns 所有 Arise 工具的物件
@@ -35,7 +33,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		[EnumAriseTools.ARISE_BACKGROUND_STATUS]: createBackgroundStatusTool(backgroundManager),
 		/** 取消背景任務工具 / Cancel background task tool */
 		[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: createBackgroundCancelTool(backgroundManager),
-		/** 列出可用模型工具 / List available models tool */
+		/** 列出可用模型工具 / List available models tool @see docs/tools/list-models.md */
 		[EnumAriseTools.ARISE_LIST_MODELS]: createListModelsTool(ctx),
 	} satisfies IAriseTools
 }

@@ -38,12 +38,10 @@ function formatModelsForProvider(provider: CachedProvider): string[] {
 }
 
 /**
- * 建立模型列表工具
- * Create list models tool
+ * 建立可用模型列表工具
+ * Create available models list tool
  *
- * 用於列出所有可用的模型
- * Used to list all available models
- *
+ * @see docs/tools/list-models.md
  * @param ctx - Plugin 上下文
  */
 export function createListModelsTool(ctx: PluginInput) {
