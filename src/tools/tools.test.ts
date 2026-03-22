@@ -1,3 +1,4 @@
+import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 import { createCallAriseAgentTool } from "./call-arise-agent";
 import {
   createBackgroundTaskTool,
@@ -33,21 +34,22 @@ describe("arise_summon tool", () => {
   it("has correct structure", () => {
     const tool = createCallAriseAgentTool(mockCtx);
 
-    expect(tool).toBeDefined();
-    expect(tool.description).toBeDefined();
-    expect(tool.description).toContain("shadow");
-    expect(tool.args).toBeDefined();
-    expect(tool.execute).toBeDefined();
-    expect(typeof tool.execute).toBe("function");
+    expect(tool).toMatchObject({
+      description: expect.stringContaining("shadow"),
+      args: expect.any(Object),
+      execute: expect.any(Function),
+    })
   });
 
   it("has all required args", () => {
     const tool = createCallAriseAgentTool(mockCtx);
 
-    expect(tool.args.shadow).toBeDefined();
-    expect(tool.args.prompt).toBeDefined();
-    expect(tool.args.run_in_background).toBeDefined();
-    expect(tool.args.description).toBeDefined();
+    expect(tool.args).toMatchObject({
+      shadow: expect.anything(),
+      prompt: expect.anything(),
+      run_in_background: expect.anything(),
+      description: expect.anything(),
+    })
   });
 
   it("lists all shadows in description", () => {

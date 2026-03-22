@@ -1,9 +1,7 @@
-import { z, ZodEnum, ZodString, ZodOptional, ZodBoolean } from "zod";
-import { tool, type ToolContext } from "@opencode-ai/plugin";
+import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./background-manager";
-import type { ShadowName } from "../config/schema";
-import { EnumAriseTools, ARISE_TOOLS } from "./tool-names";
-import { IPluginToolAriseArgs, IReturnTypeOfPluginTool, IReturnTypeOfPluginToolArise, tool2 } from '../types/opencode';
+import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
+import { tool2 } from '../types/opencode';
 import { getErrorMessage, formatDuration } from "../utils/message";
 
 /**
@@ -16,9 +14,14 @@ import { getErrorMessage, formatDuration } from "../utils/message";
  * @param manager - BackgroundManager 實例
  */
 export function createBackgroundTaskTool(manager: BackgroundManager){
+  const {
+    description,
+    args,
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND);
+
   return tool2<EnumAriseTools.ARISE_BACKGROUND>({
-    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND].description,
-    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND].args,
+    description,
+    args,
 
     async execute(args, context: ToolContext) {
       const { shadow, prompt, description, model } = args;
@@ -57,9 +60,14 @@ Use arise_background_output("${task.id}") when you need the result.`;
  * @param manager - BackgroundManager 實例
  */
 export function createBackgroundOutputTool(manager: BackgroundManager) {
+  const {
+    description,
+    args,
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_OUTPUT);
+
   return tool2<EnumAriseTools.ARISE_BACKGROUND_OUTPUT>({
-    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_OUTPUT].description,
-    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_OUTPUT].args,
+    description,
+    args,
 
     async execute(args) {
       const task = manager.getTask(args.task_id);
@@ -100,9 +108,15 @@ ${task.result ?? "(No output)"}`;
  * @param manager - BackgroundManager 實例
  */
 export function createBackgroundStatusTool(manager: BackgroundManager) {
+
+  const {
+    description,
+    args,
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_STATUS);
+
   return tool2<EnumAriseTools.ARISE_BACKGROUND_STATUS>({
-    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_STATUS].description,
-    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_STATUS].args,
+    description,
+    args,
 
     async execute(args, context: ToolContext) {
       /** 取得所有任務 / Get all tasks */
@@ -140,9 +154,14 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
  * @param manager - BackgroundManager 實例
  */
 export function createBackgroundCancelTool(manager: BackgroundManager) {
+  const {
+    description,
+    args,
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_CANCEL);
+
   return tool2<EnumAriseTools.ARISE_BACKGROUND_CANCEL>({
-    description: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_CANCEL].description,
-    args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND_CANCEL].args,
+    description,
+    args,
 
     async execute(args) {
       const success = await manager.cancelTask(args.task_id);

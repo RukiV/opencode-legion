@@ -1,10 +1,6 @@
-import { tool } from "@opencode-ai/plugin";
 import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
-import { ARISE_TOOLS, EnumAriseTools } from './tool-names';
-import { ALLOWED_SHADOWS, EnumShadowSubAgentsName } from '../agents/shadow-names';
-import { ITSToStringLiteral } from 'ts-type';
-import { z } from 'zod';
+import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
 import { tool2 } from '../types/opencode';
 import { resolveModelContext } from '../utils/model-resolver';
 import { extractTextFromMessageParts, getErrorMessage } from '../utils/message';
@@ -20,10 +16,14 @@ import { extractTextFromMessageParts, getErrorMessage } from '../utils/message';
  * @returns Arise Agent 工具定義
  */
 export function createCallAriseAgentTool(ctx: PluginInput) {
-  return tool2({
-    description: ARISE_TOOLS[EnumAriseTools.ARISE_SUMMON].description,
+  const {
+    description,
+    args,
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_SUMMON);
 
-    args: ARISE_TOOLS[EnumAriseTools.ARISE_SUMMON].args,
+  return tool2({
+    description,
+    args,
 
     /**
      * 執行工具
