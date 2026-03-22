@@ -54,7 +54,9 @@ Available shadows:
 - shadow-sovereign: Deep reasoning (complex debugging, architecture decisions)
 
 Use run_in_background=true for parallel execution (recommended for exploration/research).
-Use run_in_background=false when you need the result immediately.`,
+Use run_in_background=false when you need the result immediately.
+
+Model override: Use the 'model' parameter to specify a different model for this shadow (format: provider/model, e.g. anthropic/claude-sonnet-4). If not specified, each shadow uses its default model.`,
     shortDescription: "Invoke a shadow synchronously or in background",
 
     args: {
@@ -71,6 +73,10 @@ Use run_in_background=false when you need the result immediately.`,
         .string()
         .optional()
         .describe("Short description of the task (for tracking)"),
+      model: z
+        .string()
+        .optional()
+        .describe("Override model for this shadow (format: provider/model, e.g. opencode/big-pickle)"),
     },
   },
   [EnumAriseTools.ARISE_BACKGROUND]: {
@@ -94,6 +100,10 @@ Returns a task_id immediately. Use arise_background_output to get results later.
       description: z
         .string()
         .describe("Short description (3-5 words)"),
+      model: z
+        .string()
+        .optional()
+        .describe("Override model for this shadow (format: provider/model, e.g. opencode/big-pickle)"),
     },
   } as const,
   [EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: {

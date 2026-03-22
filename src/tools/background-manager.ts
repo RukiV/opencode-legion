@@ -3,6 +3,8 @@ import type { Event } from "@opencode-ai/sdk";
 import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
 import { IAllShadowAgentsName } from "../agents/shadow-names";
 import { getErrorMessage } from "../utils/message";
+import { resolveModelContext } from "../utils/model-resolver";
+import { getSessionModel } from "../config/model-cache";
 
 /**
  * 將配置值正規化為 getter 函式
@@ -171,6 +173,7 @@ export class BackgroundManager {
     prompt: string;
     description: string;
     parentSessionId: string;
+    model?: string;
   }): Promise<BackgroundTask> {
     const taskId = this.generateTaskId();
 
@@ -209,6 +212,21 @@ export class BackgroundManager {
     this.tasks.set(taskId, task);
 
     /**
+     * 解析模型上下文
+     * Resolve model context
+     *
+     * 優先順序：用戶指定 > Shadow 預設 > <auto> 使用父模型
+     * Priority: User specified > Shadow default > <auto> use parent model
+     */
+    const parentModel = getSessionModel(opts.parentSessionId);
+    const modelBody = resolveModelContext(
+      parentModel,
+      opts.shadow as IAllShadowAgentsName,
+      undefined,
+      opts.model
+    );
+
+    /**
      * 非同步執行 prompt（fire and forget）
      * Execute prompt asynchronously (fire and forget)
      *
@@ -220,6 +238,7 @@ export class BackgroundManager {
         path: { id: sessionId },
         body: {
           agent: opts.shadow,
+          model: modelBody,
           parts: [{ type: "text", text: opts.prompt }],
         },
       })

@@ -37,7 +37,7 @@ export function createCallAriseAgentTool(ctx: PluginInput) {
      * @returns 執行結果訊息
      */
     async execute(args, context) {
-      const { shadow, prompt, run_in_background, description } = args;
+      const { shadow, prompt, run_in_background, description, model } = args;
       /** 任務描述（用於顯示）/ Task description (for display) */
       const taskDesc = description ?? `${shadow} task`;
 
@@ -62,11 +62,11 @@ export function createCallAriseAgentTool(ctx: PluginInput) {
          * 解析模型上下文
          * Resolve model context
          *
-         * 從父 session 取得模型並轉換為 providerID/modelID 格式
-         * Get model from parent session and convert to providerID/modelID format
+         * 優先順序：用戶指定 > Shadow 預設 > <auto> 使用父模型
+         * Priority: User specified > Shadow default > <auto> use parent model
          */
         const parentModel = getSessionModel(context.sessionID);
-        const modelBody = resolveModelContext(parentModel, shadow);
+        const modelBody = resolveModelContext(parentModel, shadow, undefined, model);
 
         /**
          * 根據執行模式分支

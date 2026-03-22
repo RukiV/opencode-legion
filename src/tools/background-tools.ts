@@ -21,7 +21,7 @@ export function createBackgroundTaskTool(manager: BackgroundManager){
     args: ARISE_TOOLS[EnumAriseTools.ARISE_BACKGROUND].args,
 
     async execute(args, context: ToolContext) {
-      const { shadow, prompt, description } = args;
+      const { shadow, prompt, description, model } = args;
 
       try {
         /** 啟動背景任務 / Launch background task */
@@ -30,6 +30,7 @@ export function createBackgroundTaskTool(manager: BackgroundManager){
           prompt,
           description,
           parentSessionId: context.sessionID,
+          model,
         });
 
         return `[arise] Shadow ${shadow} launched in background.
