@@ -132,8 +132,8 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
       const agents = cfg.agent as JsonObject;
 
       /**
-       * 添加 Shadow Soldiers
-       * Add Shadow soldiers
+       * 添加 Shadow Subagents
+       * Add Shadow subagents
        *
        * 遍歷所有 Shadow 代理，根據配置決定是否註冊
        * Iterate through all Shadow agents, decide whether to register based on config

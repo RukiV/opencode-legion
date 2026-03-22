@@ -12,9 +12,9 @@ import { ITSRequiredWith } from "ts-type";
  * Enum of all Arise tool names
  */
 export enum EnumAriseTools {
-	/** 同步或非同步召喚 shadow士兵執行任務 / Invoke a shadow synchronously or in background */
+	/** 同步或非同步召喚 shadow agent 執行任務 / Invoke a shadow agent synchronously or in background */
 	ARISE_SUMMON = "arise_summon",
-	/** 以背景任務方式啟動 shadow士兵 (平行執行) / Launch shadow as background task (parallel) */
+	/** 以背景任務方式啟動 shadow agent (平行執行) / Launch shadow agent as background task (parallel) */
 	ARISE_BACKGROUND = "arise_background",
 	/** 取得背景任務的輸出結果 / Get result from background task */
 	ARISE_BACKGROUND_OUTPUT = "arise_background_output",
@@ -56,9 +56,9 @@ interface I_AriseToolsConfigEntry
  */
 export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SUMMON]: {
-		description: `Invoke a shadow synchronously or in background
+		description: `Invoke a shadow agent synchronously or in background
 
-Available shadows:
+Available shadow agents:
 - beru: Fast codebase scout (exploration, grep, file discovery)
 - igris: Precise implementation (code changes, running commands)
 - bellion: Strategic planning (architecture, complex analysis)
@@ -69,16 +69,16 @@ Available shadows:
 Use run_in_background=true for parallel execution (recommended for exploration/research).
 Use run_in_background=false when you need the result immediately.
 
-Model override: Use the 'model' parameter to specify a different model for this shadow (format: provider/model, e.g. opencode/big-pickle). If not specified, each shadow uses its default model.`,
-		shortDescription: "Invoke a shadow synchronously or in background",
+Model override: Use the 'model' parameter to specify a different model for this shadow agent (format: provider/model, e.g. opencode/big-pickle). If not specified, each shadow agent uses its default model.`,
+		shortDescription: "Invoke a shadow agent synchronously or in background",
 
 		args: {
 			shadow: z
 				.enum(ALLOWED_SHADOWS)
-				.describe("Which shadow to summon"),
+				.describe("Which shadow agent to summon"),
 			prompt: z
 				.string()
-				.describe("The task/question for the shadow (be specific)"),
+				.describe("The task/question for the shadow agent (be specific)"),
 			run_in_background: z
 				.boolean()
 				.describe("true = async (parallel), false = sync (wait for result)"),
@@ -89,11 +89,11 @@ Model override: Use the 'model' parameter to specify a different model for this 
 			model: z
 				.string()
 				.optional()
-				.describe("Override model for this shadow (format: provider/model, e.g. opencode/big-pickle)"),
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)"),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND]: {
-		description: `Launch a shadow soldier as a background task for parallel execution.
+		description: `Launch a shadow agent as a background task for parallel execution.
 
 Best for:
 - beru: Parallel codebase exploration
@@ -101,27 +101,27 @@ Best for:
 - bellion: Parallel planning/analysis
 
 Returns a task_id immediately. Use arise_background_output to get results later.`,
-		shortDescription: "Launch shadow soldier as background task (parallel)",
+		shortDescription: "Launch shadow agent as background task (parallel)",
 
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
-				.describe("Which shadow to run in background"),
+				.describe("Which shadow agent to run in background"),
 			prompt: z
 				.string()
-				.describe("The task for the shadow"),
+				.describe("The task for the shadow agent"),
 			description: z
 				.string()
 				.describe("Short description (3-5 words)"),
 			model: z
 				.string()
 				.optional()
-				.describe("Override model for this shadow (format: provider/model, e.g. opencode/big-pickle)"),
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)"),
 		},
 	} as const,
 	[EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: {
-		// description: `Get the output from a background shadow task.`,
-		shortDescription: "Get the output from a background shadow task.",
+		// description: `Get the output from a background shadow agent task.`,
+		shortDescription: "Get the output from a background shadow agent task.",
 
 		args: {
 			task_id: z
