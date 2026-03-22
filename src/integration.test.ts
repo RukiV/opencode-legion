@@ -1,4 +1,6 @@
+import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 import OpencodeArise from "./index";
+import { ALL_ARISE_TOOLS } from "./tools/tool-names";
 
 // Comprehensive mock context
 const createMockCtx = () => ({
@@ -61,18 +63,15 @@ describe("Plugin Integration", () => {
     expect(typeof hooks.event).toBe("function");
   });
 
-  it("registers all 5 custom tools", async () => {
+  it("registers all custom tools", async () => {
     const ctx = createMockCtx();
     const hooks = await OpencodeArise(ctx as any);
 
     const toolNames = Object.keys(hooks.tool!);
 
-    expect(toolNames).toContain("arise_summon");
-    expect(toolNames).toContain("arise_background");
-    expect(toolNames).toContain("arise_background_output");
-    expect(toolNames).toContain("arise_background_status");
-    expect(toolNames).toContain("arise_background_cancel");
-    expect(toolNames.length).toBe(5);
+    expect(hooks.tool!).toContainAllKeys(ALL_ARISE_TOOLS);
+
+    expect(toolNames).toHaveLength(ALL_ARISE_TOOLS.length);
   });
 
   it("config hook sets default_agent to monarch", async () => {
