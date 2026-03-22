@@ -1,0 +1,65 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Bug 2: toMatchObject 與 spread operator 和 expect.any() / toMatchObject fails with spread operator [FIXME] 三元展開 expect.any() 時失敗 / [FIXME] Fails with ternary spread expect.any() 1`] = `
+"expect(received).toMatchObject(expected)
+
+  {
+-   "extra": Any<String>,
+-   "name": "test",
++   "extra": "test extra",
++   "name": "test name",
+  }
+
+- Expected  - 2
++ Received  + 2
+"
+`;
+
+exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 1`] = `
+{
+  "label": "before",
+  "obj": {
+    "bar": "bar",
+    "foo": "foo",
+  },
+}
+`;
+
+exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 2`] = `
+{
+  "label": "after",
+  "obj": {
+    "bar": Any<String>,
+    "foo": "foo",
+  },
+}
+`;
+
+exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 3`] = `
+"expect(received).toBeString()
+
+Received: Any<String>
+"
+`;
+
+exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 4`] = `
+"expect(received).not.toBeObject()
+
+Expected value not to be an object
+
+Received: Any<String>
+"
+`;
+
+exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 5`] = `
+"expect(received).toMatchObject(expected)
+
+@@ -2,3 +2,3 @@
+    "bar": Any<String>,
++   "foo": "foo",
+  }
+
+- Expected  - 0
++ Received  + 1
+"
+`;
