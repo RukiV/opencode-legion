@@ -5,7 +5,7 @@
 
 import { AUTO_MODEL } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
-import type { IAllShadowAgentsName } from "../agents/shadow-names";
+import type { IAllShadowAgentsName } from "../types/enums";
 
 /**
  * Determines the effective model based on parent model and default model.

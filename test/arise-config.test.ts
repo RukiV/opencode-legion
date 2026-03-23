@@ -13,7 +13,7 @@ import {
 	EnumShadowSubAgentsName,
 	EnumShadowAgentsName,
 	ALL_SHADOW_AGENTS_NAME,
-} from "../src/agents/shadow-names";
+} from "../src/types/enums";
 import {
 	ALL_ARISE_TOOLS,
 	EnumAriseTools,

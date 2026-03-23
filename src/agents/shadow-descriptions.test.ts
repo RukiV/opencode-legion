@@ -22,7 +22,7 @@ import {
 	ALLOWED_SHADOWS,
 	BACKGROUND_SHADOWS,
 	EnumShadowSubAgentsName,
-} from "./shadow-names";
+} from "../types/enums";
 
 /**
  * SHADOW_DESCRIPTIONS 常量測試

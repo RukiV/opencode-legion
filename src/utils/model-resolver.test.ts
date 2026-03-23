@@ -25,7 +25,7 @@ import {
 	parseModelString,
 	resolveModelContext,
 } from "./model-resolver";
-import { EnumShadowSubAgentsName } from "../agents/shadow-names";
+import { EnumShadowSubAgentsName } from "../types/enums";
 import type { IShadowAgents } from "../agents/shadows";
 
 /**

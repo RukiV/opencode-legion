@@ -1,7 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
-import { IAllShadowAgentsName } from "../agents/shadow-names";
+import { IAllShadowAgentsName } from "../types/enums";
 import { getErrorMessage } from "../utils/message";
 import { resolveModelContext } from "../utils/model-resolver";
 import { getSessionModel } from "../config/model-cache";

@@ -54,7 +54,7 @@ Received: Any<String>
 exports[`其他測試 / Other tests [FIXME] toMatchObject 會修改 actual / [FIXME] toMatchObject mutates actual 5`] = `
 "expect(received).toMatchObject(expected)
 
-  {
+@@ -2,3 +2,3 @@
     "bar": Any<String>,
 +   "foo": "foo",
   }

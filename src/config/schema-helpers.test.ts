@@ -26,7 +26,7 @@ import {
 	getRetryDelayMax,
 	type IAriseConfig,
 } from "./schema";
-import { EnumShadowSubAgentsName } from "../agents/shadow-names";
+import { EnumShadowSubAgentsName } from "../types/enums";
 
 /**
  * 預設常數測試
