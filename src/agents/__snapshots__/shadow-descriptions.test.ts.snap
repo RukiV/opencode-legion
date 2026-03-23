@@ -1,0 +1,158 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`getMonarchShadowList generates correctly formatted list 1`] = `
+"- @beru - Fastest scout. Codebase exploration, grep, file discovery, pattern search (supports background)
+- @igris - Precise implementer. Code changes, file editing, running commands, test verification
+- @bellion - Master strategist. Strategic planning, architecture analysis, complex problem decomposition (supports background)
+- @tusk - UI/UX specialist. Frontend development, UI/UX design, styling, components, animations
+- @tank - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
+- @shadow-sovereign - Deep reasoning specialist. Deep reasoning, complex debugging, architecture decisions, failure recovery"
+`;
+
+exports[`suggestShadowAgent snapshot test complex query 1`] = `
+[
+  "tusk",
+  "beru",
+  "igris",
+]
+`;
+
+exports[`getShadowAgentsMarkdownTable generates correct Markdown table 1`] = `
+"| Shadow Agent | Role | Best For |
+| --- | --- | --- |
+| 🐜 **beru** | Fastest scout | Finding files by name or pattern, Searching code for patterns or functions |
+| ⚔️ **igris** | Precise implementer | Implementing code changes, Editing files with precision |
+| 🎖️ **bellion** | Master strategist | Planning complex refactoring, Architecture design decisions |
+| 🎨 **tusk** | UI/UX specialist | Building UI components, Styling and layouts |
+| 🛡️ **tank** | External knowledge gatherer | Finding external documentation, Researching best practices |
+| 👁️ **shadow-sovereign** | Deep reasoning specialist | Complex architectural decisions, Debugging after multiple failed attempts |"
+`;
+
+exports[`getAllShadowNames snapshot test 1`] = `
+[
+  "beru",
+  "igris",
+  "bellion",
+  "tusk",
+  "tank",
+  "shadow-sovereign",
+]
+`;
+
+exports[`Snapshot tests for description outputs getShortDescription outputs are stable 1`] = `
+[
+  {
+    "description": "🐜 Fastest scout - Codebase exploration, grep, file discovery, pattern search",
+    "name": "beru",
+  },
+  {
+    "description": "⚔️ Precise implementer - Code changes, file editing, running commands, test verification",
+    "name": "igris",
+  },
+  {
+    "description": "🎖️ Master strategist - Strategic planning, architecture analysis, complex problem decomposition",
+    "name": "bellion",
+  },
+  {
+    "description": "🎨 UI/UX specialist - Frontend development, UI/UX design, styling, components, animations",
+    "name": "tusk",
+  },
+  {
+    "description": "🛡️ External knowledge gatherer - Web search, documentation lookup, examples, best practices research",
+    "name": "tank",
+  },
+  {
+    "description": "👁️ Deep reasoning specialist - Deep reasoning, complex debugging, architecture decisions, failure recovery",
+    "name": "shadow-sovereign",
+  },
+]
+`;
+
+exports[`Snapshot tests for description outputs getFullDescription outputs are stable 1`] = `
+[
+  {
+    "description": 
+"🐜 Beru - Ant King Scout
+Role: Fastest scout
+Capabilities: Codebase exploration, grep, file discovery, pattern search
+Best for:
+  • Finding files by name or pattern
+  • Searching code for patterns or functions
+  • Understanding code structure
+  • Quick codebase reconnaissance
+Background: Supported"
+,
+    "name": "beru",
+  },
+  {
+    "description": 
+"⚔️ Igris - Loyal Knight
+Role: Precise implementer
+Capabilities: Code changes, file editing, running commands, test verification
+Best for:
+  • Implementing code changes
+  • Editing files with precision
+  • Running build/test commands
+  • Verifying changes work correctly
+Background: Not supported"
+,
+    "name": "igris",
+  },
+  {
+    "description": 
+"🎖️ Bellion - Grand Marshal
+Role: Master strategist
+Capabilities: Strategic planning, architecture analysis, complex problem decomposition
+Best for:
+  • Planning complex refactoring
+  • Architecture design decisions
+  • Migration planning
+  • Breaking down large tasks
+Background: Supported"
+,
+    "name": "bellion",
+  },
+  {
+    "description": 
+"🎨 Tusk - Creative Shadow
+Role: UI/UX specialist
+Capabilities: Frontend development, UI/UX design, styling, components, animations
+Best for:
+  • Building UI components
+  • Styling and layouts
+  • Frontend integration
+  • Design system work
+Background: Not supported"
+,
+    "name": "tusk",
+  },
+  {
+    "description": 
+"🛡️ Tank - Research Shadow
+Role: External knowledge gatherer
+Capabilities: Web search, documentation lookup, examples, best practices research
+Best for:
+  • Finding external documentation
+  • Researching best practices
+  • Finding code examples
+  • Learning new libraries/frameworks
+Background: Supported"
+,
+    "name": "tank",
+  },
+  {
+    "description": 
+"👁️ Shadow-sovereign - Full Power
+Role: Deep reasoning specialist
+Capabilities: Deep reasoning, complex debugging, architecture decisions, failure recovery
+Best for:
+  • Complex architectural decisions
+  • Debugging after multiple failed attempts
+  • Extended reasoning analysis
+  • Recovery strategies
+Background: Not supported"
+,
+    "name": "shadow-sovereign",
+  },
+]
+`;
