@@ -64,6 +64,32 @@ export const AgentOverride = z.object({
   retry_delay_max: z.number().optional(),
   /** 系統提示補充（可選）/ System prompt supplement (optional) */
   system_prompt_addon: z.string().optional(),
+  /** 自動繼續任務設定（可選）/ Auto resume settings (optional) */
+  auto_resume: z
+    .object({
+      /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
+      enabled: z.boolean().default(false),
+      /** 最大重試次數（預設 3）/ Max retry count (default 3) */
+      max_retries: z.number().default(3).optional(),
+      /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
+      retry_delay: z.number().default(5000).optional(),
+      /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
+      on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional(),
+      /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
+      target: z.enum(["background", "all"]).default("background").optional(),
+      /** 自訂提示訊息（可選）/ Custom prompts (optional) */
+      prompts: z
+        .object({
+          /** 首次重試時的提示 / Prompt for first retry */
+          retry: z.string().optional(),
+          /** 最終重試時的提示 / Prompt for final retry */
+          final: z.string().optional(),
+          /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
+          custom: z.array(z.string()).optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -113,6 +139,38 @@ export const AriseConfigSchema = z.object({
       retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT),
       /** 重試延遲最大值（毫秒，預設 60000）/ Max retry delay in ms (default 60000) */
       retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX),
+      /** 自動繼續任務設定（可選）/ Auto resume task settings (optional) */
+      auto_resume: z
+        .object({
+          /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
+          enabled: z.boolean().default(false),
+          /** 最大重試次數（預設 3）/ Max retry count (default 3) */
+          max_retries: z.number().default(3).optional(),
+          /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
+          retry_delay: z.number().default(5000).optional(),
+          /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
+          /** - ignore: 忽略錯誤，不重試 / Ignore errors, no retry */
+          /** - retry: 自動重試 / Auto retry */
+          /** - notify: 通知但等待手動處理 / Notify but wait for manual handling */
+          on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional(),
+          /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
+          /** - background: 只對背景任務 / Only for background tasks */
+          /** - all: 所有任務 / All tasks */
+          target: z.enum(["background", "all"]).default("background").optional(),
+          /** 自訂提示訊息（可選）/ Custom prompts (optional) */
+          /** 用於自訂重試時的提示內容，可使用變數 / Used to customize prompts during retry, supports variables */
+          prompts: z
+            .object({
+              /** 首次重試時的提示 / Prompt for first retry */
+              retry: z.string().optional(),
+              /** 最終重試時的提示 / Prompt for final retry */
+              final: z.string().optional(),
+              /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
+              custom: z.array(z.string()).optional(),
+            })
+            .optional(),
+        })
+        .optional(),
     })
     .optional(),
   /** 除錯設定（可選）/ Debug settings (optional) */
@@ -160,6 +218,18 @@ export const DEFAULT_CONFIG: IAriseConfig = {
     poll_interval: DEFAULT_POLL_INTERVAL,
     retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
     retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
+    auto_resume: {
+      enabled: false,
+      max_retries: 3,
+      retry_delay: 5000,
+      on_error: "ignore",
+      target: "background",
+      prompts: {
+        retry: undefined,
+        final: undefined,
+        custom: undefined,
+      },
+    },
   },
   /** 除錯設定 / Debug settings */
   debug: {
@@ -280,3 +350,41 @@ export const getRetryDelayIncrement = _createConfigGetter("retry_delay_increment
  * @returns 重試延遲最大值（毫秒）
  */
 export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_RETRY_DELAY_MAX);
+
+/**
+ * Auto-resume 預設值
+ * Auto-resume default value
+ */
+const DEFAULT_AUTO_RESUME = {
+  enabled: false,
+  max_retries: 3,
+  retry_delay: 5000,
+  on_error: "ignore" as const,
+  target: "background" as const,
+  prompts: {
+    retry: undefined as string | undefined,
+    final: undefined as string | undefined,
+    custom: undefined as string[] | undefined,
+  },
+};
+
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_RESUME);
+
+/**
+ * 取得 auto_resume enabled 設定的輔助函式
+ * Helper function to get auto_resume enabled setting
+ *
+ * 優先順序：agent.auto_resume.enabled -> background.auto_resume.enabled -> 預設值 false
+ * Priority: agent.auto_resume.enabled -> background.auto_resume.enabled -> default false
+ *
+ * @param config - AriseConfig 物件
+ * @param agentName - agent 名稱（可選）
+ * @returns 是否啟用 auto_resume
+ */
+export function getAutoResumeEnabled(
+  config: IAriseConfig,
+  agentName?: IAllShadowAgentsName
+): boolean {
+  const autoResume = getAutoResumeConfig(config, agentName);
+  return autoResume.enabled;
+}

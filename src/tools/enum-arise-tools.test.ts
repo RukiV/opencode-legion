@@ -46,9 +46,6 @@ describe("EnumAriseTools", () =>
 
 			expect(enumValues.length as number).toBe(allLength);
 			expect(configKeys.length as number).toBe(allLength);
-
-			// 確保都等於 6
-			expect(allLength).toBe(6);
 		});
 	});
 

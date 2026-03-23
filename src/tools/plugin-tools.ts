@@ -6,6 +6,7 @@ import {
 	createBackgroundTaskTool,
 } from './background-tools';
 import { createListModelsTool } from './list-models';
+import { createContinueTool } from './continue-tool';
 import { EnumAriseTools } from './tool-names';
 import { IAriseTools } from '../types/types';
 import { BackgroundManager } from './background-manager';
@@ -35,5 +36,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: createBackgroundCancelTool(backgroundManager),
 		/** 列出可用模型工具 / List available models tool @see docs/tools/list-models.md */
 		[EnumAriseTools.ARISE_LIST_MODELS]: createListModelsTool(ctx),
+		/** 主動繼續/重試失敗任務工具 / Actively continue/retry failed task tool */
+		[EnumAriseTools.ARISE_CONTINUE]: createContinueTool(backgroundManager),
 	} satisfies IAriseTools
 }

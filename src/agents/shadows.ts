@@ -395,6 +395,29 @@ Returns a formatted list of all available models in the format provider/modelID.
 				.describe("Filter models by provider (e.g. 'anthropic', 'openai')"),
 		},
 	},
+	[EnumAriseTools.ARISE_CONTINUE]: {
+		description: `Actively continue/resume a failed background task.
+
+This tool allows agents to manually trigger a retry for a failed task, instead of waiting for passive auto-resume.
+
+Use this when:
+- You want to retry a task immediately without waiting for auto-resume
+- Auto-resume is disabled but you still want to retry manually
+- You want to attempt multiple manual retries
+
+Returns the status of the resume attempt.`,
+		shortDescription: "Actively continue/resume a failed task manually",
+
+		args: {
+			task_id: z
+				.string()
+				.describe("The task ID to resume/continue"),
+			force: z
+				.boolean()
+				.optional()
+				.describe("Force retry even if task is not in error state"),
+		},
+	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;
 
 /**

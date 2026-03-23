@@ -162,6 +162,8 @@ export enum EnumAriseTools {
 	ARISE_BACKGROUND_CANCEL = "arise_background_cancel",
 	/** 列出所有可用的模型 / List all available models */
 	ARISE_LIST_MODELS = "arise_list_models",
+	/** 主動繼續執行失敗的任務 / Actively continue/resume a failed task */
+	ARISE_CONTINUE = "arise_continue",
 }
 
 /**
@@ -175,4 +177,5 @@ export const ALL_ARISE_TOOLS = [
 	EnumAriseTools.ARISE_BACKGROUND_STATUS,
 	EnumAriseTools.ARISE_BACKGROUND_CANCEL,
 	EnumAriseTools.ARISE_LIST_MODELS,
+	EnumAriseTools.ARISE_CONTINUE,
 ] as const satisfies EnumAriseTools[];

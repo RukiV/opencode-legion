@@ -1,10 +1,80 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../config/schema";
+import {
+	DEFAULT_POLL_INTERVAL,
+	DEFAULT_RETRY_DELAY_INCREMENT,
+	DEFAULT_RETRY_DELAY_MAX,
+	getPollInterval,
+	getRetryDelayIncrement,
+	getRetryDelayMax,
+	getAutoResumeConfig,
+	getAutoResumeEnabled,
+} from "../config/schema";
+import type { IAriseConfig } from "../config/schema";
 import { IAllShadowAgentsName } from "../types/enums";
 import { getErrorMessage } from "../utils/message";
 import { resolveModelContext } from "../utils/model-resolver";
 import { getSessionModel } from "../config/model-cache";
+
+/**
+ * === 配置取得說明 / Configuration Getter Guide ===
+ *
+ * 本檔案使用的配置應透過 schema.ts 中的 getter 函式取得，以支援 per-agent 覆寫。
+ * Configuration used in this file should be obtained via getter functions from schema.ts to support per-agent overrides.
+ *
+ * 已實作的 getter（使用 _createConfigGetter）：
+ * Implemented getters (using _createConfigGetter):
+ * - getPollInterval(config, agentName?) -> number
+ * - getRetryDelayIncrement(config, agentName?) -> number
+ * - getRetryDelayMax(config, agentName?) -> number
+ * - getAutoResumeConfig(config, agentName?) -> auto_resume 物件 / object
+ * - getAutoResumeEnabled(config, agentName?) -> boolean
+ *
+ * 使用範例 / Usage example:
+ *   const pollInterval = getPollInterval(config, "beru");
+ *   const autoResume = getAutoResumeConfig(config, "igris");
+ *
+ * 注意 / Note:
+ * - _createConfigGetter 僅適用於簡單數值類型 / _createConfigGetter is for simple scalar values
+ * - 複雜物件（如 auto_resume）需客製化 getter / Complex objects (like auto_resume) need custom getters
+ * - 優先順序：agents[agentName].property -> background.property -> 預設值 / Priority: agents[agentName].property -> background.property -> default
+ */
+
+/**
+ * Auto-resume 錯誤處理行為
+ * Auto-resume error handling behavior
+ *
+ * - ignore: 忽略錯誤，不重試 / Ignore errors, no retry
+ * - retry: 自動重試 / Auto retry
+ * - notify: 通知但等待手動處理 / Notify but wait for manual handling
+ */
+type AutoResumeOnError = "ignore" | "retry" | "notify";
+
+/**
+ * Auto-resume 目標類型
+ * Auto-resume target type
+ *
+ * - background: 只對背景任務 / Only for background tasks
+ * - all: 所有任務 / All tasks
+ */
+type AutoResumeTarget = "background" | "all";
+
+/**
+ * Auto-resume 配置介面
+ * Auto-resume configuration interface
+ */
+interface AutoResumeConfig {
+  enabled: boolean;
+  maxRetries: number;
+  retryDelay: number;
+  onError: AutoResumeOnError;
+  target: AutoResumeTarget;
+  prompts?: {
+    retry?: string;
+    final?: string;
+    custom?: string[];
+  };
+}
 
 /**
  * 將配置值正規化為 getter 函式
@@ -69,6 +139,10 @@ export interface BackgroundTask {
   error?: string;
   /** 輪詢重試次數 / Polling retry count */
   retryCount: number;
+  /** Auto-resume 重試次數 / Auto-resume retry count */
+  resumeRetryCount?: number;
+  /** Auto-resume 是否正在等待重試 / Auto-resume is waiting for retry */
+  resumePending?: boolean;
 }
 
 /**
@@ -91,6 +165,8 @@ export class BackgroundManager {
   private getRetryDelayIncrement?: (agentName?: IAllShadowAgentsName) => number;
   /** 重試延遲最大值取得器 / Max retry delay getter */
   private getRetryDelayMax?: (agentName?: IAllShadowAgentsName) => number;
+  /** Auto-resume 配置取得器（支援 per-agent 覆寫）/ Auto-resume config getter (supports per-agent override) */
+  private getAutoResumeConfig: (agentName?: IAllShadowAgentsName) => AutoResumeConfig;
 
   /**
    * 建構函式
@@ -100,14 +176,39 @@ export class BackgroundManager {
    * @param pollIntervalOrGetter - 輪詢間隔（數字或函式）
    * @param retryDelayIncrementOrGetter - 重試延遲遞增量（數字或函式）
    * @param retryDelayMaxOrGetter - 重試延遲最大值（數字或函式）
+   * @param getAutoResumeConfigOrConfig - Auto-resume 配置或 getter 函式（可選）
    */
   constructor(
     ctx: PluginInput,
     pollIntervalOrGetter: number | ((agentName?: IAllShadowAgentsName) => number) = DEFAULT_POLL_INTERVAL,
     retryDelayIncrementOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
-    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number)
+    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
+    getAutoResumeConfigOrConfig?: AutoResumeConfig | ((agentName?: IAllShadowAgentsName) => AutoResumeConfig)
   ) {
     this.ctx = ctx;
+
+    /**
+     * Auto-resume 配置初始化
+     * Auto-resume config initialization
+     *
+     * 支援函式（per-agent 覆寫）或固定物件
+      * Supports function (per-agent override) or fixed object
+      */
+    if (typeof getAutoResumeConfigOrConfig === "function") {
+      this.getAutoResumeConfig = getAutoResumeConfigOrConfig;
+    } else if (getAutoResumeConfigOrConfig) {
+      this.getAutoResumeConfig = () => getAutoResumeConfigOrConfig;
+    } else {
+      /** 預設值 / Default value */
+      this.getAutoResumeConfig = () => ({
+        enabled: false,
+        maxRetries: 3,
+        retryDelay: 5000,
+        onError: "ignore",
+        target: "background",
+        prompts: {},
+      });
+    }
 
     /**
      * 輪詢間隔初始化
@@ -144,6 +245,278 @@ export class BackgroundManager {
       retryDelayMaxOrGetter,
       DEFAULT_RETRY_DELAY_MAX
     );
+  }
+
+  /**
+   * 檢查是否應該對任務執行 auto-resume
+   * Check if auto-resume should be performed on a task
+   *
+   * 條件：
+   * 1. Auto-resume 已啟用
+   * 2. 任務處於 error 狀態
+   * 3. 未超過最大重試次數
+   * 4. 目標類型符合（background 或 all）
+   *
+   * Conditions:
+   * 1. Auto-resume is enabled
+   * 2. Task is in error status
+   * 3. Has not exceeded max retry count
+   * 4. Target type matches (background or all)
+   *
+   * @param task - 背景任務
+   * @returns 是否應該執行 auto-resume
+   */
+  private shouldAutoResume(task: BackgroundTask): boolean {
+    /**
+     * 首先檢查 auto-resume 是否啟用
+     * First check if auto-resume is enabled
+     */
+    if (!this.getAutoResumeConfig()?.enabled) {
+      return false;
+    }
+
+    /**
+     * 檢查任務是否處於 error 狀態
+     * Check if task is in error status
+     */
+    if (task.status !== "error") {
+      return false;
+    }
+
+    /**
+     * 檢查目標類型是否符合
+     * Check if target type matches
+     *
+     * target = "background" 只對背景任務（(parentSessionId !== sessionId）生效
+     * target = "background" only applies to background tasks (parentSessionId !== sessionId)
+     * target = "all" 對所有任務生效
+     * target = "all" applies to all tasks
+     */
+    if (this.getAutoResumeConfig()?.target === "background") {
+      // 背景任務的 parentSessionId 不同於 sessionId
+      // Background task has different parentSessionId from sessionId
+      if (task.parentSessionId === task.sessionId) {
+        return false;
+      }
+    }
+
+    /**
+     * 檢查是否已超過最大重試次數
+     * Check if max retry count exceeded
+     */
+    const currentRetryCount = task.resumeRetryCount ?? 0;
+    if (currentRetryCount >= (this.getAutoResumeConfig()?.maxRetries ?? 3)) {
+      return false;
+    }
+
+    /**
+     * 檢查錯誤處理行為
+     * Check error handling behavior
+     *
+     * onError = "ignore" 時不進行 auto-resume
+     * onError = "ignore" means no auto-resume
+     */
+    if (this.getAutoResumeConfig()?.onError === "ignore") {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * 執行 auto-resume
+   * Perform auto-resume
+   *
+   * 重新執行失敗的任務
+   * Re-execute failed task
+   *
+   * @param task - 要重試的任務
+   */
+  private async performAutoResume(task: BackgroundTask): Promise<void> {
+    /**
+     * 標記任務為即將重試
+     * Mark task as about to retry
+     *
+     * 防止重複觸發
+     * Prevent duplicate triggers
+     */
+    task.resumePending = true;
+
+    /**
+     * 記錄重試嘗試
+     * Log retry attempt
+     */
+    this.ctx.client.app.log?.({
+      body: {
+        service: "arise",
+        level: "info",
+        message: `[Auto-resume] Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${this.getAutoResumeConfig()?.maxRetries ?? 3}`,
+      },
+    });
+
+    /**
+     * 等待配置的重試延遲
+     * Wait for configured retry delay
+     */
+    await new Promise((resolve) => setTimeout(resolve, this.getAutoResumeConfig()?.retryDelay ?? 5000));
+
+    /**
+     * 重置 pending 狀態並增加重試計數
+     * Reset pending status and increment retry count
+     */
+    task.resumePending = false;
+    task.resumeRetryCount = (task.resumeRetryCount ?? 0) + 1;
+
+    /**
+     * 重新建立 session 並執行任務
+     * Re-create session and execute task
+     *
+     * 使用原來的 shadow、prompt、description 等參數
+     * Use original shadow, prompt, description and other parameters
+     */
+    try {
+      const session = await this.ctx.client.session.create({
+        body: { title: `[arise:${task.id} retry ${task.resumeRetryCount}] ${task.description}` },
+      });
+
+      const newSessionId = session.data?.id;
+      if (!newSessionId) {
+        throw new Error("Failed to create retry session");
+      }
+
+      /**
+       * 更新任務的 sessionId
+       * Update task's sessionId
+       */
+      const oldSessionId = task.sessionId;
+      task.sessionId = newSessionId;
+      task.status = "running";
+      task.startedAt = Date.now();
+      task.error = undefined;
+      task.completedAt = undefined;
+
+      /**
+       * 重新執行 prompt（非同步）
+       * Re-execute prompt (async)
+       *
+       * 這次不等待完成，讓輪詢機制處理
+       * Don't wait for completion, let polling mechanism handle it
+       */
+      this.ctx.client.session
+        .promptAsync({
+          path: { id: newSessionId },
+          body: {
+            agent: task.shadow,
+            model: undefined, // 使用預設模型 / Use default model
+            parts: [{ type: "text", text: task.description }],
+          },
+        })
+        .then(() => this.pollTaskCompletion(task.id))
+        .catch((err) => {
+          /**
+           * 處理 promptAsync 的錯誤
+           * Handle promptAsync errors
+           *
+           * 標記任務為 error 並記錄錯誤訊息
+           * Mark task as error and record error message
+           */
+          task.status = "error";
+          task.error = getErrorMessage(err);
+          task.completedAt = Date.now();
+
+          /**
+           * 根據 on_error 設定處理錯誤
+           * Handle error based on on_error setting
+           */
+          if (this.getAutoResumeConfig()?.onError === "notify") {
+            // 通知模式：記錄但不做進一步重試
+            // Notify mode: log but don't retry further
+            this.ctx.client.app.log?.({
+              body: {
+                service: "arise",
+                level: "warn",
+                message: `[Auto-resume] Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
+              },
+            });
+          } else if (this.getAutoResumeConfig()?.onError === "retry") {
+            // 遞迴嘗試 auto-resume（會再次檢查 shouldAutoResume）
+            // Recursively attempt auto-resume (will check shouldAutoResume again)
+            this.ctx.client.app.log?.({
+              body: {
+                service: "arise",
+                level: "warn",
+                message: `[Auto-resume] Task ${task.id} retry failed: ${task.error}. Will retry again...`,
+              },
+            });
+            this.performAutoResume(task).catch((e) => {
+              this.ctx.client.app.log?.({
+                body: {
+                  service: "arise",
+                  level: "error",
+                  message: `[Auto-resume] Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
+                },
+              });
+            });
+          }
+        });
+    } catch (error) {
+      /**
+       * 處理 session 建立失敗
+       * Handle session creation failure
+       */
+      task.status = "error";
+      task.error = getErrorMessage(error);
+      task.completedAt = Date.now();
+
+      this.ctx.client.app.log?.({
+        body: {
+          service: "arise",
+          level: "error",
+          message: `[Auto-resume] Failed to create retry session for task ${task.id}: ${task.error}`,
+        },
+      });
+    }
+  }
+
+  /**
+   * 更新 auto-resume 配置
+   * Update auto-resume config
+   *
+   * @param config - 新的 auto-resume 配置
+   */
+  updateAutoResumeConfig(config: Partial<AutoResumeConfig>): void {
+    const current = this.getAutoResumeConfig?.() ?? {
+      enabled: false,
+      maxRetries: 3,
+      retryDelay: 5000,
+      onError: "ignore" as const,
+      target: "background" as const,
+      prompts: {},
+    };
+    this.getAutoResumeConfig = () => ({
+      enabled: config.enabled ?? current.enabled,
+      maxRetries: config.maxRetries ?? current.maxRetries,
+      retryDelay: config.retryDelay ?? current.retryDelay,
+      onError: config.onError ?? current.onError,
+      target: config.target ?? current.target,
+    });
+  }
+
+  /**
+   * 取得目前的 auto-resume 配置
+   * Get current auto-resume config
+   *
+   * @returns 目前的 auto-resume 配置
+   */
+  getAutoResumeConfigCopy(): AutoResumeConfig {
+    return this.getAutoResumeConfig?.() ?? {
+      enabled: false,
+      maxRetries: 3,
+      retryDelay: 5000,
+      onError: "ignore",
+      target: "background",
+      prompts: {},
+    };
   }
 
   /**
@@ -247,6 +620,22 @@ export class BackgroundManager {
         task.status = "error";
         task.error = getErrorMessage(err);
         task.completedAt = Date.now();
+
+        /**
+         * 檢查是否需要執行 auto-resume
+         * Check if auto-resume should be executed
+         */
+        if (this.shouldAutoResume(task)) {
+          this.performAutoResume(task).catch((e) => {
+            this.ctx.client.app.log?.({
+              body: {
+                service: "arise",
+                level: "error",
+                message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
+              },
+            });
+          });
+        }
       });
 
     return task;
@@ -366,6 +755,26 @@ export class BackgroundManager {
       task.status = "error";
       task.error = getErrorMessage(err);
       task.completedAt = Date.now();
+
+      /**
+       * 檢查是否需要執行 auto-resume
+       * Check if auto-resume should be executed
+       */
+      if (this.shouldAutoResume(task)) {
+        /**
+         * 非同步執行 auto-resume，不阻塞當前流程
+         * Execute auto-resume asynchronously, don't block current flow
+         */
+        this.performAutoResume(task).catch((e) => {
+          this.ctx.client.app.log?.({
+            body: {
+              service: "arise",
+              level: "error",
+              message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
+            },
+          });
+        });
+      }
     }
   }
 
@@ -530,5 +939,112 @@ export class BackgroundManager {
         }
       }
     }
+  }
+
+  /**
+   * 手動重試任務
+   * Manual retry task
+   *
+   * 允許 agents 主動觸發任務重試，而非等待被動 auto-resume
+   * Allows agents to actively trigger task retry, instead of waiting for passive auto-resume
+   *
+   * @param taskId - 要重試的任務 ID
+   * @param force - 是否強制重試（即使任務不在 error 狀態）
+   * @returns 重試結果訊息
+   */
+  async manualRetry(taskId: string, force: boolean = false): Promise<string> {
+    const task = this.tasks.get(taskId);
+
+    /** 任務不存在 / Task not found */
+    if (!task) {
+      return `[arise] Task not found: ${taskId}`;
+    }
+
+    /** 檢查任務是否處於 error 狀態 / Check if task is in error state */
+    if (task.status !== "error" && !force) {
+      return `[arise] Task ${taskId} is not in error state (status: ${task.status}). Use force=true to retry anyway.`;
+    }
+
+    /** 檢查是否正在等待 auto-resume 重試 / Check if waiting for auto-resume retry */
+    if (task.resumePending) {
+      return `[arise] Task ${taskId} is already pending auto-resume retry. Please wait for the current retry to complete.`;
+    }
+
+    /**
+     * 執行手動重試
+     * Perform manual retry
+     *
+     * 建立新的 session 並重新執行任務
+     * Create new session and re-execute task
+     */
+    try {
+      const session = await this.ctx.client.session.create({
+        body: { title: `[arise:${task.id} manual retry] ${task.description}` },
+      });
+
+      const newSessionId = session.data?.id;
+      if (!newSessionId) {
+        throw new Error("Failed to create retry session");
+      }
+
+      /** 更新任務資訊 / Update task info */
+      task.sessionId = newSessionId;
+      task.status = "running";
+      task.startedAt = Date.now();
+      task.error = undefined;
+      task.completedAt = undefined;
+      task.resumeRetryCount = (task.resumeRetryCount ?? 0) + 1;
+
+      /** 執行 prompt / Execute prompt */
+      this.ctx.client.session
+        .promptAsync({
+          path: { id: newSessionId },
+          body: {
+            agent: task.shadow,
+            model: undefined,
+            parts: [{ type: "text", text: task.description }],
+          },
+        })
+        .then(() => this._publicSchedulePolling(task.id))
+        .catch((err) => {
+          task.status = "error";
+          task.error = getErrorMessage(err);
+          task.completedAt = Date.now();
+        });
+
+      return `[arise] Manual retry initiated for task ${taskId}.
+
+Attempt: ${task.resumeRetryCount}
+Description: ${task.description}
+Shadow: ${task.shadow}
+
+Use arise_background_output("${task.id}") to check the result.`;
+    } catch (error) {
+      const msg = getErrorMessage(error);
+      return `[arise] Failed to initiate manual retry: ${msg}`;
+    }
+  }
+
+  /**
+   * 公開的排程輪詢方法（供外部使用）
+   * Public schedule polling method (for external use)
+   *
+   * @param taskId - 任務 ID
+   */
+  private _publicSchedulePolling(taskId: string): void {
+    const task = this.tasks.get(taskId);
+    if (task) {
+      this.schedulePolling(taskId, task.shadow as IAllShadowAgentsName);
+    }
+  }
+
+  /**
+   * 取得 plugin 上下文（供外部工具使用）
+   * Get plugin context (for external tools)
+   *
+   * @returns Plugin 上下文
+   */
+  getContext(): PluginInput {
+    return this.ctx;
   }
 }
