@@ -2,13 +2,20 @@
  * Arise Tools 重新導出模組
  * Arise Tools Re-export Module
  *
- * 所有工具相關導出都來自 shadows.ts
- * All tool-related exports come from shadows.ts
+ * 枚舉從 enums.ts 導入，ARISE_TOOLS 和函數從 shadows.ts 導入
+ * Enums imported from enums.ts, ARISE_TOOLS and functions from shadows.ts
  */
 
+// 枚舉從 enums.ts 導入
+// Import enums from enums.ts
 export {
 	EnumAriseTools,
 	ALL_ARISE_TOOLS,
+} from "../types/enums";
+
+// ARISE_TOOLS 和函數從 shadows.ts 導入
+// Import ARISE_TOOLS and functions from shadows.ts
+export {
 	ARISE_TOOLS,
 	getAriseToolsSection,
 	getAriseToolsConfigEntry,

@@ -1,43 +1,6 @@
 import type { ITSTypeAndStringLiteral } from 'ts-type';
 
 /**
- * Shadow Agent 模式
- * Shadow Agent mode
- *
- * - PRIMARY: 主代理（Monarch 使用）
- * - SUBAGENT: 子代理（其他 Shadow 使用）
- * - ALL: 所有模式
- */
-export enum EnumOpencodeAgentMode {
-	/** 主代理模式 - 唯一的主要協調者 / Primary mode - the only main coordinator */
-	PRIMARY = "primary",
-	/** 子代理模式 - 被 Monarch 召喚的 Shadow / Subagent mode - Shadows summoned by Monarch */
-	SUBAGENT = "subagent",
-	/** 所有模式 - 可同時作為主代理和子代理 / All modes - can be both primary and subagent */
-	ALL = "all",
-}
-
-/**
- * Shadow Agent 權限等級
- * Shadow Agent permission level
- *
- * 控制 Shadow 代理對特定操作的權限
- * Controls Shadow agent permissions for specific operations
- *
- * - ALLOW: 允許執行
- * - DENY: 拒絕執行
- * - ASK: 詢問使用者
- */
-export enum EnumOpencodeAgentPermission {
-	/** 允許執行 / Allow execution */
-	ALLOW = "allow",
-	/** 拒絕執行 / Deny execution */
-	DENY = "deny",
-	/** 詢問使用者 / Ask user */
-	ASK = "ask",
-}
-
-/**
  * Shadow Monarch 名稱列舉
  * 用於識別主要協調者
  *
@@ -146,3 +109,70 @@ export const ALL_SHADOW_AGENTS_NAME = [
  * IAllowedShadowName - Use ITSTypeAndStringLiteral to convert enum to literal type
  */
 export type IAllowedShadowName = ITSTypeAndStringLiteral<EnumShadowSubAgentsName>;
+
+/**
+ * Hook 名稱列舉
+ * Hook name enum
+ *
+ * 定義所有可用的生命週期 Hook 名稱
+ * Defines all available lifecycle hook names
+ */
+export const enum EnumHookName {
+	/** 橫幅顯示 Hook / Arise Banner Hook */
+	AriseBanner = "arise-banner",
+	/** 輸出整形 Hook / Output Shaper Hook */
+	OutputShaper = "output-shaper",
+	/** 緊湊化保留 Hook / Compaction Preserver Hook */
+	CompactionPreserver = "compaction-preserver",
+	/** 待辦事項強制 Hook / Todo Enforcer Hook */
+	TodoEnforcer = "todo-enforcer",
+}
+
+/**
+ * Hook 名稱陣列
+ * Hook names array
+ *
+ * 用於建立 Zod schema
+ * Used for creating Zod schema
+ */
+export const ALLOWED_HOOKS = [
+	EnumHookName.AriseBanner,
+	EnumHookName.OutputShaper,
+	EnumHookName.CompactionPreserver,
+	EnumHookName.TodoEnforcer,
+] as const;
+
+/**
+ * Arise 工具名稱列舉
+ * Arise tool name enum
+ *
+ * 定義所有 OpencodeArise 插件提供的工具 key
+ * Enum of all Arise tool names
+ */
+export enum EnumAriseTools {
+	/** 同步或非同步召喚 shadow agent 執行任務 / Invoke a shadow agent synchronously or in background */
+	ARISE_SUMMON = "arise_summon",
+	/** 以背景任務方式啟動 shadow agent (平行執行) / Launch shadow agent as background task (parallel) */
+	ARISE_BACKGROUND = "arise_background",
+	/** 取得背景任務的輸出結果 / Get result from background task */
+	ARISE_BACKGROUND_OUTPUT = "arise_background_output",
+	/** 列出所有背景任務及其狀態 / List all background tasks and their status */
+	ARISE_BACKGROUND_STATUS = "arise_background_status",
+	/** 取消執行中的背景任務 / Cancel a running background task */
+	ARISE_BACKGROUND_CANCEL = "arise_background_cancel",
+	/** 列出所有可用的模型 / List all available models */
+	ARISE_LIST_MODELS = "arise_list_models",
+}
+
+/**
+ * 所有 Arise 工具陣列
+ * All Arise tools array
+ */
+export const ALL_ARISE_TOOLS = [
+	EnumAriseTools.ARISE_SUMMON,
+	EnumAriseTools.ARISE_BACKGROUND,
+	EnumAriseTools.ARISE_BACKGROUND_OUTPUT,
+	EnumAriseTools.ARISE_BACKGROUND_STATUS,
+	EnumAriseTools.ARISE_BACKGROUND_CANCEL,
+	EnumAriseTools.ARISE_LIST_MODELS,
+] as const satisfies EnumAriseTools[];

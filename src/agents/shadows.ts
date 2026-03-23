@@ -1,7 +1,8 @@
 import { type Agent } from '@opencode-ai/sdk';
 import type { ITSPickExtra } from 'ts-type';
 import { z } from "zod";
-import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission, EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName } from '../types/enums';
+import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/opencode';
+import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 
 /**
@@ -272,36 +273,6 @@ export function getShadowDescription(name: EnumShadowSubAgentsName): IShadowDesc
 export function getAllShadowNames(): EnumShadowSubAgentsName[] {
   return [...ALLOWED_SHADOWS];
 }
-
-/**
- * Arise Tools 列舉 (Enum)
- * 定義所有 OpencodeArise 插件提供的工具 key
- *
- * Enum of all Arise tool names
- */
-export enum EnumAriseTools {
-	/** 同步或非同步召喚 shadow agent 執行任務 / Invoke a shadow agent synchronously or in background */
-	ARISE_SUMMON = "arise_summon",
-	/** 以背景任務方式啟動 shadow agent (平行執行) / Launch shadow agent as background task (parallel) */
-	ARISE_BACKGROUND = "arise_background",
-	/** 取得背景任務的輸出結果 / Get result from background task */
-	ARISE_BACKGROUND_OUTPUT = "arise_background_output",
-	/** 列出所有背景任務及其狀態 / List all background tasks and their status */
-	ARISE_BACKGROUND_STATUS = "arise_background_status",
-	/** 取消執行中的背景任務 / Cancel a running background task */
-	ARISE_BACKGROUND_CANCEL = "arise_background_cancel",
-	/** 列出所有可用的模型 / List all available models @see docs/tools/list-model.md */
-	ARISE_LIST_MODELS = "arise_list_models",
-}
-
-export const ALL_ARISE_TOOLS = [
-	EnumAriseTools.ARISE_SUMMON,
-	EnumAriseTools.ARISE_BACKGROUND,
-	EnumAriseTools.ARISE_BACKGROUND_OUTPUT,
-	EnumAriseTools.ARISE_BACKGROUND_STATUS,
-	EnumAriseTools.ARISE_BACKGROUND_CANCEL,
-	EnumAriseTools.ARISE_LIST_MODELS,
-] as const satisfies EnumAriseTools[];
 
 /**
  * only for valid ARISE_TOOLS

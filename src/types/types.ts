@@ -1,5 +1,5 @@
 import { ITSPartialRecord } from "ts-type";
-import { EnumAriseTools } from "../tools/tool-names";
+import { EnumAriseTools } from "../types/enums";
 import { IReturnTypeOfPluginToolArise } from "./opencode";
 
 export type IReturnHasPlugin<T extends string> = ITSPartialRecord<T, string[]>;

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ALL_SHADOW_AGENTS_NAME, IAllShadowAgentsName } from "../types/enums";
-import { ALLOWED_HOOKS, EnumHookName } from "./hook-names";
+import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { IValueNotPartial } from "../types/types";
 
 /**

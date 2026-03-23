@@ -1,8 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
-import { IAllShadowAgentsName } from "./types/enums";
-import { EnumHookName } from "./config/hook-names";
+import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
 import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { extractTextFromMessageParts, getErrorMessage } from "./utils/message";
@@ -12,7 +11,7 @@ import {
   createOutputShaperHook,
   createCompactionPreserverHook,
   createTodoEnforcerHook,
-} from "./hooks";
+} from "./hooks/index";
 import {
   createCallAriseAgentTool,
   BackgroundManager,
@@ -22,7 +21,7 @@ import {
   createBackgroundCancelTool,
 } from "./tools";
 import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/opencode';
-import { EnumAriseTools } from './tools/tool-names';
+import { EnumAriseTools } from './types/enums';
 import { IAriseTools } from "./types/types";
 import { createPluginTools } from './tools/plugin-tools';
 

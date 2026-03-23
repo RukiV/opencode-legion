@@ -1,5 +1,6 @@
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./shadows";
-import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName, EnumOpencodeAgentMode } from '../types/enums';
+import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName } from '../types/enums';
+import { EnumOpencodeAgentMode } from '../types/opencode';
 
 /**
  * 所有 Shadow 代理名稱陣列

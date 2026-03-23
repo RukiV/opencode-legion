@@ -4,15 +4,20 @@
  *
  * 定義 Shadow Agent 的模式、權限和工具相關類型
  * Defines Shadow Agent modes, permissions, and tool-related types
+ *
+ * 關於 Enum 放置：
+ * - OpenCode 概念相關的 Enum（模式、權限）定義於此檔案
+ * - ARISE 工具專用的 Enum 定義於 enums.ts
  */
 
 import { ToolContext, type ToolDefinition } from '@opencode-ai/plugin/tool';
-import { z, ZodType } from 'zod';
-import { ARISE_TOOLS, EnumAriseTools } from '../tools/tool-names';
-import { IAriseTools } from '../types/types';
+import { z } from 'zod';
+import { EnumAriseTools } from '../types/enums';
+import { ARISE_TOOLS } from '../agents/shadows';
+import type { IAriseTools } from '../types/types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
-import { type Hooks, PluginInput, tool } from '@opencode-ai/plugin';
-import { ITSOverwrite, ITSRequireAtLeastOne } from 'ts-type';
+import { type Hooks, type PluginInput, tool } from '@opencode-ai/plugin';
+import type { ITSOverwrite } from 'ts-type';
 import { BackgroundManager } from '../tools/background-manager';
 
 /**

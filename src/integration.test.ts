@@ -1,6 +1,6 @@
 import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 import OpencodeArise from "./index";
-import { ALL_ARISE_TOOLS } from "./tools/tool-names";
+import { ALL_ARISE_TOOLS } from "./types/enums";
 
 // Comprehensive mock context
 const createMockCtx = () => ({
