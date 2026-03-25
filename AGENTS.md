@@ -261,7 +261,8 @@ types/      - TypeScript type definitions
 | `typescript-naming-convention` | Creating or modifying TypeScript naming                  |
 | `analyze-code-commenter` | Editing, refactoring, implementing code or comment       |
 | `typescript-unimplemented-handler` | TypeScript type system limitations                       |
-| `test-file-best-practices` | Creating, Editing, refactoring test                   |
+| `test-file-best-practices` | 測試檔案最佳實踐規範。測試位置、命名、快照、fixtures、臨時檔案管理 |
+| `test-snapshot-documentation` | 利用測試快照進行文件化、範例展示、行為展示 |
 
 ---
 

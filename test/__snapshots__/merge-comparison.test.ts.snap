@@ -1,0 +1,555 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`deepMerge vs configMergeDeep comparison basic object merging both merge simple objects correctly 1`] = `
+{
+  "explain": 
+"✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([override, base]) 產生相同結果
+Simple object merge: both functions produce the same result"
+,
+  "input": {
+    "base": {
+      "a": 1,
+      "b": 2,
+    },
+    "override": {
+      "b": 3,
+      "c": 4,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+    "b": 3,
+    "c": 4,
+  },
+  "resultDeepMerge": {
+    "a": 1,
+    "b": 3,
+    "c": 4,
+  },
+  "tags": "basic, object-merge, same-result",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison basic object merging both handle nested object merging 1`] = `
+{
+  "explain": 
+"✅ 巢狀物件合併：兩者都遞迴合併嵌套物件
+Nested object merge: both recursively merge nested objects"
+,
+  "input": {
+    "base": {
+      "nested": {
+        "a": 1,
+        "b": 2,
+      },
+    },
+    "override": {
+      "nested": {
+        "b": 3,
+        "c": 4,
+      },
+    },
+  },
+  "resultConfigMerge": {
+    "nested": {
+      "a": 1,
+      "b": 3,
+      "c": 4,
+    },
+  },
+  "resultDeepMerge": {
+    "nested": {
+      "a": 1,
+      "b": 3,
+      "c": 4,
+    },
+  },
+  "tags": "nested, object-merge, recursive",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison array merging differences deepMerge replaces arrays entirely 1`] = `
+{
+  "explain": 
+"⚠️ 陣列處理差異 - deepMerge：完全替換陣列
+Array handling difference - deepMerge: replaces entire array"
+,
+  "input": {
+    "base": {
+      "items": [
+        1,
+        2,
+        3,
+      ],
+    },
+    "override": {
+      "items": [
+        4,
+        5,
+      ],
+    },
+  },
+  "resultConfigMerge": {
+    "items": [],
+  },
+  "resultDeepMerge": {
+    "items": [
+      4,
+      5,
+    ],
+  },
+  "tags": "array, replace, difference",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison array merging differences configMergeDeep keeps first array (left wins) 1`] = `
+{
+  "explain": 
+"⚠️ 陣列處理差異 - configMergeDeep：保留左側（override）陣列
+Array handling difference - configMergeDeep: keeps left (override) array"
+,
+  "input": {
+    "base": {
+      "items": [
+        1,
+        2,
+        3,
+      ],
+    },
+    "override": {
+      "items": [
+        4,
+        5,
+      ],
+    },
+  },
+  "resultConfigMerge": {
+    "items": [],
+  },
+  "resultDeepMerge": {
+    "items": [
+      4,
+      5,
+    ],
+  },
+  "tags": "array, left-wins, difference",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison array merging differences _arrayMergeLeftTargetWins returns target unchanged 1`] = `
+{
+  "explain": 
+"✅ _arrayMergeLeftTargetWins：回傳 target 不變（相同參考）
+_arrayMergeLeftTargetWins: returns target unchanged (same reference)"
+,
+  "input": {
+    "source": [
+      4,
+      5,
+      6,
+    ],
+    "target": [
+      1,
+      2,
+      3,
+    ],
+  },
+  "result": [
+    1,
+    2,
+    3,
+  ],
+  "tags": "array, helper-function, unchanged",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison multiple object merging deepMerge only handles two objects 1`] = `
+{
+  "explain": 
+"⚠️ 函式簽章差異 - deepMerge：需要鏈式呼叫處理多個物件
+Function signature difference - deepMerge: requires chaining for multiple objects"
+,
+  "input": {
+    "a": {
+      "x": 1,
+    },
+    "b": {
+      "y": 2,
+    },
+    "c": {
+      "z": 3,
+    },
+  },
+  "resultConfigMerge": {
+    "x": 1,
+    "y": 2,
+    "z": 3,
+  },
+  "resultDeepMerge": {
+    "x": 1,
+    "y": 2,
+    "z": 3,
+  },
+  "tags": "signature, multiple-objects, chaining",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison multiple object merging configMergeDeep handles multiple objects in one call 1`] = `
+{
+  "explain": 
+"✅ 函式簽章差異 - configMergeDeep：一次呼叫處理多個物件
+Function signature difference - configMergeDeep: handles multiple objects in one call"
+,
+  "input": {
+    "a": {
+      "x": 1,
+    },
+    "b": {
+      "y": 2,
+    },
+    "c": {
+      "z": 3,
+    },
+  },
+  "resultConfigMerge": {
+    "x": 1,
+    "y": 2,
+    "z": 3,
+  },
+  "resultDeepMerge": {
+    "x": 1,
+    "y": 2,
+    "z": 3,
+  },
+  "tags": "signature, multiple-objects, single-call",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison multiple object merging configMergeDeep merges multiple with left-to-right precedence 1`] = `
+{
+  "explain": 
+"✅ 多物件優先順序：左側優先（override > user > defaults）
+Multiple objects precedence: leftmost wins (override > user > defaults)"
+,
+  "input": {
+    "defaults": {
+      "a": 1,
+      "b": 1,
+      "c": 1,
+    },
+    "override": {
+      "c": 3,
+    },
+    "user": {
+      "b": 2,
+      "c": 2,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+  },
+  "resultDeepMerge": {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+  },
+  "tags": "precedence, left-to-right, priority",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison null and special value handling deepMerge handles null in override 1`] = `
+{
+  "explain": 
+"✅ null 處理：deepMerge 保留 override 中的 null
+Null handling: deepMerge preserves null in override"
+,
+  "input": {
+    "base": {
+      "value": "original",
+    },
+    "override": {
+      "value": null,
+    },
+  },
+  "resultConfigMerge": {
+    "value": null,
+  },
+  "resultDeepMerge": {
+    "value": null,
+  },
+  "tags": "null, special-value, preserve",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison null and special value handling configMergeDeep [override, base] keeps leftmost null 1`] = `
+{
+  "explain": 
+"✅ null 處理：configMergeDeep 保留左側（override）null
+Null handling: configMergeDeep keeps leftmost (override) null"
+,
+  "input": {
+    "base": {
+      "value": "original",
+    },
+    "override": {
+      "value": null,
+    },
+  },
+  "resultConfigMerge": {
+    "value": null,
+  },
+  "resultDeepMerge": {
+    "value": null,
+  },
+  "tags": "null, special-value, left-wins",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison null and special value handling deepMerge treats null in base as non-object 1`] = `
+{
+  "explain": 
+"✅ base 中的 null：null 不被視為物件，因此被覆蓋
+Null in base: null is not treated as object, so it gets overwritten"
+,
+  "input": {
+    "base": {
+      "nested": null,
+    },
+    "override": {
+      "nested": {
+        "a": 1,
+      },
+    },
+  },
+  "resultConfigMerge": {
+    "nested": {
+      "a": 1,
+    },
+  },
+  "resultDeepMerge": {
+    "nested": {
+      "a": 1,
+    },
+  },
+  "tags": "null, nested, overwrite",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison edge cases deepMerge with empty objects 1`] = `
+{
+  "explain": 
+"✅ 空物件處理：override 值被保留
+Empty object handling: override values are preserved"
+,
+  "input": {
+    "base": {},
+    "override": {
+      "a": 1,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+  },
+  "resultDeepMerge": {
+    "a": 1,
+  },
+  "tags": "edge-case, empty-object",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison edge cases configMergeDeep with empty array 1`] = `
+{
+  "explain": 
+"⚠️ 空陣列處理：configMergeDeep([]) 回傳空物件（與 deepMerge({}, {}) 不同）
+Empty array handling: configMergeDeep([]) returns empty object (different from deepMerge({}, {}))"
+,
+  "resultConfigMerge": {},
+  "resultDeepMerge": {},
+  "tags": "edge-case, empty-array, difference",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison edge cases configMergeDeep with single object 1`] = `
+{
+  "explain": 
+"✅ 單一物件：configMergeDeep([input]) 回傳單一物件
+Single object: configMergeDeep([input]) returns the single object"
+,
+  "input": {
+    "input": {
+      "a": 1,
+      "b": 2,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+    "b": 2,
+  },
+  "resultDeepMerge": {
+    "a": 1,
+    "b": 2,
+  },
+  "tags": "edge-case, single-object",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison edge cases deepMerge does not mutate original objects 1`] = `
+{
+  "explain": 
+"✅ 不可變性：deepMerge 不會修改原始物件
+Immutability: deepMerge does not mutate original objects"
+,
+  "input": {
+    "base": {
+      "a": 1,
+      "nested": {
+        "x": 1,
+      },
+    },
+    "override": {
+      "b": 2,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+    "b": 2,
+    "nested": {
+      "x": 1,
+    },
+  },
+  "resultDeepMerge": {
+    "a": 1,
+    "b": 2,
+    "nested": {
+      "x": 1,
+    },
+  },
+  "tags": "immutable, mutation, not-mutate",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison deep nested merging configMergeDeep left-priority differs from deepMerge at deep nesting 1`] = `
+{
+  "explain": 
+"✅ 深層巢狀合併：兩者都在深層巢狀處遞迴合併
+Deep nested merge: both recursively merge at deep nesting"
+,
+  "input": {
+    "base": {
+      "level1": {
+        "level2": {
+          "level3": {
+            "a": 1,
+            "b": 2,
+          },
+        },
+      },
+    },
+    "override": {
+      "level1": {
+        "level2": {
+          "level3": {
+            "b": 3,
+            "c": 4,
+          },
+        },
+      },
+    },
+  },
+  "resultConfigMerge": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "a": 1,
+          "b": 3,
+          "c": 4,
+        },
+      },
+    },
+  },
+  "resultDeepMerge": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "a": 1,
+          "b": 3,
+          "c": 4,
+        },
+      },
+    },
+  },
+  "tags": "nested, deep, recursive",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison deep nested merging nested array behavior shows key difference 1`] = `
+{
+  "explain": 
+"⚠️ 巢狀陣列行為顯示關鍵差異：deepMerge 替換整個陣列，configMergeDeep 保留左側
+Nested array behavior shows key difference: deepMerge replaces entire array, configMergeDeep keeps left"
+,
+  "input": {
+    "base": {
+      "config": {
+        "items": [
+          "a",
+          "b",
+        ],
+      },
+    },
+    "override": {
+      "config": {
+        "items": [
+          "c",
+        ],
+      },
+    },
+  },
+  "resultConfigMerge": {
+    "config": {
+      "items": [],
+    },
+  },
+  "resultDeepMerge": {
+    "config": {
+      "items": [
+        "c",
+      ],
+    },
+  },
+  "tags": "nested-array, array, difference",
+}
+`;
+
+exports[`deepMerge vs configMergeDeep comparison function signature differences deepMerge takes (base, override) while configMergeDeep takes array 1`] = `
+{
+  "explain": 
+"✅ 函式簽章差異總結：deepMerge(base, override) vs configMergeDeep([objects...])
+Function signature summary: deepMerge(base, override) vs configMergeDeep([objects...])"
+,
+  "input": {
+    "obj1": {
+      "a": 1,
+    },
+    "obj2": {
+      "b": 2,
+    },
+    "obj3": {
+      "c": 3,
+    },
+  },
+  "resultConfigMerge": {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+  },
+  "resultDeepMerge": {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+  },
+  "tags": "signature, comparison, summary",
+}
+`;

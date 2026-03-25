@@ -66,6 +66,7 @@
     "@opencode-ai/plugin": "^1.2.27",
     "@opencode-ai/sdk": "^1.2.27",
     "@yarn-tool/npa-to-deps": "^3.0.5",
+    "deepmerge-plus": "^4.0.1",
     "fs-extra": "^11.3.4",
     "jsonc-parser": "^3.3.1",
     "ts-type": "^3.0.10",
