@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.10](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.9...@bluelovers/opencode-arise@0.1.10) (2026-03-26)
+
+
+
+### 🐛　Bug Fixes
+
+* **queue-utils:** 修復 parallelLimit 併發控制邏輯 ([c8e78eb](https://github.com/moinulmoin/opencode-arise/commit/c8e78eb62e9bf9fd190cf9100f6fb4b96a4763cd))
+
+
+### ✨　Features
+
+* **background:** 新增 auto-resume 功能與手動重試工具 ([191c7fc](https://github.com/moinulmoin/opencode-arise/commit/191c7fc6f242c4516fb834f44a8977b522e10dc1))
+* **config:** 新增 configMergeDeep 深層合併工具函數 ([9b4c57c](https://github.com/moinulmoin/opencode-arise/commit/9b4c57cfda1b0803a0acd22ac46c6e1fb5590194))
+
+
+### 📦　Code Refactoring
+
+* **enums:** 整合所有枚舉至 types/enums.ts 並清理 re-export 檔案 ([8d0e4aa](https://github.com/moinulmoin/opencode-arise/commit/8d0e4aa5032c89eb5bf67bd80db312a6828cb5e3))
+* **enums:** 更新引用至 enums.ts 並建立 shadow-names.ts 做為 re-export ([b2c8536](https://github.com/moinulmoin/opencode-arise/commit/b2c853689db017e542db75b66b008d223cdefdbc))
+* **enums:** 將 shadow-names.ts 更名為 types/enums.ts ([9285714](https://github.com/moinulmoin/opencode-arise/commit/9285714f8712bd7d383378ba1be6b184c89f4ad8))
+* **enums:** 整合 EnumOpencodeAgentMode 與 EnumOpencodeAgentPermission 至 shadow-names.ts ([909df99](https://github.com/moinulmoin/opencode-arise/commit/909df99efa83692d9d5387543b4985f4bdf222f2))
+* **shadows:** 整合 SHADOW_DESCRIPTIONS 與 ARISE_TOOLS 至 shadows.ts ([a0ab2b6](https://github.com/moinulmoin/opencode-arise/commit/a0ab2b61cd4fa58ae75e049dd71fbcddd77675d4))
+* **terms:** 更新術語 shadow soldier/soldier/shadow → shadow agent ([e3d6f3e](https://github.com/moinulmoin/opencode-arise/commit/e3d6f3ebaf70345acb0e14a0ad84a98b2e04fa21))
+
+
+### 📚　Documentation
+
+* **tools:** 新增 list-models.md 文件並更新相關 [@see](https://github.com/see) 參照 ([efca297](https://github.com/moinulmoin/opencode-arise/commit/efca297cb6a40e5b11e4cff84684d4122040959a))
+
+
+### 🔖　Miscellaneous
+
+* 新增會話恢復與佇列處理工具函數 ([53a9cc9](https://github.com/moinulmoin/opencode-arise/commit/53a9cc9ca389793dece7eecb3d94103aea2f8394))
+
+
+
 ## 0.1.9 (2026-03-22)
 
 
