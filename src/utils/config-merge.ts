@@ -1,13 +1,13 @@
 
 import { deepmergeAll, IAnyRecord } from 'deepmerge-plus';
 
-export function configMergeDeep<T extends IAnyRecord>(inputList: [override: T, ...base: T[]]): T
+export function configMergeDeep<T extends IAnyRecord>(inputList: [base: T, ...override: T[]]): T
 export function configMergeDeep<T extends IAnyRecord>(inputList: T[]): T
 export function configMergeDeep<T extends IAnyRecord>(inputList: T[]): T
 {
   return deepmergeAll(inputList, {
-    keyValueUpsertMode: true,
-    arrayMerge: _arrayMergeLeftTargetWins,
+    // keyValueUpsertMode: true,
+    arrayMerge: _arrayMergeRightSourceWins,
   });
 }
 
@@ -17,7 +17,7 @@ export function configMergeDeep<T extends IAnyRecord>(inputList: T[]): T
  */
 export function _arrayMergeLeftTargetWins(target: any[], source: any[]): any[]
 {
-	return target.slice();
+	return target;
 }
 
 /**

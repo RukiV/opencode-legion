@@ -23,15 +23,21 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { b: 3, c: 4 };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			// 期望值 / Expected values
+			const expected = { a: 1, b: 3, c: 4 };
 
 			expect({
-				explain: "✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([override, base]) 產生相同結果\nSimple object merge: both functions produce the same result",
+				explain: "✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([base, override]) 產生相同結果\nSimple object merge: both functions produce the same result",
 				tags: "basic, object-merge, same-result",
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expected,
+				resultConfigMerge: expected,
+			});
 		});
 
 		it("both handle nested object merging", () => {
@@ -39,7 +45,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { nested: { b: 3, c: 4 } };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedNested = { nested: { a: 1, b: 3, c: 4 } };
 
 			expect({
 				explain: "✅ 巢狀物件合併：兩者都遞迴合併嵌套物件\nNested object merge: both recursively merge nested objects",
@@ -47,41 +55,54 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedNested,
+				resultConfigMerge: expectedNested,
+			});
 		});
 	});
 
-	describe("array merging differences", () => {
-		it("deepMerge replaces arrays entirely", () => {
+	describe("array merging behavior", () => {
+		it("deepMerge and configMergeDeep both replace arrays with source array", () => {
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedArray = { items: [4, 5] };
 
 			expect({
-				explain: "⚠️ 陣列處理差異 - deepMerge：完全替換陣列\nArray handling difference - deepMerge: replaces entire array",
-				tags: "array, replace, difference",
+				explain: "✅ 陣列處理相同 - 兩者都使用來源陣列\nArray handling same - both functions use source array",
+				tags: "array, replace, same",
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedArray,
+				resultConfigMerge: expectedArray,
+			});
 		});
 
-		it("configMergeDeep keeps first array (left wins)", () => {
+		it("configMergeDeep and deepMerge both use source array for merging", () => {
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedArray = { items: [4, 5] };
 
 			expect({
-				explain: "⚠️ 陣列處理差異 - configMergeDeep：保留左側（override）陣列\nArray handling difference - configMergeDeep: keeps left (override) array",
-				tags: "array, left-wins, difference",
+				explain: "✅ 陣列處理相同 - 兩者都使用來源陣列（override）\nArray handling same - both functions use source array (override)",
+				tags: "array, source, same",
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedArray,
+				resultConfigMerge: expectedArray,
+			});
 		});
 
 		it("_arrayMergeLeftTargetWins returns target unchanged", () => {
@@ -90,12 +111,16 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 
 			const result = _arrayMergeLeftTargetWins(target, source);
 
+			const expectedResult = [1, 2, 3];
+
 			expect({
 				explain: "✅ _arrayMergeLeftTargetWins：回傳 target 不變（相同參考）\n_arrayMergeLeftTargetWins: returns target unchanged (same reference)",
 				tags: "array, helper-function, unchanged",
 				input: { target, source },
 				result,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				result: expectedResult,
+			});
 		});
 	});
 
@@ -112,13 +137,18 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const resultDeepMerge = result2;
 			const resultConfigMerge = configMergeDeep([a, b, c]);
 
+			const expectedMulti = { x: 1, y: 2, z: 3 };
+
 			expect({
 				explain: "⚠️ 函式簽章差異 - deepMerge：需要鏈式呼叫處理多個物件\nFunction signature difference - deepMerge: requires chaining for multiple objects",
 				tags: "signature, multiple-objects, chaining",
 				input: { a, b, c },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedMulti,
+				resultConfigMerge: expectedMulti,
+			});
 		});
 
 		it("configMergeDeep handles multiple objects in one call", () => {
@@ -129,13 +159,18 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const resultDeepMerge = deepMerge(deepMerge(a, b), c);
 			const resultConfigMerge = configMergeDeep([a, b, c]);
 
+			const expectedMulti = { x: 1, y: 2, z: 3 };
+
 			expect({
 				explain: "✅ 函式簽章差異 - configMergeDeep：一次呼叫處理多個物件\nFunction signature difference - configMergeDeep: handles multiple objects in one call",
 				tags: "signature, multiple-objects, single-call",
 				input: { a, b, c },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedMulti,
+				resultConfigMerge: expectedMulti,
+			});
 		});
 
 		it("configMergeDeep merges multiple with left-to-right precedence", () => {
@@ -146,13 +181,18 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const resultDeepMerge = deepMerge(deepMerge(defaults, user), override);
 			const resultConfigMerge = configMergeDeep([override, user, defaults]);
 
+			const expectedPrecedence = { a: 1, b: 2, c: 3 };
+
 			expect({
 				explain: "✅ 多物件優先順序：左側優先（override > user > defaults）\nMultiple objects precedence: leftmost wins (override > user > defaults)",
 				tags: "precedence, left-to-right, priority",
 				input: { defaults, user, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedPrecedence,
+				resultConfigMerge: expectedPrecedence,
+			});
 		});
 	});
 
@@ -162,7 +202,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { value: null };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedNull = { value: null };
 
 			expect({
 				explain: "✅ null 處理：deepMerge 保留 override 中的 null\nNull handling: deepMerge preserves null in override",
@@ -170,15 +212,20 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedNull,
+				resultConfigMerge: expectedNull,
+			});
 		});
 
-		it("configMergeDeep [override, base] keeps leftmost null", () => {
+		it("configMergeDeep [base, override] keeps leftmost null", () => {
 			const base = { value: "original" };
 			const override = { value: null };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedNull = { value: null };
 
 			expect({
 				explain: "✅ null 處理：configMergeDeep 保留左側（override）null\nNull handling: configMergeDeep keeps leftmost (override) null",
@@ -186,7 +233,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedNull,
+				resultConfigMerge: expectedNull,
+			});
 		});
 
 		it("deepMerge treats null in base as non-object", () => {
@@ -194,7 +244,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { nested: { a: 1 } };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedNested = { nested: { a: 1 } };
 
 			expect({
 				explain: "✅ base 中的 null：null 不被視為物件，因此被覆蓋\nNull in base: null is not treated as object, so it gets overwritten",
@@ -202,7 +254,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedNested,
+				resultConfigMerge: expectedNested,
+			});
 		});
 	});
 
@@ -212,7 +267,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { a: 1 };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedEmpty = { a: 1 };
 
 			expect({
 				explain: "✅ 空物件處理：override 值被保留\nEmpty object handling: override values are preserved",
@@ -220,19 +277,27 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedEmpty,
+				resultConfigMerge: expectedEmpty,
+			});
 		});
 
 		it("configMergeDeep with empty array", () => {
 			const resultDeepMerge = deepMerge({}, {});
 			const resultConfigMerge = configMergeDeep([]);
 
+			const expectedEmptyObj = {};
+
 			expect({
 				explain: "⚠️ 空陣列處理：configMergeDeep([]) 回傳空物件（與 deepMerge({}, {}) 不同）\nEmpty array handling: configMergeDeep([]) returns empty object (different from deepMerge({}, {}))",
 				tags: "edge-case, empty-array, difference",
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedEmptyObj,
+				resultConfigMerge: expectedEmptyObj,
+			});
 		});
 
 		it("configMergeDeep with single object", () => {
@@ -241,13 +306,18 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const resultDeepMerge = deepMerge({}, input);
 			const resultConfigMerge = configMergeDeep([input]);
 
+			const expectedSingle = { a: 1, b: 2 };
+
 			expect({
 				explain: "✅ 單一物件：configMergeDeep([input]) 回傳單一物件\nSingle object: configMergeDeep([input]) returns the single object",
 				tags: "edge-case, single-object",
 				input: { input },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedSingle,
+				resultConfigMerge: expectedSingle,
+			});
 		});
 
 		it("deepMerge does not mutate original objects", () => {
@@ -255,7 +325,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const override = { b: 2 };
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedMutate = { a: 1, b: 2, nested: { x: 1 } };
 
 			expect({
 				explain: "✅ 不可變性：deepMerge 不會修改原始物件\nImmutability: deepMerge does not mutate original objects",
@@ -263,7 +335,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedMutate,
+				resultConfigMerge: expectedMutate,
+			});
 		});
 	});
 
@@ -285,7 +360,15 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			};
 
 			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+			const resultConfigMerge = configMergeDeep([base, override]);
+
+			const expectedDeepNested = {
+				level1: {
+					level2: {
+						level3: { a: 1, b: 3, c: 4 }
+					}
+				}
+			};
 
 			expect({
 				explain: "✅ 深層巢狀合併：兩者都在深層巢狀處遞迴合併\nDeep nested merge: both recursively merge at deep nesting",
@@ -293,32 +376,40 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 				input: { base, override },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedDeepNested,
+				resultConfigMerge: expectedDeepNested,
+			});
 		});
 
-		it("nested array behavior shows key difference", () => {
-			const base = {
-				config: {
-					items: ["a", "b"]
-				}
-			};
-			const override = {
-				config: {
-					items: ["c"]
-				}
-			};
+		it("nested array behavior shows both functions use source array", () => {
+		const base = {
+			config: {
+				items: ["a", "b"]
+			}
+		};
+		const override = {
+			config: {
+				items: ["c"]
+			}
+		};
 
-			const resultDeepMerge = deepMerge(base, override);
-			const resultConfigMerge = configMergeDeep([override, base]);
+		const resultDeepMerge = deepMerge(base, override);
+		const resultConfigMerge = configMergeDeep([base, override]);
 
-			expect({
-				explain: "⚠️ 巢狀陣列行為顯示關鍵差異：deepMerge 替換整個陣列，configMergeDeep 保留左側\nNested array behavior shows key difference: deepMerge replaces entire array, configMergeDeep keeps left",
-				tags: "nested-array, array, difference",
-				input: { base, override },
-				resultDeepMerge,
-				resultConfigMerge,
-			}).toMatchSnapshot();
+		const expectedNestedArray = { config: { items: ["c"] } };
+
+		expect({
+			explain: "✅ 巢狀陣列行為相同 - 兩者都使用來源陣列\nNested array behavior same - both functions use source array",
+			tags: "nested-array, array, same",
+			input: { base, override },
+			resultDeepMerge,
+			resultConfigMerge,
+		}).toMatchSnapshot({
+			resultDeepMerge: expectedNestedArray,
+			resultConfigMerge: expectedNestedArray,
 		});
+	});
 	});
 
 	describe("function signature differences", () => {
@@ -333,13 +424,18 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			// configMergeDeep signature: (objects[]) - array of objects
 			const resultConfigMerge = configMergeDeep([obj1, obj2, obj3]);
 
+			const expectedSignature = { a: 1, b: 2, c: 3 };
+
 			expect({
 				explain: "✅ 函式簽章差異總結：deepMerge(base, override) vs configMergeDeep([objects...])\nFunction signature summary: deepMerge(base, override) vs configMergeDeep([objects...])",
 				tags: "signature, comparison, summary",
 				input: { obj1, obj2, obj3 },
 				resultDeepMerge,
 				resultConfigMerge,
-			}).toMatchSnapshot();
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedSignature,
+				resultConfigMerge: expectedSignature,
+			});
 		});
 	});
 });

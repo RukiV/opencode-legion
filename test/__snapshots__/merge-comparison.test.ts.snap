@@ -3,7 +3,7 @@
 exports[`deepMerge vs configMergeDeep comparison basic object merging both merge simple objects correctly 1`] = `
 {
   "explain": 
-"✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([override, base]) 產生相同結果
+"✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([base, override]) 產生相同結果
 Simple object merge: both functions produce the same result"
 ,
   "input": {
@@ -68,11 +68,11 @@ Nested object merge: both recursively merge nested objects"
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison array merging differences deepMerge replaces arrays entirely 1`] = `
+exports[`deepMerge vs configMergeDeep comparison array merging behavior deepMerge and configMergeDeep both replace arrays with source array 1`] = `
 {
   "explain": 
-"⚠️ 陣列處理差異 - deepMerge：完全替換陣列
-Array handling difference - deepMerge: replaces entire array"
+"✅ 陣列處理相同 - 兩者都使用來源陣列
+Array handling same - both functions use source array"
 ,
   "input": {
     "base": {
@@ -90,7 +90,10 @@ Array handling difference - deepMerge: replaces entire array"
     },
   },
   "resultConfigMerge": {
-    "items": [],
+    "items": [
+      4,
+      5,
+    ],
   },
   "resultDeepMerge": {
     "items": [
@@ -98,15 +101,15 @@ Array handling difference - deepMerge: replaces entire array"
       5,
     ],
   },
-  "tags": "array, replace, difference",
+  "tags": "array, replace, same",
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison array merging differences configMergeDeep keeps first array (left wins) 1`] = `
+exports[`deepMerge vs configMergeDeep comparison array merging behavior configMergeDeep and deepMerge both use source array for merging 1`] = `
 {
   "explain": 
-"⚠️ 陣列處理差異 - configMergeDeep：保留左側（override）陣列
-Array handling difference - configMergeDeep: keeps left (override) array"
+"✅ 陣列處理相同 - 兩者都使用來源陣列（override）
+Array handling same - both functions use source array (override)"
 ,
   "input": {
     "base": {
@@ -124,7 +127,10 @@ Array handling difference - configMergeDeep: keeps left (override) array"
     },
   },
   "resultConfigMerge": {
-    "items": [],
+    "items": [
+      4,
+      5,
+    ],
   },
   "resultDeepMerge": {
     "items": [
@@ -132,11 +138,11 @@ Array handling difference - configMergeDeep: keeps left (override) array"
       5,
     ],
   },
-  "tags": "array, left-wins, difference",
+  "tags": "array, source, same",
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison array merging differences _arrayMergeLeftTargetWins returns target unchanged 1`] = `
+exports[`deepMerge vs configMergeDeep comparison array merging behavior _arrayMergeLeftTargetWins returns target unchanged 1`] = `
 {
   "explain": 
 "✅ _arrayMergeLeftTargetWins：回傳 target 不變（相同參考）
@@ -247,8 +253,8 @@ Multiple objects precedence: leftmost wins (override > user > defaults)"
   },
   "resultConfigMerge": {
     "a": 1,
-    "b": 2,
-    "c": 3,
+    "b": 1,
+    "c": 1,
   },
   "resultDeepMerge": {
     "a": 1,
@@ -283,7 +289,7 @@ Null handling: deepMerge preserves null in override"
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison null and special value handling configMergeDeep [override, base] keeps leftmost null 1`] = `
+exports[`deepMerge vs configMergeDeep comparison null and special value handling configMergeDeep [base, override] keeps leftmost null 1`] = `
 {
   "explain": 
 "✅ null 處理：configMergeDeep 保留左側（override）null
@@ -484,11 +490,11 @@ Deep nested merge: both recursively merge at deep nesting"
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison deep nested merging nested array behavior shows key difference 1`] = `
+exports[`deepMerge vs configMergeDeep comparison deep nested merging nested array behavior shows both functions use source array 1`] = `
 {
   "explain": 
-"⚠️ 巢狀陣列行為顯示關鍵差異：deepMerge 替換整個陣列，configMergeDeep 保留左側
-Nested array behavior shows key difference: deepMerge replaces entire array, configMergeDeep keeps left"
+"✅ 巢狀陣列行為相同 - 兩者都使用來源陣列
+Nested array behavior same - both functions use source array"
 ,
   "input": {
     "base": {
@@ -509,7 +515,9 @@ Nested array behavior shows key difference: deepMerge replaces entire array, con
   },
   "resultConfigMerge": {
     "config": {
-      "items": [],
+      "items": [
+        "c",
+      ],
     },
   },
   "resultDeepMerge": {
@@ -519,7 +527,7 @@ Nested array behavior shows key difference: deepMerge replaces entire array, con
       ],
     },
   },
-  "tags": "nested-array, array, difference",
+  "tags": "nested-array, array, same",
 }
 `;
 

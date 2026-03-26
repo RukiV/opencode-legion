@@ -515,26 +515,28 @@ export async function parallelLimit<T, R>(
 {
 	const results: R[] = new Array(items.length);
 	const executing: Promise<void>[] = [];
+	const itemPromises: Promise<void>[] = [];
 
 	for (let i = 0; i < items.length; i++)
 	{
+		const itemIndex = i;
 		const promise = fn(items[i], i).then((result) =>
 		{
-			results[i] = result;
+			results[itemIndex] = result;
 		});
 
 		executing.push(promise);
+		itemPromises.push(promise);
 
 		if (executing.length >= concurrency)
 		{
-			await Promise.race(executing);
-			executing.splice(
-				executing.findIndex((p) => p === promise),
-				1
+			const completedPromise = await Promise.race(
+				executing.map((p, idx) => p.then(() => idx))
 			);
+			executing.splice(completedPromise, 1);
 		}
 	}
 
-	await Promise.all(executing);
+	await Promise.all(itemPromises);
 	return results;
 }
