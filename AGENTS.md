@@ -221,6 +221,25 @@ src/
 └── *.test.ts       # Test files (co-located with source)
 ```
 
+### JavaScript Git-Friendly Code Style
+
+**用途**：減少 Git 差異中的視覺雜訊，提升程式碼合併時的可讀性與安全性。
+
+**載入方式**：使用 `skill` 工具載入 `js-git-friendly-coding-style`
+
+**使用時機**：
+| 情況 | 處理方式 |
+|------|----------|
+| **創建新檔案** | 載入此 skill 並套用風格 |
+| **用戶明確要求** | 載入此 skill 並套用風格 |
+| **修改他人代碼** | 保持原有格式，不套用此風格 |
+| **用戶未指定風格** | 保持原檔案格式一致性 |
+
+**核心原則**：
+- 最小化無關變更（不增加原本沒有的 `{` 或 `;`）
+- 清晰的邊界識別（大括號換行）
+- 一致的縮排（使用 Tab，除非原為空格）
+
 ## Plugin Rules (CRITICAL)
 
 1. **MUST export ONLY `default`** from `src/index.ts`
