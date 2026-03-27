@@ -8,8 +8,10 @@
 
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
+import { EnumSessionEventType } from "../types/enum-opencode";
 import { clearSessionModel } from "../config/model-cache";
 import { getErrorMessage } from "../utils/error";
+import { ITSTypeAndStringLiteral } from "ts-type";
 
 /**
  * 事件處理器客戶端上下文（使用 Pick 避免重複類型）
@@ -40,10 +42,7 @@ export interface IEventHandlerContext
  * 定義我們處理的會話事件類型
  * Defines the session event types we handle
  */
-export type ISessionEventType =
-	| "session.created"
-	| "session.idle"
-	| "session.deleted";
+export type ISessionEventType = ITSTypeAndStringLiteral<EnumSessionEventType>;
 
 /**
  * 檢查是否為會話事件
@@ -55,9 +54,9 @@ export type ISessionEventType =
 export function isSessionEvent(eventType: string): eventType is ISessionEventType
 {
 	return (
-		eventType === "session.created" ||
-		eventType === "session.idle" ||
-		eventType === "session.deleted"
+		eventType === EnumSessionEventType.SessionCreated ||
+		eventType === EnumSessionEventType.SessionIdle ||
+		eventType === EnumSessionEventType.SessionDeleted
 	);
 }
 
@@ -157,13 +156,13 @@ export function createFullEventHandler(
 		params.backgroundManager.handleEvent(event);
 
 		/** 會話創建時顯示橫幅 / Show banner on session creation */
-		if (event.type === "session.created" && params.bannerHook)
+		if (event.type === EnumSessionEventType.SessionCreated && params.bannerHook)
 		{
 			await params.bannerHook.onSessionCreated();
 		}
 
 		/** 處理 session.idle 以進行 TODO 強制執行 / Handle session.idle for TODO enforcement */
-		if (event.type === "session.idle" && todoEnforcer)
+		if (event.type === EnumSessionEventType.SessionIdle && todoEnforcer)
 		{
 			const sessionId = extractSessionId(event);
 			if (sessionId)
@@ -215,7 +214,7 @@ export function createFullEventHandler(
 		}
 
 		/** 清除會話結束時的模型緩存 / Clear model cache when session ends */
-		if (event.type === "session.deleted")
+		if (event.type === EnumSessionEventType.SessionDeleted)
 		{
 			handleSessionDeleted(event);
 		}
