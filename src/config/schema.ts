@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ALL_SHADOW_AGENTS_NAME, IAllShadowAgentsName } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { IValueNotPartial } from "../types/types";
-import { AUTO } from "../types/const-default";
+import { AUTO_MODEL } from "../types/const-default";
 
 /**
  * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
@@ -11,9 +11,9 @@ import { AUTO } from "../types/const-default";
  * 當使用此值時，背景任務會自動使用呼叫它的主任務的模型
  * When used, background tasks will automatically use the parent task's model
  *
- * @deprecated 使用 AUTO 取代 / Use AUTO instead
+ * @deprecated 使用 AUTO_MODEL 取代 / Use AUTO_MODEL instead
  */
-export const AUTO_MODEL = AUTO;
+export const AUTO_MODEL_MODEL = AUTO_MODEL;
 
 /**
  * 輪詢間隔預設值（毫秒）
@@ -358,7 +358,7 @@ export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_R
  * Auto-resume 預設值
  * Auto-resume default value
  */
-const DEFAULT_AUTO_RESUME = {
+const DEFAULT_AUTO_MODEL_RESUME = {
   enabled: false,
   max_retries: 3,
   retry_delay: 5000,
@@ -371,7 +371,7 @@ const DEFAULT_AUTO_RESUME = {
   },
 };
 
-export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_RESUME);
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME);
 
 /**
  * 取得 auto_resume enabled 設定的輔助函式

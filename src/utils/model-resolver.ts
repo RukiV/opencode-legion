@@ -3,7 +3,7 @@
  * 模型解析工具函數
  */
 
-import { AUTO, DEFAULT_MODEL } from "../types/const-default";
+import { AUTO_MODEL, DEFAULT_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
@@ -32,11 +32,11 @@ export function getEffectiveModel(
   userModel?: string,
 ): string | undefined {
   // 用戶指定的模型擁有最高優先級
-  if (userModel && userModel !== AUTO) {
+  if (userModel && userModel !== AUTO_MODEL) {
     return userModel;
   }
 
-  if (defaultModel === AUTO) {
+  if (defaultModel === AUTO_MODEL) {
     // 若為 <auto> 且有父模型則使用，否則 fallback
     return parentModel ?? defaultModel;
   }
@@ -71,7 +71,7 @@ export function getModelFromConfig(
 export function parseModelString(
   model: string | undefined,
 ): { providerID: string; modelID: string } | undefined {
-  if (!model || model === AUTO) {
+  if (!model || model === AUTO_MODEL) {
     return undefined;
   }
 
@@ -184,13 +184,13 @@ export function getEffectiveModelWithFallback(
   userModel?: string,
 ): string {
   // 1. 用戶指定的模型擁有最高優先級
-  if (userModel && userModel !== AUTO) {
+  if (userModel && userModel !== AUTO_MODEL) {
     return userModel;
   }
 
   // 2. Config 中的模型次之
   if (configModel) {
-    if (configModel === AUTO) {
+    if (configModel === AUTO_MODEL) {
       // <auto> 使用父模型，若無則檢查 defaultModel，最後才是 DEFAULT_MODEL
       return parentModel ?? defaultModel ?? DEFAULT_MODEL;
     }
@@ -198,7 +198,7 @@ export function getEffectiveModelWithFallback(
   }
 
   // 3. Shadow 預設模型
-  if (defaultModel === AUTO) {
+  if (defaultModel === AUTO_MODEL) {
     // <auto> 使用父模型，若無則檢查 defaultModel，最後才是 DEFAULT_MODEL
     return parentModel ?? defaultModel ?? DEFAULT_MODEL;
   }

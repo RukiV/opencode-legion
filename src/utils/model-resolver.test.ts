@@ -23,7 +23,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { AUTO } from "../types/const-default";
+import { AUTO_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import {
 	getEffectiveModel,
@@ -92,14 +92,14 @@ describe("getModelFromConfig", () => {
 describe("getEffectiveModel", () => {
 	test("當 defaultModel 是 <auto> 且有 parentModel 時，返回 parentModel", () => {
 		/** <auto> 模式會使用父模型的模型 / <auto> mode uses parent's model */
-		const result = getEffectiveModel("anthropic/claude-sonnet-4", AUTO);
+		const result = getEffectiveModel("anthropic/claude-sonnet-4", AUTO_MODEL);
 		expect(result).toBe("anthropic/claude-sonnet-4");
 	});
 
 	test("當 defaultModel 是 <auto> 且無 parentModel 時，返回 <auto>", () => {
 		/** 無父模型時，<auto> 無法解析 / <auto> cannot resolve without parent model */
-		const result = getEffectiveModel(undefined, AUTO);
-		expect(result).toBe(AUTO);
+		const result = getEffectiveModel(undefined, AUTO_MODEL);
+		expect(result).toBe(AUTO_MODEL);
 	});
 
 	test("當 defaultModel 不是 <auto> 時，直接返回 defaultModel", () => {
@@ -155,7 +155,7 @@ describe("getEffectiveModelWithFallback", () => {
 			"parent/model",
 			"default/model",
 			"config/model",
-			AUTO,
+			AUTO_MODEL,
 		);
 		expect(result).toBe("config/model");
 	});
@@ -174,7 +174,7 @@ describe("getEffectiveModelWithFallback", () => {
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
 			"default/model",
-			AUTO,
+			AUTO_MODEL,
 			undefined,
 		);
 		expect(result).toBe("parent/model");
@@ -193,7 +193,7 @@ describe("getEffectiveModelWithFallback", () => {
 	test("Shadow 預設為 <auto> 且有父模型時使用父模型", () => {
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
-			AUTO,
+			AUTO_MODEL,
 			undefined,
 			undefined,
 		);
@@ -204,12 +204,12 @@ describe("getEffectiveModelWithFallback", () => {
 		/** <auto> 在此階段返回，會在 resolveModelContext 中 fallback 到 DEFAULT_MODEL */
 		const result = getEffectiveModelWithFallback(
 			undefined,
-			AUTO,
+			AUTO_MODEL,
 			undefined,
 			undefined,
 		);
 		/** 現在返回 <auto>，因為先檢查 parentModel 才到 DEFAULT_MODEL */
-		expect(result).toBe(AUTO);
+		expect(result).toBe(AUTO_MODEL);
 	});
 
 	test("無任何模型時使用 DEFAULT_MODEL", () => {
@@ -265,7 +265,7 @@ describe("parseModelString", () => {
 
 	test("當模型字串為 <auto> 時，返回 undefined", () => {
 		/** <auto> 是特殊值，需要單獨處理 / <auto> is a special value that needs separate handling */
-		const result = parseModelString(AUTO);
+		const result = parseModelString(AUTO_MODEL);
 		expect(result).toBeUndefined();
 	});
 
@@ -339,7 +339,7 @@ describe("resolveModelContext", () => {
 	test("當 config 模型為 <auto> 時，使用父模型", () => {
 		const config = {
 			agents: {
-				[EnumShadowSubAgentsName.Beru]: { model: AUTO },
+				[EnumShadowSubAgentsName.Beru]: { model: AUTO_MODEL },
 			},
 		} as IAriseConfig;
 		const result = resolveModelContext(
@@ -357,7 +357,7 @@ describe("resolveModelContext", () => {
 		/** <auto> 遞延到 Shadow 預設模型 / <auto> defers to Shadow default model */
 		const config = {
 			agents: {
-				[EnumShadowSubAgentsName.Beru]: { model: AUTO },
+				[EnumShadowSubAgentsName.Beru]: { model: AUTO_MODEL },
 			},
 		} as IAriseConfig;
 		const result = resolveModelContext(
@@ -400,7 +400,7 @@ describe("resolveModelContext", () => {
 			"anthropic/claude-3",
 			EnumShadowSubAgentsName.Beru,
 			config,
-			AUTO,
+			AUTO_MODEL,
 		);
 		expect(result).toEqual({
 			providerID: "config",
