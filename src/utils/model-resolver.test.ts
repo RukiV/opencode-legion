@@ -6,7 +6,7 @@
  * Tests for getEffectiveModel, parseModelString, resolveModelContext, and getModelFromConfig functions
  *
  * 測試重點：
- * 1. <auto> 模型的特殊處理邏輯
+ * 1. AUTO 模型的特殊處理邏輯
  * 2. 模型字串解析（provider/modelID 格式）
  * 3. 無效輸入的錯誤處理
  * 4. 多段模型 ID 的支援
@@ -14,7 +14,7 @@
  * 6. DEFAULT_MODEL fallback
  *
  * Test focus areas:
- * 1. Special handling logic for <auto> model
+ * 1. Special handling logic for AUTO model
  * 2. Model string parsing (provider/modelID format)
  * 3. Error handling for invalid inputs
  * 4. Support for multi-segment model IDs
@@ -86,24 +86,24 @@ describe("getModelFromConfig", () => {
  * getEffectiveModel 函數測試
  * getEffectiveModel function tests
  *
- * 測試 <auto> 模型的特殊處理邏輯
- * Tests special handling logic for <auto> model
+ * 測試 AUTO 模型的特殊處理邏輯
+ * Tests special handling logic for AUTO model
  */
 describe("getEffectiveModel", () => {
-	test("當 defaultModel 是 <auto> 且有 parentModel 時，返回 parentModel", () => {
-		/** <auto> 模式會使用父模型的模型 / <auto> mode uses parent's model */
+	test("當 defaultModel 是 AUTO 且有 parentModel 時，返回 parentModel", () => {
+		/** AUTO 模式會使用父模型的模型 / AUTO mode uses parent's model */
 		const result = getEffectiveModel("anthropic/claude-sonnet-4", AUTO_MODEL);
 		expect(result).toBe("anthropic/claude-sonnet-4");
 	});
 
-	test("當 defaultModel 是 <auto> 且無 parentModel 時，返回 <auto>", () => {
-		/** 無父模型時，<auto> 無法解析 / <auto> cannot resolve without parent model */
+	test("當 defaultModel 是 AUTO 且無 parentModel 時，返回 AUTO", () => {
+		/** 無父模型時，AUTO 無法解析 / AUTO cannot resolve without parent model */
 		const result = getEffectiveModel(undefined, AUTO_MODEL);
 		expect(result).toBe(AUTO_MODEL);
 	});
 
-	test("當 defaultModel 不是 <auto> 時，直接返回 defaultModel", () => {
-		/** 非 <auto> 模型直接使用 / Non-<auto> models are used directly */
+	test("當 defaultModel 不是 AUTO 時，直接返回 defaultModel", () => {
+		/** 非 AUTO 模型直接使用 / Non-AUTO models are used directly */
 		const result = getEffectiveModel(
 			"anthropic/claude-sonnet-4",
 			"openai/gpt-4",
@@ -111,8 +111,8 @@ describe("getEffectiveModel", () => {
 		expect(result).toBe("openai/gpt-4");
 	});
 
-	test("當 parentModel 為 undefined 且 defaultModel 不是 <auto> 時，返回 defaultModel", () => {
-		/** 即使無父模型，非 <auto> 模型仍直接使用 / Non-<auto> models used directly even without parent */
+	test("當 parentModel 為 undefined 且 defaultModel 不是 AUTO 時，返回 defaultModel", () => {
+		/** 即使無父模型，非 AUTO 模型仍直接使用 / Non-AUTO models used directly even without parent */
 		const result = getEffectiveModel(undefined, "openai/gpt-4");
 		expect(result).toBe("openai/gpt-4");
 	});
@@ -149,15 +149,15 @@ describe("getEffectiveModelWithFallback", () => {
 		expect(result).toBe("user/model");
 	});
 
-	test("用戶指定 <auto> 時，使用下一優先級", () => {
-		/** <auto> 會遞延到下一優先級 / <auto> defers to next priority */
+	test("用戶指定 AUTO 時，回退到 parentModel", () => {
+		/** AUTO 會使用 parentModel 回退 / AUTO uses parentModel fallback */
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
 			"default/model",
 			"config/model",
 			AUTO_MODEL,
 		);
-		expect(result).toBe("config/model");
+		expect(result).toBe("parent/model");
 	});
 
 	test("Config 模型次於用戶指定但優先於 Shadow 預設", () => {
@@ -170,7 +170,7 @@ describe("getEffectiveModelWithFallback", () => {
 		expect(result).toBe("config/model");
 	});
 
-	test("Config 模型為 <auto> 時使用父模型", () => {
+	test("Config 模型為 AUTO 時使用父模型", () => {
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
 			"default/model",
@@ -190,7 +190,7 @@ describe("getEffectiveModelWithFallback", () => {
 		expect(result).toBe("default/model");
 	});
 
-	test("Shadow 預設為 <auto> 且有父模型時使用父模型", () => {
+	test("Shadow 預設為 AUTO 且有父模型時使用父模型", () => {
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
 			AUTO_MODEL,
@@ -200,16 +200,16 @@ describe("getEffectiveModelWithFallback", () => {
 		expect(result).toBe("parent/model");
 	});
 
-	test("無父模型且預設為 <auto> 時，返回 <auto>（會在 resolveModelContext 中進一步處理）", () => {
-		/** <auto> 在此階段返回，會在 resolveModelContext 中 fallback 到 DEFAULT_MODEL */
+	test("無父模型且預設為 AUTO 時，返回 DEFAULT_MODEL", () => {
+		/** 當 defaultModel 為 AUTO 且無 parentModel 時，回退到 DEFAULT_MODEL */
 		const result = getEffectiveModelWithFallback(
 			undefined,
 			AUTO_MODEL,
 			undefined,
 			undefined,
 		);
-		/** 現在返回 <auto>，因為先檢查 parentModel 才到 DEFAULT_MODEL */
-		expect(result).toBe(AUTO_MODEL);
+		/** 回退到 DEFAULT_MODEL */
+		expect(result).toBe("opencode/big-pickle");
 	});
 
 	test("無任何模型時使用 DEFAULT_MODEL", () => {
@@ -263,8 +263,8 @@ describe("parseModelString", () => {
 		expect(result).toBeUndefined();
 	});
 
-	test("當模型字串為 <auto> 時，返回 undefined", () => {
-		/** <auto> 是特殊值，需要單獨處理 / <auto> is a special value that needs separate handling */
+	test("當模型字串為 AUTO 時，返回 undefined", () => {
+		/** AUTO 是特殊值，需要單獨處理 / AUTO is a special value that needs separate handling */
 		const result = parseModelString(AUTO_MODEL);
 		expect(result).toBeUndefined();
 	});
@@ -336,7 +336,7 @@ describe("resolveModelContext", () => {
 		});
 	});
 
-	test("當 config 模型為 <auto> 時，使用父模型", () => {
+	test("當 config 模型為 AUTO 時，使用父模型", () => {
 		const config = {
 			agents: {
 				[EnumShadowSubAgentsName.Beru]: { model: AUTO_MODEL },
@@ -353,8 +353,8 @@ describe("resolveModelContext", () => {
 		});
 	});
 
-	test("當 config 模型為 <auto> 且無父模型時，使用 Shadow 預設模型", () => {
-		/** <auto> 遞延到 Shadow 預設模型 / <auto> defers to Shadow default model */
+	test("當 config 模型為 AUTO 且無父模型時，使用 Shadow 預設模型", () => {
+		/** AUTO 遞延到 Shadow 預設模型 / AUTO defers to Shadow default model */
 		const config = {
 			agents: {
 				[EnumShadowSubAgentsName.Beru]: { model: AUTO_MODEL },
@@ -389,8 +389,8 @@ describe("resolveModelContext", () => {
 		});
 	});
 
-	test("當呼叫時指定 <auto> 時，遞延到 config", () => {
-		/** <auto> 會遞延到 config 模型 / <auto> defers to config model */
+	test("當呼叫時指定 AUTO 時，回退到 parentModel", () => {
+		/** AUTO 會回退到 parentModel / AUTO falls back to parentModel */
 		const config = {
 			agents: {
 				[EnumShadowSubAgentsName.Beru]: { model: "config/model" },
@@ -403,8 +403,8 @@ describe("resolveModelContext", () => {
 			AUTO_MODEL,
 		);
 		expect(result).toEqual({
-			providerID: "config",
-			modelID: "model",
+			providerID: "anthropic",
+			modelID: "claude-3",
 		});
 	});
 

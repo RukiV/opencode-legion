@@ -64,8 +64,8 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
          * 解析模型上下文
          * Resolve model context
          *
-         * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > <auto> 使用父模型 > 父模型 > DEFAULT_MODEL
-         * Priority: User specified > Config model > Shadow default > <auto> use parent > parentModel > DEFAULT_MODEL
+         * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > AUTO 使用父模型 > 父模型 > DEFAULT_MODEL
+         * Priority: User specified > Config model > Shadow default > AUTO use parent > parentModel > DEFAULT_MODEL
          */
         const parentModel = getSessionModel(context.sessionID);
         const modelBody = resolveModelContext(parentModel, shadow, config, model);

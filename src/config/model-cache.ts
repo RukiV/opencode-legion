@@ -2,15 +2,15 @@
  * 模型緩存管理器
  * Model cache manager
  *
- * 用於緩存每個會話使用的模型，實現 <auto> 模型自動取值功能
- * Caches the model used by each session for <auto> model inheritance
+ * 用於緩存每個會話使用的模型，實現 AUTO 模型自動取值功能
+ * Caches the model used by each session for AUTO model inheritance
  *
  * 使用場景：
- * 當 Monarch 召喚 Shadow 時，Shadow 可以使用 <auto> 作為模型
+ * 當 Monarch 召喚 Shadow 時，Shadow 可以使用 AUTO 作為模型
  * 這時會自動沿用 Monarch 所在會話的模型
  *
  * Usage scenario:
- * When Monarch summons Shadow, Shadow can use <auto> as model
+ * When Monarch summons Shadow, Shadow can use AUTO as model
  * This will automatically inherit the model from Monarch's session
  */
 

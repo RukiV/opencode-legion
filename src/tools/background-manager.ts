@@ -588,8 +588,8 @@ export class BackgroundManager {
      * 解析模型上下文
      * Resolve model context
      *
-     * 優先順序：用戶指定 > Shadow 預設 > <auto> 使用父模型
-     * Priority: User specified > Shadow default > <auto> use parent model
+     * 優先順序：用戶指定 > Shadow 預設 > AUTO 使用父模型
+     * Priority: User specified > Shadow default > AUTO use parent model
      */
     const parentModel = getSessionModel(opts.parentSessionId);
     const modelBody = resolveModelContext(

@@ -20,7 +20,7 @@ import { z } from "zod";
  * - 呼叫 arise_summon 工具時 model 參數設為 AUTO_MODEL
  * - shadows.ts 中 Shadow 預設模型設為 AUTO_MODEL
  */
-export const AUTO_MODEL = "AUTO";
+export const AUTO_MODEL = 'AUTO' as const;
 
 /**
  * Zod schema for AUTO_MODEL 常數驗證
@@ -35,4 +35,4 @@ export const AutoModelSchema = z.literal(AUTO_MODEL);
  * 當沒有指定任何模型時使用的 fallback
  * Used when no model is specified at all
  */
-export const DEFAULT_MODEL = "opencode/big-pickle";
+export const DEFAULT_MODEL = 'opencode/big-pickle' as const;

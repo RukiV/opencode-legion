@@ -152,9 +152,9 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
          * 解析模型
          * Resolve model
          *
-         * 如果 Shadow 設定為 <auto>，則使用主任務的模型
+         * 如果 Shadow 設定為 AUTO，則使用主任務的模型
          * 否則使用使用者覆寫或 Shadow 預設模型
-         * If Shadow is set to <auto>, use parent task's model
+         * If Shadow is set to AUTO, use parent task's model
          * Otherwise use user override or Shadow's default model
          */
         const resolvedModel = shadow.model === AUTO_MODEL ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
@@ -206,8 +206,8 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 聊天參數鉤子 - 快取模型
      * Chat params hook - Cache model
      *
-     * 記錄目前會話使用的模型，供 <auto> 模型使用
-     * Record the model used by current session for <auto> model
+      * 記錄目前會話使用的模型，供 AUTO 模型使用
+      * Record the model used by current session for AUTO model
      */
     async "chat.params"(input) {
       if (input.model) {
