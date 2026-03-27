@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
+import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
 import { tool2 } from '../types/opencode';
 import { resolveModelContext } from '../utils/model-resolver';
@@ -13,9 +14,10 @@ import { extractTextFromMessageParts, getErrorMessage } from '../utils/message';
  * Provides a tool for Monarch to summon Shadow agents
  *
  * @param ctx - Plugin 上下文
+ * @param config - Arise 配置物件
  * @returns Arise Agent 工具定義
  */
-export function createCallAriseAgentTool(ctx: PluginInput) {
+export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig) {
   const {
     description,
     args,
@@ -62,11 +64,11 @@ export function createCallAriseAgentTool(ctx: PluginInput) {
          * 解析模型上下文
          * Resolve model context
          *
-         * 優先順序：用戶指定 > Shadow 預設 > <auto> 使用父模型
-         * Priority: User specified > Shadow default > <auto> use parent model
+         * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > <auto> 使用父模型 > 父模型 > DEFAULT_MODEL
+         * Priority: User specified > Config model > Shadow default > <auto> use parent > parentModel > DEFAULT_MODEL
          */
         const parentModel = getSessionModel(context.sessionID);
-        const modelBody = resolveModelContext(parentModel, shadow, undefined, model);
+        const modelBody = resolveModelContext(parentModel, shadow, config, model);
 
         /**
          * 根據執行模式分支

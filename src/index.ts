@@ -111,7 +111,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 提供 Shadow 召喚和背景任務管理工具
      * Provides Shadow summoning and background task management tools
      */
-    tool: createPluginTools(ctx, backgroundManager),
+    tool: createPluginTools(ctx, backgroundManager, config),
 
     /**
      * 配置鉤子 - 設定 Agent

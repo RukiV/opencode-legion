@@ -11,6 +11,8 @@ import { EnumAriseTools } from './tool-names';
 import { IAriseTools } from '../types/types';
 import { BackgroundManager } from './background-manager';
 import type { PluginInput } from '@opencode-ai/plugin';
+import type { IAriseConfig } from '../config/schema';
+import { loadAriseConfig } from '../config/io';
 
 /**
  * 建立所有插件工具
@@ -21,11 +23,11 @@ import type { PluginInput } from '@opencode-ai/plugin';
  * @param backgroundManager - 背景任務管理器
  * @returns 所有 Arise 工具的物件
  */
-export function createPluginTools(ctx: PluginInput, backgroundManager: BackgroundManager): IAriseTools
+export function createPluginTools(ctx: PluginInput, backgroundManager: BackgroundManager, config: IAriseConfig): IAriseTools
 {
 	return {
 		/** 同步/非同步召喚 Shadow 工具 / Sync/async summon Shadow tool */
-		[EnumAriseTools.ARISE_SUMMON]: createCallAriseAgentTool(ctx),
+		[EnumAriseTools.ARISE_SUMMON]: createCallAriseAgentTool(ctx, config),
 		/** 啟動背景任務工具 / Launch background task tool */
 		[EnumAriseTools.ARISE_BACKGROUND]: createBackgroundTaskTool(backgroundManager),
 		/** 取得背景任務輸出工具 / Get background task output tool */

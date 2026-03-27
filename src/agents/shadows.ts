@@ -324,7 +324,7 @@ Model override: Use the 'model' parameter to specify a different model for this 
 			model: z
 				.string()
 				.optional()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)"),
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or <auto> to use parent task's model)"),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND]: {
