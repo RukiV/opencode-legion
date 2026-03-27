@@ -32,11 +32,11 @@ export function getEffectiveModel(
   userModel?: string,
 ): string | undefined {
   /** 用戶指定的模型擁有最高優先級 / User-specified model has highest priority */
-  if (userModel && userModel !== AUTO_MODEL) {
+  if (_isDefinedAndNotAutoModel(userModel)) {
     return userModel;
   }
 
-  if (defaultModel === AUTO_MODEL) {
+  if (_isAutoModel(defaultModel)) {
     /** 若為 AUTO 且有父模型則使用，否則 fallback / If AUTO and has parentModel, use it; otherwise fallback */
     return parentModel ?? defaultModel;
   }
@@ -55,10 +55,7 @@ export function getModelFromConfig(
   config: IAriseConfig | undefined,
   shadowName: IAllShadowAgentsName,
 ): string | undefined {
-  if (!config?.agents) {
-    return undefined;
-  }
-  return config.agents[shadowName]?.model;
+  return config?.agents?.[shadowName]?.model;
 }
 
 /**
@@ -71,7 +68,7 @@ export function getModelFromConfig(
 export function parseModelString(
   model: string | undefined,
 ): { providerID: string; modelID: string } | undefined {
-  if (!model || model === AUTO_MODEL) {
+  if (!_isNotEmpty(model) || _isAutoModel(model)) {
     return undefined;
   }
 
@@ -139,7 +136,7 @@ export function resolveModelContext(
   const configModel = getModelFromConfig(config, shadow);
 
   /** 2. 從 SHADOW_AGENTS 取得預設模型 / 2. Get default model from SHADOW_AGENTS */
-  const defaultModel = SHADOW_AGENTS[shadow]?.model ?? void 0;
+  const defaultModel = SHADOW_AGENTS[shadow]?.model;
 
   /** 3. 決定有效模型 / 3. Determine effective model */
   const effectiveModel = getEffectiveModelWithFallback(
