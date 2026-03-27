@@ -16,11 +16,11 @@ import { z } from "zod";
  * When used, background tasks will automatically use the parent task's model
  *
  * 使用時機：
- * - opencode-arise.json 中 agents.<agent>.model 設為 <auto>
- * - 呼叫 arise_summon 工具時 model 參數設為 <auto>
- * - shadows.ts 中 Shadow 預設模型設為 <auto>
+ * - opencode-arise.json 中 agents.<agent>.model 設為 AUTO
+ * - 呼叫 arise_summon 工具時 model 參數設為 AUTO
+ * - shadows.ts 中 Shadow 預設模型設為 AUTO
  */
-export const AUTO = "<auto>";
+export const AUTO = "AUTO";
 
 /**
  * Zod schema for AUTO 常數驗證
