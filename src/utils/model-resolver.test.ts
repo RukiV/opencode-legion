@@ -2,8 +2,8 @@
  * 模型解析工具測試
  * Model resolver utility tests
  *
- * 測試 getEffectiveModel、parseModelString、resolveModelContext、getModelFromConfig 函數的行為
- * Tests for getEffectiveModel, parseModelString, resolveModelContext, and getModelFromConfig functions
+ * 測試 parseModelString、resolveModelContext、getModelFromConfig、getEffectiveModelWithFallback 函數的行為
+ * Tests for parseModelString, resolveModelContext, getModelFromConfig, and getEffectiveModelWithFallback functions
  *
  * 測試重點：
  * 1. AUTO 模型的特殊處理邏輯
@@ -20,13 +20,14 @@
  * 4. Support for multi-segment model IDs
  * 5. Config model priority
  * 6. DEFAULT_MODEL fallback
+ *
+ * @deprecated getEffectiveModel 測試已移至 test/lib/deprecated/get-effective-model.ts
  */
 
 import { describe, expect, test } from "bun:test";
 import { AUTO_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import {
-	getEffectiveModel,
 	getEffectiveModelWithFallback,
 	getModelFromConfig,
 	parseModelString,
@@ -79,54 +80,6 @@ describe("getModelFromConfig", () => {
 		} as IAriseConfig;
 		const result = getModelFromConfig(config, EnumShadowSubAgentsName.Beru);
 		expect(result).toBe("custom/model");
-	});
-});
-
-/**
- * getEffectiveModel 函數測試
- * getEffectiveModel function tests
- *
- * 測試 AUTO 模型的特殊處理邏輯
- * Tests special handling logic for AUTO model
- */
-describe("getEffectiveModel", () => {
-	test("當 defaultModel 是 AUTO 且有 parentModel 時，返回 parentModel", () => {
-		/** AUTO 模式會使用父模型的模型 / AUTO mode uses parent's model */
-		const result = getEffectiveModel("anthropic/claude-sonnet-4", AUTO_MODEL);
-		expect(result).toBe("anthropic/claude-sonnet-4");
-	});
-
-	test("當 defaultModel 是 AUTO 且無 parentModel 時，返回 AUTO", () => {
-		/** 無父模型時，AUTO 無法解析 / AUTO cannot resolve without parent model */
-		const result = getEffectiveModel(undefined, AUTO_MODEL);
-		expect(result).toBe(AUTO_MODEL);
-	});
-
-	test("當 defaultModel 不是 AUTO 時，直接返回 defaultModel", () => {
-		/** 非 AUTO 模型直接使用 / Non-AUTO models are used directly */
-		const result = getEffectiveModel(
-			"anthropic/claude-sonnet-4",
-			"openai/gpt-4",
-		);
-		expect(result).toBe("openai/gpt-4");
-	});
-
-	test("當 parentModel 為 undefined 且 defaultModel 不是 AUTO 時，返回 defaultModel", () => {
-		/** 即使無父模型，非 AUTO 模型仍直接使用 / Non-AUTO models used directly even without parent */
-		const result = getEffectiveModel(undefined, "openai/gpt-4");
-		expect(result).toBe("openai/gpt-4");
-	});
-
-	test("當兩者都為 undefined 時，返回 undefined", () => {
-		/** 兩者都未定義時返回 undefined / Returns undefined when both are undefined */
-		const result = getEffectiveModel(undefined, undefined);
-		expect(result).toBe(undefined);
-	});
-
-	test("當 defaultModel 為空字串時，返回空字串", () => {
-		/** 空字串是有效值（不同於 undefined）/ Empty string is a valid value (different from undefined) */
-		const result = getEffectiveModel("anthropic/claude", "");
-		expect(result).toBe("");
 	});
 });
 

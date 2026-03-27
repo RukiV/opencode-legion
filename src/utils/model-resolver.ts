@@ -18,32 +18,6 @@ import type { IAllShadowAgentsName } from "../types/enums";
 export { DEFAULT_MODEL } from "../types/const-default";
 
 /**
- * Determines the effective model based on parent model and default model.
- * 根據父模型和預設模型決定有效模型
- *
- * @param parentModel - The parent session's model / 父會話模型
- * @param defaultModel - The shadow's default model / Shadow 預設模型
- * @param userModel - User-specified model override (takes highest priority) / 用戶指定的模型覆寫（最高優先級）
- * @returns The effective model to use / 要使用的有效模型
- */
-export function getEffectiveModel(
-  parentModel: string | undefined,
-  defaultModel: string | undefined,
-  userModel?: string,
-): string | undefined {
-  /** 用戶指定的模型擁有最高優先級 / User-specified model has highest priority */
-  if (_isDefinedAndNotAutoModel(userModel)) {
-    return userModel;
-  }
-
-  if (_isAutoModel(defaultModel)) {
-    /** 若為 AUTO 且有父模型則使用，否則 fallback / If AUTO and has parentModel, use it; otherwise fallback */
-    return parentModel ?? defaultModel;
-  }
-  return defaultModel;
-}
-
-/**
  * 從配置中取得代理模型
  * Get agent model from config
  *
