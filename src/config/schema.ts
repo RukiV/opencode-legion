@@ -15,9 +15,6 @@ import { AUTO } from "../types/const-default";
  */
 export const AUTO_MODEL = AUTO;
 
-// 為了向後相容，保留舊的名稱 / For backward compatibility, keep old name
-export { AUTO } from "../types/const-default";
-
 /**
  * 輪詢間隔預設值（毫秒）
  * Default polling interval in milliseconds

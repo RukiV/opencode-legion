@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax, AUTO_MODEL } from "./config/schema";
+import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/schema";
+import { AUTO } from "./types/const-default";
 import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
 import { loadAriseConfig, deepMerge } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
@@ -156,7 +157,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
          * If Shadow is set to <auto>, use parent task's model
          * Otherwise use user override or Shadow's default model
          */
-        const resolvedModel = shadow.model === AUTO_MODEL ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
+        const resolvedModel = shadow.model === AUTO ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
 
         /** 註冊 Shadow 代理 / Register Shadow agent */
         agents[name] = {
