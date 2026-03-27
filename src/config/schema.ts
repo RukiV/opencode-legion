@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ALL_SHADOW_AGENTS_NAME, IAllShadowAgentsName } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { IValueNotPartial } from "../types/types";
+import { AUTO } from "../types/const-default";
 
 /**
  * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
@@ -9,8 +10,13 @@ import { IValueNotPartial } from "../types/types";
  *
  * 當使用此值時，背景任務會自動使用呼叫它的主任務的模型
  * When used, background tasks will automatically use the parent task's model
+ *
+ * @deprecated 使用 AUTO 取代 / Use AUTO instead
  */
-export const AUTO_MODEL = "<auto>";
+export const AUTO_MODEL = AUTO;
+
+// 為了向後相容，保留舊的名稱 / For backward compatibility, keep old name
+export { AUTO } from "../types/const-default";
 
 /**
  * 輪詢間隔預設值（毫秒）

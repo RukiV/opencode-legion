@@ -3,7 +3,8 @@
  * 模型解析工具函數
  */
 
-import { AUTO_MODEL, type IAriseConfig } from "../config/schema";
+import { AUTO, DEFAULT_MODEL } from "../types/const-default";
+import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
 
@@ -14,7 +15,7 @@ import type { IAllShadowAgentsName } from "../types/enums";
  * 當沒有指定任何模型時使用的 fallback
  * Used when no model is specified at all
  */
-export const DEFAULT_MODEL = "opencode/big-pickle";
+export { DEFAULT_MODEL } from "../types/const-default";
 
 /**
  * Determines the effective model based on parent model and default model.
@@ -31,11 +32,11 @@ export function getEffectiveModel(
   userModel?: string,
 ): string | undefined {
   // 用戶指定的模型擁有最高優先級
-  if (userModel && userModel !== AUTO_MODEL) {
+  if (userModel && userModel !== AUTO) {
     return userModel;
   }
 
-  if (defaultModel === AUTO_MODEL) {
+  if (defaultModel === AUTO) {
     // 若為 <auto> 且有父模型則使用，否則 fallback
     return parentModel ?? defaultModel;
   }
@@ -70,7 +71,7 @@ export function getModelFromConfig(
 export function parseModelString(
   model: string | undefined,
 ): { providerID: string; modelID: string } | undefined {
-  if (!model || model === AUTO_MODEL) {
+  if (!model || model === AUTO) {
     return undefined;
   }
 
@@ -183,13 +184,13 @@ export function getEffectiveModelWithFallback(
   userModel?: string,
 ): string {
   // 1. 用戶指定的模型擁有最高優先級
-  if (userModel && userModel !== AUTO_MODEL) {
+  if (userModel && userModel !== AUTO) {
     return userModel;
   }
 
   // 2. Config 中的模型次之
   if (configModel) {
-    if (configModel === AUTO_MODEL) {
+    if (configModel === AUTO) {
       // <auto> 使用父模型，若無則檢查 defaultModel，最後才是 DEFAULT_MODEL
       return parentModel ?? defaultModel ?? DEFAULT_MODEL;
     }
@@ -197,7 +198,7 @@ export function getEffectiveModelWithFallback(
   }
 
   // 3. Shadow 預設模型
-  if (defaultModel === AUTO_MODEL) {
+  if (defaultModel === AUTO) {
     // <auto> 使用父模型，若無則檢查 defaultModel，最後才是 DEFAULT_MODEL
     return parentModel ?? defaultModel ?? DEFAULT_MODEL;
   }
