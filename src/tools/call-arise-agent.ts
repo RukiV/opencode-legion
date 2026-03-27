@@ -4,7 +4,8 @@ import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
 import { tool2 } from '../types/opencode';
 import { resolveModelContext } from '../utils/model-resolver';
-import { extractTextFromMessageParts, getErrorMessage } from '../utils/message';
+import { extractTextFromMessageParts } from '../utils/message';
+import { getErrorMessage } from '../utils/error';
 
 /**
  * 建立呼叫 Arise Agent 的工具

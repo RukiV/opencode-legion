@@ -9,6 +9,8 @@
  * - https://github.com/code-yeongyu/oh-my-openagent
  */
 
+import { getErrorMessage } from "./error";
+
 /* ============ 型別定義 / Type Definitions ============ */
 
 /**
@@ -233,11 +235,10 @@ export function createRecoveryPrompt(customText?: string): string
 export function detectErrorType(error: unknown): EnumRecoveryErrorType | null
 {
 	/**
-	 * 將錯誤轉換為字串以便分析
-	 * Convert error to string for analysis
+	 * 使用共用函式取得錯誤訊息
+	 * Use shared function to get error message
 	 */
-	const errorStr = String(error);
-	const errorMessage = error instanceof Error ? error.message : errorStr;
+	const errorMessage = getErrorMessage(error);
 
 	/**
 	 * 工具結果缺失錯誤

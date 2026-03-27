@@ -29,16 +29,12 @@ export function extractTextFromMessageParts(parts?: Array<{ type: string; text?:
 /* ============ 錯誤處理 / Error Handling ============ */
 
 /**
- * 安全地取得錯誤訊息
- * Safely extract error message
+ * 從 error.ts 重新匯出 getErrorMessage
+ * Re-export getErrorMessage from error.ts
  *
- * @param error - 錯誤物件（可以是任何類型）
- * @returns 錯誤訊息字串
+ * @deprecated 請直接從 utils/error 匯入 / Import directly from utils/error
  */
-export function getErrorMessage(error: unknown): string
-{
-	return error instanceof Error ? error.message : String(error);
-}
+export { getErrorMessage } from "./error";
 
 /* ============ 時間格式化 / Time Formatting ============ */
 

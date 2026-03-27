@@ -1,7 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
 import { tool2 } from '../types/opencode';
-import { getErrorMessage } from '../utils/message';
+import { getErrorMessage } from '../utils/error';
 import {
   type CachedProvider,
   getProvidersCache,

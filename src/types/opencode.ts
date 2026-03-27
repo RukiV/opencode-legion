@@ -16,7 +16,7 @@ import { EnumAriseTools } from '../types/enums';
 import { ARISE_TOOLS } from '../agents/shadows';
 import type { IAriseTools } from '../types/types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
-import { type Hooks, type PluginInput, tool } from '@opencode-ai/plugin';
+import { type Hooks, type PluginInput, tool, Plugin } from '@opencode-ai/plugin';
 import type { ITSOverwrite } from 'ts-type';
 import { BackgroundManager } from '../tools/background-manager';
 
@@ -138,6 +138,8 @@ export type IHooks = ITSOverwrite<Hooks, {
  *
  * OpenCode 插件的主入口點類型
  * The main entry point type for OpenCode plugins
+ *
+ * @see {@link import("@opencode-ai/plugin").Plugin}
  */
 export type IPlugin = (input: PluginInput) => Promise<IHooks>;
 

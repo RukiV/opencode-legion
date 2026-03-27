@@ -2,12 +2,16 @@ import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/schema";
 import { AUTO_MODEL } from "./types/const-default";
-import { _isAutoModel } from "./utils/model-resolver";
 import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
-import { loadAriseConfig, deepMerge } from "./config/io";
+import { loadAriseConfig } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
-import { extractTextFromMessageParts, getErrorMessage } from "./utils/message";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
+import { _isAutoModel } from "./utils/model-resolver";
+import { deepMerge } from "./config/io";
+import { extractTextFromMessageParts } from "./utils/message";
+import { getErrorMessage } from "./utils/error";
+import { createConfigHandler } from "./plugin/config-handler";
+import { createFullEventHandler, extractSessionId } from "./plugin/event-handler";
 import {
   createAriseBannerHook,
   createOutputShaperHook,
@@ -121,70 +125,11 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      *
      * 將 Shadow Agents 註冊到 OpenCode
      * Register Shadow Agents to OpenCode
+     *
+     * 使用 config-handler 模組處理純邏輯
+     * Uses config-handler module for pure logic
      */
-    async config(opencodeConfig) {
-      const cfg = opencodeConfig as JsonObject;
-
-      /** 設定 Monarch 為預設代理 / Set Monarch as default agent */
-      cfg.default_agent = "monarch";
-
-      /** 初始化 agent 設定 / Initialize agent config */
-      cfg.agent = (cfg.agent as JsonObject) ?? {};
-      const agents = cfg.agent as JsonObject;
-
-      /**
-       * 添加 Shadow Subagents
-       * Add Shadow subagents
-       *
-       * 遍歷所有 Shadow 代理，根據配置決定是否註冊
-       * Iterate through all Shadow agents, decide whether to register based on config
-       */
-      const disabledShadows = new Set(config.disabled_shadows ?? []);
-      for (const [name, shadow] of Object.entries(SHADOW_AGENTS)) {
-        const shadowName = name as IAllShadowAgentsName;
-        /** 跳過已停用的 Shadow / Skip disabled shadows */
-        if (disabledShadows.has(shadowName)) continue;
-
-        const userOverride = config.agents?.[shadowName];
-        /** 跳過使用者已停用的 Shadow / Skip shadows disabled by user */
-        if (userOverride?.disabled) continue;
-
-        /**
-         * 解析模型
-         * Resolve model
-         *
-         * 如果 Shadow 設定為 AUTO，則使用主任務的模型
-         * 否則使用使用者覆寫或 Shadow 預設模型
-         * If Shadow is set to AUTO, use parent task's model
-         * Otherwise use user override or Shadow's default model
-         */
-        const resolvedModel = _isAutoModel(shadow.model) ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
-
-        /** 註冊 Shadow 代理 / Register Shadow agent */
-        agents[name] = {
-          description: shadow.description,
-          mode: shadow.mode,
-          model: resolvedModel,
-          steps: shadow.steps,
-          ...(shadow.prompt && { prompt: shadow.prompt }),
-          ...(shadow.permission && { permission: shadow.permission }),
-          ...(shadow.options && { options: shadow.options }),
-        };
-      }
-
-      /**
-       * 套用 OpenCode 代理覆寫
-       * Apply OpenCode agent overrides
-       *
-       * - 讓 build/plan 可被呼叫
-       * - 隱藏 explore/general
-       * - Make build/plan invokable
-       * - Hide explore/general
-       */
-      for (const [name, override] of Object.entries(OPENCODE_OVERRIDES)) {
-        agents[name] = deepMerge((agents[name] as JsonObject) ?? {}, override as JsonObject);
-      }
-    },
+    config: createConfigHandler(config),
 
     /**
      * 工具執行後鉤子 - 格式化輸出
@@ -235,71 +180,20 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      *
      * 處理各類 OpenCode 事件
      * Handle various OpenCode events
+     *
+     * 使用 event-handler 模組處理邏輯
+     * Uses event-handler module for logic
      */
-    async event(input: { event: Event }) {
-      const event = input.event;
-
-      /** 讓背景任務管理器處理事件 / Let background manager handle events */
-      backgroundManager.handleEvent(event);
-
-      /** 會話創建時顯示橫幅 / Show banner on session creation */
-      if (event.type === "session.created" && bannerHook) {
-        await bannerHook.onSessionCreated();
-      }
-
-      /** 處理 session.idle 以進行 TODO 強制執行 / Handle session.idle for TODO enforcement */
-      if (event.type === "session.idle" && todoEnforcer) {
-        const sessionId = (event as { properties?: { sessionID?: string } }).properties?.sessionID;
-        if (sessionId) {
-          try {
-            /** 取得最近訊息以檢查未完成的 TODO / Get recent messages to check for incomplete todos */
-            const messages = await ctx.client.session.messages({
-              path: { id: sessionId },
-            });
-
-            if (messages.data) {
-              /**
-               * 從訊息 parts 中提取文字內容
-               * Extract text content from message parts
-               */
-              const recentMessages = messages.data.slice(-5).map((m) => {
-                const textContent = extractTextFromMessageParts(m.parts);
-                return { content: textContent };
-              });
-
-              const result = await todoEnforcer.checkCompletion(recentMessages);
-
-              if (result.hasIncompleteTodos && result.reminderMessage) {
-                await ctx.client.tui.showToast({
-                  body: {
-                    title: "Arise - Incomplete Tasks",
-                    message: "You have pending TODOs. Complete them before stopping.",
-                    variant: "warning",
-                    duration: 5000,
-                  },
-                });
-              }
-            }
-          } catch (error) {
-            ctx.client.app.log?.({
-              body: {
-                service: "arise",
-                level: "warn",
-                message: `TODO enforcement failed: ${getErrorMessage(error)}`,
-              },
-            });
-          }
-        }
-      }
-
-      /** 清除會話結束時的模型緩存 / Clear model cache when session ends */
-      if (event.type === "session.deleted") {
-        const sessionId = (event as { properties?: { sessionID?: string } }).properties?.sessionID;
-        if (sessionId) {
-          clearSessionModel(sessionId);
-        }
-      }
-    },
+    event: createFullEventHandler({
+      ctx: {
+        client: ctx.client,
+      },
+      bannerHook,
+      outputShaper,
+      compactionPreserver,
+      todoEnforcer,
+      backgroundManager,
+    }),
   };
 };
 

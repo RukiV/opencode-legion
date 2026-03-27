@@ -12,7 +12,7 @@ import {
 } from "../config/schema";
 import type { IAriseConfig } from "../config/schema";
 import { IAllShadowAgentsName } from "../types/enums";
-import { getErrorMessage } from "../utils/message";
+import { getErrorMessage } from "../utils/error";
 import { resolveModelContext } from "../utils/model-resolver";
 import { getSessionModel } from "../config/model-cache";
 

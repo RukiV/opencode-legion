@@ -2,7 +2,8 @@ import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./background-manager";
 import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
 import { tool2 } from '../types/opencode';
-import { getErrorMessage, formatDuration } from "../utils/message";
+import { formatDuration } from "../utils/message";
+import { getErrorMessage } from "../utils/error";
 
 /**
  * 建立背景任務工具
