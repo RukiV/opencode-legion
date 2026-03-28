@@ -1,10 +1,10 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
-exports[`deepMerge vs configMergeDeep comparison basic object merging both merge simple objects correctly 1`] = `
+exports[`deepMerge vs configMergeDeep comparison basic object merging all three merge simple objects correctly 1`] = `
 {
   "explain": 
-"✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([base, override]) 產生相同結果
-Simple object merge: both functions produce the same result"
+"✅ 簡單物件合併：三個函式都產生相同結果
+Simple object merge: all three produce same result"
 ,
   "input": {
     "base": {
@@ -26,15 +26,20 @@ Simple object merge: both functions produce the same result"
     "b": 3,
     "c": 4,
   },
+  "resultDeepMerge3": {
+    "a": 1,
+    "b": 3,
+    "c": 4,
+  },
   "tags": "basic, object-merge, same-result",
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison basic object merging both handle nested object merging 1`] = `
+exports[`deepMerge vs configMergeDeep comparison basic object merging all three handle nested object merging 1`] = `
 {
   "explain": 
-"✅ 巢狀物件合併：兩者都遞迴合併嵌套物件
-Nested object merge: both recursively merge nested objects"
+"✅ 巢狀物件合併：三個函式都遞迴合併嵌套物件
+Nested object merge: all three recursively merge nested objects"
 ,
   "input": {
     "base": {
@@ -64,15 +69,22 @@ Nested object merge: both recursively merge nested objects"
       "c": 4,
     },
   },
+  "resultDeepMerge3": {
+    "nested": {
+      "a": 1,
+      "b": 3,
+      "c": 4,
+    },
+  },
   "tags": "nested, object-merge, recursive",
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison array merging behavior deepMerge and configMergeDeep both replace arrays with source array 1`] = `
+exports[`deepMerge vs configMergeDeep comparison array merging behavior all three replace arrays with source array 1`] = `
 {
   "explain": 
-"✅ 陣列處理相同 - 兩者都使用來源陣列
-Array handling same - both functions use source array"
+"✅ 陣列處理相同 - 三個函式都使用來源陣列
+Array handling same - all three functions use source array"
 ,
   "input": {
     "base": {
@@ -96,6 +108,12 @@ Array handling same - both functions use source array"
     ],
   },
   "resultDeepMerge": {
+    "items": [
+      4,
+      5,
+    ],
+  },
+  "resultDeepMerge3": {
     "items": [
       4,
       5,
@@ -105,11 +123,11 @@ Array handling same - both functions use source array"
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison array merging behavior configMergeDeep and deepMerge both use source array for merging 1`] = `
+exports[`deepMerge vs configMergeDeep comparison array merging behavior all three use source array for merging 1`] = `
 {
   "explain": 
-"✅ 陣列處理相同 - 兩者都使用來源陣列（override）
-Array handling same - both functions use source array (override)"
+"✅ 陣列處理相同 - 三個函式都使用來源陣列（override）
+Array handling same - all three functions use source array (override)"
 ,
   "input": {
     "base": {
@@ -133,6 +151,12 @@ Array handling same - both functions use source array (override)"
     ],
   },
   "resultDeepMerge": {
+    "items": [
+      4,
+      5,
+    ],
+  },
+  "resultDeepMerge3": {
     "items": [
       4,
       5,
@@ -169,11 +193,11 @@ _arrayMergeLeftTargetWins: returns target unchanged (same reference)"
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison multiple object merging deepMerge only handles two objects 1`] = `
+exports[`deepMerge vs configMergeDeep comparison multiple object merging all three handle multiple objects (deepMerge3 requires chaining) 1`] = `
 {
   "explain": 
-"⚠️ 函式簽章差異 - deepMerge：需要鏈式呼叫處理多個物件
-Function signature difference - deepMerge: requires chaining for multiple objects"
+"⚠️ 函式簽章差異 - deepMerge3 和 deepMerge 都需要鏈式呼叫
+Function signature difference - deepMerge3 and deepMerge both require chaining"
 ,
   "input": {
     "a": {
@@ -192,6 +216,11 @@ Function signature difference - deepMerge: requires chaining for multiple object
     "z": 3,
   },
   "resultDeepMerge": {
+    "x": 1,
+    "y": 2,
+    "z": 3,
+  },
+  "resultDeepMerge3": {
     "x": 1,
     "y": 2,
     "z": 3,
@@ -200,42 +229,11 @@ Function signature difference - deepMerge: requires chaining for multiple object
 }
 `;
 
-exports[`deepMerge vs configMergeDeep comparison multiple object merging configMergeDeep handles multiple objects in one call 1`] = `
+exports[`deepMerge vs configMergeDeep comparison multiple object merging all three merge with left-to-right precedence 1`] = `
 {
   "explain": 
-"✅ 函式簽章差異 - configMergeDeep：一次呼叫處理多個物件
-Function signature difference - configMergeDeep: handles multiple objects in one call"
-,
-  "input": {
-    "a": {
-      "x": 1,
-    },
-    "b": {
-      "y": 2,
-    },
-    "c": {
-      "z": 3,
-    },
-  },
-  "resultConfigMerge": {
-    "x": 1,
-    "y": 2,
-    "z": 3,
-  },
-  "resultDeepMerge": {
-    "x": 1,
-    "y": 2,
-    "z": 3,
-  },
-  "tags": "signature, multiple-objects, single-call",
-}
-`;
-
-exports[`deepMerge vs configMergeDeep comparison multiple object merging configMergeDeep merges multiple with left-to-right precedence 1`] = `
-{
-  "explain": 
-"✅ 多物件優先順序：左側優先（override > user > defaults）
-Multiple objects precedence: leftmost wins (override > user > defaults)"
+"✅ 多物件優先順序：三個函式都是左側優先（override > user > defaults）
+Multiple objects precedence: all three use leftmost wins (override > user > defaults)"
 ,
   "input": {
     "defaults": {
@@ -257,6 +255,11 @@ Multiple objects precedence: leftmost wins (override > user > defaults)"
     "c": 1,
   },
   "resultDeepMerge": {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+  },
+  "resultDeepMerge3": {
     "a": 1,
     "b": 2,
     "c": 3,

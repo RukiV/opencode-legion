@@ -262,6 +262,7 @@ src/
    - Avoid adding barrel exports (e.g., `export * from './module'`)
    - Import directly from the source module when needed
    - This rule applies to ALL files, not just `src/index.ts`
+   - **禁止任何情況下的 re-export**（包含向後相容性），除非使用者明確要求
 
 ## Architecture
 

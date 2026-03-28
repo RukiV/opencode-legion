@@ -12,16 +12,16 @@
 // @noUnusedLocals:false
 /// <reference types="bun" />
 import { describe, expect, it } from "bun:test";
-import { deepMerge } from "../src/config/io";
-import { configMergeDeep, _arrayMergeLeftTargetWins } from "../src/utils/config-merge";
+import { deepMerge, configMergeDeep, _arrayMergeLeftTargetWins, deepMerge3 } from "../src/utils/config-merge";
 
 describe("deepMerge vs configMergeDeep comparison", () => {
 
 	describe("basic object merging", () => {
-		it("both merge simple objects correctly", () => {
+		it("all three merge simple objects correctly", () => {
 			const base = { a: 1, b: 2 };
 			const override = { b: 3, c: 4 };
 
+			const resultDeepMerge3 = deepMerge3(base, override);
 			const resultDeepMerge = deepMerge(base, override);
 			const resultConfigMerge = configMergeDeep([base, override]);
 
@@ -29,33 +29,38 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const expected = { a: 1, b: 3, c: 4 };
 
 			expect({
-				explain: "✅ 簡單物件合併：deepMerge(base, override) 與 configMergeDeep([base, override]) 產生相同結果\nSimple object merge: both functions produce the same result",
+				explain: "✅ 簡單物件合併：三個函式都產生相同結果\nSimple object merge: all three produce same result",
 				tags: "basic, object-merge, same-result",
 				input: { base, override },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expected,
 				resultDeepMerge: expected,
 				resultConfigMerge: expected,
 			});
 		});
 
-		it("both handle nested object merging", () => {
+		it("all three handle nested object merging", () => {
 			const base = { nested: { a: 1, b: 2 } };
 			const override = { nested: { b: 3, c: 4 } };
 
+			const resultDeepMerge3 = deepMerge3(base, override);
 			const resultDeepMerge = deepMerge(base, override);
 			const resultConfigMerge = configMergeDeep([base, override]);
 
 			const expectedNested = { nested: { a: 1, b: 3, c: 4 } };
 
 			expect({
-				explain: "✅ 巢狀物件合併：兩者都遞迴合併嵌套物件\nNested object merge: both recursively merge nested objects",
+				explain: "✅ 巢狀物件合併：三個函式都遞迴合併嵌套物件\nNested object merge: all three recursively merge nested objects",
 				tags: "nested, object-merge, recursive",
 				input: { base, override },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expectedNested,
 				resultDeepMerge: expectedNested,
 				resultConfigMerge: expectedNested,
 			});
@@ -63,43 +68,49 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 	});
 
 	describe("array merging behavior", () => {
-		it("deepMerge and configMergeDeep both replace arrays with source array", () => {
+		it("all three replace arrays with source array", () => {
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
+			const resultDeepMerge3 = deepMerge3(base, override);
 			const resultDeepMerge = deepMerge(base, override);
 			const resultConfigMerge = configMergeDeep([base, override]);
 
 			const expectedArray = { items: [4, 5] };
 
 			expect({
-				explain: "✅ 陣列處理相同 - 兩者都使用來源陣列\nArray handling same - both functions use source array",
+				explain: "✅ 陣列處理相同 - 三個函式都使用來源陣列\nArray handling same - all three functions use source array",
 				tags: "array, replace, same",
 				input: { base, override },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expectedArray,
 				resultDeepMerge: expectedArray,
 				resultConfigMerge: expectedArray,
 			});
 		});
 
-		it("configMergeDeep and deepMerge both use source array for merging", () => {
+		it("all three use source array for merging", () => {
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
+			const resultDeepMerge3 = deepMerge3(base, override);
 			const resultDeepMerge = deepMerge(base, override);
 			const resultConfigMerge = configMergeDeep([base, override]);
 
 			const expectedArray = { items: [4, 5] };
 
 			expect({
-				explain: "✅ 陣列處理相同 - 兩者都使用來源陣列（override）\nArray handling same - both functions use source array (override)",
+				explain: "✅ 陣列處理相同 - 三個函式都使用來源陣列（override）\nArray handling same - all three functions use source array (override)",
 				tags: "array, source, same",
 				input: { base, override },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expectedArray,
 				resultDeepMerge: expectedArray,
 				resultConfigMerge: expectedArray,
 			});
@@ -125,71 +136,52 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 	});
 
 	describe("multiple object merging", () => {
-		it("deepMerge only handles two objects", () => {
+		it("all three handle multiple objects (deepMerge3 requires chaining)", () => {
 			const a = { x: 1 };
 			const b = { y: 2 };
 			const c = { z: 3 };
 
-			// deepMerge requires chaining for multiple objects
-			const result1 = deepMerge(a, b);
-			const result2 = deepMerge(result1, c);
-
-			const resultDeepMerge = result2;
-			const resultConfigMerge = configMergeDeep([a, b, c]);
-
-			const expectedMulti = { x: 1, y: 2, z: 3 };
-
-			expect({
-				explain: "⚠️ 函式簽章差異 - deepMerge：需要鏈式呼叫處理多個物件\nFunction signature difference - deepMerge: requires chaining for multiple objects",
-				tags: "signature, multiple-objects, chaining",
-				input: { a, b, c },
-				resultDeepMerge,
-				resultConfigMerge,
-			}).toMatchSnapshot({
-				resultDeepMerge: expectedMulti,
-				resultConfigMerge: expectedMulti,
-			});
-		});
-
-		it("configMergeDeep handles multiple objects in one call", () => {
-			const a = { x: 1 };
-			const b = { y: 2 };
-			const c = { z: 3 };
-
+			// deepMerge3 requires chaining for multiple objects
+			const resultDeepMerge3 = deepMerge3(deepMerge3(a, b), c);
 			const resultDeepMerge = deepMerge(deepMerge(a, b), c);
 			const resultConfigMerge = configMergeDeep([a, b, c]);
 
 			const expectedMulti = { x: 1, y: 2, z: 3 };
 
 			expect({
-				explain: "✅ 函式簽章差異 - configMergeDeep：一次呼叫處理多個物件\nFunction signature difference - configMergeDeep: handles multiple objects in one call",
-				tags: "signature, multiple-objects, single-call",
+				explain: "⚠️ 函式簽章差異 - deepMerge3 和 deepMerge 都需要鏈式呼叫\nFunction signature difference - deepMerge3 and deepMerge both require chaining",
+				tags: "signature, multiple-objects, chaining",
 				input: { a, b, c },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expectedMulti,
 				resultDeepMerge: expectedMulti,
 				resultConfigMerge: expectedMulti,
 			});
 		});
 
-		it("configMergeDeep merges multiple with left-to-right precedence", () => {
+		it("all three merge with left-to-right precedence", () => {
 			const defaults = { a: 1, b: 1, c: 1 };
 			const user = { b: 2, c: 2 };
 			const override = { c: 3 };
 
+			const resultDeepMerge3 = deepMerge3(deepMerge3(defaults, user), override);
 			const resultDeepMerge = deepMerge(deepMerge(defaults, user), override);
 			const resultConfigMerge = configMergeDeep([override, user, defaults]);
 
 			const expectedPrecedence = { a: 1, b: 2, c: 3 };
 
 			expect({
-				explain: "✅ 多物件優先順序：左側優先（override > user > defaults）\nMultiple objects precedence: leftmost wins (override > user > defaults)",
+				explain: "✅ 多物件優先順序：三個函式都是左側優先（override > user > defaults）\nMultiple objects precedence: all three use leftmost wins (override > user > defaults)",
 				tags: "precedence, left-to-right, priority",
 				input: { defaults, user, override },
+				resultDeepMerge3,
 				resultDeepMerge,
 				resultConfigMerge,
 			}).toMatchSnapshot({
+				resultDeepMerge3: expectedPrecedence,
 				resultDeepMerge: expectedPrecedence,
 				resultConfigMerge: expectedPrecedence,
 			});
@@ -427,7 +419,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const expectedSignature = { a: 1, b: 2, c: 3 };
 
 			expect({
-				explain: "✅ 函式簽章差異總結：deepMerge(base, override) vs configMergeDeep([objects...])\nFunction signature summary: deepMerge(base, override) vs configMergeDeep([objects...])",
+				explain: "✅ 函式簽章差異總結：deepMerge(base, override) vs configMergeDeep([objects...])\n" +
+"Function signature summary: deepMerge(base, override) vs configMergeDeep([objects...])",
 				tags: "signature, comparison, summary",
 				input: { obj1, obj2, obj3 },
 				resultDeepMerge,

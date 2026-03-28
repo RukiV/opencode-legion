@@ -14,69 +14,13 @@ import { AriseConfigSchema, DEFAULT_CONFIG, type IAriseConfig } from "./schema";
 import { findOpencodeConfig, getAriseConfigPaths } from "./paths";
 import { FakeBun as Bun } from "../utils/bun-shim";
 import { createJsonHandler } from "../utils/jsonc";
+import { deepMerge } from "../utils/config-merge";
 
 import type { PluginInput } from '@opencode-ai/plugin';
 import { ITSValueOrArrayMaybeReadonly } from 'ts-type';
 import { IReturnHasPlugin } from '../types/types';
 
 type JsonObject = Record<string, unknown>;
-
-/**
- * 深度合併兩個物件
- * Deep merge two objects
- *
- * 遞迴地合併巢狀物件，陣列會被直接替換而非合併
- * Recursively merges nested objects; arrays are replaced instead of merged
- *
- * @param base - 基礎物件（被合併的物件）
- * @param override - 覆蓋物件（優先使用的值）
- * @returns 合併後的物件
- */
-export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
-{
-	/** 複製基礎物件以避免修改原始資料 / Copy base object to avoid mutating original */
-	const result: JsonObject = { ...base };
-
-	/** 遍歷覆蓋物件的所有鍵值 / Iterate through all key-value pairs in override */
-	for (const [key, value] of Object.entries(override))
-	{
-		/**
-		 * 檢查是否需要遞迴合併
-		 * Check if recursive merge is needed
-		 *
-		 * 條件：
-		 * 1. value 是物件（不是 null，不是陣列）
-		 * 2. result[key] 也是物件（不是 null，不是陣列）
-		 */
-		if (
-			typeof value === "object" &&
-			value !== null &&
-			!Array.isArray(value) &&
-			typeof result[key] === "object" &&
-			result[key] !== null &&
-			!Array.isArray(result[key])
-		)
-		{
-			/**
-			 * 遞迴合併巢狀物件
-			 * Recursively merge nested objects
-			 */
-			result[key] = deepMerge(result[key] as JsonObject, value as JsonObject);
-		}
-		else
-		{
-			/**
-			 * 直接覆蓋值（包含陣列）
-			 * Direct override (including arrays)
-			 *
-			 * 陣列會被整個替換，不進行元素級別的合併
-			 * Arrays are replaced entirely, no element-level merging
-			 */
-			result[key] = value;
-		}
-	}
-	return result;
-}
 
 /**
  * 解析 JSONC（帶註解的 JSON）

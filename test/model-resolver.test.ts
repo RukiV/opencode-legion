@@ -4,12 +4,12 @@ import { describe, expect, it } from "bun:test";
 import { AUTO_MODEL, DEFAULT_MODEL } from "../src/types/const-default";
 import {
 	_isAutoModel,
-	_isNotEmpty,
 	_isDefinedAndNotAutoModel,
 	_resolveAutoModelBase,
 	_resolveAutoModelCore,
 	getEffectiveModelWithFallback,
 } from "../src/utils/model-resolver";
+import { _isNotEmpty } from "../src/utils/string-utils";
 
 describe("_isAutoModel", () =>
 {

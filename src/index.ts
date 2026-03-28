@@ -7,7 +7,7 @@ import { loadAriseConfig } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import { _isAutoModel } from "./utils/model-resolver";
-import { deepMerge } from "./config/io";
+import { deepMerge } from "./utils/config-merge";
 import { extractTextFromMessageParts } from "./utils/message";
 import { getErrorMessage } from "./utils/error";
 import { createConfigHandler } from "./plugin/config-handler";

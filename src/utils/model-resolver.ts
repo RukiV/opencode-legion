@@ -7,6 +7,7 @@ import { AUTO_MODEL, DEFAULT_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
+import { _isNotEmpty } from "./string-utils";
 
 /**
  * 預設模型
@@ -141,18 +142,6 @@ export function resolveModelContext(
 export function _isAutoModel(model?: string): model is typeof AUTO_MODEL
 {
   return model === AUTO_MODEL;
-}
-
-/**
- * 判斷模型是否為非空字串（不含空白）
- * Check if model is non-empty string (no whitespace only)
- *
- * @param model - 模型字串 / Model string
- * @returns 若非空则回傳 true / Returns true if model is not empty
- */
-export function _isNotEmpty<T extends string>(model?: T): model is Exclude<NonNullable<T>, ''>
-{
-  return model?.trim().length! > 0
 }
 
 /**

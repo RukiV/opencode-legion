@@ -4,6 +4,7 @@ import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
 import { IValueNotPartial } from "../types/types";
 import { AUTO_MODEL } from "../types/const-default";
+import { deepMerge3 } from "../utils/config-merge";
 
 /**
  * 特殊模型值，表示自動沿用發起對話的主任務所使用的模型
@@ -299,6 +300,7 @@ export const DEFAULT_CONFIG: IAriseConfig = {
  *    - 外層：最終結果不為 null/undefined
  *    - 內層：OR 運算前的兩個來源都已排除空值
  * 3. 使用 keyof 限制只能存取有效的背景設定鍵
+ * 4. 支援深層合併 for 巢狀物件（如 auto_resume）
  *
  * 型別推導過程：
  * - T 限制為 IAriseConfig["background"] 的鍵（不含 undefined）
@@ -306,6 +308,20 @@ export const DEFAULT_CONFIG: IAriseConfig = {
  * - 回傳值 = background[T] | agents[A][T]，兩者皆已排除空值
  */
 export type ILazyConfigGetterValue<T extends keyof IValueNotPartial<IAriseConfig["background"]>, A extends IAllShadowAgentsName = IAllShadowAgentsName> = IValueNotPartial<IValueNotPartial<IAriseConfig["background"]>[T] | IValueNotPartial<IAriseConfig["agents"]>[IValueNotPartial<A>][T]>;
+
+/**
+ * _createConfigGetter 函式選項
+ * Options for _createConfigGetter function
+ *
+ * @property deepMerge3 - 是否啟用深層合併（預設 false）
+ *                       啟用後，巢狀物件會遞迴合併
+ *                       For nested objects, will recursively merge
+ */
+export interface ICreateConfigGetterOptions
+{
+	/** 是否啟用深層合併 / Enable deep merge */
+	deepMerge3?: boolean;
+}
 
 /**
  * 建立配置 getter 函式的工廠函式
@@ -317,28 +333,28 @@ export type ILazyConfigGetterValue<T extends keyof IValueNotPartial<IAriseConfig
  * 優先順序：agent 特定設定 -> background 全域設定 -> 預設值
  * Priority: agent-specific setting -> background global setting -> default value
  *
+ * 合併行為：
+ * - deepMerge3: false（預設）- 簡單覆寫，後面的值直接覆寫前面的
+ * - deepMerge3: true - 巢狀物件會遞迴合併，非物件值則直接覆寫
+ *
  * @param configKey - 配置鍵名稱（snake_case）
  * @param defaultValue - 預設值
+ * @param options - 選項物件（可選）
  * @returns 讀取配置的 getter 函式
  */
 export function _createConfigGetter<T extends keyof Exclude<IAriseConfig["background"], undefined>>(
 	configKey: T,
-	defaultValue: ILazyConfigGetterValue<NoInfer<T>, IAllShadowAgentsName>
+	defaultValue: ILazyConfigGetterValue<NoInfer<T>, IAllShadowAgentsName>,
+	options: ICreateConfigGetterOptions = {}
 )
 {
+	const { deepMerge3: enableDeepMerge = false } = options;
+
 	return <A extends IAllShadowAgentsName = IAllShadowAgentsName>(config: IAriseConfig, agentName?: A): ILazyConfigGetterValue<NoInfer<T>, NoInfer<A>> =>
 	{
-		/**
-		 * 優先檢查 agent 特定的設定
-		 * First check for agent-specific setting
-		 *
-		 * 允許個別代理覆寫全域設定
-		 * Allows individual agents to override global settings
-		 */
-		if (agentName && (config.agents as any)?.[agentName]?.[configKey] !== undefined)
-		{
-			return (config.agents as any)[agentName]![configKey];
-		}
+		// 以預設值為基礎
+		// Start with default value as base
+		let result: any = defaultValue;
 
 		/**
 		 * 檢查全域 background 設定
@@ -347,19 +363,50 @@ export function _createConfigGetter<T extends keyof Exclude<IAriseConfig["backgr
 		 * 作為次優先級的全域設定
 		 * As secondary priority global setting
 		 */
-		if ((config.background as any)?.[configKey] !== undefined)
+		const backgroundValue = (config.background as any)?.[configKey];
+		if (backgroundValue !== undefined)
 		{
-			return (config.background as any)[configKey];
+			// 根據選項決定合併方式
+			// Decide merge method based on options
+			if (enableDeepMerge)
+			{
+				result = deepMerge3(result, backgroundValue);
+			}
+			else
+			{
+				// 簡單覆寫 / Simple override
+				result = backgroundValue;
+			}
 		}
 
 		/**
-		 * 回退至預設值
-		 * Fallback to default value
+		 * 優先檢查 agent 特定的設定
+		 * First check for agent-specific setting
 		 *
-		 * 確保總是有有效的設定值
-		 * Ensures there's always a valid setting value
+		 * 允許個別代理覆寫全域設定
+		 * Allows individual agents to override global settings
+		 * 最高優先級 / Highest priority
 		 */
-		return defaultValue;
+		if (agentName)
+		{
+			const agentValue = (config.agents as any)?.[agentName]?.[configKey];
+			if (agentValue !== undefined)
+			{
+				// 根據選項決定合併方式
+				// Decide merge method based on options
+				if (enableDeepMerge)
+				{
+					result = deepMerge3(result, agentValue);
+				}
+				else
+				{
+					// 簡單覆寫 / Simple override
+					result = agentValue;
+				}
+			}
+		}
+
+		return result;
 	};
 }
 
@@ -419,7 +466,7 @@ const DEFAULT_AUTO_MODEL_RESUME = {
   },
 };
 
-export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME);
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME, { deepMerge3: true });
 
 /**
  * 取得 auto_resume enabled 設定的輔助函式

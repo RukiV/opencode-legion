@@ -11,7 +11,7 @@ import type { IAllShadowAgentsName } from "../types/enums";
 import type { IShadowAgent } from "../agents/shadows";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents";
 import { _isAutoModel } from "../utils/model-resolver";
-import { deepMerge } from "../config/io";
+import { deepMerge } from "../utils/config-merge";
 import { type Config } from "@opencode-ai/sdk";
 
 /**
