@@ -15,6 +15,12 @@ import { IAllShadowAgentsName } from "../types/enums";
 import { getErrorMessage } from "../utils/error";
 import { resolveModelContext } from "../utils/model-resolver";
 import { getSessionModel } from "../config/model-cache";
+import {
+	formatAriseMsgError,
+	formatAriseMsgTitleCustom,
+	formatAriseMsgPrefixId,
+	formatAriseMsgSuccessMultiLine,
+} from "../utils/arise-message";
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
@@ -957,17 +963,17 @@ export class BackgroundManager {
 
     /** 任務不存在 / Task not found */
     if (!task) {
-      return `[arise] Task not found: ${taskId}`;
+      return formatAriseMsgError(`Task not found: ${taskId}`);
     }
 
     /** 檢查任務是否處於 error 狀態 / Check if task is in error state */
     if (task.status !== "error" && !force) {
-      return `[arise] Task ${taskId} is not in error state (status: ${task.status}). Use force=true to retry anyway.`;
+      return formatAriseMsgError(`Task ${taskId} is not in error state (status: ${task.status}). Use force=true to retry anyway.`);
     }
 
     /** 檢查是否正在等待 auto-resume 重試 / Check if waiting for auto-resume retry */
     if (task.resumePending) {
-      return `[arise] Task ${taskId} is already pending auto-resume retry. Please wait for the current retry to complete.`;
+      return formatAriseMsgError(`Task ${taskId} is already pending auto-resume retry. Please wait for the current retry to complete.`);
     }
 
     /**
@@ -979,7 +985,7 @@ export class BackgroundManager {
      */
     try {
       const session = await this.ctx.client.session.create({
-        body: { title: `[arise:${task.id} manual retry] ${task.description}` },
+        body: { title: formatAriseMsgTitleCustom(task.description, formatAriseMsgPrefixId(task.id, "manual retry")) },
       });
 
       const newSessionId = session.data?.id;
@@ -1012,16 +1018,17 @@ export class BackgroundManager {
           task.completedAt = Date.now();
         });
 
-      return `[arise] Manual retry initiated for task ${taskId}.
-
-Attempt: ${task.resumeRetryCount}
+      return formatAriseMsgSuccessMultiLine(
+        `Manual retry initiated for task ${taskId}.`,
+        `Attempt: ${task.resumeRetryCount}
 Description: ${task.description}
 Shadow: ${task.shadow}
 
-Use arise_background_output("${task.id}") to check the result.`;
+Use arise_background_output("${task.id}") to check the result.`
+      );
     } catch (error) {
       const msg = getErrorMessage(error);
-      return `[arise] Failed to initiate manual retry: ${msg}`;
+      return formatAriseMsgError(`Failed to initiate manual retry: ${msg}`);
     }
   }
 

@@ -8,6 +8,10 @@ import {
   setProvidersCache,
   DEFAULT_PROVIDERS_CACHE_TTL,
 } from '../config/model-cache';
+import {
+  formatAriseMsgError,
+  formatAriseMsgSuccess,
+} from '../utils/arise-message';
 
 /**
  * 格式化模型列表
@@ -72,7 +76,7 @@ export function createListModelsTool(ctx: PluginInput) {
           const providersResult = await ctx.client.config.providers();
 
           if (!providersResult.data) {
-            return "[arise] Failed to fetch providers: No data returned";
+            return formatAriseMsgError("Failed to fetch providers: No data returned");
           }
 
           providers = providersResult.data.providers as CachedProvider[];
@@ -84,7 +88,7 @@ export function createListModelsTool(ctx: PluginInput) {
         }
 
 				if (!providers || providers.length === 0) {
-					return "[arise] No providers configured. Add providers in your opencode.json config file.";
+					return formatAriseMsgError("No providers configured. Add providers in your opencode.json config file.");
 				}
 
 				/** 根據篩選條件過濾提供者 / Filter providers based on criteria */
@@ -93,7 +97,7 @@ export function createListModelsTool(ctx: PluginInput) {
 					: providers;
 
 				if (filteredProviders.length === 0) {
-					return `[arise] No providers found matching "${provider}". Available providers: ${providers.map((p) => p.id).join(", ")}`;
+					return formatAriseMsgError(`No providers found matching "${provider}". Available providers: ${providers.map((p) => p.id).join(", ")}`);
 				}
 
 				/** 格式化模型列表 / Format models list */
@@ -109,13 +113,13 @@ export function createListModelsTool(ctx: PluginInput) {
 
         const cacheNote = fromCache ? " (cached)" : "";
 
-				return `[arise]${cacheNote} ${header}
+				return formatAriseMsgSuccess(`${cacheNote} ${header}
 ${lines.join("\n").trim()}
 
-Use these model names with the 'model' parameter when calling arise_summon or arise_background.`;
+Use these model names with the 'model' parameter when calling arise_summon or arise_background.`);
 			} catch (error) {
 				const msg = getErrorMessage(error);
-				return `[arise] Failed to fetch models: ${msg}`;
+				return formatAriseMsgError(`Failed to fetch models: ${msg}`);
 			}
 		},
 	});

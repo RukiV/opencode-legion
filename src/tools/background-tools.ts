@@ -4,6 +4,13 @@ import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
 import { tool2 } from '../types/types-opencode';
 import { formatDuration } from "../utils/message";
 import { getErrorMessage } from "../utils/error";
+import {
+  formatAriseMsgError,
+  formatAriseMsgSuccess,
+  formatAriseMsgSuccessMultiLine,
+  formatAriseMsgInfo,
+  formatAriseMsgMulti,
+} from "../utils/arise-message";
 
 /**
  * 建立背景任務工具
@@ -37,15 +44,16 @@ export function createBackgroundTaskTool(manager: BackgroundManager){
           model,
         });
 
-        return `[arise] Shadow ${shadow} launched in background.
-
-Task ID: ${task.id}
+        return formatAriseMsgSuccessMultiLine(
+          `Shadow ${shadow} launched in background.`,
+          `Task ID: ${task.id}
 Description: ${description}
 
-Use arise_background_output("${task.id}") when you need the result.`;
+Use arise_background_output("${task.id}") when you need the result.`
+        );
       } catch (error) {
         const msg = getErrorMessage(error);
-        return `[arise] Failed to launch background task: ${msg}`;
+        return formatAriseMsgError(`Failed to launch background task: ${msg}`);
       }
     },
   });
@@ -75,7 +83,7 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
 
       /** 任務不存在 / Task not found */
       if (!task) {
-        return `[arise] Task not found: ${args.task_id}`;
+        return formatAriseMsgError(`Task not found: ${args.task_id}`);
       }
 
       /** 格式化任務執行時長 / Format task execution duration */
@@ -83,18 +91,19 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
 
       /** 任務仍在執行中 / Task still running */
       if (task.status === "running") {
-        return `[arise] Task still running (${duration}). Check again later.`;
+        return formatAriseMsgInfo(`Task still running (${duration}). Check again later.`);
       }
 
       /** 任務執行失敗 / Task execution failed */
       if (task.status === "error") {
-        return `[arise] Task failed: ${task.error ?? "Unknown error"}`;
+        return formatAriseMsgError(`Task failed: ${task.error ?? "Unknown error"}`);
       }
 
       /** 任務成功完成 / Task completed successfully */
-      return `[arise] ${task.shadow} completed (${duration}):
-
-${task.result ?? "(No output)"}`;
+      return formatAriseMsgSuccessMultiLine(
+        `${task.shadow} completed (${duration}):`,
+        task.result ?? "(No output)"
+      );
     },
   });
 }
@@ -130,7 +139,7 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
 
       /** 沒有任務 / No tasks */
       if (tasks.length === 0) {
-        return "[arise] No background tasks.";
+        return formatAriseMsgInfo("No background tasks.");
       }
 
       /** 格式化任務列表 / Format task list */
@@ -140,7 +149,7 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
         return `- ${t.id}: ${t.shadow} | ${t.status} | ${t.description} (${duration})`;
       });
 
-      return `[arise] Background tasks:\n${lines.join("\n")}`;
+      return formatAriseMsgMulti(`Background tasks:\n${lines.join("\n")}`);
     },
   });
 }
@@ -168,9 +177,9 @@ export function createBackgroundCancelTool(manager: BackgroundManager) {
       const success = await manager.cancelTask(args.task_id);
 
       if (success) {
-        return `[arise] Task ${args.task_id} cancelled.`;
+        return formatAriseMsgSuccess(`Task ${args.task_id} cancelled.`);
       } else {
-        return `[arise] Could not cancel task (not found or already completed).`;
+        return formatAriseMsgError("Could not cancel task (not found or already completed).");
       }
     },
   });

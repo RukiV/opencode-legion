@@ -6,6 +6,11 @@ import { tool2 } from '../types/types-opencode';
 import { resolveModelContext } from '../utils/model-resolver';
 import { extractTextFromMessageParts } from '../utils/message';
 import { getErrorMessage } from '../utils/error';
+import {
+  formatAriseMsgTitle,
+  formatAriseMsgError,
+  formatAriseMsgSuccessMultiLine,
+} from '../utils/arise-message';
 
 /**
  * 建立呼叫 Arise Agent 的工具
@@ -53,12 +58,12 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
          * Each Shadow task executes in an isolated session
          */
         const session = await ctx.client.session.create({
-          body: { title: `[arise] ${taskDesc}` },
+          body: { title: formatAriseMsgTitle(taskDesc) },
         });
 
         const sessionId = session.data?.id;
         if (!sessionId) {
-          return `[arise] Failed to create session for ${shadow}`;
+          return formatAriseMsgError(`Failed to create session for ${shadow}`);
         }
 
         /**
@@ -103,11 +108,10 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
             });
           });
 
-          return `[arise] Summoned ${shadow} in background.
-Task: ${taskDesc}
-Session ID: ${sessionId}
-
-The shadow is working. Continue with your work.`;
+          return formatAriseMsgSuccessMultiLine(
+            `Summoned ${shadow} in background.`,
+            `Task: ${taskDesc}\nSession ID: ${sessionId}\n\nThe shadow is working. Continue with your work.`
+          );
         } else {
           /**
            * 同步模式（等待完成）
@@ -151,12 +155,13 @@ The shadow is working. Continue with your work.`;
              */
             const textParts = extractTextFromMessageParts(lastAssistant.parts);
 
-            return `[arise] ${shadow} reports:
-
-${textParts || "(No text response)"}`;
+            return formatAriseMsgSuccessMultiLine(
+              `${shadow} reports:`,
+              textParts || "(No text response)"
+            );
           }
 
-          return `[arise] ${shadow} completed but returned no message.`;
+          return formatAriseMsgError(`${shadow} completed but returned no message.`);
         }
       } catch (error) {
         /**
@@ -167,7 +172,7 @@ ${textParts || "(No text response)"}`;
          * Safely extract error message
          */
         const message = getErrorMessage(error);
-        return `[arise] Failed to summon ${shadow}: ${message}`;
+        return formatAriseMsgError(`Failed to summon ${shadow}: ${message}`);
       }
     },
   });
