@@ -18,14 +18,26 @@ A lightweight, token-efficient orchestrator layer that extends [OpenCode](https:
 ## Installation
 
 ```bash
-bunx opencode-arise install
+bunx @bluelovers/opencode-arise install
 ```
 
 This registers the plugin with OpenCode and creates a default config.
 
+or
+
+`~/.config/opencode/opencode.jsonc`
+
+```jsonc
+{
+  "plugins": [
+    "@bluelovers/opencode-arise@latest"
+  ]
+}
+```
+
 **Verify installation:**
 ```bash
-bunx opencode-arise doctor
+bunx @bluelovers/opencode-arise doctor
 ```
 
 ## Quick Start
@@ -262,7 +274,7 @@ Contributions are welcome! Please read the contributing guidelines first.
 
 ```bash
 # Clone the repo
-git clone https://github.com/moinulmoin/opencode-arise.git
+git clone https://github.com/bluelovers/opencode-arise.git
 cd opencode-arise
 
 # Install dependencies

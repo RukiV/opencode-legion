@@ -12,16 +12,19 @@
     "solo-leveling",
     "arise"
   ],
-  "homepage": "https://github.com/moinulmoin/opencode-arise#readme",
+  "homepage": "https://github.com/bluelovers/opencode-arise#readme",
   "bugs": {
-    "url": "https://github.com/moinulmoin/opencode-arise/issues"
+    "url": "https://github.com/bluelovers/opencode-arise/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/moinulmoin/opencode-arise.git"
+    "url": "git+https://github.com/bluelovers/opencode-arise.git"
   },
   "license": "MIT",
   "author": "moinulmoin",
+  "contributors": [
+    "bluelovers"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -43,8 +46,9 @@
     "test": "cross-env NO_COLOR=1 FORCE_COLOR=0 bun --env-file=.env.test test --update-snapshots",
     "test:color": "bun test --update-snapshots",
     "posttest": "echo posttest",
-    "prebuild": "node --run clean",
+    "prebuild": "node --run build:version && node --run clean",
     "build": "node --run build:bun",
+    "build:version": "bun test/scripts/generate-version.ts",
     "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
     "build:tsc": "tsc",
     "npm:publish:bump": "node --run version:bump && npm publish",

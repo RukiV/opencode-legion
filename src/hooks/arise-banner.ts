@@ -1,13 +1,62 @@
 import type { PluginInput } from "@opencode-ai/plugin";
+import { PLUGIN_VERSION, PLUGIN_VERSION_HOMEPAGE } from "../types/version";
 
 /**
- * ASCII 藝術橫幅
- * ASCII art banner
+ * 產生居中填充的字串
+ * Generate center-padded string
+ *
+ * @param text - 要顯示的文字
+ * @param totalWidth - 總寬度（不含邊框字符）
+ * @returns 填充後的字串
+ */
+function centerPad(text: string, totalWidth: number): string {
+  const textLength = text.length;
+  const padding = totalWidth - textLength;
+
+  if (padding <= 0) {
+    return text;
+  }
+
+  const leftPadding = Math.floor(padding / 2);
+  const rightPadding = padding - leftPadding;
+
+  return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
+}
+
+/** 從 package.json 取得的版本號 */
+// const PLUGIN_VERSION = getVersionFromPackageJson();
+
+/** 橫幅內容區域寬度（不含邊框字符） */
+const BANNER_CONTENT_WIDTH = 58;
+
+/**
+ * 產生版本號行（含動態寬度對齊）
+ * Generate version line with dynamic width alignment
+ *
+ * @param version - 版本號
+ * @returns 對齊後的版本號行
+ */
+function generateVersionLine(version: string): string {
+  const versionText = `v${version}`;
+  const padded = centerPad(versionText, BANNER_CONTENT_WIDTH);
+  return `║${padded}║`;
+}
+
+/**
+ * 產生 ASCII 橫幅（含版本號）
+ * Generate ASCII banner (with version)
  *
  * 當插件啟動時顯示的歡迎橫幅
  * Welcome banner displayed when plugin starts
+ *
+ * @param version - 版本號（可選，預設為 PLUGIN_VERSION）
+ * @returns ASCII 藝術橫幅字串
  */
-const BANNER_ASCII = `
+function generateBannerASCII(version?: string): string {
+  const ver = version ?? PLUGIN_VERSION;
+  const versionLine = generateVersionLine(ver);
+
+  return `
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
 ║               ⚔️  A R I S E !  ⚔️                     ║
@@ -18,11 +67,14 @@ const BANNER_ASCII = `
 ║                                                       ║
 ║   Monarch ready. Shadows await your command.          ║
 ║                                                       ║
+${versionLine}
 ╚═══════════════════════════════════════════════════════╝
+${PLUGIN_VERSION_HOMEPAGE}
 `;
+}
 
-/** Toast 通知訊息 / Toast notification message */
-const TOAST_MESSAGE = "⚔️ ARISE! Shadow Army Assembled. Monarch ready.";
+/** Toast 通知訊息（含版本號）/ Toast notification message (with version) */
+const TOAST_MESSAGE = `⚔️ ARISE! Shadow Army Assembled. Monarch ready. v${PLUGIN_VERSION}`;
 
 /**
  * 程序級標誌：確保橫幅只顯示一次
@@ -79,7 +131,8 @@ export function createAriseBannerHook(ctx: PluginInput) {
  * @returns ASCII 藝術橫幅字串
  */
 export function getBanner(): string {
-  return BANNER_ASCII;
+  // 每次調用時重新讀取版本號，確保顯示最新版本
+  return generateBannerASCII(PLUGIN_VERSION);
 }
 
 /**
@@ -91,7 +144,7 @@ export function getBanner(): string {
  */
 export function printBannerToConsole(): void {
   if (!bannerShownThisProcess) {
-    console.log(BANNER_ASCII);
+    console.log(getBanner());
     bannerShownThisProcess = true;
   }
 }
