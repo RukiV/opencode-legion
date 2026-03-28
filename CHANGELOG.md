@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.13](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.12...@bluelovers/opencode-arise@0.1.13) (2026-03-28)
+
+
+
+### ✨　Features
+
+* **banner:** 在橫幅中顯示版本號 ([c60a80d](https://github.com/bluelovers/opencode-arise/commit/c60a80d8e6dcaaca29de065ed91e24e7cc4fb838))
+
+
+
 ## [0.1.12](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.11...@bluelovers/opencode-arise@0.1.12) (2026-03-28)
 
 
