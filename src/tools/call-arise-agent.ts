@@ -16,7 +16,7 @@ import {
  * 建立呼叫 Arise Agent 的工具
  * Create tool for calling Arise Agent
  *
- * 提供一個工具讓 Monarch 可以召喚 Shadow 代理
+ * 提供一個工具讓 Monarch 可以召喚 Shadow Agent
  * Provides a tool for Monarch to summon Shadow agents
  *
  * @param ctx - Plugin 上下文
@@ -37,7 +37,7 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
      * 執行工具
      * Execute tool
      *
-     * 處理 Shadow 代理的召喚請求
+     * 處理 Shadow Agent 的召喚請求
      * Handles Shadow agent summoning requests
      *
      * @param args - 工具參數

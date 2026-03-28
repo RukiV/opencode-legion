@@ -36,16 +36,15 @@ export const DEFAULT_RETRY_DELAY_INCREMENT = 5000;
 export const DEFAULT_RETRY_DELAY_MAX = 60000;
 
 /**
- * Shadow 代理名稱 Zod Schema
- * Shadow agent name Zod schema
+ * Shadow Agent 名稱 Zod Schema
  *
- * 定義所有可用的 Shadow 代理名稱
- * Defines all available Shadow agent names
+ * 定義所有可用的 Shadow Agent 名稱
+ * Defines all available Shadow Agent names
  *
  * @see IAllShadowAgentsName
  */
 export const ShadowName = z.enum(ALL_SHADOW_AGENTS_NAME).meta({
-  description: "Shadow 代理名稱 / Shadow agent name",
+  description: "Shadow Agent 名稱 / Shadow Agent name",
   title: "Shadow Agent Name",
 });
 
@@ -65,39 +64,99 @@ export const HookName = z.enum(ALLOWED_HOOKS).meta({
 export const AgentOverride = z
   .object({
     /** 模型名稱（可選）/ Model name (optional) */
-    model: z.string().optional(),
+    model: z.string().optional()
+      .meta({
+        description: "要使用的模型名稱 / Model name to use",
+        title: "Model",
+      }),
     /** 是否停用該代理（可選）/ Whether to disable this agent (optional) */
-    disabled: z.boolean().optional(),
+    disabled: z.boolean().optional()
+      .meta({
+        description: "是否停用此代理 / Whether to disable this agent",
+        title: "Disabled",
+      }),
     /** 輪詢間隔（毫秒，可選）/ Polling interval in ms (optional) */
-    poll_interval: z.number().optional(),
+    poll_interval: z.number().optional()
+      .meta({
+        description: "輪詢間隔（毫秒）/ Polling interval in milliseconds",
+        title: "Poll Interval",
+      }),
     /** 重試延遲遞增量（毫秒，可選）/ Retry delay increment in ms (optional) */
-    retry_delay_increment: z.number().optional(),
+    retry_delay_increment: z.number().optional()
+      .meta({
+        description: "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
+        title: "Retry Delay Increment",
+      }),
     /** 重試延遲最大值（毫秒，可選）/ Max retry delay in ms (optional) */
-    retry_delay_max: z.number().optional(),
+    retry_delay_max: z.number().optional()
+      .meta({
+        description: "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
+        title: "Retry Delay Max",
+      }),
     /** 系統提示補充（可選）/ System prompt supplement (optional) */
-    system_prompt_addon: z.string().optional(),
+    system_prompt_addon: z.string().optional()
+      .meta({
+        description: "系統提示補充內容 / System prompt supplement content",
+        title: "System Prompt Addon",
+      }),
     /** 自動繼續任務設定（可選）/ Auto resume settings (optional) */
     auto_resume: z
       .object({
         /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
-        enabled: z.boolean().default(false),
+        enabled: z.boolean().default(false)
+          .meta({
+            description: "是否啟用自動繼續任務 / Enable auto resume",
+            title: "Enabled",
+          }),
         /** 最大重試次數（預設 3）/ Max retry count (default 3) */
-        max_retries: z.number().default(3).optional(),
+        max_retries: z.number().default(3).optional()
+          .meta({
+            description: "最大重試次數 / Maximum retry count",
+            title: "Max Retries",
+          }),
         /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
-        retry_delay: z.number().default(5000).optional(),
+        retry_delay: z.number().default(5000).optional()
+          .meta({
+            description: "重試延遲（毫秒）/ Retry delay in milliseconds",
+            title: "Retry Delay",
+          }),
         /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
-        on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional(),
+        on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional()
+          .meta({
+            description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+            title: "On Error",
+          }),
         /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
-        target: z.enum(["background", "all"]).default("background").optional(),
+        target: z.enum(["background", "all"]).default("background").optional()
+          .meta({
+            description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+            title: "Target",
+          }),
         /** 自訂提示訊息（可選）/ Custom prompts (optional) */
         prompts: z
           .object({
             /** 首次重試時的提示 / Prompt for first retry */
-            retry: z.string().optional(),
+            retry: z.string().optional()
+              .meta({
+                description: "首次重試時的提示 / Prompt for first retry",
+                title: "Retry Prompt",
+              }),
             /** 最終重試時的提示 / Prompt for final retry */
-            final: z.string().optional(),
+            final: z.string().optional()
+              .meta({
+                description: "最終重試時的提示 / Prompt for final retry",
+                title: "Final Prompt",
+              }),
             /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
-            custom: z.array(z.string()).optional(),
+            custom: z.array(z.string()).optional()
+              .meta({
+                description: "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
+                title: "Custom Prompts",
+              }),
+          })
+          .meta({
+            description: "自訂提示訊息 / Custom prompts",
+            title: "Prompts",
           })
           .optional(),
       })
@@ -119,24 +178,56 @@ export const AgentOverride = z
 export const AriseConfigSchema = z
   .object({
     /** JSON Schema URI（可選）/ JSON Schema URI (optional) */
-    $schema: z.string().optional(),
-    /** 要停用的陰影代理列表（可選）/ List of shadows to disable (optional) */
-    disabled_shadows: z.array(ShadowName).optional(),
+    $schema: z.string().optional()
+      .meta({
+        description: "JSON Schema URI / JSON Schema URI",
+        title: "Schema",
+      }),
+    /** 要停用的 Shadow Agents 列表（可選）/ List of Shadow Agents to disable (optional) */
+    disabled_shadows: z.array(ShadowName).optional()
+      .meta({
+        description: "要停用的 Shadow Agents 列表 / List of Shadow Agents to disable",
+        title: "Disabled Shadows",
+      }),
     /** 要停用的 Hook 列表（可選）/ List of hooks to disable (optional) */
-    disabled_hooks: z.array(HookName).optional(),
+    disabled_hooks: z.array(HookName).optional()
+      .meta({
+        description: "要停用的 Hook 列表 / List of hooks to disable",
+        title: "Disabled Hooks",
+      }),
     /** 是否顯示歡迎橫幅（預設 true）/ Show welcome banner (default true) */
-    show_banner: z.boolean().default(true).optional(),
+    show_banner: z.boolean().default(true).optional()
+      .meta({
+        description: "是否顯示歡迎橫幅 / Show welcome banner",
+        title: "Show Banner",
+      }),
     /** 每個工作階段都顯示橫幅（預設 false）/ Show banner every session (default false) */
-    banner_every_session: z.boolean().default(false).optional(),
+    banner_every_session: z.boolean().default(false).optional()
+      .meta({
+        description: "每個工作階段都顯示橫幅 / Show banner every session",
+        title: "Banner Every Session",
+      }),
     /** 各代理的覆寫設定（可選）/ Per-agent override settings (optional) */
-    agents: z.record(ShadowName, AgentOverride).optional(),
+    agents: z.record(ShadowName, AgentOverride).optional()
+      .meta({
+        description: "各代理的覆寫設定 / Per-agent override settings",
+        title: "Agents",
+      }),
     /** 輸出截斷設定（可選）/ Output truncation settings (optional) */
     output_shaping: z
       .object({
         /** 最大輸出字元數（預設 12000）/ Max output chars (default 12000) */
-        max_chars: z.number().default(12000),
+        max_chars: z.number().default(12000)
+          .meta({
+            description: "最大輸出字元數 / Maximum output characters",
+            title: "Max Chars",
+          }),
         /** 是否保留錯誤輸出（預設 true）/ Preserve error output (default true) */
-        preserve_errors: z.boolean().default(true),
+        preserve_errors: z.boolean().default(true)
+          .meta({
+            description: "是否保留錯誤輸出 / Preserve error output",
+            title: "Preserve Errors",
+          }),
       })
       .meta({
         description: "輸出截斷設定 / Output truncation settings",
@@ -147,9 +238,17 @@ export const AriseConfigSchema = z
     compaction: z
       .object({
         /** 觸發壓縮的閾值百分比（50-95，預設 80）/ Compaction threshold percent (50-95, default 80) */
-        threshold_percent: z.number().min(50).max(95).default(80),
+        threshold_percent: z.number().min(50).max(95).default(80)
+          .meta({
+            description: "觸發壓縮的閾值百分比（50-95）/ Compaction threshold percent (50-95)",
+            title: "Threshold Percent",
+          }),
         /** 保留 TODO 項目（預設 true）/ Preserve TODO items (default true) */
-        preserve_todos: z.boolean().default(true),
+        preserve_todos: z.boolean().default(true)
+          .meta({
+            description: "保留 TODO 項目 / Preserve TODO items",
+            title: "Preserve TODOs",
+          }),
       })
       .meta({
         description: "對話壓縮設定 / Conversation compaction settings",
@@ -160,39 +259,83 @@ export const AriseConfigSchema = z
     background: z
       .object({
         /** 輪詢間隔（毫秒，預設 2000）/ Polling interval in ms (default 2000) */
-        poll_interval: z.number().default(DEFAULT_POLL_INTERVAL),
-        /** 重試延遲遞增量（毫秒，預設 5000）/ Retry delay increment in ms (default 5000) */
-        retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT),
+        poll_interval: z.number().default(DEFAULT_POLL_INTERVAL)
+          .meta({
+            description: "輪詢間隔（毫秒）/ Polling interval in milliseconds",
+            title: "Poll Interval",
+          }),
+        /** 重試延�遞增量（毫秒，預設 5000）/ Retry delay increment in ms (default 5000) */
+        retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT)
+          .meta({
+            description: "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
+            title: "Retry Delay Increment",
+          }),
         /** 重試延遲最大值（毫秒，預設 60000）/ Max retry delay in ms (default 60000) */
-        retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX),
+        retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX)
+          .meta({
+            description: "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
+            title: "Retry Delay Max",
+          }),
         /** 自動繼續任務設定（可選）/ Auto resume task settings (optional) */
         auto_resume: z
           .object({
             /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
-            enabled: z.boolean().default(false),
+            enabled: z.boolean().default(false)
+              .meta({
+                description: "是否啟用自動繼續任務 / Enable auto resume",
+                title: "Enabled",
+              }),
             /** 最大重試次數（預設 3）/ Max retry count (default 3) */
-            max_retries: z.number().default(3).optional(),
+            max_retries: z.number().default(3).optional()
+              .meta({
+                description: "最大重試次數 / Maximum retry count",
+                title: "Max Retries",
+              }),
             /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
-            retry_delay: z.number().default(5000).optional(),
+            retry_delay: z.number().default(5000).optional()
+              .meta({
+                description: "重試延遲（毫秒）/ Retry delay in milliseconds",
+                title: "Retry Delay",
+              }),
             /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
             /** - ignore: 忽略錯誤，不重試 / Ignore errors, no retry */
             /** - retry: 自動重試 / Auto retry */
             /** - notify: 通知但等待手動處理 / Notify but wait for manual handling */
-            on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional(),
+            on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional()
+              .meta({
+                description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+                title: "On Error",
+              }),
             /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
             /** - background: 只對背景任務 / Only for background tasks */
             /** - all: 所有任務 / All tasks */
-            target: z.enum(["background", "all"]).default("background").optional(),
+            target: z.enum(["background", "all"]).default("background").optional()
+              .meta({
+                description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+                title: "Target",
+              }),
             /** 自訂提示訊息（可選）/ Custom prompts (optional) */
             /** 用於自訂重試時的提示內容，可使用變數 / Used to customize prompts during retry, supports variables */
             prompts: z
               .object({
                 /** 首次重試時的提示 / Prompt for first retry */
-                retry: z.string().optional(),
+                retry: z.string().optional()
+                  .meta({
+                    description: "首次重試時的提示 / Prompt for first retry",
+                    title: "Retry Prompt",
+                  }),
                 /** 最終重試時的提示 / Prompt for final retry */
-                final: z.string().optional(),
+                final: z.string().optional()
+                  .meta({
+                    description: "最終重試時的提示 / Prompt for final retry",
+                    title: "Final Prompt",
+                  }),
                 /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
-                custom: z.array(z.string()).optional(),
+                custom: z.array(z.string()).optional()
+                  .meta({
+                    description: "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
+                    title: "Custom Prompts",
+                  }),
               })
               .meta({
                 description: "自訂提示訊息 / Custom prompts",
@@ -215,7 +358,11 @@ export const AriseConfigSchema = z
     debug: z
       .object({
         /** 是否啟用除錯模式（預設 false）/ Enable debug mode (default false) */
-        enabled: z.boolean().default(false),
+        enabled: z.boolean().default(false)
+          .meta({
+            description: "是否啟用除錯模式 / Enable debug mode",
+            title: "Enabled",
+          }),
         /**
          * 日誌級別（預設 warn）/ Log level (default warn)
          * - error: 錯誤訊息 / Error messages
@@ -223,7 +370,11 @@ export const AriseConfigSchema = z
          * - info: 一般資訊 / General information
          * - debug: 除錯資訊 / Debug information
          */
-        level: z.enum(ALLOWED_LOG_LEVELS).default(EnumLogLevel.Warn),
+        level: z.enum(ALLOWED_LOG_LEVELS).default(EnumLogLevel.Warn)
+          .meta({
+            description: "日誌級別：error、warn、info、debug / Log level: error, warn, info, debug",
+            title: "Level",
+          }),
       })
       .meta({
         description: "除錯設定 / Debug settings",
@@ -251,7 +402,7 @@ export const DEFAULT_CONFIG: IAriseConfig = {
   show_banner: true,
   /** 不每個工作階段都顯示橫幅 / Don't show banner every session */
   banner_every_session: false,
-  /** 不停用任何陰影代理 / Don't disable any shadow agents */
+  /** 不停用任何 Shadow Agents / Don't disable any Shadow Agents */
   disabled_shadows: [],
   /** 不停用任何 Hook / Don't disable any hooks */
   disabled_hooks: [],

@@ -61,7 +61,7 @@ export enum EnumOpencodeAgentMode {
  * Shadow Agent 權限等級
  * Shadow Agent permission level
  *
- * 控制 Shadow 代理對特定操作的權限
+ * 控制 Shadow Agent 對特定操作的權限
  * Controls Shadow agent permissions for specific operations
  *
  * - ALLOW: 允許執行

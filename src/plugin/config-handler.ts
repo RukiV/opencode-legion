@@ -31,7 +31,7 @@ export interface IOpencodeConfig extends Config
 }
 
 /**
- * 設定 Shadow 代理配置參數
+ * 設定 Shadow Agent 配置參數
  * Set Shadow agent config parameters
  *
  * @param params - 參數物件 / Parameters object
@@ -54,7 +54,7 @@ export function setShadowAgentsConfig(params: {
 	 * 添加 Shadow Subagents
 	 * Add Shadow subagents
 	 *
-	 * 遍歷所有 Shadow 代理，根據配置決定是否註冊
+	 * 遍歷所有 Shadow Agent，根據配置決定是否註冊
 	 * Iterate through all Shadow agents, decide whether to register based on config
 	 */
 	const disabledShadows = new Set(ariseConfig.disabled_shadows ?? []);
@@ -79,7 +79,7 @@ export function setShadowAgentsConfig(params: {
 		 */
 		const resolvedModel = _isAutoModel(shadow.model) ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
 
-		/** 註冊 Shadow 代理 / Register Shadow agent */
+		/** 註冊 Shadow Agent / Register Shadow agent */
 		agents[name] = {
 			description: shadow.description,
 			mode: shadow.mode,
@@ -129,7 +129,7 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 		/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
 		opencodeConfig.default_agent = "monarch";
 
-		/** 設定 Shadow 代理配置 / Set Shadow agents config */
+		/** 設定 Shadow Agent 配置 / Set Shadow agents config */
 		setShadowAgentsConfig({
 			ariseConfig,
 			opencodeConfig

@@ -274,6 +274,12 @@ config/     - Schema and path utilities
 types/      - TypeScript type definitions
 ```
 
+## Translation Rules / 翻譯規定
+
+See [docs/TRANSLATION_RULES.md](./docs/TRANSLATION_RULES.md) for the complete translation rules.
+
+---
+
 ## Skills/Rules to Load
 
 | Skill/Rules | When to Use                                              |

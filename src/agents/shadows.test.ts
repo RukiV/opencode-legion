@@ -3,7 +3,7 @@ import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName } from '../
 import { EnumOpencodeAgentMode } from '../types/enum-opencode';
 
 /**
- * 所有 Shadow 代理名稱陣列
+ * 所有 Shadow Agent名稱陣列
  * All Shadow agent names array
  *
  * 包含 Monarch 和所有子代理
@@ -15,7 +15,7 @@ const ALL_SHADOW_AGENTS_NAME = [EnumShadowAgentsName.ShadowMonarch, ...ALLOWED_S
  * Shadow Agents 測試
  * Shadow Agents tests
  *
- * 驗證 Shadow 代理配置的正確性
+ * 驗證 Shadow Agent配置的正確性
  * Verifies correctness of Shadow agent configuration
  */
 describe("Shadow Agents", () => {
@@ -23,7 +23,7 @@ describe("Shadow Agents", () => {
    * 測試 1: 所有預期的 Shadow 都已定義
    * Test 1: All expected shadows are defined
    *
-   * 確保沒有遺漏任何 Shadow 代理
+   * 確保沒有遺漏任何 Shadow Agent
    * Ensures no Shadow agents are missing
    */
   test("has all expected shadows", () => {

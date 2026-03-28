@@ -6,8 +6,8 @@ import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGRO
 import { ITSRequiredWith } from "ts-type";
 
 /**
- * Shadow 代理介面
- * Shadow agent interface
+ * Shadow Agent 介面
+ * Shadow Agent interface
  *
  * 擴展 Agent 類型，添加 Shadow 特有的屬性
  * Extends Agent type with Shadow-specific properties
@@ -28,8 +28,8 @@ export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsN
 }
 
 /**
- * 所有 Shadow 代理的類型映射
- * Type mapping for all Shadow agents
+ * 所有 Shadow Agents 的類型映射
+ * Type mapping for all Shadow Agents
  *
  * 確保每個 Shadow 名稱都有對應的代理類型
  * Ensures each Shadow name has a corresponding agent type
@@ -461,8 +461,8 @@ export function getAriseToolsConfigEntry<A extends EnumAriseTools>(ariseToolName
 }
 
 /**
- * Shadow 代理定義集合
- * Shadow agents definition collection
+ * Shadow Agents 定義集合
+ * Shadow Agents definition collection
  */
 export const SHADOW_AGENTS: IShadowAgents = {
   /**
@@ -600,8 +600,7 @@ Think deeply, plan carefully.`,
   },
 
   /**
-   * Tusk - 創意陰影，UI/UX 專家
-   * Tusk - Creative shadow, UI/UX specialist
+   * Tusk - Creative Shadow, UI/UX 專家 (specialist)
    *
    * 處理所有視覺和前端工作
    * Handles all visual and frontend work
@@ -629,8 +628,7 @@ Create with artistry.`,
   },
 
   /**
-   * Tank - 研究陰影，外部知識收集者
-   * Tank - Research shadow, external knowledge gatherer
+   * Tank - Research Shadow, 外部知識收集者 (external knowledge gatherer)
    *
    * 從程式碼庫外部查找資訊
    * Finds information from outside the codebase

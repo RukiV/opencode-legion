@@ -23,7 +23,7 @@ export { DEFAULT_MODEL } from "../types/const-default";
  * Get agent model from config
  *
  * @param config - Arise 配置物件
- * @param shadowName - Shadow 代理名稱
+ * @param shadowName - Shadow Agent名稱
  * @returns 配置中指定的模型，若無則回傳 undefined
  */
 export function getModelFromConfig(
