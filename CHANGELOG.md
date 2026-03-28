@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.12](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.11...@bluelovers/opencode-arise@0.1.12) (2026-03-28)
+
+
+
+### ✨　Features
+
+* **schema:** 為 Zod schema 添加 .meta() 描述與 title ([119dea9](https://github.com/moinulmoin/opencode-arise/commit/119dea932bcaecffdc5859af94cb230f1571f64b))
+
+
+### 📦　Code Refactoring
+
+* **config:** 重構 DeepMerge 函式並新增 deepMerge3 ([7598a8c](https://github.com/moinulmoin/opencode-arise/commit/7598a8ccc474a4d3d1e6b3993aaa8837070d97ad))
+* **schema:** 將 deepMerge3 選項改為 enableDeepMerge ([2dac4bc](https://github.com/moinulmoin/opencode-arise/commit/2dac4bca2ebe9da3c94e3054d2f111e5b178d293))
+
+
+
 ## [0.1.11](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.10...@bluelovers/opencode-arise@0.1.11) (2026-03-28)
 
 
