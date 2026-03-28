@@ -1,7 +1,7 @@
 import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./background-manager";
 import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
-import { tool2 } from '../types/opencode';
+import { tool2 } from '../types/types-opencode';
 
 /**
  * 建立主動繼續工具

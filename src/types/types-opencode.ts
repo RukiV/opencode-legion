@@ -2,60 +2,22 @@
  * Shadow Agent 相關型別定義
  * Shadow Agent type definitions
  *
- * 定義 Shadow Agent 的模式、權限和工具相關類型
- * Defines Shadow Agent modes, permissions, and tool-related types
+ * 定義 Shadow Agent 的工具相關類型
+ * Defines Shadow Agent tool-related types
  *
  * 關於 Enum 放置：
- * - OpenCode 概念相關的 Enum（模式、權限）定義於此檔案
+ * - OpenCode 概念相關的 Enum（模式、權限）定義於 enum-opencode.ts
  * - ARISE 工具專用的 Enum 定義於 enums.ts
  */
 
 import { ToolContext, type ToolDefinition } from '@opencode-ai/plugin/tool';
 import { z } from 'zod';
-import { EnumAriseTools } from '../types/enums';
+import { EnumAriseTools } from './enums';
 import { ARISE_TOOLS } from '../agents/shadows';
-import type { IAriseTools } from '../types/types';
+import type { IAriseTools } from './types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
 import { type Hooks, type PluginInput, tool, Plugin } from '@opencode-ai/plugin';
 import type { ITSOverwrite } from 'ts-type';
-import { BackgroundManager } from '../tools/background-manager';
-
-/**
- * Shadow Agent 模式
- * Shadow Agent mode
- *
- * - PRIMARY: 主代理（Monarch 使用）
- * - SUBAGENT: 子代理（其他 Shadow 使用）
- * - ALL: 所有模式
- */
-export enum EnumOpencodeAgentMode {
-	/** 主代理模式 - 唯一的主要協調者 / Primary mode - the only main coordinator */
-	PRIMARY = "primary",
-	/** 子代理模式 - 被 Monarch 召喚的 Shadow / Subagent mode - Shadows summoned by Monarch */
-	SUBAGENT = "subagent",
-	/** 所有模式 - 可同時作為主代理和子代理 / All modes - can be both primary and subagent */
-	ALL = "all",
-}
-
-/**
- * Shadow Agent 權限等級
- * Shadow Agent permission level
- *
- * 控制 Shadow 代理對特定操作的權限
- * Controls Shadow agent permissions for specific operations
- *
- * - ALLOW: 允許執行
- * - DENY: 拒絕執行
- * - ASK: 詢問使用者
- */
-export enum EnumOpencodeAgentPermission {
-	/** 允許執行 / Allow execution */
-	ALLOW = "allow",
-	/** 拒絕執行 / Deny execution */
-	DENY = "deny",
-	/** 詢問使用者 / Ask user */
-	ASK = "ask",
-}
 
 /**
  * Zod 原始結構類型

@@ -1,7 +1,7 @@
 import { type Agent } from '@opencode-ai/sdk';
 import type { ITSPickExtra } from 'ts-type';
 import { z } from "zod";
-import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/opencode';
+import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/enum-opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 

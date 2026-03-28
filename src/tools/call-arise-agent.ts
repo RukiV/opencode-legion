@@ -2,7 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
 import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
-import { tool2 } from '../types/opencode';
+import { tool2 } from '../types/types-opencode';
 import { resolveModelContext } from '../utils/model-resolver';
 import { extractTextFromMessageParts } from '../utils/message';
 import { getErrorMessage } from '../utils/error';

@@ -7,42 +7,13 @@
  */
 
 import type { PluginInput } from "@opencode-ai/plugin";
-import type { Event } from "@opencode-ai/sdk";
-import { EnumSessionEventType } from "../types/enum-opencode";
+import type { Event, EventSessionCreated, EventSessionDeleted, EventSessionIdle } from "@opencode-ai/sdk";
+import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType } from "../types/enum-opencode";
 import { clearSessionModel } from "../config/model-cache";
 import { getErrorMessage } from "../utils/error";
-import { ITSTypeAndStringLiteral } from "ts-type";
+import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
 
-/**
- * 事件處理器客戶端上下文（使用 Pick 避免重複類型）
- * Event handler client context (uses Pick to avoid type duplication)
- *
- * 從 PluginInput.client 中提取我們需要的屬性
- * Extracts the properties we need from PluginInput.client
- */
-export type IEventHandlerClient = Pick<PluginInput["client"], "session" | "tui" | "app">;
-
-/**
- * 事件處理器上下文
- * Event handler context
- *
- * 包裝 IEventHandlerClient 以符合實際使用方式
- * Wraps IEventHandlerClient to match actual usage
- */
-export interface IEventHandlerContext
-{
-	/** 客戶端 / Client */
-	client: IEventHandlerClient;
-}
-
-/**
- * 會話事件類型
- * Session event types
- *
- * 定義我們處理的會話事件類型
- * Defines the session event types we handle
- */
-export type ISessionEventType = ITSTypeAndStringLiteral<EnumSessionEventType>;
+export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 
 /**
  * 檢查是否為會話事件
@@ -80,12 +51,93 @@ export function extractSessionId(event: Event)
  * 清除會話的模型緩存
  * Clears the model cache for the session
  */
-export function handleSessionDeleted(event: Event)
+export function handleSessionDeleted(event: EventSessionDeleted, params?: ICreateEventHandlerParams)
 {
 	const sessionId = extractSessionId(event);
 	if (sessionId)
 	{
 		clearSessionModel(sessionId);
+	}
+}
+
+/**
+ * 處理會話創建事件
+ * Handle session created event
+ *
+ * 顯示橫幅（如果有的話）
+ * Shows banner (if available)
+ */
+async function handleSessionCreated(
+	event: EventSessionCreated,
+	params: Pick<ICreateEventHandlerParams, "bannerHook">
+): Promise<void>
+{
+	await params.bannerHook?.onSessionCreated();
+}
+
+/**
+ * 處理會話空閒事件
+ * Handle session idle event
+ *
+ * 執行 TODO 檢查並顯示提醒（如果需要的話）
+ * Performs TODO check and shows reminder (if needed)
+ */
+async function handleSessionIdle(
+	event: EventSessionIdle,
+	params: Pick<ICreateEventHandlerParams, "todoEnforcer"> & { ctx: IEventHandlerContext }
+): Promise<void>
+{
+	if (!params.todoEnforcer)
+	{
+		return;
+	}
+	const sessionId = extractSessionId(event);
+	if (!sessionId)
+	{
+		return;
+	}
+	try
+	{
+		/** 取得最近訊息以檢查未完成的 TODO / Get recent messages to check for incomplete todos */
+		const messages = await params.ctx.client.session.messages({
+			path: { id: sessionId },
+		});
+
+		if (messages.data)
+		{
+			/**
+			 * 從訊息 parts 中提取文字內容
+			 * Extract text content from message parts
+			 */
+			const recentMessages = messages.data.slice(-5).map((m) =>
+			{
+				const textContent = extractTextFromMessageParts(m.parts);
+				return { content: textContent };
+			});
+
+			const result = await params.todoEnforcer.checkCompletion(recentMessages);
+
+			if (result.hasIncompleteTodos && result.reminderMessage)
+			{
+				await params.ctx.client.tui?.showToast({
+					body: {
+						title: "Arise - Incomplete Tasks",
+						message: "You have pending TODOs. Complete them before stopping.",
+						variant: "warning",
+						duration: 5000,
+					},
+				});
+			}
+		}
+	} catch (error)
+	{
+		params.ctx.client.app?.log?.({
+			body: {
+				service: "arise",
+				level: "warn",
+				message: `TODO enforcement failed: ${getErrorMessage(error)}`,
+			},
+		});
 	}
 }
 
@@ -139,14 +191,9 @@ export function createFullEventHandler(
 	}
 )
 {
-	const { ctx, todoEnforcer } = params;
-
 	/**
 	 * 完整的事件處理函式
 	 * Full event handler function
-	 *
-	 * 包含需要 ctx 的額外邏輯
-	 * Includes extra logic that requires ctx
 	 */
 	return async function fullEventHandler(input: { event: Event }): Promise<void>
 	{
@@ -155,68 +202,20 @@ export function createFullEventHandler(
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
 
-		/** 會話創建時顯示橫幅 / Show banner on session creation */
-		if (event.type === EnumSessionEventType.SessionCreated && params.bannerHook)
+		switch (event.type)
 		{
-			await params.bannerHook.onSessionCreated();
-		}
-
-		/** 處理 session.idle 以進行 TODO 強制執行 / Handle session.idle for TODO enforcement */
-		if (event.type === EnumSessionEventType.SessionIdle && todoEnforcer)
-		{
-			const sessionId = extractSessionId(event);
-			if (sessionId)
-			{
-				try
-				{
-					/** 取得最近訊息以檢查未完成的 TODO / Get recent messages to check for incomplete todos */
-					const messages = await ctx.client.session.messages({
-						path: { id: sessionId },
-					});
-
-					if (messages.data)
-					{
-						/**
-						 * 從訊息 parts 中提取文字內容
-						 * Extract text content from message parts
-						 */
-						const recentMessages = messages.data.slice(-5).map((m) =>
-						{
-							const textContent = extractTextFromMessageParts(m.parts);
-							return { content: textContent };
-						});
-
-						const result = await todoEnforcer.checkCompletion(recentMessages);
-
-						if (result.hasIncompleteTodos && result.reminderMessage)
-						{
-							await ctx.client.tui?.showToast({
-								body: {
-									title: "Arise - Incomplete Tasks",
-									message: "You have pending TODOs. Complete them before stopping.",
-									variant: "warning",
-									duration: 5000,
-								},
-							});
-						}
-					}
-				} catch (error)
-				{
-					ctx.client.app?.log?.({
-						body: {
-							service: "arise",
-							level: "warn",
-							message: `TODO enforcement failed: ${getErrorMessage(error)}`,
-						},
-					});
-				}
-			}
-		}
-
-		/** 清除會話結束時的模型緩存 / Clear model cache when session ends */
-		if (event.type === EnumSessionEventType.SessionDeleted)
-		{
-			handleSessionDeleted(event);
+			case EnumSessionEventType.SessionCreated:
+				await handleSessionCreated(event, params);
+				break;
+			case EnumSessionEventType.SessionIdle:
+				await handleSessionIdle(event, params);
+				break;
+			case EnumSessionEventType.SessionDeleted:
+				handleSessionDeleted(event, params);
+				break;
+			default:
+				// 未處理的事件類型 / No handler for other event types
+				break;
 		}
 	};
 }

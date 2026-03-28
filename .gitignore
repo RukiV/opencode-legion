@@ -9,3 +9,4 @@ nul
 /__root.js.map
 test/temp.ts
 test/temp/
+tsconfig.tsbuildinfo

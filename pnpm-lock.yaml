@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@opencode-ai/plugin':
-        specifier: ^1.2.27
-        version: 1.2.27
+        specifier: ^1.3.3
+        version: 1.3.3
       '@opencode-ai/sdk':
-        specifier: ^1.2.27
-        version: 1.2.27
+        specifier: ^1.3.3
+        version: 1.3.3
       '@yarn-tool/npa-to-deps':
         specifier: ^3.0.5
         version: 3.0.5(ts-toolbelt@9.6.0)
@@ -26,9 +26,21 @@ importers:
       jsonc-parser:
         specifier: ^3.3.1
         version: 3.3.1
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
+      path-in-dir:
+        specifier: ^1.0.13
+        version: 1.0.13(ts-toolbelt@9.6.0)
+      path-is-same:
+        specifier: ^1.0.29
+        version: 1.0.29(ts-toolbelt@9.6.0)
       ts-type:
-        specifier: ^3.0.10
-        version: 3.0.10(ts-toolbelt@9.6.0)
+        specifier: ^3.0.12
+        version: 3.0.12(ts-toolbelt@9.6.0)
+      upath2:
+        specifier: ^3.1.23
+        version: 3.1.23(ts-toolbelt@9.6.0)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -60,24 +72,12 @@ importers:
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
-      micromatch:
-        specifier: ^4.0.8
-        version: 4.0.8
-      path-in-dir:
-        specifier: ^1.0.13
-        version: 1.0.13(ts-toolbelt@9.6.0)
-      path-is-same:
-        specifier: ^1.0.29
-        version: 1.0.29(ts-toolbelt@9.6.0)
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      upath2:
-        specifier: ^3.1.23
-        version: 3.1.23(ts-toolbelt@9.6.0)
+        specifier: ^6.0.2
+        version: 6.0.2
 
 packages:
 
@@ -96,11 +96,11 @@ packages:
   '@lazy-node/types-path@1.0.3':
     resolution: {integrity: sha512-5Bnl5s5jh7o14i0oa7gj+Y0fDLIlri3+KVZmv4gk0OFGuOrOEmWBBCI9ky3Syip5g/yPHZdfa+WO5BVJMUpMdw==}
 
-  '@opencode-ai/plugin@1.2.27':
-    resolution: {integrity: sha512-h+8Bw9v9nghMg7T+SUCTzxlIhOrsTqXW7U0HVLGQST5DjbN7uyCUM51roZWZ8LRjGxzbzFhvPnY1bj8i+ioZyw==}
+  '@opencode-ai/plugin@1.3.3':
+    resolution: {integrity: sha512-pxI4LanjnQb8sUd/zfQilzlGHyrdjmZuQ1XsUFbm+rij4yq0mUPtXcPGfuZJBEcGchKn57tA3/LB6RmipLQpXg==}
 
-  '@opencode-ai/sdk@1.2.27':
-    resolution: {integrity: sha512-Wk0o/I+Fo+wE3zgvlJDs8Fb67KlKqX0PrV8dK5adSDkANq6r4Z25zXJg2iOir+a8ntg3rAcpel1OY4FV/TwRUA==}
+  '@opencode-ai/sdk@1.3.3':
+    resolution: {integrity: sha512-qg7DwEVUpZArsYajs0DcaHqmIYB3EfHCuuTdMJir7Yc976DUWDfLR/5y9h8fKb9HAMJXe4TZkAIEr0/3OmK67g==}
 
   '@oven/bun-darwin-aarch64@1.3.11':
     resolution: {integrity: sha512-/8IzqSu4/OWGRs7Fs2ROzGVwJMFTBQkgAp6sAthkBYoN7OiM4rY/CpPVs2X9w9N1W61CHSkEdNKi8HrLZKfK3g==}
@@ -372,8 +372,8 @@ packages:
   ts-toolbelt@9.6.0:
     resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
 
-  ts-type@3.0.10:
-    resolution: {integrity: sha512-L6r2sL6PjBrXcYd1cvSznkgheqWHCUURLGHP2Kwnd6HABwkcds3N72eKbNcvZPawBlPgs3UDCz3v6P6kkOAYWA==}
+  ts-type@3.0.12:
+    resolution: {integrity: sha512-TOLYQn3xsZ+w/Nv6CZPWFR9y7YxDqfc/OFjP/qXSBFiKOGYzxERm1YZ0REb/ZBK0TBfXzZ2TfKZgQ1yIpDzJ6A==}
     peerDependencies:
       ts-toolbelt: ^9.6.0
 
@@ -383,8 +383,8 @@ packages:
   typedarray-dts@1.0.0:
     resolution: {integrity: sha512-Ka0DBegjuV9IPYFT1h0Qqk5U4pccebNIJCGl8C5uU7xtOs+jpJvKGAY4fHGK25hTmXZOEUl9Cnsg5cS6K/b5DA==}
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+  typescript@6.0.2:
+    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -429,7 +429,7 @@ snapshots:
 
   '@lazy-node/semver-simple-parse@4.0.5(ts-toolbelt@9.6.0)':
     dependencies:
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
       tslib: 2.8.1
     transitivePeerDependencies:
       - ts-toolbelt
@@ -437,17 +437,17 @@ snapshots:
   '@lazy-node/types-path@1.0.3(ts-toolbelt@9.6.0)':
     dependencies:
       '@types/node': 25.5.0
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
       tslib: 2.8.1
     transitivePeerDependencies:
       - ts-toolbelt
 
-  '@opencode-ai/plugin@1.2.27':
+  '@opencode-ai/plugin@1.3.3':
     dependencies:
-      '@opencode-ai/sdk': 1.2.27
+      '@opencode-ai/sdk': 1.3.3
       zod: 4.1.8
 
-  '@opencode-ai/sdk@1.2.27': {}
+  '@opencode-ai/sdk@1.3.3': {}
 
   '@oven/bun-darwin-aarch64@1.3.11':
     optional: true
@@ -488,7 +488,7 @@ snapshots:
   '@ts-type/package-dts@3.0.7(ts-toolbelt@9.6.0)':
     dependencies:
       '@types/semver': 7.7.1
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
     transitivePeerDependencies:
       - ts-toolbelt
 
@@ -529,7 +529,7 @@ snapshots:
     dependencies:
       fs-extra: 11.3.4
       sort-object-keys2: 3.0.8
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
       tslib: 2.8.1
       upath2: 3.1.23(ts-toolbelt@9.6.0)
     transitivePeerDependencies:
@@ -561,7 +561,7 @@ snapshots:
       '@types/npm-package-arg': 6.1.4
       '@yarn-tool/pkg-name-util': 1.0.10
       npm-package-arg: 13.0.2
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
       tslib: 2.8.1
     transitivePeerDependencies:
       - ts-toolbelt
@@ -626,7 +626,7 @@ snapshots:
   deepmerge-plus@4.0.1(ts-toolbelt@9.6.0):
     dependencies:
       is-mergeable-object: 1.1.1
-      ts-type: 3.0.10(ts-toolbelt@9.6.0)
+      ts-type: 3.0.12(ts-toolbelt@9.6.0)
       tslib: 2.8.1
     transitivePeerDependencies:
       - ts-toolbelt
@@ -787,7 +787,7 @@ snapshots:
 
   ts-toolbelt@9.6.0: {}
 
-  ts-type@3.0.10(ts-toolbelt@9.6.0):
+  ts-type@3.0.12(ts-toolbelt@9.6.0):
     dependencies:
       '@types/node': 25.5.0
       ts-toolbelt: 9.6.0
@@ -798,7 +798,7 @@ snapshots:
 
   typedarray-dts@1.0.0: {}
 
-  typescript@5.9.3: {}
+  typescript@6.0.2: {}
 
   undici-types@7.18.2: {}
 

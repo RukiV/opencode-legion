@@ -26,7 +26,7 @@ import {
   createBackgroundStatusTool,
   createBackgroundCancelTool,
 } from "./tools";
-import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/opencode';
+import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/types-opencode';
 import { EnumAriseTools } from './types/enums';
 import { IAriseTools } from "./types/types";
 import { createPluginTools } from './tools/plugin-tools';
@@ -185,9 +185,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * Uses event-handler module for logic
      */
     event: createFullEventHandler({
-      ctx: {
-        client: ctx.client,
-      },
+      ctx,
       bannerHook,
       outputShaper,
       compactionPreserver,
