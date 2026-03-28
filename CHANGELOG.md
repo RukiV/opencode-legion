@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.11](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.10...@bluelovers/opencode-arise@0.1.11) (2026-03-28)
+
+
+### BREAKING CHANGES
+
+* **plugin:** 提取配置与事件处理逻辑至独立模块
+
+
+
+### 🐛　Bug Fixes
+
+* 將 AUTO 常數修正回 AUTO_MODEL ([a4bc32f](https://github.com/moinulmoin/opencode-arise/commit/a4bc32f0a4e9a48e0dc6eaaa748914db640a4b80))
+* **constant:** 將 AUTO 值從 <auto> 改為 AUTO ([cc56538](https://github.com/moinulmoin/opencode-arise/commit/cc56538d2e8a6339038bddfbf758535d21bb5419))
+
+
+### ✨　Features
+
+* **model:** 支援 opencode-arise.json 中的模型配置 ([547e2e9](https://github.com/moinulmoin/opencode-arise/commit/547e2e9f8c275aadb1c0acfc44a04e40c0a93361))
+* **test:** add mock file system environment for safe testing ([8d6b1f0](https://github.com/moinulmoin/opencode-arise/commit/8d6b1f072fe8dbe78899743d39964a579032e672))
+
+
+### 📦　Code Refactoring
+
+* **constants:** 移除 re-export 並更新引用 ([6858d83](https://github.com/moinulmoin/opencode-arise/commit/6858d83d369e77335c9a8aa96f6db1dae0231792))
+* **constants:** 將 DEFAULT_MODEL 和 AUTO_MODEL 移至獨立的常數檔案 ([4cdefaa](https://github.com/moinulmoin/opencode-arise/commit/4cdefaa4644c18b9f3999cffc302bc07638e27c6))
+* **model-resolver:** 標記 getEffectiveModel 為已棄用 ([7398913](https://github.com/moinulmoin/opencode-arise/commit/739891341d7d88a0847da5d241e730d8ff4cbd0c))
+* **model-resolver:** 使用工具函式取代 === AUTO_MODEL 直接比較 ([abd03e2](https://github.com/moinulmoin/opencode-arise/commit/abd03e23fac15287b4e35cc0a362d1ac33c94f9e))
+* **model-resolver:** 重構模型解析邏輯並更新 <auto> 為 AUTO ([e682c93](https://github.com/moinulmoin/opencode-arise/commit/e682c93690955856caa0388025df0a766355f6e7))
+* **plugin:** add session event enum and update handler to use it ([d50ea5d](https://github.com/moinulmoin/opencode-arise/commit/d50ea5d77033e1256a63fca43b60301b5ae17268))
+* **plugin:** 提取配置与事件处理逻辑至独立模块 ([e07804e](https://github.com/moinulmoin/opencode-arise/commit/e07804ecabc3a00ba3d0d56c675ea0d4e8bd9288))
+* **types, plugin:** 重构类型系统并优化事件处理器 ([a9d399c](https://github.com/moinulmoin/opencode-arise/commit/a9d399c5089414d6b56d16359fa80d0949e2702a)), closes [#123](https://github.com/moinulmoin/opencode-arise/issues/123)
+* **utils:** 建立 arise-message 工具模組並重構訊息格式化 ([6abfb5c](https://github.com/moinulmoin/opencode-arise/commit/6abfb5c52aad9dbd73d9686fae4ab0a103ce8592))
+
+
+### 📚　Documentation
+
+* **AGENTS:** 新增 JavaScript Git-Friendly Code Style 規則說明 ([981b444](https://github.com/moinulmoin/opencode-arise/commit/981b444333e1a741e5dd35382cef2821b04b72dd))
+
+
+### 🚨　Tests
+
+* add mock integration test for real directory scenarios ([cc20b8b](https://github.com/moinulmoin/opencode-arise/commit/cc20b8b203f792225ca1a7edd9aa1aeaca40311f))
+
+
+### 🛠　Build System
+
+* **deps:** 添加测试相关的依赖项 ([cac2e80](https://github.com/moinulmoin/opencode-arise/commit/cac2e80e8013993785ae07485e3e3a6ca081c0c4))
+
+
+
 ## [0.1.10](https://github.com/moinulmoin/opencode-arise/compare/@bluelovers/opencode-arise@0.1.9...@bluelovers/opencode-arise@0.1.10) (2026-03-26)
 
 
