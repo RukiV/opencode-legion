@@ -1,8 +1,8 @@
-import { AriseConfigSchema, DEFAULT_CONFIG } from "./schema";
+import { AriseConfigSchema, createDefaultConfig } from "./schema";
 
 describe("AriseConfigSchema", () => {
   test("validates default config", () => {
-    const result = AriseConfigSchema.safeParse(DEFAULT_CONFIG);
+    const result = AriseConfigSchema.safeParse(createDefaultConfig());
     expect(result.success).toBe(true);
   });
 

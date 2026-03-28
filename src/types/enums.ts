@@ -143,6 +143,61 @@ export const ALLOWED_HOOKS = [
 ] as const;
 
 /**
+ * Auto-resume 錯誤處理行為列舉
+ * Auto-resume error handling behavior enum
+ *
+ * 定義 auto_resume 任務失敗時的行為
+ * Defines behavior when auto_resume task fails
+ */
+export enum EnumAutoResumeOnError {
+	/** 忽略錯誤，繼續執行 / Ignore error, continue execution */
+	Ignore = "ignore",
+	/** 重試任務 / Retry the task */
+	Retry = "retry",
+	/** 通知使用者 / Notify user */
+	Notify = "notify",
+}
+
+/**
+ * Auto-resume 目標任務類型列舉
+ * Auto-resume target task type enum
+ *
+ * 定義哪些任務類型啟用 auto-resume
+ * Defines which task types enable auto-resume
+ */
+export enum EnumAutoResumeTarget {
+	/** 僅背景任務 / Background tasks only */
+	Background = "background",
+	/** 所有任務 / All tasks */
+	All = "all",
+}
+
+/**
+ * Auto-resume 錯誤處理行為允許值陣列
+ * Auto-resume error handling behavior allowed values array
+ *
+ * 用於建立 Zod schema
+ * Used for creating Zod schema
+ */
+export const ALLOWED_AUTO_RESUME_ON_ERROR = [
+	EnumAutoResumeOnError.Ignore,
+	EnumAutoResumeOnError.Retry,
+	EnumAutoResumeOnError.Notify,
+] as const;
+
+/**
+ * Auto-resume 目標任務類型允許值陣列
+ * Auto-resume target task type allowed values array
+ *
+ * 用於建立 Zod schema
+ * Used for creating Zod schema
+ */
+export const ALLOWED_AUTO_RESUME_TARGET = [
+	EnumAutoResumeTarget.Background,
+	EnumAutoResumeTarget.All,
+] as const;
+
+/**
  * Arise 工具名稱列舉
  * Arise tool name enum
  *

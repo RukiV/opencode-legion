@@ -10,7 +10,7 @@ import { existsSync, readFileSync, writeFileSync } from "fs-extra";
 import { npaToDepsValue } from "@yarn-tool/npa-to-deps";
 
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "./plugin-name";
-import { AriseConfigSchema, DEFAULT_CONFIG, type IAriseConfig } from "./schema";
+import { AriseConfigSchema, createDefaultConfig, type IAriseConfig } from "./schema";
 import { findOpencodeConfig, getAriseConfigPaths } from "./paths";
 import { FakeBun as Bun } from "../utils/bun-shim";
 import { createJsonHandler } from "../utils/jsonc";
@@ -443,7 +443,7 @@ function _validateAndMergeConfig(merged: JsonObject): IAriseConfig
 		 * This ensures the plugin still works when config has errors
 		 */
 		console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
-		return DEFAULT_CONFIG;
+		return createDefaultConfig();
 	}
 
 	return result.data;
@@ -462,7 +462,7 @@ function _validateAndMergeConfig(merged: JsonObject): IAriseConfig
 function _readAndMergeConfigsSync(paths: string[]): JsonObject
 {
 	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
-	let merged: JsonObject = { ...DEFAULT_CONFIG };
+	let merged: JsonObject = { ...createDefaultConfig() };
 
 	/**
 	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）
@@ -519,7 +519,7 @@ function _readAndMergeConfigsSync(paths: string[]): JsonObject
 async function _readAndMergeConfigsAsync(paths: string[]): Promise<JsonObject>
 {
 	/** 以預設配置為基礎進行合併 / Start with default config as base for merging */
-	let merged: JsonObject = { ...DEFAULT_CONFIG };
+	let merged: JsonObject = { ...createDefaultConfig() };
 
 	/**
 	 * 反轉路徑順序以確保全域設定先被套用，局部設定後被套用（覆蓋）

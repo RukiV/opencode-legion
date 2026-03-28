@@ -38,6 +38,7 @@
     "opencode-arise": "dist/cli/index.js"
   },
   "files": [
+    "opencode-arise.schema.json",
     "dist",
     "assets/arise-banner.txt"
   ],
@@ -50,7 +51,9 @@
     "build": "node --run build:bun",
     "build:version": "bun test/scripts/generate-version.ts",
     "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
+    "build:json-schema": "bun test/scripts/generate-json-schema.ts",
     "build:tsc": "tsc",
+    "postbuild": "node --run build:json-schema",
     "npm:publish:bump": "node --run version:bump && npm publish",
     "preversion": "echo preversion && pnpm run test && pnpm run build",
     "version": "echo version",

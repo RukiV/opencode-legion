@@ -1,5 +1,5 @@
 import { createOutputShaperHook } from "./output-shaper";
-import { DEFAULT_CONFIG } from "../config/schema";
+import { createDefaultConfig } from "../config/schema";
 
 /**
  * OutputShaperHook 測試
@@ -9,7 +9,7 @@ import { DEFAULT_CONFIG } from "../config/schema";
  * Tests output truncation and error preservation logic
  */
 describe("OutputShaperHook", () => {
-  const shaper = createOutputShaperHook(DEFAULT_CONFIG);
+  const shaper = createOutputShaperHook(createDefaultConfig());
 
   /**
    * 測試 1: 短輸出不截斷

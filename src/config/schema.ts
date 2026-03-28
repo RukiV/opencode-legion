@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ALL_SHADOW_AGENTS_NAME, IAllShadowAgentsName } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
+import { ALLOWED_AUTO_RESUME_ON_ERROR, ALLOWED_AUTO_RESUME_TARGET, EnumAutoResumeOnError, EnumAutoResumeTarget } from "../types/enums";
 import { IValueNotPartial } from "../types/types";
 import { AUTO_MODEL } from "../types/const-default";
 import { deepMerge3 } from "../utils/config-merge";
@@ -58,6 +59,144 @@ export const HookName = z.enum(ALLOWED_HOOKS).meta({
 });
 
 /**
+ * Auto-resume 錯誤時的行為 Schema
+ * Auto-resume on error behavior Schema
+ *
+ * 定義 auto_resume 任務失敗時的行為
+ * Defines behavior when auto_resume task fails
+ */
+export const AutoResumeOnError = z.enum(ALLOWED_AUTO_RESUME_ON_ERROR).meta({
+  description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+  title: "On Error",
+});
+
+/**
+ * Auto-resume 目標任務類型 Schema
+ * Auto-resume target task type Schema
+ *
+ * 定義哪些任務類型啟用 auto-resume
+ * Defines which task types enable auto-resume
+ */
+export const AutoResumeTarget = z.enum(ALLOWED_AUTO_RESUME_TARGET).meta({
+  description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+  title: "Target",
+});
+
+/**
+ * Auto-resume 自訂提示 Schema
+ * Auto-resume custom prompts Schema
+ *
+ * 定義自訂提示訊息的結構
+ * Defines the structure of custom prompt messages
+ */
+const AutoResumePrompts = z
+  .object({
+    /** 首次重試時的提示 / Prompt for first retry */
+    retry: z.string().optional()
+      .meta({
+        description: "首次重試時的提示 / Prompt for first retry",
+        title: "Retry Prompt",
+      }),
+    /** 最終重試時的提示 / Prompt for final retry */
+    final: z.string().optional()
+      .meta({
+        description: "最終重試時的提示 / Prompt for final retry",
+        title: "Final Prompt",
+      }),
+    /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
+    custom: z.array(z.string()).optional()
+      .meta({
+        description: "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
+        title: "Custom Prompts",
+      }),
+  })
+  .meta({
+    description: "自訂提示訊息 / Custom prompts",
+    title: "Prompts",
+  })
+  .optional();
+
+/**
+ * Auto-resume 設定 Schema
+ * Auto-resume settings Schema
+ *
+ * 定義 auto_resume 的完整結構
+ * Defines the complete structure of auto_resume
+ */
+const AutoResumeConfig = z
+  .object({
+    /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
+    enabled: z.boolean().default(false)
+      .meta({
+        description: "是否啟用自動繼續任務 / Enable auto resume",
+        title: "Enabled",
+      }),
+    /** 最大重試次數（預設 3）/ Max retry count (default 3) */
+    max_retries: z.number().default(3).optional()
+      .meta({
+        description: "最大重試次數 / Maximum retry count",
+        title: "Max Retries",
+      }),
+    /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
+    retry_delay: z.number().default(5000).optional()
+      .meta({
+        description: "重試延遲（毫秒）/ Retry delay in milliseconds",
+        title: "Retry Delay",
+      }),
+    /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
+    on_error: AutoResumeOnError.default(EnumAutoResumeOnError.Ignore)
+      .meta({
+        description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+        title: "On Error",
+      }),
+    /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
+    target: AutoResumeTarget.default(EnumAutoResumeTarget.Background)
+      .meta({
+        description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+        title: "Target",
+      }),
+    /** 自訂提示訊息（可選）/ Custom prompts (optional) */
+    prompts: AutoResumePrompts,
+  })
+  .meta({
+    description: "自動繼續任務設定 / Auto resume settings",
+    title: "Auto Resume",
+  });
+
+/**
+ * 背景任務定時設定 Schema
+ * Background task timing settings Schema
+ *
+ * 定義輪詢和重試相關的定時設定
+ * Defines timing settings for polling and retry
+ */
+const BackgroundTiming = z
+  .object({
+    /** 輪詢間隔（毫秒，預設 2000）/ Polling interval in ms (default 2000) */
+    poll_interval: z.number().default(DEFAULT_POLL_INTERVAL)
+      .meta({
+        description: "輪詢間隔（毫秒）/ Polling interval in milliseconds",
+        title: "Poll Interval",
+      }),
+    /** 重試延遲遞增量（毫秒，預設 5000）/ Retry delay increment in ms (default 5000) */
+    retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT)
+      .meta({
+        description: "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
+        title: "Retry Delay Increment",
+      }),
+    /** 重試延遲最大值（毫秒，預設 60000）/ Max retry delay in ms (default 60000) */
+    retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX)
+      .meta({
+        description: "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
+        title: "Retry Delay Max",
+      }),
+  })
+  .meta({
+    description: "背景任務定時設定 / Background task timing settings",
+    title: "Timing",
+  });
+
+/**
  * 允許針對特定代理覆寫全域預設值
  * Allows overriding global defaults for specific agents
  */
@@ -75,96 +214,17 @@ export const AgentOverride = z
         description: "是否停用此代理 / Whether to disable this agent",
         title: "Disabled",
       }),
-    /** 輪詢間隔（毫秒，可選）/ Polling interval in ms (optional) */
-    poll_interval: z.number().optional()
-      .meta({
-        description: "輪詢間隔（毫秒）/ Polling interval in milliseconds",
-        title: "Poll Interval",
-      }),
-    /** 重試延遲遞增量（毫秒，可選）/ Retry delay increment in ms (optional) */
-    retry_delay_increment: z.number().optional()
-      .meta({
-        description: "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
-        title: "Retry Delay Increment",
-      }),
-    /** 重試延遲最大值（毫秒，可選）/ Max retry delay in ms (optional) */
-    retry_delay_max: z.number().optional()
-      .meta({
-        description: "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
-        title: "Retry Delay Max",
-      }),
     /** 系統提示補充（可選）/ System prompt supplement (optional) */
     system_prompt_addon: z.string().optional()
       .meta({
         description: "系統提示補充內容 / System prompt supplement content",
         title: "System Prompt Addon",
       }),
+  })
+  .extend(BackgroundTiming.partial().shape)
+  .extend({
     /** 自動繼續任務設定（可選）/ Auto resume settings (optional) */
-    auto_resume: z
-      .object({
-        /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
-        enabled: z.boolean().default(false)
-          .meta({
-            description: "是否啟用自動繼續任務 / Enable auto resume",
-            title: "Enabled",
-          }),
-        /** 最大重試次數（預設 3）/ Max retry count (default 3) */
-        max_retries: z.number().default(3).optional()
-          .meta({
-            description: "最大重試次數 / Maximum retry count",
-            title: "Max Retries",
-          }),
-        /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
-        retry_delay: z.number().default(5000).optional()
-          .meta({
-            description: "重試延遲（毫秒）/ Retry delay in milliseconds",
-            title: "Retry Delay",
-          }),
-        /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
-        on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional()
-          .meta({
-            description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
-            title: "On Error",
-          }),
-        /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
-        target: z.enum(["background", "all"]).default("background").optional()
-          .meta({
-            description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
-            title: "Target",
-          }),
-        /** 自訂提示訊息（可選）/ Custom prompts (optional) */
-        prompts: z
-          .object({
-            /** 首次重試時的提示 / Prompt for first retry */
-            retry: z.string().optional()
-              .meta({
-                description: "首次重試時的提示 / Prompt for first retry",
-                title: "Retry Prompt",
-              }),
-            /** 最終重試時的提示 / Prompt for final retry */
-            final: z.string().optional()
-              .meta({
-                description: "最終重試時的提示 / Prompt for final retry",
-                title: "Final Prompt",
-              }),
-            /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
-            custom: z.array(z.string()).optional()
-              .meta({
-                description: "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
-                title: "Custom Prompts",
-              }),
-          })
-          .meta({
-            description: "自訂提示訊息 / Custom prompts",
-            title: "Prompts",
-          })
-          .optional(),
-      })
-      .meta({
-        description: "自動繼續任務設定 / Auto resume settings",
-        title: "Auto Resume",
-      })
-      .optional(),
+    auto_resume: AutoResumeConfig.optional(),
   })
   .meta({
     description: "代理覆寫設定 / Agent override settings",
@@ -256,98 +316,9 @@ export const AriseConfigSchema = z
       })
       .optional(),
     /** 背景任務設定（可選）/ Background task settings (optional) */
-    background: z
-      .object({
-        /** 輪詢間隔（毫秒，預設 2000）/ Polling interval in ms (default 2000) */
-        poll_interval: z.number().default(DEFAULT_POLL_INTERVAL)
-          .meta({
-            description: "輪詢間隔（毫秒）/ Polling interval in milliseconds",
-            title: "Poll Interval",
-          }),
-        /** 重試延�遞增量（毫秒，預設 5000）/ Retry delay increment in ms (default 5000) */
-        retry_delay_increment: z.number().default(DEFAULT_RETRY_DELAY_INCREMENT)
-          .meta({
-            description: "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
-            title: "Retry Delay Increment",
-          }),
-        /** 重試延遲最大值（毫秒，預設 60000）/ Max retry delay in ms (default 60000) */
-        retry_delay_max: z.number().default(DEFAULT_RETRY_DELAY_MAX)
-          .meta({
-            description: "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
-            title: "Retry Delay Max",
-          }),
+    background: BackgroundTiming.extend({
         /** 自動繼續任務設定（可選）/ Auto resume task settings (optional) */
-        auto_resume: z
-          .object({
-            /** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
-            enabled: z.boolean().default(false)
-              .meta({
-                description: "是否啟用自動繼續任務 / Enable auto resume",
-                title: "Enabled",
-              }),
-            /** 最大重試次數（預設 3）/ Max retry count (default 3) */
-            max_retries: z.number().default(3).optional()
-              .meta({
-                description: "最大重試次數 / Maximum retry count",
-                title: "Max Retries",
-              }),
-            /** 重試延遲（毫秒，預設 5000）/ Retry delay in ms (default 5000) */
-            retry_delay: z.number().default(5000).optional()
-              .meta({
-                description: "重試延遲（毫秒）/ Retry delay in milliseconds",
-                title: "Retry Delay",
-              }),
-            /** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
-            /** - ignore: 忽略錯誤，不重試 / Ignore errors, no retry */
-            /** - retry: 自動重試 / Auto retry */
-            /** - notify: 通知但等待手動處理 / Notify but wait for manual handling */
-            on_error: z.enum(["ignore", "retry", "notify"]).default("ignore").optional()
-              .meta({
-                description: "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
-                title: "On Error",
-              }),
-            /** 哪些任務類型啟用 auto-resume（可選）/ Which task types enable auto-resume (optional) */
-            /** - background: 只對背景任務 / Only for background tasks */
-            /** - all: 所有任務 / All tasks */
-            target: z.enum(["background", "all"]).default("background").optional()
-              .meta({
-                description: "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
-                title: "Target",
-              }),
-            /** 自訂提示訊息（可選）/ Custom prompts (optional) */
-            /** 用於自訂重試時的提示內容，可使用變數 / Used to customize prompts during retry, supports variables */
-            prompts: z
-              .object({
-                /** 首次重試時的提示 / Prompt for first retry */
-                retry: z.string().optional()
-                  .meta({
-                    description: "首次重試時的提示 / Prompt for first retry",
-                    title: "Retry Prompt",
-                  }),
-                /** 最終重試時的提示 / Prompt for final retry */
-                final: z.string().optional()
-                  .meta({
-                    description: "最終重試時的提示 / Prompt for final retry",
-                    title: "Final Prompt",
-                  }),
-                /** 自定義提示陣列，按順序使用 / Custom prompt array, used in order */
-                custom: z.array(z.string()).optional()
-                  .meta({
-                    description: "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
-                    title: "Custom Prompts",
-                  }),
-              })
-              .meta({
-                description: "自訂提示訊息 / Custom prompts",
-                title: "Prompts",
-              })
-              .optional(),
-          })
-          .meta({
-            description: "自動繼續任務設定 / Auto resume settings",
-            title: "Auto Resume",
-          })
-          .optional(),
+        auto_resume: AutoResumeConfig.optional(),
       })
       .meta({
         description: "背景任務設定 / Background task settings",
@@ -391,55 +362,55 @@ export const AriseConfigSchema = z
 export type IAriseConfig = z.infer<typeof AriseConfigSchema>;
 
 /**
+ * 建立預設配置物件
+ * Create default configuration object
+ *
+ * 使用函數生成確保永遠一致
+ * Use function generation to ensure consistency
+ */
+export function createDefaultConfig(): IAriseConfig {
+  return {
+    /** 顯示歡迎橫幅 / Show welcome banner */
+    show_banner: true,
+    /** 不每個工作階段都顯示橫幅 / Don't show banner every session */
+    banner_every_session: false,
+    /** 不停用任何 Shadow Agents / Don't disable any Shadow Agents */
+    disabled_shadows: [],
+    /** 不停用任何 Hook / Don't disable any hooks */
+    disabled_hooks: [],
+    /** 輸出截斷設定 / Output truncation settings */
+    output_shaping: {
+      max_chars: 12000,
+      preserve_errors: true,
+    },
+    /** 對話壓縮設定 / Conversation compaction settings */
+    compaction: {
+      threshold_percent: 80,
+      preserve_todos: true,
+    },
+    /** 背景任務設定 / Background task settings */
+    background: {
+      poll_interval: DEFAULT_POLL_INTERVAL,
+      retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
+      retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
+      auto_resume: createDefaultAutoResume(),
+    },
+    /** 除錯設定 / Debug settings */
+    debug: {
+      enabled: false,
+      level: EnumLogLevel.Warn,
+    },
+  };
+}
+
+/**
  * 預設配置值
  * Default configuration values
  *
  * 當使用者未提供配置或配置無效時使用此值
  * Used when user doesn't provide config or config is invalid
  */
-export const DEFAULT_CONFIG: IAriseConfig = {
-  /** 顯示歡迎橫幅 / Show welcome banner */
-  show_banner: true,
-  /** 不每個工作階段都顯示橫幅 / Don't show banner every session */
-  banner_every_session: false,
-  /** 不停用任何 Shadow Agents / Don't disable any Shadow Agents */
-  disabled_shadows: [],
-  /** 不停用任何 Hook / Don't disable any hooks */
-  disabled_hooks: [],
-  /** 輸出截斷設定 / Output truncation settings */
-  output_shaping: {
-    max_chars: 12000,
-    preserve_errors: true,
-  },
-  /** 對話壓縮設定 / Conversation compaction settings */
-  compaction: {
-    threshold_percent: 80,
-    preserve_todos: true,
-  },
-  /** 背景任務設定 / Background task settings */
-  background: {
-    poll_interval: DEFAULT_POLL_INTERVAL,
-    retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
-    retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
-    auto_resume: {
-      enabled: false,
-      max_retries: 3,
-      retry_delay: 5000,
-      on_error: "ignore",
-      target: "background",
-      prompts: {
-        retry: undefined,
-        final: undefined,
-        custom: undefined,
-      },
-    },
-  },
-  /** 除錯設定 / Debug settings */
-  debug: {
-    enabled: false,
-    level: EnumLogLevel.Warn,
-  },
-};
+export const DEFAULT_CONFIG: IAriseConfig = createDefaultConfig();
 
 /**
  * 配置獲取值型別
@@ -601,23 +572,28 @@ export const getRetryDelayIncrement = _createConfigGetter("retry_delay_increment
 export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_RETRY_DELAY_MAX);
 
 /**
- * Auto-resume 預設值
- * Auto-resume default value
+ * 建立預設 auto_resume 物件
+ * Create default auto_resume object
+ *
+ * 使用函數生成確保永遠一致
+ * Use function generation to ensure consistency
  */
-const DEFAULT_AUTO_MODEL_RESUME = {
-  enabled: false,
-  max_retries: 3,
-  retry_delay: 5000,
-  on_error: "ignore" as const,
-  target: "background" as const,
-  prompts: {
-    retry: undefined as string | undefined,
-    final: undefined as string | undefined,
-    custom: undefined as string[] | undefined,
-  },
-};
+function createDefaultAutoResume() {
+  return {
+    enabled: false,
+    max_retries: 3,
+    retry_delay: 5000,
+    on_error: EnumAutoResumeOnError.Ignore,
+    target: EnumAutoResumeTarget.Background,
+    prompts: {
+      retry: undefined as string | undefined,
+      final: undefined as string | undefined,
+      custom: undefined as string[] | undefined,
+    },
+  };
+}
 
-export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME, { enableDeepMerge: true });
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", createDefaultAutoResume(), { enableDeepMerge: true });
 
 /**
  * 取得 auto_resume enabled 設定的輔助函式
