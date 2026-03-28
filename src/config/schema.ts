@@ -320,7 +320,7 @@ export type ILazyConfigGetterValue<T extends keyof IValueNotPartial<IAriseConfig
 export interface ICreateConfigGetterOptions
 {
 	/** 是否啟用深層合併 / Enable deep merge */
-	deepMerge3?: boolean;
+	enableDeepMerge?: boolean;
 }
 
 /**
@@ -335,7 +335,7 @@ export interface ICreateConfigGetterOptions
  *
  * 合併行為：
  * - deepMerge3: false（預設）- 簡單覆寫，後面的值直接覆寫前面的
- * - deepMerge3: true - 巢狀物件會遞迴合併，非物件值則直接覆寫
+	 * - enableDeepMerge: true - 巢狀物件會遞迴合併，非物件值則直接覆寫
  *
  * @param configKey - 配置鍵名稱（snake_case）
  * @param defaultValue - 預設值
@@ -348,7 +348,7 @@ export function _createConfigGetter<T extends keyof Exclude<IAriseConfig["backgr
 	options: ICreateConfigGetterOptions = {}
 )
 {
-	const { deepMerge3: enableDeepMerge = false } = options;
+	const { enableDeepMerge = false } = options;
 
 	return <A extends IAllShadowAgentsName = IAllShadowAgentsName>(config: IAriseConfig, agentName?: A): ILazyConfigGetterValue<NoInfer<T>, NoInfer<A>> =>
 	{
@@ -466,7 +466,7 @@ const DEFAULT_AUTO_MODEL_RESUME = {
   },
 };
 
-export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME, { deepMerge3: true });
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", DEFAULT_AUTO_MODEL_RESUME, { enableDeepMerge: true });
 
 /**
  * 取得 auto_resume enabled 設定的輔助函式
