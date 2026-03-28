@@ -76,3 +76,43 @@ export enum EnumOpencodeAgentPermission {
 	/** 詢問使用者 / Ask user */
 	ASK = "ask",
 }
+
+/**
+ * 日誌級別列舉
+ * Log level enumeration
+ *
+ * 用於控制除錯輸出的詳細程度
+ * Controls debug output verbosity
+ *
+ * - error: 錯誤訊息
+ * - warn: 警告訊息
+ * - info: 一般資訊
+ * - debug: 除錯資訊
+ */
+export enum EnumLogLevel {
+	/** 錯誤訊息 / Error messages */
+	Error = "error",
+	/** 警告訊息 / Warning messages */
+	Warn = "warn",
+	/** 一般資訊 / General information */
+	Info = "info",
+	/** 除錯資訊 / Debug information */
+	Debug = "debug",
+}
+
+/**
+ * 支援的日誌級別陣列
+ * Supported log levels array
+ */
+export const ALLOWED_LOG_LEVELS = [
+	EnumLogLevel.Error,
+	EnumLogLevel.Warn,
+	EnumLogLevel.Info,
+	EnumLogLevel.Debug,
+] as const;
+
+/**
+ * 日誌級別類型
+ * Log level type
+ */
+export type ILogLevel = ITSTypeAndStringLiteral<EnumLogLevel>;

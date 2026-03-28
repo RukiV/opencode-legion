@@ -26,7 +26,10 @@ export const AUTO_MODEL = 'AUTO' as const;
  * Zod schema for AUTO_MODEL 常數驗證
  * Zod schema for AUTO_MODEL constant validation
  */
-export const AutoModelSchema = z.literal(AUTO_MODEL);
+export const AutoModelSchema = z.literal(AUTO_MODEL).meta({
+  description: "自動模型標記，表示自動沿用主任務的模型 / Auto model marker, inherits parent task's model",
+  title: "Auto Model",
+});
 
 /**
  * 預設模型
