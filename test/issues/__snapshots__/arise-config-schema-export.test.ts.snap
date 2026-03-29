@@ -1,0 +1,64 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`從 JSON Schema 提取默認值 應該與 DEFAULT_CONFIG 等價 1`] = `
+{
+  "background": {
+    "auto_resume": {
+      "enabled": false,
+      "max_retries": 3,
+      "on_error": "ignore",
+      "retry_delay": 5000,
+      "target": "background",
+    },
+    "poll_interval": 2000,
+    "retry_delay_increment": 5000,
+    "retry_delay_max": 60000,
+  },
+  "banner_every_session": false,
+  "compaction": {
+    "preserve_todos": true,
+    "threshold_percent": 80,
+  },
+  "debug": {
+    "enabled": false,
+    "level": "warn",
+  },
+  "output_shaping": {
+    "max_chars": 12000,
+    "preserve_errors": true,
+  },
+  "show_banner": true,
+}
+`;
+
+exports[`從 Zod Schema 直接提取默認值 應該與 DEFAULT_CONFIG 等價 1`] = `
+{
+  "background": {
+    "auto_resume": {
+      "enabled": false,
+      "max_retries": 3,
+      "on_error": "ignore",
+      "prompts": {},
+      "retry_delay": 5000,
+      "target": "background",
+    },
+    "poll_interval": 2000,
+    "retry_delay_increment": 5000,
+    "retry_delay_max": 60000,
+  },
+  "banner_every_session": false,
+  "compaction": {
+    "preserve_todos": true,
+    "threshold_percent": 80,
+  },
+  "debug": {
+    "enabled": false,
+    "level": "warn",
+  },
+  "output_shaping": {
+    "max_chars": 12000,
+    "preserve_errors": true,
+  },
+  "show_banner": true,
+}
+`;

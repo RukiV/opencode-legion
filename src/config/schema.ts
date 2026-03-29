@@ -357,7 +357,7 @@ export const AriseConfigSchema = z
 	});
 
 /** Arise 配置類型 / Arise configuration type */
-export type IAriseConfig = z.infer<typeof AriseConfigSchema>;
+export type IAriseConfig = NonNullable<z.infer<typeof AriseConfigSchema>>;
 
 /**
  * 建立預設配置物件
