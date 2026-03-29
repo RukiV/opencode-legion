@@ -15,9 +15,9 @@ import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 import {
 	AriseConfigSchema,
-	DEFAULT_CONFIG,
 	type IAriseConfig,
 } from "../../src/config/schema";
+import { ORIGIANL_RAW_DEFAULT_CONFIG as DEFAULT_CONFIG } from "../lib/issues/zod-defaults";
 import { extractDefaultsFromJSONSchema, extractDefaultsFromSchema } from "../../src/config/zod-defaults";
 
 /**

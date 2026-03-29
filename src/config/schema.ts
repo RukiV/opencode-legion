@@ -6,6 +6,8 @@ import { ALLOWED_AUTO_RESUME_ON_ERROR, ALLOWED_AUTO_RESUME_TARGET, EnumAutoResum
 import { IValueNotPartial } from "../types/types";
 import { AUTO_MODEL } from "../types/const-default";
 import { deepMerge3 } from "../utils/config-merge";
+import { extractDefaultsFromJSONSchema } from "./zod-defaults";
+import { createDefaultConfig } from "../types/config-defaults";
 
 /**
  * 輪詢間隔預設值（毫秒）
@@ -24,15 +26,6 @@ export const DEFAULT_RETRY_DELAY_INCREMENT = 5000 as const;
  * Default maximum retry delay in milliseconds
  */
 export const DEFAULT_RETRY_DELAY_MAX = 60000 as const;
-
-/**
- * 預設配置值
- * Default configuration values
- *
- * 當使用者未提供配置或配置無效時使用此值
- * Used when user doesn't provide config or config is invalid
- */
-export const DEFAULT_CONFIG: IAriseConfig = createDefaultConfig();
 
 /**
  * Shadow Agent 名稱 Zod Schema
@@ -360,49 +353,6 @@ export const AriseConfigSchema = z
 export type IAriseConfig = NonNullable<z.infer<typeof AriseConfigSchema>>;
 
 /**
- * 建立預設配置物件
- * Create default configuration object
- *
- * 使用函數生成確保永遠一致
- * Use function generation to ensure consistency
- */
-export function createDefaultConfig()
-{
-	return {
-		/** 顯示歡迎橫幅 / Show welcome banner */
-		show_banner: true,
-		/** 不每個工作階段都顯示橫幅 / Don't show banner every session */
-		banner_every_session: false,
-		/** 不停用任何 Shadow Agents / Don't disable any Shadow Agents */
-		disabled_shadows: [] as IAriseConfig["disabled_shadows"],
-		/** 不停用任何 Hook / Don't disable any hooks */
-		disabled_hooks: [] as IAriseConfig["disabled_hooks"],
-		/** 輸出截斷設定 / Output truncation settings */
-		output_shaping: {
-			max_chars: 12000,
-			preserve_errors: true,
-		},
-		/** 對話壓縮設定 / Conversation compaction settings */
-		compaction: {
-			threshold_percent: 80,
-			preserve_todos: true,
-		},
-		/** 背景任務設定 / Background task settings */
-		background: {
-			poll_interval: DEFAULT_POLL_INTERVAL,
-			retry_delay_increment: DEFAULT_RETRY_DELAY_INCREMENT,
-			retry_delay_max: DEFAULT_RETRY_DELAY_MAX,
-			auto_resume: createDefaultAutoResume(),
-		},
-		/** 除錯設定 / Debug settings */
-		debug: {
-			enabled: false,
-			level: EnumLogLevel.Warn,
-		},
-	} satisfies IAriseConfig;
-}
-
-/**
  * 配置獲取值型別
  * Config getter value type
  *
@@ -568,7 +518,7 @@ export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_R
  * 使用函數生成確保永遠一致
  * Use function generation to ensure consistency
  */
-function createDefaultAutoResume()
+export function createDefaultAutoResume()
 {
 	return {
 		enabled: false,
@@ -584,7 +534,7 @@ function createDefaultAutoResume()
 	} satisfies NonNullable<NonNullable<IAriseConfig["background"]>["auto_resume"]>;
 }
 
-export const getAutoResumeConfig = _createConfigGetter("auto_resume", createDefaultAutoResume(), { enableDeepMerge: true });
+export const getAutoResumeConfig = _createConfigGetter("auto_resume", createDefaultConfig().background!.auto_resume!, { enableDeepMerge: true });
 
 /**
  * 取得 auto_resume enabled 設定的輔助函式

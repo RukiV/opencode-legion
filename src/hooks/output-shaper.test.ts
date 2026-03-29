@@ -1,5 +1,5 @@
 import { createOutputShaperHook } from "./output-shaper";
-import { createDefaultConfig } from "../config/schema";
+import { createDefaultConfig } from "../types/config-defaults";
 
 /**
  * OutputShaperHook 測試

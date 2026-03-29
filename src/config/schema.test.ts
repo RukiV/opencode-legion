@@ -1,4 +1,5 @@
-import { AriseConfigSchema, createDefaultConfig } from "./schema";
+import { AriseConfigSchema } from "./schema";
+import { createDefaultConfig } from "../types/config-defaults";
 
 describe("AriseConfigSchema", () => {
   test("validates default config", () => {
