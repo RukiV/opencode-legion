@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.14](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.13...@bluelovers/opencode-arise@0.1.14) (2026-03-29)
+
+
+
+### ✨　Features
+
+* **config:** add JSON schema generation and auto‑resume support ([9984a31](https://github.com/bluelovers/opencode-arise/commit/9984a31b5f1a5e7eab0ca494680a6985a896cb2c))
+
+
+### 📦　Code Refactoring
+
+* **config:** 提取配置获取逻辑到独立模块 ([26beaa3](https://github.com/bluelovers/opencode-arise/commit/26beaa3c6b352d5febc5e1b98fc261f128add951))
+* **config:** 自动生成配置默认值 ([1de3147](https://github.com/bluelovers/opencode-arise/commit/1de3147c79c981631fa250fe6755d903f287f0d1))
+* **config:** improve type safety and add schema export tests ([d6f87d9](https://github.com/bluelovers/opencode-arise/commit/d6f87d9bc781659b73a22be37854937f008d78fa))
+* **config:** improve type safety and cleanup ([cbd28ab](https://github.com/bluelovers/opencode-arise/commit/cbd28abd3df743fc9665287a6e133e9c5c65dc61))
+* **zod:** 重组工具模块并整合类型守卫 ([b0b7e28](https://github.com/bluelovers/opencode-arise/commit/b0b7e282f043614811681780cfdcb3a05ee5f49c))
+
+
+### 📚　Documentation
+
+* 新增翻譯規定，保持 Shadow 術語原文不翻譯 ([d1b433a](https://github.com/bluelovers/opencode-arise/commit/d1b433ab39a2f479781720092b570b12a2694282))
+* **agents:** 完善re-export规则与TS2459处理流程 ([ec1fb5c](https://github.com/bluelovers/opencode-arise/commit/ec1fb5c2b8ff11f39a4a78c375c29495809e4dcd))
+
+
+### 🚨　Tests
+
+* **zod:** add unified tests and dataset for zod defaults ([09ecbd1](https://github.com/bluelovers/opencode-arise/commit/09ecbd17ac72e83f24c9bef07dfaacfc4791280a))
+
+
+
 ## [0.1.13](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.12...@bluelovers/opencode-arise@0.1.13) (2026-03-28)
 
 
