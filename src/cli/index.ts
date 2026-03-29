@@ -9,6 +9,7 @@
  */
 
 import { existsSync, readFileSync } from "fs-extra";
+import { PLUGIN_VERSION } from "../types/version";
 import { getBanner } from "../hooks/arise-banner";
 import {
 	findOpencodeConfig,
@@ -268,18 +269,27 @@ function validateConfig(): void {
 }
 
 /**
+ * 顯示版本資訊
+ * Show version information
+ */
+function showVersion(): void {
+	console.log(`opencode-arise@${PLUGIN_VERSION}`);
+}
+
+/**
  * 顯示幫助訊息
  * Show help message
  */
 function showHelp(): void {
 	console.log(`
-${getBanner()}
+ ${getBanner()}
 Usage: opencode-arise <command>
 
 Commands:
   install   Register plugin with OpenCode and create default config
   doctor    Check installation status
   validate  Validate Arise configuration
+  version   Show version information
   help      Show this help message
 
 Examples:
@@ -312,6 +322,11 @@ const command = args[0];
 	case "--help":
 	case "-h":
 		showHelp();
+		break;
+	case "version":
+	case "--version":
+	case "-v":
+		showVersion();
 		break;
 	default:
 		/** 未知命令顯示錯誤和幫助 / Unknown command shows error and help */
