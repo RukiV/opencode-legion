@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
-import { type IAriseConfig, getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/schema";
+import { type IAriseConfig } from "./config/schema";
+import { getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/getters";
 import { AUTO_MODEL } from "./types/const-default";
 import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
 import { loadAriseConfig } from "./config/io";

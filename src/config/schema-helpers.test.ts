@@ -21,11 +21,13 @@ import {
 	DEFAULT_POLL_INTERVAL,
 	DEFAULT_RETRY_DELAY_INCREMENT,
 	DEFAULT_RETRY_DELAY_MAX,
+} from "./schema";
+import { type IAriseConfig } from "./schema";
+import {
 	getPollInterval,
 	getRetryDelayIncrement,
 	getRetryDelayMax,
-	type IAriseConfig,
-} from "./schema";
+} from "./getters";
 import { EnumShadowSubAgentsName } from "../types/enums";
 
 /**
