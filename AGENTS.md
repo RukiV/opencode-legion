@@ -262,7 +262,56 @@ src/
    - Avoid adding barrel exports (e.g., `export * from './module'`)
    - Import directly from the source module when needed
    - This rule applies to ALL files, not just `src/index.ts`
-   - **禁止任何情況下的 re-export**（包含向後相容性），除非使用者明確要求
+   - **禁止任何情況下的 re-export**（包含向後相容性，更新引用路徑），除非使用者明確要求 re-export
+
+### ⚠️ 重新匯出必須徵求同意
+
+**進行任何重新匯出前，必須先徵求使用者同意。**
+
+即使看起來像是合理的解決方案，也不能自行決定添加 re-export。必須先詢問使用者，例如：
+
+```
+我發現需要使用 createDefaultConfig，但目前沒有從 schema.ts 匯出。
+選項 A：直接在 io.ts 等檔案中從 ../types/config-defaults 匯入（不允許重新匯出）
+選項 B：在 schema.ts 中新增重新匯出
+
+請問您希望採用哪個方案？或者有其他建議？
+```
+
+### 處理 TS2459 匯入錯誤
+
+當遇到 `Module '"./module"' declares 'X' locally, but it is not exported` 錯誤時：
+
+**決策流程：**
+```
+遇到 TS2459 錯誤
+    │
+    ▼
+搜尋 'X' 的原始匯出位置 (使用 grep)
+    │
+    ▼
+直接從該位置匯入，而非透過中介模組
+    │
+    ▼
+驗證 typecheck 通過
+```
+
+**錯誤示範：**
+```typescript
+// ❌ 錯誤：嘗試透過重新匯出解決問題
+// schema.ts
+export { createDefaultConfig } from "../types/config-defaults";
+
+// io.ts (依然會失敗)
+import { createDefaultConfig } from "./schema";
+```
+
+**正確做法：**
+```typescript
+// ✅ 正確：直接從原始模組匯入
+// io.ts
+import { createDefaultConfig } from "../types/config-defaults";
+```
 
 ## Architecture
 
