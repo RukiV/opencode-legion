@@ -11,8 +11,9 @@
  */
 
 import { z } from "zod";
-import { $ZodDefaultDef, $ZodOptionalDef, $ZodType, ZodStandardJSONSchemaPayload } from "zod/v4/core";
+import { $ZodType, ZodStandardJSONSchemaPayload } from "zod/v4/core";
 import { tsObjectEntries } from "ts-type-object-entries";
+import { _isZodDefaultDef, _isZodOptionalDef, _isZodObject } from "./zod-type-guards";
 
 // ==================== 方法一：從 JSON Schema 提取默認值 ====================
 
@@ -48,7 +49,7 @@ export function extractDefaultsFromJSONSchema<T extends z.ZodTypeAny>(schema: T)
  * @param obj - JSON Schema 對象或值
  * @returns 提取的默認值或包含默認值的物件
  */
-function extractDefaultsFromJSONSchemaObject<T extends z.ZodTypeAny | z.ZodType>(obj: ZodStandardJSONSchemaPayload<T> | z.core.JSONSchema._JSONSchema): NonNullable<z.infer<T>>
+export function extractDefaultsFromJSONSchemaObject<T extends z.ZodTypeAny | z.ZodType>(obj: ZodStandardJSONSchemaPayload<T> | z.core.JSONSchema._JSONSchema): NonNullable<z.infer<T>>
 {
 	/**
 	 * 如果是 null 或 undefined，返回 undefined
@@ -110,7 +111,7 @@ function extractDefaultsFromJSONSchemaObject<T extends z.ZodTypeAny | z.ZodType>
 				}
 			}
 
-			return Object.keys(result).length > 0 ? result as any : undefined as any;
+			return Object.keys(result).length > 0 ? (result as any) : (undefined as any);
 		}
 	}
 
@@ -118,42 +119,6 @@ function extractDefaultsFromJSONSchemaObject<T extends z.ZodTypeAny | z.ZodType>
 }
 
 // ==================== 方法二：從 Zod Schema 直接提取默認值 ====================
-
-/**
- * 類型守衛：檢查是否為 ZodObject
- * Type guard: Check if it's a ZodObject
- *
- * ZodObject 是用 z.object() 定義的物件類型
- * ZodObject is an object type defined with z.object()
- */
-function _isZodObject(def: z.core.$ZodTypeDef): def is z.ZodObject
-{
-	return def.type === 'object';
-}
-
-/**
- * 類型守衛：檢查是否為 $ZodDefaultDef
- * Type guard: Check if it's $ZodDefaultDef
- *
- * $ZodDefaultDef 是使用 .default() 方法定義的帶有默認值的類型
- * $ZodDefaultDef is a type with default value defined using .default() method
- */
-function _is$ZodDefaultDef(def: z.core.$ZodTypeDef): def is $ZodDefaultDef
-{
-	return def.type === 'default';
-}
-
-/**
- * 類型守衛：檢查是否為 $ZodOptionalDef
- * Type guard: Check if it's $ZodOptionalDef
- *
- * $ZodOptionalDef 是使用 .optional() 方法定義的可選類型
- * $ZodOptionalDef is an optional type defined using .optional() method
- */
-function _is$ZodOptionalDef(def: z.core.$ZodTypeDef): def is $ZodOptionalDef
-{
-	return def.type === 'optional';
-}
 
 /**
  * 方法二：從 Zod Schema 直接提取默認值（不通過 JSON Schema）
@@ -186,7 +151,7 @@ export function extractDefaultsFromSchema<T extends z.ZodTypeAny | z.ZodType | $
 	 * 如果 schema 有 .default() 定義，直接返回默認值
 	 * If schema has .default() defined, return the default value directly
 	 */
-	if (_is$ZodDefaultDef(def))
+	if (_isZodDefaultDef(def))
 	{
 		return def.defaultValue as any;
 	}
@@ -195,9 +160,9 @@ export function extractDefaultsFromSchema<T extends z.ZodTypeAny | z.ZodType | $
 	 * 如果是 optional 類型，遞迴處理其內部類型
 	 * If it's an optional type, recursively process its inner type
 	 */
-	if (_is$ZodOptionalDef(def))
+	if (_isZodOptionalDef(def))
 	{
-		return extractDefaultsFromSchema(def.innerType) as any;
+		return extractDefaultsFromSchema(def.innerType as z.ZodTypeAny) as any;
 	}
 
 	/**

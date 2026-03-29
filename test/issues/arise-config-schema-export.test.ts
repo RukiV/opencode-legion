@@ -18,7 +18,7 @@ import {
 	DEFAULT_CONFIG,
 	type IAriseConfig,
 } from "../../src/config/schema";
-import { extractDefaultsFromJSONSchema, extractDefaultsFromSchema } from "../lib/issues/zod-defaults";
+import { extractDefaultsFromJSONSchema, extractDefaultsFromSchema } from "../../src/config/zod-defaults";
 
 /**
  * 方法一：從 JSON Schema 提取默認值

@@ -12,7 +12,7 @@
 /// <reference types="bun" />
 import { describe, expect, it } from "bun:test";
 import { z } from "zod";
-import { extractDefaultsFromJSONSchema, extractDefaultsFromSchema } from "../lib/issues/zod-defaults";
+import { extractDefaultsFromJSONSchema, extractDefaultsFromSchema } from "../../src/config/zod-defaults";
 import { testGroups } from "../fixtures/zod-defaults-test-cases";
 
 /**
