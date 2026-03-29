@@ -1,4 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin";
+import { formatAriseMsg } from "../utils/arise-message";
 
 /**
  * 未完成 TODO 項目的模式
@@ -120,9 +121,9 @@ export function createTodoEnforcerHook(_ctx: PluginInput) {
       if (hasIncompleteTodos) {
         return {
           hasIncompleteTodos: true,
-          reminderMessage: `[opencode-arise] Shadow Monarch notice: You have incomplete TODOs. ${
+          reminderMessage: formatAriseMsg(`Shadow Monarch notice: You have incomplete TODOs. ${
             hasInProgress ? "Tasks are in_progress." : ""
-          } ${hasPending ? "Tasks are pending." : ""} Complete them before stopping.`,
+          } ${hasPending ? "Tasks are pending." : ""} Complete them before stopping.`),
         };
       }
 

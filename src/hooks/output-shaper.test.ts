@@ -1,5 +1,7 @@
+import { describe, expect, it } from "bun:test";
 import { createOutputShaperHook } from "./output-shaper";
 import { createDefaultConfig } from "../types/config-defaults";
+import { ARISE_PREFIX } from "../utils/arise-message";
 
 /**
  * OutputShaperHook 測試
@@ -37,7 +39,7 @@ describe("OutputShaperHook", () => {
     /** 截斷後長度應小於原始長度 / Truncated length should be less than original */
     expect(result.length).toBeLessThan(longOutput.length);
     /** 應包含截斷標記 / Should contain truncation marker */
-    expect(result).toContain("[opencode-arise] Output truncated");
+    expect(result).toContain(`[${ARISE_PREFIX}] Output truncated`);
   });
 
   /**

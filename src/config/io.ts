@@ -16,6 +16,7 @@ import { findOpencodeConfig, getAriseConfigPaths } from "./paths";
 import { FakeBun as Bun } from "../utils/bun-shim";
 import { createJsonHandler } from "../utils/jsonc";
 import { deepMerge } from "../utils/config-merge";
+import { formatAriseMsgError } from "../utils/arise-message";
 
 import type { PluginInput } from '@opencode-ai/plugin';
 import { ITSValueOrArrayMaybeReadonly } from 'ts-type';
@@ -443,7 +444,7 @@ function _validateAndMergeConfig(merged: JsonObject): IAriseConfig
 		 * 這確保插件在配置錯誤時仍能正常運作
 		 * This ensures the plugin still works when config has errors
 		 */
-		console.warn("[opencode-arise] Invalid config, using defaults:", result.error.message);
+		console.warn(formatAriseMsgError(`Invalid config, using defaults: ${result.error.message}`));
 		return createDefaultConfig();
 	}
 

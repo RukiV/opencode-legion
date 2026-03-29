@@ -10,7 +10,8 @@
  * Arise 訊息前綴常數
  * Arise message prefix constant
  */
-export const ARISE_PREFIX = "[arise]" as const;
+// export const ARISE_PREFIX = "[arise]" as const;
+export const ARISE_PREFIX = "[opencode-arise]" as const;
 
 /**
  * 底層格式化函數
@@ -20,8 +21,9 @@ export const ARISE_PREFIX = "[arise]" as const;
  * @param message - 訊息內容
  * @returns 格式化後的訊息
  */
-function formatWithPrefix(prefix: string, message: string): string {
-  return `${prefix} ${message}`;
+function formatWithPrefix(prefix: string, message: string): string
+{
+	return `${prefix} ${message}`;
 }
 
 /**
@@ -31,8 +33,9 @@ function formatWithPrefix(prefix: string, message: string): string {
  * @param message - 訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsg(message: string): string {
-  return formatWithPrefix(ARISE_PREFIX, message);
+export function formatAriseMsg(message: string): string
+{
+	return formatWithPrefix(ARISE_PREFIX, message);
 }
 
 /**
@@ -43,8 +46,9 @@ export function formatAriseMsg(message: string): string {
  * @param message - 訊息內容
  * @returns "${customPrefix} ${message}"
  */
-export function formatAriseMsgCustom(customPrefix: string, message: string): string {
-  return formatWithPrefix(customPrefix, message);
+export function formatAriseMsgCustom(customPrefix: string, message: string): string
+{
+	return formatWithPrefix(customPrefix, message);
 }
 
 /**
@@ -54,8 +58,9 @@ export function formatAriseMsgCustom(customPrefix: string, message: string): str
  * @param message - 錯誤訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgError(message: string): string {
-  return formatAriseMsg(message);
+export function formatAriseMsgError(message: string): string
+{
+	return formatAriseMsg(message);
 }
 
 /**
@@ -65,8 +70,9 @@ export function formatAriseMsgError(message: string): string {
  * @param message - 成功訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgSuccess(message: string): string {
-  return formatAriseMsg(message);
+export function formatAriseMsgSuccess(message: string): string
+{
+	return formatAriseMsg(message);
 }
 
 /**
@@ -76,8 +82,9 @@ export function formatAriseMsgSuccess(message: string): string {
  * @param message - 資訊訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgInfo(message: string): string {
-  return formatAriseMsg(message);
+export function formatAriseMsgInfo(message: string): string
+{
+	return formatAriseMsg(message);
 }
 
 /**
@@ -87,8 +94,9 @@ export function formatAriseMsgInfo(message: string): string {
  * @param title - 標題內容
  * @returns "[arise] ${title}"
  */
-export function formatAriseMsgTitle(title: string): string {
-  return formatAriseMsg(title);
+export function formatAriseMsgTitle(title: string): string
+{
+	return formatAriseMsg(title);
 }
 
 /**
@@ -99,8 +107,9 @@ export function formatAriseMsgTitle(title: string): string {
  * @param customPrefix - 自訂前綴（如 "arise:task-123 retry" → "[arise:task-123 retry]"）
  * @returns 格式化後的標題
  */
-export function formatAriseMsgTitleCustom(title: string, customPrefix: string): string {
-  return formatAriseMsgCustom(`[${customPrefix}]`, title);
+export function formatAriseMsgTitleCustom(title: string, customPrefix: string): string
+{
+	return formatAriseMsgCustom(`[${customPrefix}]`, title);
 }
 
 /**
@@ -110,8 +119,9 @@ export function formatAriseMsgTitleCustom(title: string, customPrefix: string): 
  * @param lines - 訊息行陣列
  * @returns 格式化後的多行訊息
  */
-export function formatAriseMsgMulti(...lines: string[]): string {
-  return formatAriseMsg(lines.join("\n"));
+export function formatAriseMsgMulti(...lines: string[]): string
+{
+	return formatAriseMsg(lines.join("\n"));
 }
 
 /**
@@ -122,8 +132,9 @@ export function formatAriseMsgMulti(...lines: string[]): string {
  * @param details - 詳細資訊（可多行）
  * @returns 格式化後的訊息
  */
-export function formatAriseMsgSuccessMultiLine(message: string, details: string): string {
-  return formatAriseMsg(`${message}\n\n${details}`);
+export function formatAriseMsgSuccessMultiLine(message: string, details: string): string
+{
+	return formatAriseMsg(`${message}\n\n${details}`);
 }
 
 /**
@@ -134,6 +145,7 @@ export function formatAriseMsgSuccessMultiLine(message: string, details: string)
  * @param suffix - 可選後綴
  * @returns "arise:${id}" 或 "arise:${id} ${suffix}"
  */
-export function formatAriseMsgPrefixId(id: string, suffix?: string): string {
-  return suffix ? `arise:${id} ${suffix}` : `arise:${id}`;
+export function formatAriseMsgPrefixId(id: string, suffix?: string): string
+{
+	return suffix ? `arise:${id} ${suffix}` : `arise:${id}`;
 }

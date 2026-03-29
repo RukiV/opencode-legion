@@ -1,4 +1,5 @@
 import type { IAriseConfig } from "../config/schema";
+import { formatAriseMsgInfo } from "../utils/arise-message";
 
 /** 預設最大輸出字元數 / Default max output characters */
 const DEFAULT_MAX_CHARS = 12000;
@@ -128,8 +129,8 @@ export function createOutputShaperHook(config: IAriseConfig) {
 
       return `${head}
 
-[opencode-arise] Output truncated (${output.length.toLocaleString()} chars, ${truncatedChars.toLocaleString()} removed).
-Use a more specific query or read a targeted file section if needed.
+${formatAriseMsgInfo(`Output truncated (${output.length.toLocaleString()} chars, ${truncatedChars.toLocaleString()} removed).
+Use a more specific query or read a targeted file section if needed.`)}
 
 ${tail}`;
     },

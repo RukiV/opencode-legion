@@ -1,3 +1,5 @@
+import { formatAriseMsgTitle } from "../utils/arise-message";
+
 /**
  * 建立對話壓縮保留 Hook
  * Create compaction preserver hook
@@ -19,7 +21,7 @@ export function createCompactionPreserverHook() {
      * @returns 保留規則字串
      */
     getPreservationContext(): string {
-      return `[opencode-arise] Compaction preservation rules:
+      return formatAriseMsgTitle(`Compaction preservation rules:
 - PRESERVE: All TODO items (pending, in_progress, completed)
 - PRESERVE: Key decisions and assumptions made
 - PRESERVE: File paths that were touched/edited
@@ -28,7 +30,7 @@ export function createCompactionPreserverHook() {
 - PRUNE: Verbose tool outputs (grep results, large file contents)
 - PRUNE: Repetitive exploration that didn't yield results
 
-Summarize work done, but keep enough context for the Monarch to continue.`;
+Summarize work done, but keep enough context for the Monarch to continue.`);
     },
   };
 }
