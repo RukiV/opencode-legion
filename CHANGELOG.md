@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.15](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.14...@bluelovers/opencode-arise@0.1.15) (2026-03-29)
+
+
+
+### ✨　Features
+
+* **cli:** 添加版本命令到cli ([f4c5452](https://github.com/bluelovers/opencode-arise/commit/f4c5452d4be9eda96673e934aee50bd1d1f6e973))
+
+
+
 ## [0.1.14](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.13...@bluelovers/opencode-arise@0.1.14) (2026-03-29)
 
 
