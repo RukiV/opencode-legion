@@ -1,0 +1,36 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`debug-control getDebugStatus should return correct status after initialization 1`] = `
+{
+  "enabled": true,
+  "level": "info",
+}
+`;
+
+exports[`debug-control getDebugStatus should reflect changes in status 1`] = `
+{
+  "enabled": true,
+  "level": "debug",
+}
+`;
+
+exports[`debug-control getDebugStatus should track toggle state accurately 1`] = `
+{
+  "enabled": false,
+  "level": "warn",
+}
+`;
+
+exports[`debug-control getDebugStatus should track toggle state accurately 2`] = `
+{
+  "enabled": true,
+  "level": "error",
+}
+`;
+
+exports[`debug-control integration scenarios should handle complete debug workflow 1`] = `
+{
+  "enabled": false,
+  "level": "error",
+}
+`;

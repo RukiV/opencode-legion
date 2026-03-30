@@ -1,7 +1,11 @@
 import { type Agent } from '@opencode-ai/sdk';
 import type { ITSPickExtra } from 'ts-type';
 import { z } from "zod";
-import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission } from '../types/enum-opencode';
+import { 
+  EnumOpencodeAgentMode, 
+  EnumOpencodeAgentPermission, 
+  ALLOWED_LOG_LEVELS 
+} from '../types/enum-opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 
@@ -416,6 +420,33 @@ Returns the status of the resume attempt.`,
 				.boolean()
 				.optional()
 				.describe("Force retry even if task is not in error state"),
+		},
+	},
+	[EnumAriseTools.ARISE_DEBUG]: {
+		description: `Control debug mode at runtime.
+
+This tool allows you to enable/disable debug mode and set the log level during execution.
+
+Debug settings:
+- enabled: Turn debug mode on/off
+- level: Set log level (error, warn, info, debug)
+
+The log levels are ordered from least to most verbose:
+- error: Only errors
+- warn: Errors and warnings
+- info: Errors, warnings, and informational messages
+- debug: All messages including debug information`,
+		shortDescription: "Control debug mode (enable/disable/set level)",
+
+		args: {
+			enabled: z
+				.boolean()
+				.optional()
+				.describe("Enable or disable debug mode"),
+			level: z
+				.enum(ALLOWED_LOG_LEVELS)
+				.optional()
+				.describe("Set log level: error, warn, info, debug"),
 		},
 	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;

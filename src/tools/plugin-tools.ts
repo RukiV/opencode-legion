@@ -7,6 +7,7 @@ import {
 } from './background-tools';
 import { createListModelsTool } from './list-models';
 import { createContinueTool } from './continue-tool';
+import { createDebugTool } from './debug-tools';
 import { EnumAriseTools } from './tool-names';
 import { IAriseTools } from '../types/types';
 import { BackgroundManager } from './background-manager';
@@ -40,5 +41,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		[EnumAriseTools.ARISE_LIST_MODELS]: createListModelsTool(ctx),
 		/** 主動繼續/重試失敗任務工具 / Actively continue/retry failed task tool */
 		[EnumAriseTools.ARISE_CONTINUE]: createContinueTool(backgroundManager),
+		/** 除錯控制工具 / Debug control tool */
+		[EnumAriseTools.ARISE_DEBUG]: createDebugTool(),
 	} satisfies IAriseTools
 }

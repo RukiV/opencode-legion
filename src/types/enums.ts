@@ -219,6 +219,8 @@ export enum EnumAriseTools {
 	ARISE_LIST_MODELS = "arise_list_models",
 	/** 主動繼續執行失敗的任務 / Actively continue/resume a failed task */
 	ARISE_CONTINUE = "arise_continue",
+	/** 控制除錯模式 (開啟/關閉/設定等級) / Control debug mode (enable/disable/set level) */
+	ARISE_DEBUG = "arise_debug",
 }
 
 /**
@@ -233,4 +235,5 @@ export const ALL_ARISE_TOOLS = [
 	EnumAriseTools.ARISE_BACKGROUND_CANCEL,
 	EnumAriseTools.ARISE_LIST_MODELS,
 	EnumAriseTools.ARISE_CONTINUE,
+	EnumAriseTools.ARISE_DEBUG,
 ] as const satisfies EnumAriseTools[];

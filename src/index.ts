@@ -1,39 +1,23 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
-import type { Event } from "@opencode-ai/sdk";
 import { type IAriseConfig } from "./config/schema";
 import { getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/getters";
-import { AUTO_MODEL } from "./types/const-default";
 import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
 import { loadAriseConfig } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
-import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./agents";
 import { _isAutoModel } from "./utils/model-resolver";
-import { deepMerge } from "./utils/config-merge";
-import { extractTextFromMessageParts } from "./utils/message";
-import { getErrorMessage } from "./utils/error";
 import { createConfigHandler } from "./plugin/config-handler";
 import { createFullEventHandler, extractSessionId } from "./plugin/event-handler";
+import { createAriseBannerHook } from "./hooks/arise-banner";
+import { createOutputShaperHook } from "./hooks/output-shaper";
+import { createCompactionPreserverHook } from "./hooks/compaction-preserver";
+import { createTodoEnforcerHook } from "./hooks/todo-enforcer";
 import {
-  createAriseBannerHook,
-  createOutputShaperHook,
-  createCompactionPreserverHook,
-  createTodoEnforcerHook,
-} from "./hooks/index";
-import {
-  createCallAriseAgentTool,
   BackgroundManager,
-  createBackgroundTaskTool,
-  createBackgroundOutputTool,
-  createBackgroundStatusTool,
-  createBackgroundCancelTool,
-} from "./tools";
-import { IHooks, IPlugin, IReturnTypeOfPluginToolArise } from './types/types-opencode';
-import { EnumAriseTools } from './types/enums';
-import { IAriseTools } from "./types/types";
+} from "./tools/background-manager";
+import { initDebugControl } from "./utils/debug-control";
+import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/plugin-tools';
 
-/** JSON 物件類型別名 / JSON object type alias */
-type JsonObject = Record<string, unknown>;
 
 /**
  * 檢查 Hook 是否啟用
@@ -68,6 +52,15 @@ function isHookEnabled(config: IAriseConfig, hookName: EnumHookName): boolean {
 const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
   /** 載入 Arise 配置 / Load Arise config */
   const config = await loadAriseConfig(ctx);
+
+  /**
+   * 初始化除錯控制
+   * Initialize debug control
+   *
+   * 根據配置設定 consoleLogger.enabled 和預設日誌級別
+   * Sets consoleLogger.enabled and default log level based on config
+   */
+  initDebugControl(config);
 
   /**
    * 初始化背景任務管理器
