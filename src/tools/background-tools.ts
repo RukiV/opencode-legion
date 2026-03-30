@@ -1,8 +1,9 @@
 import type { ToolContext } from "@opencode-ai/plugin";
-import type { BackgroundManager } from "./background-manager";
-import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
+import type { BackgroundManager } from "./lib/background-manager";
+import { EnumAriseTools } from "../types/enums";
+import { getAriseToolsConfigEntry } from "../agents/shadows";
 import { tool2 } from '../types/types-opencode';
-import { formatDuration } from "../utils/message";
+import { formatDuration } from "../utils/string/message";
 import { getErrorMessage } from "../utils/error";
 import {
   formatAriseMsgError,
@@ -10,7 +11,7 @@ import {
   formatAriseMsgSuccessMultiLine,
   formatAriseMsgInfo,
   formatAriseMsgMulti,
-} from "../utils/arise-message";
+} from "../utils/string/arise-message";
 
 /**
  * 建立背景任務工具

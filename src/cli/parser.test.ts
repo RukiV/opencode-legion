@@ -2,7 +2,7 @@
 /// <reference types="bun-types" />
 import { describe, expect, it } from "bun:test";
 
-import { createJsonHandler } from "../utils/jsonc";
+import { createJsonHandler } from "../utils/config/jsonc";
 
 describe("createJsonHandler", () => {
   it("parses plain JSON", () => {

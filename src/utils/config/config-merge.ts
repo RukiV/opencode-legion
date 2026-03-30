@@ -1,7 +1,7 @@
 
 import { deepmergeAll, IAnyRecord } from 'deepmerge-plus';
 import { ITSPartialRecord, ITSDeepPartial } from 'ts-type';
-import { _isNonNullableObject } from './type-guard';
+import { _isNonNullableObject } from '../type/type-guard';
 
 type JsonObject = Record<string, unknown>;
 

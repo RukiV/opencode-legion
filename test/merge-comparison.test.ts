@@ -12,7 +12,7 @@
 // @noUnusedLocals:false
 /// <reference types="bun" />
 import { describe, expect, it } from "bun:test";
-import { deepMerge, configMergeDeep, _arrayMergeLeftTargetWins, deepMerge3 } from "../src/utils/config-merge";
+import { deepMerge, configMergeDeep, _arrayMergeLeftTargetWins, deepMerge3 } from "../src/utils/config/config-merge";
 
 describe("deepMerge vs configMergeDeep comparison", () => {
 

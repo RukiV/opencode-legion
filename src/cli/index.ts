@@ -23,7 +23,7 @@ import {
 
 } from "../config/io";
 import { AriseConfigSchema } from "../config/schema";
-import { createJsonHandler } from "../utils/jsonc";
+import { createJsonHandler } from "../utils/config/jsonc";
 import { getErrorMessage } from "../utils/error";
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from '../config/plugin-name';
 

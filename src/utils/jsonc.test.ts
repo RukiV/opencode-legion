@@ -9,7 +9,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { createJsonHandler, detectFormat } from "./jsonc";
+import { createJsonHandler, detectFormat } from "./config/jsonc";
 
 /* ============ createJsonHandler 工廠函數測試 / createJsonHandler factory function tests ============ */
 

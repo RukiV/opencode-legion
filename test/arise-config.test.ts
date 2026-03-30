@@ -14,12 +14,8 @@ import {
 	EnumShadowAgentsName,
 	ALL_SHADOW_AGENTS_NAME,
 } from "../src/types/enums";
-import {
-	ALL_ARISE_TOOLS,
-	EnumAriseTools,
-	ARISE_TOOLS,
-	getAriseToolsSection,
-} from "../src/tools/tool-names";
+import { ALL_ARISE_TOOLS, EnumAriseTools } from "../src/types/enums";
+import { ARISE_TOOLS, getAriseToolsSection } from "../src/agents/shadows";
 import {
 	SHADOW_DESCRIPTIONS,
 	getMonarchShadowList,

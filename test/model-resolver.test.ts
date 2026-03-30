@@ -9,7 +9,7 @@ import {
 	_resolveAutoModelCore,
 	getEffectiveModelWithFallback,
 } from "../src/utils/model-resolver";
-import { _isNotEmpty } from "../src/utils/string-utils";
+import { _isNotEmpty } from "../src/utils/string/string-utils";
 
 describe("_isAutoModel", () =>
 {

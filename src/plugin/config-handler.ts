@@ -9,9 +9,9 @@
 import type { IAriseConfig } from "../config/schema";
 import type { IAllShadowAgentsName } from "../types/enums";
 import type { IShadowAgent } from "../agents/shadows";
-import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents";
+import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents/shadows";
 import { _isAutoModel } from "../utils/model-resolver";
-import { deepMerge } from "../utils/config-merge";
+import { deepMerge } from "../utils/config/config-merge";
 import { type Config } from "@opencode-ai/sdk";
 
 /**

@@ -6,7 +6,8 @@
  * Provides runtime debug mode toggle and log level setting
  */
 
-import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
+import { EnumAriseTools } from '../types/enums';
+import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
 import
 	{
@@ -16,7 +17,7 @@ import
 		setLogLevel,
 		getDebugStatus,
 	} from '../utils/debug-control';
-import { formatAriseMsgSuccess, formatAriseMsgError } from '../utils/arise-message';
+import { formatAriseMsgSuccess, formatAriseMsgError } from '../utils/string/arise-message';
 import type { ILogLevel } from '../types/enum-opencode';
 
 /**

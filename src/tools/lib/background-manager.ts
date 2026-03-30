@@ -4,25 +4,25 @@ import {
 	DEFAULT_POLL_INTERVAL,
 	DEFAULT_RETRY_DELAY_INCREMENT,
 	DEFAULT_RETRY_DELAY_MAX,
-} from "../config/schema";
+} from "../../config/schema";
 import {
 	getPollInterval,
 	getRetryDelayIncrement,
 	getRetryDelayMax,
 	getAutoResumeConfig,
 	getAutoResumeEnabled,
-} from "../config/getters";
-import type { IAriseConfig } from "../config/schema";
-import { IAllShadowAgentsName } from "../types/enums";
-import { getErrorMessage } from "../utils/error";
-import { resolveModelContext } from "../utils/model-resolver";
-import { getSessionModel } from "../config/model-cache";
+} from "../../config/getters";
+import type { IAriseConfig } from "../../config/schema";
+import { IAllShadowAgentsName } from "../../types/enums";
+import { getErrorMessage } from "../../utils/error";
+import { resolveModelContext } from "../../utils/model-resolver";
+import { getSessionModel } from "../../config/model-cache";
 import {
 	formatAriseMsgError,
 	formatAriseMsgTitleCustom,
 	formatAriseMsgPrefixId,
 	formatAriseMsgSuccessMultiLine,
-} from "../utils/arise-message";
+} from "../../utils/string/arise-message";
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===

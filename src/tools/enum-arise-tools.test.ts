@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { EnumAriseTools, ARISE_TOOLS, ALL_ARISE_TOOLS, getAriseToolsConfigEntry } from "./tool-names";
+import { EnumAriseTools, ALL_ARISE_TOOLS } from "../types/enums";
+import { ARISE_TOOLS, getAriseToolsConfigEntry } from "../agents/shadows";
 import type { IAriseTools } from "../types/types";
 import { ITSRequiredWith } from "ts-type";
 

@@ -7,7 +7,7 @@ import { AUTO_MODEL, DEFAULT_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
-import { _isNotEmpty } from "./string-utils";
+import { _isNotEmpty } from "./string/string-utils";
 
 /**
  * 預設模型

@@ -13,10 +13,10 @@ import { createCompactionPreserverHook } from "./hooks/compaction-preserver";
 import { createTodoEnforcerHook } from "./hooks/todo-enforcer";
 import {
   BackgroundManager,
-} from "./tools/background-manager";
+} from "./tools/lib/background-manager";
 import { initDebugControl } from "./utils/debug-control";
 import { IHooks, IPlugin } from './types/types-opencode';
-import { createPluginTools } from './tools/plugin-tools';
+import { createPluginTools } from './tools/index';
 
 
 /**

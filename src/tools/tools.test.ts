@@ -6,7 +6,7 @@ import {
   createBackgroundStatusTool,
   createBackgroundCancelTool,
 } from "./background-tools";
-import { BackgroundManager } from "./background-manager";
+import { BackgroundManager } from "./lib/background-manager";
 
 // Mock context for testing
 const mockCtx = {

@@ -8,9 +8,9 @@ import {
 import { createListModelsTool } from './list-models';
 import { createContinueTool } from './continue-tool';
 import { createDebugTool } from './debug-tools';
-import { EnumAriseTools } from './tool-names';
+import { EnumAriseTools } from '../types/enums';
 import { IAriseTools } from '../types/types';
-import { BackgroundManager } from './background-manager';
+import { BackgroundManager } from './lib/background-manager';
 import type { PluginInput } from '@opencode-ai/plugin';
 import type { IAriseConfig } from '../config/schema';
 import { loadAriseConfig } from '../config/io';

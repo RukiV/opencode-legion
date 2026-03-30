@@ -1,7 +1,7 @@
 import { describe, expect, it, test } from "bun:test";
 import { createOutputShaperHook } from "./output-shaper";
 import { createDefaultConfig } from "../types/config-defaults";
-import { ARISE_PREFIX, formatAriseMsg } from "../utils/arise-message";
+import { ARISE_PREFIX, formatAriseMsg } from "../utils/string/arise-message";
 
 /**
  * OutputShaperHook 測試

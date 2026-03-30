@@ -14,9 +14,9 @@ import { AriseConfigSchema, type IAriseConfig } from "./schema";
 import { createDefaultConfig } from "../types/config-defaults";
 import { findOpencodeConfig, getAriseConfigPaths } from "./paths";
 import { FakeBun as Bun } from "../utils/bun-shim";
-import { createJsonHandler } from "../utils/jsonc";
-import { deepMerge } from "../utils/config-merge";
-import { formatAriseMsgError } from "../utils/arise-message";
+import { createJsonHandler } from "../utils/config/jsonc";
+import { deepMerge } from "../utils/config/config-merge";
+import { formatAriseMsgError } from "../utils/string/arise-message";
 
 import type { PluginInput } from '@opencode-ai/plugin';
 import { ITSValueOrArrayMaybeReadonly } from 'ts-type';

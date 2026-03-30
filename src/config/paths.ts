@@ -12,7 +12,7 @@ import { resolve } from "path";
 
 import { SHADOW_AGENTS } from "../agents/shadows";
 import { type IAriseConfig } from "./schema";
-import { createJsonHandler } from "../utils/jsonc";
+import { createJsonHandler } from "../utils/config/jsonc";
 
 /**
  * 取得使用者主目錄

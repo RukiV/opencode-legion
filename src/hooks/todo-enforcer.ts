@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { formatAriseMsg } from "../utils/arise-message";
+import { formatAriseMsg } from "../utils/string/arise-message";
 
 /**
  * 未完成 TODO 項目的模式

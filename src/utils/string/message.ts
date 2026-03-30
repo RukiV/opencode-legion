@@ -34,7 +34,7 @@ export function extractTextFromMessageParts(parts?: Array<{ type: string; text?:
  *
  * @deprecated 請直接從 utils/error 匯入 / Import directly from utils/error
  */
-export { getErrorMessage } from "./error";
+export { getErrorMessage } from "../error";
 
 /* ============ 時間格式化 / Time Formatting ============ */
 

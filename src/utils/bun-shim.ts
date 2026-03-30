@@ -7,7 +7,7 @@
  */
 
 import { pathExists, readFile } from "fs-extra";
-import { createJsonHandler } from "./jsonc";
+import { createJsonHandler } from "./config/jsonc";
 
 /**
  * Bun 文件物件介面

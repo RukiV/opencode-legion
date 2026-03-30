@@ -1,16 +1,17 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
 import type { IAriseConfig } from "../config/schema";
-import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
+import { EnumAriseTools } from '../types/enums';
+import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
 import { resolveModelContext } from '../utils/model-resolver';
-import { extractTextFromMessageParts } from '../utils/message';
+import { extractTextFromMessageParts } from '../utils/string/message';
 import { getErrorMessage } from '../utils/error';
 import {
   formatAriseMsgTitle,
   formatAriseMsgError,
   formatAriseMsgSuccessMultiLine,
-} from '../utils/arise-message';
+} from '../utils/string/arise-message';
 
 /**
  * 建立呼叫 Arise Agent 的工具

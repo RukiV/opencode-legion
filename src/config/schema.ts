@@ -4,7 +4,7 @@ import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
 import { ALLOWED_AUTO_RESUME_ON_ERROR, ALLOWED_AUTO_RESUME_TARGET, EnumAutoResumeOnError, EnumAutoResumeTarget } from "../types/enums";
 import { AUTO_MODEL } from "../types/const-default";
-import { extractDefaultsFromJSONSchema } from "./zod-defaults";
+import { extractDefaultsFromJSONSchema } from "../utils/type/zod-defaults";
 
 /**
  * 輪詢間隔預設值（毫秒）

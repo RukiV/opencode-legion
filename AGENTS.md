@@ -28,8 +28,9 @@ pnpm run typecheck
 # Build (outputs to dist/)
 pnpm run build
 
-# Run all tests
+# Run all tests (for agents)
 pnpm run test:agent
+# Run all tests (for humans)
 pnpm run test
 
 # Run a single test file

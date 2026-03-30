@@ -1,6 +1,7 @@
 import type { ToolContext } from "@opencode-ai/plugin";
-import type { BackgroundManager } from "./background-manager";
-import { EnumAriseTools, getAriseToolsConfigEntry } from "./tool-names";
+import type { BackgroundManager } from "./lib/background-manager";
+import { EnumAriseTools } from "../types/enums";
+import { getAriseToolsConfigEntry } from "../agents/shadows";
 import { tool2 } from '../types/types-opencode';
 
 /**

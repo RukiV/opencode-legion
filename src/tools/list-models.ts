@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { EnumAriseTools, getAriseToolsConfigEntry } from './tool-names';
+import { EnumAriseTools } from '../types/enums';
+import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
 import { getErrorMessage } from '../utils/error';
 import {
@@ -11,7 +12,7 @@ import {
 import {
   formatAriseMsgError,
   formatAriseMsgSuccess,
-} from '../utils/arise-message';
+} from '../utils/string/arise-message';
 
 /**
  * 格式化模型列表

@@ -1,4 +1,4 @@
-import { formatAriseMsgTitle } from "../utils/arise-message";
+import { formatAriseMsgTitle } from "../utils/string/arise-message";
 
 /**
  * 建立對話壓縮保留 Hook
