@@ -5,6 +5,7 @@
  * 提供統一的訊息格式化函數，確保所有 Arise 相關訊息有一致的格式
  * Provides unified message formatting functions to ensure consistent format for all Arise-related messages
  */
+import type { ITSValueOrArrayMaybeReadonly } from "ts-type";
 
 /**
  * Arise 訊息前綴常數
@@ -21,8 +22,12 @@ export const ARISE_PREFIX = "[opencode-arise]" as const;
  * @param message - 訊息內容
  * @returns 格式化後的訊息
  */
-function formatWithPrefix(prefix: string, message: string): string
+function formatWithPrefix(prefix: string, message: ITSValueOrArrayMaybeReadonly<string>): string
 {
+	if (Array.isArray(message))
+	{
+		message = message.join(", ");
+	}
 	return `${prefix} ${message}`;
 }
 
@@ -33,7 +38,7 @@ function formatWithPrefix(prefix: string, message: string): string
  * @param message - 訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsg(message: string): string
+export function formatAriseMsg(message: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatWithPrefix(ARISE_PREFIX, message);
 }
@@ -46,7 +51,7 @@ export function formatAriseMsg(message: string): string
  * @param message - 訊息內容
  * @returns "${customPrefix} ${message}"
  */
-export function formatAriseMsgCustom(customPrefix: string, message: string): string
+export function formatAriseMsgCustom(customPrefix: string, message: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatWithPrefix(customPrefix, message);
 }
@@ -58,7 +63,7 @@ export function formatAriseMsgCustom(customPrefix: string, message: string): str
  * @param message - 錯誤訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgError(message: string): string
+export function formatAriseMsgError(message: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatAriseMsg(message);
 }
@@ -70,7 +75,7 @@ export function formatAriseMsgError(message: string): string
  * @param message - 成功訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgSuccess(message: string): string
+export function formatAriseMsgSuccess(message: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatAriseMsg(message);
 }
@@ -82,7 +87,7 @@ export function formatAriseMsgSuccess(message: string): string
  * @param message - 資訊訊息內容
  * @returns "[arise] ${message}"
  */
-export function formatAriseMsgInfo(message: string): string
+export function formatAriseMsgInfo(message: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatAriseMsg(message);
 }
@@ -94,7 +99,7 @@ export function formatAriseMsgInfo(message: string): string
  * @param title - 標題內容
  * @returns "[arise] ${title}"
  */
-export function formatAriseMsgTitle(title: string): string
+export function formatAriseMsgTitle(title: ITSValueOrArrayMaybeReadonly<string>): string
 {
 	return formatAriseMsg(title);
 }
@@ -107,7 +112,7 @@ export function formatAriseMsgTitle(title: string): string
  * @param customPrefix - 自訂前綴（如 "arise:task-123 retry" → "[arise:task-123 retry]"）
  * @returns 格式化後的標題
  */
-export function formatAriseMsgTitleCustom(title: string, customPrefix: string): string
+export function formatAriseMsgTitleCustom(title: ITSValueOrArrayMaybeReadonly<string>, customPrefix: string): string
 {
 	return formatAriseMsgCustom(`[${customPrefix}]`, title);
 }
@@ -121,7 +126,7 @@ export function formatAriseMsgTitleCustom(title: string, customPrefix: string): 
  */
 export function formatAriseMsgMulti(...lines: string[]): string
 {
-	return formatAriseMsg(lines.join("\n"));
+	return formatAriseMsg(lines);
 }
 
 /**

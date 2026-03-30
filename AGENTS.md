@@ -29,10 +29,12 @@ pnpm run typecheck
 pnpm run build
 
 # Run all tests
+pnpm run test:agent
 pnpm run test
 
 # Run a single test file
 pnpm test -- <test-file-path>
+pnpm run test:agent -- <test-file-path>
 # Example: pnpm test -- src/index.test.ts
 
 # Run tests matching a pattern
