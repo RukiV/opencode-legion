@@ -26,6 +26,7 @@ import { AriseConfigSchema } from "../config/schema";
 import { createJsonHandler } from "../utils/config/jsonc";
 import { getErrorMessage } from "../utils/error";
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from '../config/plugin-name';
+import { console } from 'debug-color2';
 
 /**
  * 建立預設 Arise 配置的處理函式
@@ -62,7 +63,7 @@ function createDefaultAriseConfigHandler(): void {
  * 4. Create default config
  */
 function install(): void {
-	console.log(getBanner());
+	console.yellow.log(getBanner());
 	console.log("\n🌑 Installing opencode-arise...\n");
 
 	const configPath = findOpencodeConfig();
@@ -281,8 +282,8 @@ function showVersion(): void {
  * Show help message
  */
 function showHelp(): void {
+	console.yellow.log(getBanner());
 	console.log(`
- ${getBanner()}
 Usage: opencode-arise <command>
 
 Commands:

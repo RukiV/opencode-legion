@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { PLUGIN_VERSION, PLUGIN_VERSION_HOMEPAGE } from "../types/version";
+import { console } from 'debug-color2';
 
 /**
  * 產生居中填充的字串
@@ -144,7 +145,7 @@ export function getBanner(): string {
  */
 export function printBannerToConsole(): void {
   if (!bannerShownThisProcess) {
-    console.log(getBanner());
+    console.yellow.log(getBanner());
     bannerShownThisProcess = true;
   }
 }
