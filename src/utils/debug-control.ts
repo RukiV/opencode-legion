@@ -327,12 +327,92 @@ export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: 
   consoleLog(...argv);
 }
 
-export function logAriseWithLevel<M extends IMethods2>(consoleLog: Console2, methodName: M, fn: () => Parameters<Console2[M]>)
+/**
+ * 格式化並輸出 Arise 訊息（陣列參數版本）
+ * Format and output Arise message (array parameter version)
+ *
+ * 與 logArise 的差異：
+ * - logArise 使用展開參數 (...argv)
+ * - logArise2 使用陣列參數 (argv)
+ *
+ * Difference from logArise:
+ * - logArise uses spread parameters (...argv)
+ * - logArise2 uses array parameter (argv)
+ *
+ * @param consoleLog - console 日誌函式 / Console log function
+ * @param argv - 參數陣列 / Parameter array
+ *
+ * @example
+ * // 基本用法：格式化 Arise 訊息
+ * logArise2(console.log, ["Hello World"]);
+ * logArise2(console.yellow.log, ["Hello World"]);
+ *
+ * // 多參數用法
+ * logArise2(console.warn, ["Warning:", "disk space low"]);
+ *
+ * // 非字串首參數（不格式化）
+ * logArise2(console.log, [123, "data"]);
+ */
+export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Parameters<T>)
+{
+	if (typeof argv[0] === 'string')
+  {
+    argv[0] = formatAriseMsg(argv[0]);
+  }
+
+	// @ts-ignore
+  consoleLog(...argv);
+}
+
+/**
+ * 依日誌等級條件輸出 Arise 訊息
+ * Output Arise message with log level condition
+ *
+ * 此函式會先檢查日誌等級是否允許輸出，通過時才執行 fn() 取得參數並格式化輸出
+ * This function first checks if the log level allows output, then executes fn() to get parameters and format output
+ *
+ * 延遲執行優勢：
+ * - fn() 僅在 canLog 通過時才執行，避免不必要的字串拼接或計算
+ * - 適用於昂貴的日誌訊息建構（如 JSON.stringify 大型物件）
+ *
+ * Lazy execution advantage:
+ * - fn() is only executed when canLog passes, avoiding unnecessary string concatenation or computation
+ * - Suitable for expensive log message construction (e.g., JSON.stringify large objects)
+ *
+ * @param methodName - console 方法名稱（如 'log', 'error', 'debug'）/ Console method name (e.g., 'log', 'error', 'debug')
+ * @param fn - 回傳參數陣列的函式（延遲執行）/ Function that returns parameter array (lazy execution)
+ * @param consoleLog - console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel
+ *
+ * @example
+ * import { logArise2WithLevel, setDebugEnabled, setLogLevel } from './debug-control';
+ *
+ * setDebugEnabled(true);
+ * setLogLevel(EnumLogLevel.Debug);
+ *
+ * // 基本用法：輸出 Info 等級訊息
+ * logArise2WithLevel('log', () => ["Server started on port 3000"]);
+ *
+ * // 錯誤等級用法
+ * logArise2WithLevel('error', () => ["Connection failed:", error.message]);
+ *
+ * // 除錯等級用法（僅在 Debug 等級時輸出）
+ * logArise2WithLevel('debug', () => ["User data:", JSON.stringify(user)]);
+ *
+ * // 延遲執行範例：昂貴的計算僅在等級通過時執行
+ * logArise2WithLevel('debug', () => {
+ *   const expensiveData = computeExpensiveDebugInfo(); // 僅在 Debug 等級時執行
+ *   return ["Debug info:", expensiveData];
+ * });
+ *
+ * // 使用自訂 console 物件
+ * logArise2WithLevel('log', () => ["Custom output"], consoleLoggerWithLevel.blue);
+ */
+export function logArise2WithLevel<M extends IMethods2>(methodName: M, fn: () => Parameters<Console2[M]>, consoleLog: Console2 = consoleLoggerWithLevel)
 {
   const level = getMethodLogLevel(methodName);
 	if (canLog(level))
 	{
 		const args = fn();
-		logArise(consoleLog[methodName], ...args);
+		logArise2(consoleLog[methodName], args);
 	}
 }
