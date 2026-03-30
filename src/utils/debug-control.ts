@@ -16,6 +16,10 @@
 import { consoleLogger } from 'debug-color2/logger';
 import { EnumLogLevel, type ILogLevel } from '../types/enum-opencode';
 import type { IAriseConfig } from '../config/schema';
+import { formatAriseMsg } from './string/arise-message';
+import { Console2 } from 'debug-color2';
+import { ITSExtractKeyof, ITSMemberMethods } from 'ts-type';
+import { ICrossConsole } from 'debug-color2/lib/types/CrossConsole';
 
 /**
  * 日誌級別優先級（數字越大越詳細）
@@ -238,7 +242,7 @@ function getMethodLogLevel(methodName: string): ILogLevel
  * consoleLogger.red.error("msg");     // 紅色錯誤，Error 等級 ✅
  * consoleLogger.green.debug("msg");   // 綠色除錯，Debug 等級 ✅
  */
-function wrapConsoleLogger<T extends object>(target: T): T
+function wrapConsoleLogger<T extends Console2>(target: T): T
 {
 	return new Proxy(target, {
 		get(obj, prop, receiver)
@@ -275,7 +279,7 @@ function wrapConsoleLogger<T extends object>(target: T): T
 			// 如果是物件（如顏色分支 .yellow），則遞迴包裝
 			if (typeof value === "object" && value !== null)
 			{
-				return wrapConsoleLogger(value as object);
+				return wrapConsoleLogger(value as any);
 			}
 
 			return value;
@@ -304,4 +308,31 @@ function wrapConsoleLogger<T extends object>(target: T): T
  * consoleLoggerWithLevel.yellow.log("Hello!");  // ✅ 輸出黃色文字
  * consoleLoggerWithLevel.green.debug("Debug info");  // ✅ 輸出綠色文字
  */
-export const consoleLoggerWithLevel: typeof consoleLogger = wrapConsoleLogger(consoleLogger);
+export const consoleLoggerWithLevel: Console2 = wrapConsoleLogger(consoleLogger);
+
+type IMethods2 = Exclude<ITSExtractKeyof<ITSMemberMethods<ICrossConsole>, string>, 'constructor' | 'new' | 'prototype' | 'Console' | 'length'>;
+
+type IConsoleLogFunction = ICrossConsole[IMethods2] & {
+	blue?: never
+};
+
+export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: Parameters<T>)
+{
+  if (typeof argv[0] === 'string')
+  {
+    argv[0] = formatAriseMsg(argv[0]);
+  }
+
+  // @ts-ignore
+  consoleLog(...argv);
+}
+
+export function logAriseWithLevel<M extends IMethods2>(consoleLog: Console2, methodName: M, fn: () => Parameters<Console2[M]>)
+{
+  const level = getMethodLogLevel(methodName);
+	if (canLog(level))
+	{
+		const args = fn();
+		logArise(consoleLog[methodName], ...args);
+	}
+}

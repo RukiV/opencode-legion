@@ -409,6 +409,10 @@ Use this when:
 - Auto-resume is disabled but you still want to retry manually
 - You want to attempt multiple manual retries
 
+Runtime controls:
+- auto_resume: Enable/disable auto-resume for future failures after this manual retry
+- background_auto_resume: Enable/disable auto-resume specifically for background tasks
+
 Returns the status of the resume attempt.`,
 		shortDescription: "Actively continue/resume a failed task manually",
 
@@ -420,6 +424,14 @@ Returns the status of the resume attempt.`,
 				.boolean()
 				.optional()
 				.describe("Force retry even if task is not in error state"),
+			auto_resume: z
+				.boolean()
+				.optional()
+				.describe("Enable auto-resume for future failures after this manual retry"),
+			background_auto_resume: z
+				.boolean()
+				.optional()
+				.describe("Enable/disable auto-resume specifically for background tasks"),
 		},
 	},
 	[EnumAriseTools.ARISE_DEBUG]: {

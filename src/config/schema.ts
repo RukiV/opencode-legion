@@ -110,8 +110,16 @@ const AutoResumePrompts = z
  *
  * 定義 auto_resume 的完整結構
  * Defines the complete structure of auto_resume
+ *
+ * 屬性使用 snake_case 命名：
+ * - enabled: 是否啟用
+ * - max_retries: 最大重試次數
+ * - retry_delay: 重試延遲（毫秒）
+ * - on_error: 錯誤時的行為
+ * - target: 目標任務類型
+ * - prompts: 自訂提示訊息
  */
-const AutoResumeConfig = z
+export const AutoResumeConfig = z
 	.object({
 		/** 是否啟用自動繼續任務（預設 false）/ Enable auto resume (default false) */
 		enabled: z.boolean().default(false)
@@ -348,3 +356,6 @@ export const AriseConfigSchema = z
 
 /** Arise 配置類型 / Arise configuration type */
 export type IAriseConfig = NonNullable<z.infer<typeof AriseConfigSchema>>;
+
+/** Auto-resume 配置類型（從 const AutoResumeConfig 推導）/ Auto-resume config type (derived from const AutoResumeConfig) */
+export type IAutoResumeConfig = NonNullable<z.infer<typeof AutoResumeConfig>>;
