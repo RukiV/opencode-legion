@@ -5,6 +5,7 @@ import {
     getRetryDelayIncrement,
     getRetryDelayMax,
     getAutoResumeConfig,
+    getAutoResumeSafetyPrompt,
   } from "../../config/getters";
 import type { IAriseConfig } from "../../config/schema";
 import {
@@ -522,6 +523,36 @@ export class BackgroundManager
       ]);
 
       /**
+       * 取得安全檢查提示（可選）
+       * Get safety check prompt (optional)
+       *
+       * 設計原理 / Design rationale:
+       * 使用 getAutoResumeSafetyPrompt 取得 safety_prompt，因為：
+       * - 支援 per-agent 覆寫：agents[agentName].auto_resume.safety_prompt
+       * - 支援全域設定：background.auto_resume.safety_prompt
+       * - 優先順序：agent 設定優先於 background 設定
+       *
+       * Use getAutoResumeSafetyPrompt to get safety_prompt because:
+       * - Supports per-agent override: agents[agentName].auto_resume.safety_prompt
+       * - Supports global setting: background.auto_resume.safety_prompt
+       * - Priority: agent setting takes precedence over background setting
+       */
+      const safetyPrompt = getAutoResumeSafetyPrompt(this.config, task.shadow as IAllShadowAgentsName);
+
+      /**
+       * 組合最終執行的 prompt
+       * Compose final prompt to execute
+       *
+       * 如果有 safety_prompt，則前置於任務描述
+       * 使用 \n\n---\n\n 作為分隔符號，清晰區分安全檢查提示與實際任務
+       * If safety_prompt exists, prepend to task description
+       * Use \n\n---\n\n as separator to clearly separate safety check from actual task
+       */
+      const finalPrompt = safetyPrompt
+        ? `${safetyPrompt}\n\n---\n\n${task.description}`
+        : task.description;
+
+      /**
        * 重新執行 prompt（非同步）
        * Re-execute prompt (async)
        *
@@ -534,7 +565,7 @@ export class BackgroundManager
           body: {
             agent: task.shadow,
             model: undefined, // 使用預設模型 / Use default model
-            parts: [{ type: "text", text: task.description }],
+            parts: [{ type: "text", text: finalPrompt }],
           },
         })
         .then(() =>

@@ -8,6 +8,17 @@
  * 運行方式 / Usage:
  *   bun test/scripts/generate-config-defaults.ts
  *   tsx test/scripts/generate-config-defaults.ts
+ *
+ * ⚠️ 重要說明 / Important Notes:
+ * - 此腳本使用 extractDefaultsFromJSONSchema 自動從 Zod Schema 提取預設值
+ * - 新增 schema 欄位時，請確保欄位有適當的預設值（.default() 或 .optional()）
+ * - 預設值會自動出現在產生的 createDefaultConfig() 函式中
+ * - 驗證函式 validateDefaults() 需要同步更新，以驗證新增的欄位
+ * 
+ * - extractDefaultsFromJSONSchema automatically extracts default values from Zod Schema
+ * - When adding schema fields, ensure fields have appropriate defaults (.default() or .optional())
+ * - Default values will automatically appear in the generated createDefaultConfig() function
+ * - Validation function validateDefaults() needs to be updated to validate new fields
  */
 
 // @ts-ignore

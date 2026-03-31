@@ -153,6 +153,18 @@ export const AutoResumeConfig = z
 			}),
 		/** 自訂提示訊息（可選）/ Custom prompts (optional) */
 		prompts: AutoResumePrompts,
+		/**
+		 * 安全檢查提示（可選）/ Safety check prompt (optional)
+		 *
+		 * 重要：新增欄位時，請確保 config-defaults.ts 也會自動產生對應的預設值
+		 * Important: When adding new fields, ensure config-defaults.ts will auto-generate corresponding defaults
+		 * @see build:config-defaults 腳本會自動從 schema 提取預設值
+		 */
+		safety_prompt: z.string().optional()
+			.meta({
+				description: "自動繼續任務前发送的安全检查提示 / Safety check prompt before auto resume",
+				title: "Safety Prompt",
+			}),
 	})
 	.meta({
 		description: "自動繼續任務設定 / Auto resume settings",
