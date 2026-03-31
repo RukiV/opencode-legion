@@ -18,6 +18,7 @@ import {
 	EnumAutoResumeTarget,
 	IAllShadowAgentsName,
 } from "../../types/enums";
+import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext } from "../../utils/model-resolver";
 import { getSessionModel } from "../../config/model-cache";
@@ -56,8 +57,53 @@ import type { ICrossConsole, IMethods } from "debug-color2/lib/types/CrossConsol
  * - 複雜物件（如 auto_resume）需客製化 getter / Complex objects (like auto_resume) need custom getters
  * - 優先順序：agents[agentName].property -> background.property -> 預設值 / Priority: agents[agentName].property -> background.property -> default
  */
+/**
+ * 檢查 auto-resume 是否應該執行的純函式
+ * Pure function to check if auto-resume should be performed
+ *
+ * 將 BackgroundManager.shouldAutoResume 的邏輯提取為可獨立測試的純函式
+ * Extracts logic from BackgroundManager.shouldAutoResume as independently testable pure function
+ *
+ * @param config - auto-resume 配置
+ * @param taskStatus - 任務狀態
+ * @param isBackgroundTask - 是否為背景任務（parentSessionId !== sessionId）
+ * @param currentRetryCount - 目前重試次數
+ * @returns 是否應該執行 auto-resume
+ */
+export function _shouldAutoResume(
+	config: IAutoResumeConfig,
+	taskStatus: string,
+	isBackgroundTask: boolean,
+	currentRetryCount: number
+): boolean {
+	/** 檢查是否啟用 / Check if enabled */
+	if (!config.enabled) {
+		return false;
+	}
 
+	/** 檢查任務是否處於 error 狀態 / Check if task is in error status */
+	if (taskStatus !== "error") {
+		return false;
+	}
 
+	/** 檢查目標類型是否符合 / Check if target type matches */
+	if (config.target === EnumAutoResumeTarget.Background && !isBackgroundTask) {
+		return false;
+	}
+
+	/** 檢查是否已超過最大重試次數 / Check if max retry count exceeded */
+	const maxRetries = config.max_retries ?? 3;
+	if (currentRetryCount >= maxRetries) {
+		return false;
+	}
+
+	/** 檢查錯誤處理行為 / Check error handling behavior */
+	if (config.on_error === EnumAutoResumeOnError.Ignore) {
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * 將配置值正規化為 getter 函式
@@ -144,6 +190,8 @@ export class BackgroundManager {
   private tasks: Map<string, BackgroundTask> = new Map();
   /** Plugin 上下文 / Plugin context */
   private ctx: PluginInput;
+  /** AriseConfig 物件（用於取得 per-agent 覆寫配置）/ AriseConfig object (for per-agent override config) */
+  private config: IAriseConfig;
   /** 預設輪詢間隔 / Default polling interval */
   private defaultPollInterval: number;
   /** 輪詢間隔取得器（可選，支援 per-agent 設定）/ Polling interval getter (optional, supports per-agent settings) */
@@ -152,50 +200,26 @@ export class BackgroundManager {
   private getRetryDelayIncrement?: (agentName?: IAllShadowAgentsName) => number;
   /** 重試延遲最大值取得器 / Max retry delay getter */
   private getRetryDelayMax?: (agentName?: IAllShadowAgentsName) => number;
-  /** Auto-resume 配置取得器（支援 per-agent 覆寫）/ Auto-resume config getter (supports per-agent override) */
-  private getAutoResumeConfig: (agentName?: IAllShadowAgentsName) => IAutoResumeConfig;
 
   /**
    * 建構函式
    * Constructor
    *
    * @param ctx - Plugin 上下文
+   * @param config - AriseConfig 物件（用於取得 per-agent 覆寫配置）
    * @param pollIntervalOrGetter - 輪詢間隔（數字或函式）
    * @param retryDelayIncrementOrGetter - 重試延遲遞增量（數字或函式）
    * @param retryDelayMaxOrGetter - 重試延遲最大值（數字或函式）
-   * @param getAutoResumeConfigOrConfig - Auto-resume 配置或 getter 函式（可選）
    */
   constructor(
     ctx: PluginInput,
+    config: IAriseConfig,
     pollIntervalOrGetter: number | ((agentName?: IAllShadowAgentsName) => number) = DEFAULT_POLL_INTERVAL,
     retryDelayIncrementOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
-    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
-    getAutoResumeConfigOrConfig?: IAutoResumeConfig | ((agentName?: IAllShadowAgentsName) => IAutoResumeConfig)
+    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number)
   ) {
     this.ctx = ctx;
-
-    /**
-     * Auto-resume 配置初始化
-     * Auto-resume config initialization
-     *
-     * 支援函式（per-agent 覆寫）或固定物件
-      * Supports function (per-agent override) or fixed object
-      */
-    if (typeof getAutoResumeConfigOrConfig === "function") {
-      this.getAutoResumeConfig = getAutoResumeConfigOrConfig;
-    } else if (getAutoResumeConfigOrConfig) {
-      this.getAutoResumeConfig = () => getAutoResumeConfigOrConfig;
-    } else {
-      /** 預設值 / Default value */
-      this.getAutoResumeConfig = () => ({
-        enabled: false,
-        max_retries: 3,
-        retry_delay: 5000,
-        on_error: EnumAutoResumeOnError.Ignore,
-        target: EnumAutoResumeTarget.Background,
-        prompts: {},
-      });
-    }
+    this.config = config;
 
     /**
      * 輪詢間隔初始化
@@ -254,11 +278,11 @@ export class BackgroundManager {
     * @returns 是否應該執行 auto-resume
     */
   shouldAutoResume(task: BackgroundTask): boolean {
-    /** 取得 auto-resume 配置 / Get auto-resume config */
-    const autoResumeConfig = this.getAutoResumeConfig(task.shadow as IAllShadowAgentsName);
+    /** 取得 auto-resume 配置（使用 getters.ts 的 getAutoResumeConfig）/ Get auto-resume config (using getters.ts getAutoResumeConfig) */
+    const autoResumeConfig = getAutoResumeConfig(this.config, task.shadow as IAllShadowAgentsName);
 
     /** 檢查是否啟用 / Check if enabled */
-    if (!this.getAutoResumeConfig()?.enabled) {
+    if (!autoResumeConfig.enabled) {
       logArise2WithLevel("debug", () => [
         `[background-manager]`,
         `shouldAutoResume: auto-resume not enabled, returning false`,
@@ -287,7 +311,7 @@ export class BackgroundManager {
      * target = "all" 對所有任務生效
      * target = "all" applies to all tasks
      */
-    if (this.getAutoResumeConfig()?.target === "background") {
+    if (autoResumeConfig.target === EnumAutoResumeTarget.Background) {
       // 背景任務的 parentSessionId 不同於 sessionId
       // Background task has different parentSessionId from sessionId
       if (task.parentSessionId === task.sessionId) {
@@ -304,7 +328,7 @@ export class BackgroundManager {
      * Check if max retry count exceeded
      */
     const currentRetryCount = task.resumeRetryCount ?? 0;
-    const maxRetries = this.getAutoResumeConfig()?.max_retries ?? 3;
+    const maxRetries = autoResumeConfig.max_retries ?? 3;
     if (currentRetryCount >= maxRetries) {
       logArise2WithLevel("debug", () => [
         `[background-manager]`,
@@ -320,7 +344,7 @@ export class BackgroundManager {
      * onError = "ignore" 時不進行 auto-resume
      * onError = "ignore" means no auto-resume
      */
-    if (this.getAutoResumeConfig()?.on_error === EnumAutoResumeOnError.Ignore) {
+    if (autoResumeConfig.on_error === EnumAutoResumeOnError.Ignore) {
       logArise2WithLevel("debug", () => [
         `[background-manager]`,
         `shouldAutoResume: on_error=Ignore, returning false`,
@@ -358,6 +382,12 @@ export class BackgroundManager {
    */
   private async performAutoResume(task: BackgroundTask): Promise<void> {
     /**
+     * 取得 auto-resume 配置（支援 per-agent 覆寫）
+     * Get auto-resume config (supports per-agent override)
+     */
+    const autoResumeConfig = getAutoResumeConfig(this.config, task.shadow as IAllShadowAgentsName);
+
+    /**
      * 標記任務為即將重試
      * Mark task as about to retry
      *
@@ -379,7 +409,7 @@ export class BackgroundManager {
       body: {
         service: "arise",
         level: "info",
-        message: `[Auto-resume] Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${this.getAutoResumeConfig()?.max_retries ?? 3}`,
+        message: `[Auto-resume] Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
       },
     });
 
@@ -389,10 +419,10 @@ export class BackgroundManager {
      */
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
-      `performAutoResume: waiting retry_delay=${this.getAutoResumeConfig()?.retry_delay ?? 5000}ms before retry`,
+      `performAutoResume: waiting retry_delay=${autoResumeConfig.retry_delay ?? 5000}ms before retry`,
     ]);
 
-    await new Promise((resolve) => setTimeout(resolve, this.getAutoResumeConfig()?.retry_delay ?? 5000));
+    await new Promise((resolve) => setTimeout(resolve, autoResumeConfig.retry_delay ?? 5000));
 
     /**
      * 重置 pending 狀態並增加重試計數
@@ -478,7 +508,8 @@ export class BackgroundManager {
            * 根據 on_error 設定處理錯誤
            * Handle error based on on_error setting
            */
-          if (this.getAutoResumeConfig()?.on_error === EnumAutoResumeOnError.Notify) {
+          const autoResumeCfg = getAutoResumeConfig(this.config, task.shadow as IAllShadowAgentsName);
+          if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Notify) {
             // 通知模式：記錄但不做進一步重試
             // Notify mode: log but don't retry further
             this.ctx.client.app.log?.({
@@ -488,7 +519,7 @@ export class BackgroundManager {
                 message: `[Auto-resume] Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
               },
             });
-          } else if (this.getAutoResumeConfig()?.on_error === EnumAutoResumeOnError.Retry) {
+          } else if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Retry) {
             // 遞迴嘗試 auto-resume（會再次檢查 shouldAutoResume）
             // Recursively attempt auto-resume (will check shouldAutoResume again)
             this.ctx.client.app.log?.({
@@ -539,39 +570,21 @@ export class BackgroundManager {
    *
    * @param config - 新的 auto-resume 配置
    */
-  updateIAutoResumeConfig(config: Partial<IAutoResumeConfig>): void {
-    const current = this.getAutoResumeConfig?.() ?? {
-      enabled: false,
-      max_retries: 3,
-      retry_delay: 5000,
-      on_error: EnumAutoResumeOnError.Ignore,
-      target: EnumAutoResumeTarget.Background,
-      prompts: {},
-    };
-    this.getAutoResumeConfig = () => ({
+  updateAutoResumeConfig(config: Partial<IAutoResumeConfig>): void {
+    const current = getAutoResumeConfig(this.config);
+    const updated: IAutoResumeConfig = {
       enabled: config.enabled ?? current.enabled,
       max_retries: config.max_retries ?? current.max_retries,
       retry_delay: config.retry_delay ?? current.retry_delay,
       on_error: config.on_error ?? current.on_error,
       target: config.target ?? current.target,
-    });
-  }
-
-  /**
-   * 取得目前的 auto-resume 配置
-   * Get current auto-resume config
-   *
-   * @returns 目前的 auto-resume 配置
-   */
-  getAutoResumeConfigCopy(): IAutoResumeConfig {
-    return this.getAutoResumeConfig?.() ?? {
-      enabled: false,
-      max_retries: 3,
-      retry_delay: 5000,
-      on_error: EnumAutoResumeOnError.Ignore,
-      target: EnumAutoResumeTarget.Background,
-      prompts: {},
     };
+    // 直接修改 config.background.auto_resume 以套用覆寫
+    // Directly modify config.background.auto_resume to apply override
+    if (this.config.background) 
+    {
+      this.config.background.auto_resume = updated;
+    }
   }
 
   /**

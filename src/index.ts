@@ -68,13 +68,14 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
    *
    * 傳遞 getPollInterval, getRetryDelayIncrement, getRetryDelayMax 函式
    * 讓 BackgroundManager 可以根據配置動態取得各代理的設定
-   * Pass getter functions so BackgroundManager can dynamically get each agent's settings
-   */
+    * Pass getter functions so BackgroundManager can dynamically get each agent's settings
+    */
   const pollIntervalGetter = (agentName?: IAllShadowAgentsName) => getPollInterval(config, agentName);
   const retryDelayIncrementGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayIncrement(config, agentName);
   const retryDelayMaxGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayMax(config, agentName);
   const backgroundManager = new BackgroundManager(
     ctx,
+    config,
     pollIntervalGetter,
     retryDelayIncrementGetter,
     retryDelayMaxGetter
