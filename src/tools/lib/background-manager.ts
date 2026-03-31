@@ -28,7 +28,7 @@ import {
 	formatAriseMsgPrefixId,
 	formatAriseMsgSuccessMultiLine,
 } from "../../utils/string/arise-message";
-import { consoleLoggerWithLevel } from "../../utils/debug-control";
+import { consoleLoggerWithLevel, logArise2WithLevel } from "../../utils/debug-control";
 import { ITSExtractKeyof, ITSKeyofByExtractType, ITSMemberMethods, ITSOmitByType } from "ts-type";
 import { Console2 } from "debug-color2";
 import type { ICrossConsole, IMethods } from "debug-color2/lib/types/CrossConsole";
@@ -247,18 +247,22 @@ export class BackgroundManager {
    * Conditions:
    * 1. Auto-resume is enabled
    * 2. Task is in error status
-   * 3. Has not exceeded max retry count
-   * 4. Target type matches (background or all)
-   *
-   * @param task - 背景任務
-   * @returns 是否應該執行 auto-resume
-   */
-  private shouldAutoResume(task: BackgroundTask): boolean {
-    /**
-     * 首先檢查 auto-resume 是否啟用
-     * First check if auto-resume is enabled
-     */
+    * 3. Has not exceeded max retry count
+    * 4. Target type matches (background or all)
+    *
+    * @param task - 背景任務
+    * @returns 是否應該執行 auto-resume
+    */
+  shouldAutoResume(task: BackgroundTask): boolean {
+    /** 取得 auto-resume 配置 / Get auto-resume config */
+    const autoResumeConfig = this.getAutoResumeConfig(task.shadow as IAllShadowAgentsName);
+
+    /** 檢查是否啟用 / Check if enabled */
     if (!this.getAutoResumeConfig()?.enabled) {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `shouldAutoResume: auto-resume not enabled, returning false`,
+      ]);
       return false;
     }
 
@@ -267,6 +271,10 @@ export class BackgroundManager {
      * Check if task is in error status
      */
     if (task.status !== "error") {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `shouldAutoResume: task status=${task.status} !== 'error', returning false`,
+      ]);
       return false;
     }
 
@@ -283,6 +291,10 @@ export class BackgroundManager {
       // 背景任務的 parentSessionId 不同於 sessionId
       // Background task has different parentSessionId from sessionId
       if (task.parentSessionId === task.sessionId) {
+        logArise2WithLevel("debug", () => [
+          `[background-manager]`,
+          `shouldAutoResume: target=background but parentSessionId === sessionId (foreground task), returning false`,
+        ]);
         return false;
       }
     }
@@ -292,7 +304,12 @@ export class BackgroundManager {
      * Check if max retry count exceeded
      */
     const currentRetryCount = task.resumeRetryCount ?? 0;
-    if (currentRetryCount >= (this.getAutoResumeConfig()?.max_retries ?? 3)) {
+    const maxRetries = this.getAutoResumeConfig()?.max_retries ?? 3;
+    if (currentRetryCount >= maxRetries) {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `shouldAutoResume: resumeRetryCount=${currentRetryCount} >= max_retries=${maxRetries}, returning false`,
+      ]);
       return false;
     }
 
@@ -304,9 +321,17 @@ export class BackgroundManager {
      * onError = "ignore" means no auto-resume
      */
     if (this.getAutoResumeConfig()?.on_error === EnumAutoResumeOnError.Ignore) {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `shouldAutoResume: on_error=Ignore, returning false`,
+      ]);
       return false;
     }
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `shouldAutoResume: all checks passed, returning true`,
+    ]);
     return true;
   }
 
@@ -329,6 +354,11 @@ export class BackgroundManager {
      */
     task.resumePending = true;
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `performAutoResume: marking taskId=${task.id} as resumePending, currentResumeRetryCount=${task.resumeRetryCount ?? 0}`,
+    ]);
+
     /**
      * 記錄重試嘗試
      * Log retry attempt
@@ -345,6 +375,11 @@ export class BackgroundManager {
      * 等待配置的重試延遲
      * Wait for configured retry delay
      */
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `performAutoResume: waiting retry_delay=${this.getAutoResumeConfig()?.retry_delay ?? 5000}ms before retry`,
+    ]);
+
     await new Promise((resolve) => setTimeout(resolve, this.getAutoResumeConfig()?.retry_delay ?? 5000));
 
     /**
@@ -353,6 +388,11 @@ export class BackgroundManager {
      */
     task.resumePending = false;
     task.resumeRetryCount = (task.resumeRetryCount ?? 0) + 1;
+
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `performAutoResume: reset resumePending=false, resumeRetryCount=${task.resumeRetryCount}`,
+    ]);
 
     /**
      * 重新建立 session 並執行任務
@@ -382,6 +422,11 @@ export class BackgroundManager {
       task.error = undefined;
       task.completedAt = undefined;
 
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `performAutoResume: updated task, oldSessionId=${oldSessionId}, newSessionId=${task.sessionId}, status=${task.status}`,
+      ]);
+
       /**
        * 重新執行 prompt（非同步）
        * Re-execute prompt (async)
@@ -398,7 +443,13 @@ export class BackgroundManager {
             parts: [{ type: "text", text: task.description }],
           },
         })
-        .then(() => this.pollTaskCompletion(task.id))
+        .then(() => {
+          logArise2WithLevel("info", () => [
+            `[background-manager]`,
+            `performAutoResume: promptAsync succeeded for taskId=${task.id}, will be polled`,
+          ]);
+          this.pollTaskCompletion(task.id);
+        })
         .catch((err) => {
           /**
            * 處理 promptAsync 的錯誤
@@ -454,6 +505,11 @@ export class BackgroundManager {
       task.status = "error";
       task.error = getErrorMessage(error);
       task.completedAt = Date.now();
+
+      logArise2WithLevel("error", () => [
+        `[background-manager]`,
+        `performAutoResume: failed to create retry session for taskId=${task.id}, error=${task.error}`,
+      ]);
 
       this.ctx.client.app.log?.({
         body: {
@@ -537,6 +593,11 @@ export class BackgroundManager {
   }): Promise<BackgroundTask> {
     const taskId = this.generateTaskId();
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `launch: generated taskId=${taskId}, shadow=${opts.shadow}, parentSessionId=${opts.parentSessionId}`,
+    ]);
+
     /**
      * 為背景任務建立新 session
      * Create new session for background task
@@ -568,8 +629,18 @@ export class BackgroundManager {
       retryCount: 0,
     };
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `launch: task created, id=${task.id}, status=${task.status}, startedAt=${task.startedAt}`,
+    ]);
+
     /** 註冊任務到管理器 / Register task to manager */
     this.tasks.set(taskId, task);
+
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `launch: registered task ${taskId}, total tasks: ${this.tasks.size}`,
+    ]);
 
     /**
      * 解析模型上下文
@@ -585,6 +656,11 @@ export class BackgroundManager {
       undefined,
       opts.model
     );
+
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `launch: resolved model, parentModel=${parentModel ?? "none"}, finalModelBody=${JSON.stringify(modelBody)}`,
+    ]);
 
     /**
      * 非同步執行 prompt（fire and forget）
@@ -602,11 +678,22 @@ export class BackgroundManager {
           parts: [{ type: "text", text: opts.prompt }],
         },
       })
-      .then(() => this.schedulePolling(taskId, opts.shadow as IAllShadowAgentsName))
+      .then(() => {
+        logArise2WithLevel("info", () => [
+          `[background-manager]`,
+          `launch: promptAsync succeeded, taskId=${taskId}, scheduling polling`,
+        ]);
+        this.schedulePolling(taskId, opts.shadow as IAllShadowAgentsName);
+      })
       .catch((err) => {
         task.status = "error";
         task.error = getErrorMessage(err);
         task.completedAt = Date.now();
+
+        logArise2WithLevel("error", () => [
+          `[background-manager]`,
+          `launch: promptAsync error, taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${this.shouldAutoResume(task)}`,
+        ]);
 
         /**
          * 檢查是否需要執行 auto-resume
@@ -653,6 +740,11 @@ export class BackgroundManager {
       ? this.getPollInterval(agentName)
       : this.defaultPollInterval;
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `schedulePolling: taskId=${taskId}, baseInterval=${baseInterval}ms, agentName=${agentName ?? "default"}`,
+    ]);
+
     /**
      * 計算重試延遲（從第二次失敗開始）
      * Calculate retry delay (starts from second failure)
@@ -665,9 +757,20 @@ export class BackgroundManager {
       const increment = this.getRetryDelayIncrement
         ? this.getRetryDelayIncrement(agentName)
         : DEFAULT_RETRY_DELAY_INCREMENT;
+
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `schedulePolling: increment=${increment}ms`,
+      ]);
+
       const maxDelay = this.getRetryDelayMax
         ? this.getRetryDelayMax(agentName)
         : DEFAULT_RETRY_DELAY_MAX;
+
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `schedulePolling: maxDelay=${maxDelay}ms`,
+      ]);
 
       /**
        * 計算額外延遲
@@ -678,7 +781,17 @@ export class BackgroundManager {
        */
       const additionalDelay = Math.min(task.retryCount * increment, maxDelay);
       interval = baseInterval + additionalDelay;
+
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `schedulePolling: retryCount=${task.retryCount}, additionalDelay=${additionalDelay}ms, finalInterval=${interval}ms`,
+      ]);
     }
+
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `schedulePolling: scheduling poll for taskId=${taskId} in ${interval}ms`,
+    ]);
 
     setTimeout(() => this.pollTaskCompletion(taskId), interval);
   }
@@ -696,6 +809,11 @@ export class BackgroundManager {
     const task = this.tasks.get(taskId);
     if (!task || task.status !== "running") return;
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `pollTaskCompletion: taskId=${taskId}, currentStatus=${task.status}`,
+    ]);
+
     try {
       /**
        * 檢查 session 狀態
@@ -707,6 +825,11 @@ export class BackgroundManager {
       if (statuses && task.sessionId in statuses) {
         const status = statuses[task.sessionId];
 
+        logArise2WithLevel("debug", () => [
+          `[background-manager]`,
+          `pollTaskCompletion: sessionId=${task.sessionId}, status.type=${status.type}`,
+        ]);
+
         /**
          * Session idle = 任務完成
          * Session idle = task completed
@@ -715,6 +838,12 @@ export class BackgroundManager {
           await this.extractResult(task);
           task.status = "completed";
           task.completedAt = Date.now();
+
+          logArise2WithLevel("info", () => [
+            `[background-manager]`,
+            `pollTaskCompletion: taskId=${taskId} completed, result length: ${task.result?.length ?? 0}`,
+          ]);
+
           await this.notifyParent(task);
         }
         /**
@@ -723,6 +852,12 @@ export class BackgroundManager {
          */
         else if (status.type === "busy" || status.type === "retry") {
           task.retryCount++;
+
+          logArise2WithLevel("debug", () => [
+            `[background-manager]`,
+            `pollTaskCompletion: session busy/retry, taskId=${taskId}, retryCount=${task.retryCount}`,
+          ]);
+
           this.schedulePolling(taskId, task.shadow as IAllShadowAgentsName);
         }
       } else {
@@ -733,6 +868,11 @@ export class BackgroundManager {
          * 這是一種容錯機制，避免因狀態查詢失敗而無法完成任務
          * This is a fault tolerance mechanism to avoid tasks never completing due to status query failures
          */
+        logArise2WithLevel("debug", () => [
+          `[background-manager]`,
+          `pollTaskCompletion: sessionId=${task.sessionId} not in status map, assuming completed`,
+        ]);
+
         await this.extractResult(task);
         task.status = "completed";
         task.completedAt = Date.now();
@@ -742,6 +882,11 @@ export class BackgroundManager {
       task.status = "error";
       task.error = getErrorMessage(err);
       task.completedAt = Date.now();
+
+      logArise2WithLevel("error", () => [
+        `[background-manager]`,
+        `pollTaskCompletion: taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${this.shouldAutoResume(task)}`,
+      ]);
 
       /**
        * 檢查是否需要執行 auto-resume
@@ -831,7 +976,17 @@ export class BackgroundManager {
       ? Math.round((task.completedAt - task.startedAt) / 1000)
       : 0;
 
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `notifyParent: taskId=${task.id}, duration=${duration}s`,
+    ]);
+
     try {
+      logArise2WithLevel("info", () => [
+        `[background-manager]`,
+        `notifyParent: showing toast, task=${task.shadow} finished: ${task.description} (${duration}s)`,
+      ]);
+
       await this.ctx.client.tui.showToast({
         body: {
           title: "Shadow Complete",
@@ -845,6 +1000,10 @@ export class BackgroundManager {
        * TUI 可能不可用（無圖形介面）
        * TUI might not be available (non-graphical environment)
        */
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `notifyParent: TUI not available, skipping notification`,
+      ]);
     }
   }
 
@@ -947,9 +1106,10 @@ export class BackgroundManager {
     autoResume?: boolean,
     backgroundAutoResume?: boolean
   ): Promise<string> {
-    consoleLoggerWithLevel.debug(
-      formatAriseMsg(`[background-manager] manualRetry called: taskId=${taskId}, force=${force}, autoResume=${autoResume}, backgroundAutoResume=${backgroundAutoResume}`)
-    );
+    logArise2WithLevel("debug", () => [
+      `[background-manager]`,
+      `manualRetry called: taskId=${taskId}, force=${force}, autoResume=${autoResume}, backgroundAutoResume=${backgroundAutoResume}`,
+    ]);
 
     const task = this.tasks.get(taskId);
 
@@ -1000,9 +1160,10 @@ export class BackgroundManager {
       if (autoResume !== undefined) {
         // 記錄覆寫日誌 / Log override (使用 info 等級讓使用者能看到)
         // Use info level so users can see the runtime setting change
-        consoleLoggerWithLevel.info(
-          formatAriseMsg(`[background-manager] manualRetry: autoResume runtime override: ${autoResume}`)
-        );
+        logArise2WithLevel("info", () => [
+          `[background-manager]`,
+          `manualRetry: autoResume runtime override: ${autoResume}`,
+        ]);
         // 臨時存儲覆寫值 / Temporarily store override value
         task.overrideAutoResume = autoResume;
         autoResumeStatus = autoResume ? "enabled" : "disabled";
@@ -1011,9 +1172,10 @@ export class BackgroundManager {
       if (backgroundAutoResume !== undefined) {
         // 記錄覆寫日誌 / Log override (使用 info 等級讓使用者能看到)
         // Use info level so users can see the runtime setting change
-        consoleLoggerWithLevel.info(
-          formatAriseMsg(`[background-manager] manualRetry: backgroundAutoResume runtime override: ${backgroundAutoResume}`)
-        );
+        logArise2WithLevel("info", () => [
+          `[background-manager]`,
+          `manualRetry: backgroundAutoResume runtime override: ${backgroundAutoResume}`,
+        ]);
         // 臨時存儲覆寫值 / Temporarily store override value
         task.overrideBackgroundAutoResume = backgroundAutoResume;
         backgroundAutoResumeStatus = backgroundAutoResume ? "enabled" : "disabled";
