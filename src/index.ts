@@ -1,7 +1,6 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import { type IAriseConfig } from "./config/schema";
-import { getPollInterval, getRetryDelayIncrement, getRetryDelayMax } from "./config/getters";
-import { IAllShadowAgentsName, EnumHookName } from "./types/enums";
+import { EnumHookName } from "./types/enums";
 import { loadAriseConfig } from "./config/io";
 import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { _isAutoModel } from "./utils/model-resolver";
@@ -66,20 +65,10 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
    * 初始化背景任務管理器
    * Initialize background manager
    *
-   * 傳遞 getPollInterval, getRetryDelayIncrement, getRetryDelayMax 函式
-   * 讓 BackgroundManager 可以根據配置動態取得各代理的設定
-    * Pass getter functions so BackgroundManager can dynamically get each agent's settings
-    */
-  const pollIntervalGetter = (agentName?: IAllShadowAgentsName) => getPollInterval(config, agentName);
-  const retryDelayIncrementGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayIncrement(config, agentName);
-  const retryDelayMaxGetter = (agentName?: IAllShadowAgentsName) => getRetryDelayMax(config, agentName);
-  const backgroundManager = new BackgroundManager(
-    ctx,
-    config,
-    pollIntervalGetter,
-    retryDelayIncrementGetter,
-    retryDelayMaxGetter
-  );
+   * 傳入 ctx 和 config，BackgroundManager 內部透過公開方法取得各代理的設定
+   * Pass ctx and config; BackgroundManager uses public methods to get per-agent settings
+   */
+  const backgroundManager = new BackgroundManager(ctx, config);
 
   /**
    * 初始化 Hooks

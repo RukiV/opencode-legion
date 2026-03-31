@@ -1,22 +1,17 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import {
-    DEFAULT_POLL_INTERVAL,
-    DEFAULT_RETRY_DELAY_INCREMENT,
-    DEFAULT_RETRY_DELAY_MAX,
-  } from "../../config/schema";
-import {
     getPollInterval,
     getRetryDelayIncrement,
     getRetryDelayMax,
     getAutoResumeConfig,
-    getAutoResumeEnabled,
   } from "../../config/getters";
-import type { IAriseConfig, IAutoResumeConfig } from "../../config/schema";
+import type { IAriseConfig } from "../../config/schema";
 import {
     EnumAutoResumeOnError,
     EnumAutoResumeTarget,
     IAllShadowAgentsName,
+    BackgroundTaskStatus,
   } from "../../types/enums";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
@@ -29,71 +24,29 @@ import {
     formatAriseMsgPrefixId,
     formatAriseMsgSuccessMultiLine,
   } from "../../utils/string/arise-message";
-import { consoleLoggerWithLevel, logArise2WithLevel } from "../../utils/debug-control";
-import { ITSExtractKeyof, ITSKeyofByExtractType, ITSMemberMethods, ITSOmitByType } from "ts-type";
-import { Console2 } from "debug-color2";
-import type { ICrossConsole, IMethods } from "debug-color2/lib/types/CrossConsole";
-import { BackgroundTaskStatus } from "../../types/enums";
+import { logArise2WithLevel } from "../../utils/debug-control";
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
  *
- * 本檔案使用的配置應透過 schema.ts 中的 getter 函式取得，以支援 per-agent 覆寫。
- * Configuration used in this file should be obtained via getter functions from schema.ts to support per-agent overrides.
+ * BackgroundManager 提供公開的 getter 方法，透過 getters.ts 中的函式取得 per-agent 配置。
+ * BackgroundManager exposes public getter methods that delegate to getters.ts for per-agent config.
  *
- * 已實作的 getter（使用 _createConfigGetter）：
- * Implemented getters (using _createConfigGetter):
- * - getPollInterval(config, agentName?) -> number
- * - getRetryDelayIncrement(config, agentName?) -> number
- * - getRetryDelayMax(config, agentName?) -> number
+ * 公開方法 / Public methods:
+ * - getPollInterval(agentName?) -> number
+ * - getRetryDelayIncrement(agentName?) -> number
+ * - getRetryDelayMax(agentName?) -> number
+ *
+ * 內部使用的 getter（從 getters.ts 直接呼叫）:
  * - getAutoResumeConfig(config, agentName?) -> auto_resume 物件 / object
- * - getAutoResumeEnabled(config, agentName?) -> boolean
  *
  * 使用範例 / Usage example:
- *   const pollInterval = getPollInterval(config, "beru");
- *   const autoResume = getAutoResumeConfig(config, "igris");
+ *   const pollInterval = manager.getPollInterval("beru");
+ *   const maxDelay = manager.getRetryDelayMax("igris");
  *
- * 注意 / Note:
- * - _createConfigGetter 僅適用於簡單數值類型 / _createConfigGetter is for simple scalar values
- * - 複雜物件（如 auto_resume）需客製化 getter / Complex objects (like auto_resume) need custom getters
- * - 優先順序：agents[agentName].property -> background.property -> 預設值 / Priority: agents[agentName].property -> background.property -> default
-  */
-
-/**
- * 將配置值正規化為 getter 函式
- * Normalize config value to getter function
- *
- * 內部使用的輔助函式，處理以下轉換：
- * - 函式：直接返回
- * - 數字：包裝為返回該數字的函式
- * - undefined：返回返回預設值的函式
- *
- * Internal helper function that handles:
- * - Function: return directly
- * - Number: wrap in a function that returns it
- * - undefined: return a function that returns the default
- *
- * @param value - 輸入值（數字、函式或 undefined）
- * @param defaultValue - 預設值
- * @returns 正規化後的 getter 函式
+ * 優先順序：agents[agentName].property -> background.property -> 預設值
+ * Priority: agents[agentName].property -> background.property -> default
  */
-function _normalizeToGetter(
-  value: number | ((agentName?: IAllShadowAgentsName) => number) | undefined,
-  defaultValue: number
-): (agentName?: IAllShadowAgentsName) => number
-{
-  if (typeof value === "function")
-  {
-    return value;
-  }
-  if (value !== undefined)
-  {
-    /** 固定值，建立閉包返回 / Fixed value, create closure to return it */
-    return () => value;
-  }
-  /** 使用預設值 / Use default value */
-  return () => defaultValue;
-}
 
 /**
  * 背景任務結構定義
@@ -151,73 +104,65 @@ export class BackgroundManager
   private ctx: PluginInput;
   /** AriseConfig 物件（用於取得 per-agent 覆寫配置）/ AriseConfig object (for per-agent override config) */
   private config: IAriseConfig;
-  /** 預設輪詢間隔 / Default polling interval */
-  private defaultPollInterval: number;
-  /** 輪詢間隔取得器（可選，支援 per-agent 設定）/ Polling interval getter (optional, supports per-agent settings) */
-  private getPollInterval?: (agentName?: IAllShadowAgentsName) => number;
-  /** 重試延遲遞增量取得器 / Retry delay increment getter */
-  private getRetryDelayIncrement?: (agentName?: IAllShadowAgentsName) => number;
-  /** 重試延遲最大值取得器 / Max retry delay getter */
-  private getRetryDelayMax?: (agentName?: IAllShadowAgentsName) => number;
-
   /**
    * 建構函式
    * Constructor
    *
-   * @param ctx - Plugin 上下文
-   * @param config - AriseConfig 物件（用於取得 per-agent 覆寫配置）
-   * @param pollIntervalOrGetter - 輪詢間隔（數字或函式）
-   * @param retryDelayIncrementOrGetter - 重試延遲遞增量（數字或函式）
-   * @param retryDelayMaxOrGetter - 重試延遲最大值（數字或函式）
+   * @param ctx - Plugin 上下文 / Plugin context
+   * @param config - AriseConfig 物件（用於取得 per-agent 覆寫配置）/ AriseConfig object for per-agent overrides
    */
   constructor(
     ctx: PluginInput,
-    config: IAriseConfig,
-    pollIntervalOrGetter: number | ((agentName?: IAllShadowAgentsName) => number) = DEFAULT_POLL_INTERVAL,
-    retryDelayIncrementOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number),
-    retryDelayMaxOrGetter?: number | ((agentName?: IAllShadowAgentsName) => number)
+    config: IAriseConfig = createDefaultConfig()
   )
   {
     this.ctx = ctx;
     this.config = config;
+  }
 
-    /**
-     * 輪詢間隔初始化
-     * Polling interval initialization
-     *
-     * 支援傳入數字（固定值）或函式（動態取得 per-agent 設定）
-     * Supports passing number (fixed value) or function (dynamic per-agent settings)
-     *
-     * 特別處理：如果傳入函式，保留 defaultPollInterval 為預設值
-     * Special handling: if function is passed, keep defaultPollInterval as default
-     */
-    if (typeof pollIntervalOrGetter === "function")
-    {
-      this.getPollInterval = pollIntervalOrGetter;
-      this.defaultPollInterval = DEFAULT_POLL_INTERVAL;
-    } else
-    {
-      this.defaultPollInterval = pollIntervalOrGetter;
-      this.getPollInterval = () => pollIntervalOrGetter;
-    }
+  /**
+   * 取得輪詢間隔
+   * Get polling interval
+   *
+   * 優先順序：agent.poll_interval -> background.poll_interval -> 預設值
+   * Priority: agent.poll_interval -> background.poll_interval -> default
+   *
+   * @param agentName - agent 名稱（可選）/ Agent name (optional)
+   * @returns 輪詢間隔（毫秒）/ Polling interval (ms)
+   */
+  public getPollInterval(agentName?: IAllShadowAgentsName): number
+  {
+    return getPollInterval(this.config, agentName);
+  }
 
-    /**
-     * 重試延遲遞增量初始化
-     * Retry delay increment initialization
-     */
-    this.getRetryDelayIncrement = _normalizeToGetter(
-      retryDelayIncrementOrGetter,
-      DEFAULT_RETRY_DELAY_INCREMENT
-    );
+  /**
+   * 取得重試延遲遞增量
+   * Get retry delay increment
+   *
+   * 優先順序：agent.retry_delay_increment -> background.retry_delay_increment -> 預設值
+   * Priority: agent.retry_delay_increment -> background.retry_delay_increment -> default
+   *
+   * @param agentName - agent 名稱（可選）/ Agent name (optional)
+   * @returns 重試延遲遞增量（毫秒）/ Retry delay increment (ms)
+   */
+  public getRetryDelayIncrement(agentName?: IAllShadowAgentsName): number
+  {
+    return getRetryDelayIncrement(this.config, agentName);
+  }
 
-    /**
-     * 重試延遲最大值初始化
-     * Max retry delay initialization
-     */
-    this.getRetryDelayMax = _normalizeToGetter(
-      retryDelayMaxOrGetter,
-      DEFAULT_RETRY_DELAY_MAX
-    );
+  /**
+   * 取得重試延遲最大值
+   * Get max retry delay
+   *
+   * 優先順序：agent.retry_delay_max -> background.retry_delay_max -> 預設值
+   * Priority: agent.retry_delay_max -> background.retry_delay_max -> default
+   *
+   * @param agentName - agent 名稱（可選）/ Agent name (optional)
+   * @returns 重試延遲最大值（毫秒）/ Max retry delay (ms)
+   */
+  public getRetryDelayMax(agentName?: IAllShadowAgentsName): number
+  {
+    return getRetryDelayMax(this.config, agentName);
   }
 
   /**
@@ -837,26 +782,19 @@ export class BackgroundManager
     return task;
   }
 
-  /**
-   * 排程輪詢檢查任務狀態
-   * Schedule polling to check task status
-   *
-   * 計算下次輪詢的間隔時間
-   * Calculates the next polling interval
-   *
-   * === 設定值讀取機制流程 / Config Getter Flow ===
-   * 1. 透過 this.getPollInterval(agentName?) 取得輪詢間隔
-   *    - 若有設定 this.getPollInterval getter，則呼叫並傳入 agentName
-   *    - 若無，則使用建構時傳入的 this.defaultPollInterval
-   * 2. 透過 this.getRetryDelayIncrement(agentName?) 取得重試延遲遞增量
-   * 3. 透過 this.getRetryDelayMax(agentName?) 取得重試延遲最大值
-   *
-   * 優先順序：agents[agentName].poll_interval -> background.poll_interval -> 預設值
-   * Priority: agents[agentName].poll_interval -> background.poll_interval -> default
-   *
-   * @param taskId - 任務 ID
-   * @param agentName - Shadow 名稱
-   */
+   /**
+    * 排程輪詢檢查任務狀態
+    * Schedule polling to check task status
+    *
+    * 計算下次輪詢的間隔時間
+    * Calculates the next polling interval
+    *
+    * 設定值透過公開 getter 方法取得，自動支援 per-agent 覆寫。
+    * Config values obtained via public getter methods, automatically supporting per-agent overrides.
+    *
+    * @param taskId - 任務 ID
+    * @param agentName - Shadow 名稱
+    */
   private schedulePolling(taskId: string, agentName?: IAllShadowAgentsName): void
   {
     const task = this.tasks.get(taskId);
@@ -866,17 +804,10 @@ export class BackgroundManager
      * 計算基本輪詢間隔
      * Calculate base polling interval
      *
-     * 優先使用 per-agent 設定，否則使用預設值
-     * Prefer per-agent setting, otherwise use default
-     *
-     * === 設定值讀取流程 / Config getter flow ===
-     * 1. 檢查 this.getPollInterval 是否已設定（由建構函式初始化）
-     * 2. 若已設定，呼叫 this.getPollInterval(agentName) 取得 per-agent 設定值
-     * 3. 若未設定，回退使用 this.defaultPollInterval
+     * 透過公開方法取得 per-agent 設定值
+     * Get per-agent setting via public method
      */
-    const baseInterval = this.getPollInterval
-      ? this.getPollInterval(agentName)
-      : this.defaultPollInterval;
+    const baseInterval = this.getPollInterval(agentName);
 
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
@@ -884,36 +815,27 @@ export class BackgroundManager
     ]);
 
     /**
-     * 計算重試延遲（從第二次失敗開始）
-     * Calculate retry delay (starts from second failure)
-     *
-     * 隨著重試次數增加，輪詢間隔會漸進式延長
-     * As retry count increases, polling interval progressively extends
-     *
-     * === 設定值讀取流程 / Config getter flow ===
-     * 1. 檢查 task.retryCount > 0（第二次（含）失敗才會進入）
-     * 2. 透過 this.getRetryDelayIncrement(agentName) 取得遞增量
-     *    - 若無 getter，回退使用 DEFAULT_RETRY_DELAY_INCREMENT (1000ms)
-     * 3. 透過 this.getRetryDelayMax(agentName) 取得最大延遲
-     *    - 若無 getter，回退使用 DEFAULT_RETRY_DELAY_MAX (60000ms)
-     * 4. 計算額外延遲 = min(retryCount * increment, maxDelay)
-     * 5. 最終間隔 = baseInterval + additionalDelay
-     */
+      * 計算重試延遲（從第二次失敗開始）
+      * Calculate retry delay (starts from second failure)
+      *
+      * 隨著重試次數增加，輪詢間隔會漸進式延長
+      * As retry count increases, polling interval progressively extends
+      *
+      * 計算方式：
+      * additionalDelay = min(retryCount * increment, maxDelay)
+      * interval = baseInterval + additionalDelay
+      */
     let interval = baseInterval;
     if (task.retryCount > 0)
     {
-      const increment = this.getRetryDelayIncrement
-        ? this.getRetryDelayIncrement(agentName)
-        : DEFAULT_RETRY_DELAY_INCREMENT;
+      const increment = this.getRetryDelayIncrement(agentName);
 
       logArise2WithLevel("debug", () => [
         `[background-manager]`,
         `schedulePolling: increment=${increment}ms`,
       ]);
 
-      const maxDelay = this.getRetryDelayMax
-        ? this.getRetryDelayMax(agentName)
-        : DEFAULT_RETRY_DELAY_MAX;
+      const maxDelay = this.getRetryDelayMax(agentName);
 
       logArise2WithLevel("debug", () => [
         `[background-manager]`,
