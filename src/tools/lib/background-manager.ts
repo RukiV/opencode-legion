@@ -342,6 +342,18 @@ export class BackgroundManager {
    * 重新執行失敗的任務
    * Re-execute failed task
    *
+   * === 設定值讀取機制流程 / Config Getter Flow ===
+   * 1. 透過 this.getAutoResumeConfig() 取得 auto-resume 設定物件
+   *    - 回傳結構：{ enabled, max_retries, retry_delay, on_error, target, prompts }
+   *    - 若無，回退使用預設值：{ enabled: false, max_retries: 3, retry_delay: 5000, ... }
+   * 2. 取得 retry_delay：用於控制重試間隔（預設 5000ms）
+   * 3. 取得 max_retries：用於控制最大重試次數（預設 3 次）
+   * 4. 取得 on_error：用於控制錯誤發生時的行為（Ignore/Notify/Retry）
+   * 5. 取得 target：用於控制哪些類型任務（Foreground/Background）適用
+   *
+   * 優先順序：agents[agentName].auto_resume -> background.auto_resume -> 預設值
+   * Priority: agents[agentName].auto_resume -> background.auto_resume -> default
+   *
    * @param task - 要重試的任務
    */
   private async performAutoResume(task: BackgroundTask): Promise<void> {
@@ -722,6 +734,16 @@ export class BackgroundManager {
    * 計算下次輪詢的間隔時間
    * Calculates the next polling interval
    *
+   * === 設定值讀取機制流程 / Config Getter Flow ===
+   * 1. 透過 this.getPollInterval(agentName?) 取得輪詢間隔
+   *    - 若有設定 this.getPollInterval getter，則呼叫並傳入 agentName
+   *    - 若無，則使用建構時傳入的 this.defaultPollInterval
+   * 2. 透過 this.getRetryDelayIncrement(agentName?) 取得重試延遲遞增量
+   * 3. 透過 this.getRetryDelayMax(agentName?) 取得重試延遲最大值
+   *
+   * 優先順序：agents[agentName].poll_interval -> background.poll_interval -> 預設值
+   * Priority: agents[agentName].poll_interval -> background.poll_interval -> default
+   *
    * @param taskId - 任務 ID
    * @param agentName - Shadow 名稱
    */
@@ -735,6 +757,11 @@ export class BackgroundManager {
      *
      * 優先使用 per-agent 設定，否則使用預設值
      * Prefer per-agent setting, otherwise use default
+     *
+     * === 設定值讀取流程 / Config getter flow ===
+     * 1. 檢查 this.getPollInterval 是否已設定（由建構函式初始化）
+     * 2. 若已設定，呼叫 this.getPollInterval(agentName) 取得 per-agent 設定值
+     * 3. 若未設定，回退使用 this.defaultPollInterval
      */
     const baseInterval = this.getPollInterval
       ? this.getPollInterval(agentName)
@@ -751,6 +778,15 @@ export class BackgroundManager {
      *
      * 隨著重試次數增加，輪詢間隔會漸進式延長
      * As retry count increases, polling interval progressively extends
+     *
+     * === 設定值讀取流程 / Config getter flow ===
+     * 1. 檢查 task.retryCount > 0（第二次（含）失敗才會進入）
+     * 2. 透過 this.getRetryDelayIncrement(agentName) 取得遞增量
+     *    - 若無 getter，回退使用 DEFAULT_RETRY_DELAY_INCREMENT (1000ms)
+     * 3. 透過 this.getRetryDelayMax(agentName) 取得最大延遲
+     *    - 若無 getter，回退使用 DEFAULT_RETRY_DELAY_MAX (60000ms)
+     * 4. 計算額外延遲 = min(retryCount * increment, maxDelay)
+     * 5. 最終間隔 = baseInterval + additionalDelay
      */
     let interval = baseInterval;
     if (task.retryCount > 0) {
