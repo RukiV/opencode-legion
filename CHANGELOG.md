@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.18](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.16...@bluelovers/opencode-arise@0.1.18) (2026-03-31)
+
+
+
+### ✨　Features
+
+* **auto-resume:** 新增 safety_prompt 安全檢查提示功能 ([2914743](https://github.com/bluelovers/opencode-arise/commit/2914743145d7355b51167031dfa98bbd8ea39b95))
+
+
+### 📦　Code Refactoring
+
+* 新增 EnumReasoningEffort 並使用 BackgroundTaskStatus 替换字串 ([6230f2f](https://github.com/bluelovers/opencode-arise/commit/6230f2f9a55940f9e00285b02f9c60f6fcfd7fc6))
+* **arise-message:** 使用 utility functions 統一訊息格式化 ([c0e81ab](https://github.com/bluelovers/opencode-arise/commit/c0e81ab7dd99ad85ab6a04f4679d43305eaaa5da))
+* **background-manager:** 移除 getter 參數，改為公開 API 方法 ([38bc89b](https://github.com/bluelovers/opencode-arise/commit/38bc89be90c7abe1e8f1ad9f19c7a4ddb1e040cf))
+* **background-manager:** 重構 BackgroundTaskStatus 為 enum 並更新 shouldAutoResume 註解 ([19447ef](https://github.com/bluelovers/opencode-arise/commit/19447efde0b3dc7daf337ff73322783f138570aa))
+* **background-manager:** 使用 getters.ts 的 getAutoResumeConfig 取代自訂實作 ([c3c30c6](https://github.com/bluelovers/opencode-arise/commit/c3c30c6ba75c5916f4b6b7008dd5767eb06901d4))
+* **config:** update import path for zod-defaults module ([060a310](https://github.com/bluelovers/opencode-arise/commit/060a31042ba28b6666dd4a3a96bcf7b43b2b3012))
+
+
+### 🛠　Build System
+
+* **deps:** 更新依赖并添加工具脚本 ([e893770](https://github.com/bluelovers/opencode-arise/commit/e8937703d5e0aad85d488b97b15237fed0f6c19f))
+
+
+
 ## [0.1.16](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.15...@bluelovers/opencode-arise@0.1.16) (2026-03-31)
 
 

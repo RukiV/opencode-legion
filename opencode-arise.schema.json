@@ -175,6 +175,11 @@
                 "additionalProperties": false,
                 "description": "自訂提示訊息 / Custom prompts",
                 "title": "Prompts"
+              },
+              "safety_prompt": {
+                "description": "自動繼續任務前发送的安全检查提示 / Safety check prompt before auto resume",
+                "title": "Safety Prompt",
+                "type": "string"
               }
             },
             "required": [
@@ -339,6 +344,11 @@
               "additionalProperties": false,
               "description": "自訂提示訊息 / Custom prompts",
               "title": "Prompts"
+            },
+            "safety_prompt": {
+              "description": "自動繼續任務前发送的安全检查提示 / Safety check prompt before auto resume",
+              "title": "Safety Prompt",
+              "type": "string"
             }
           },
           "required": [

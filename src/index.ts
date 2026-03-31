@@ -113,6 +113,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 使用 config-handler 模組處理純邏輯
      * Uses config-handler module for pure logic
      */
+    // @ts-ignore
     config: createConfigHandler(config),
 
     /**
