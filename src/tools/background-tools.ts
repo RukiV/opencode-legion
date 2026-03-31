@@ -1,5 +1,6 @@
 import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./lib/background-manager";
+import { BackgroundTaskStatus } from "../types/enums";
 import { EnumAriseTools } from "../types/enums";
 import { getAriseToolsConfigEntry } from "../agents/shadows";
 import { tool2 } from '../types/types-opencode';
@@ -91,12 +92,12 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
       const duration = formatDuration(task.startedAt, task.completedAt);
 
       /** 任務仍在執行中 / Task still running */
-      if (task.status === "running") {
+      if (task.status === BackgroundTaskStatus.Running) {
         return formatAriseMsgInfo(`Task still running (${duration}). Check again later.`);
       }
 
       /** 任務執行失敗 / Task execution failed */
-      if (task.status === "error") {
+      if (task.status === BackgroundTaskStatus.Error) {
         return formatAriseMsgError(`Task failed: ${task.error ?? "Unknown error"}`);
       }
 

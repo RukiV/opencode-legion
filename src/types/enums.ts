@@ -198,6 +198,20 @@ export const ALLOWED_AUTO_RESUME_TARGET = [
 ] as const;
 
 /**
+ * 背景任務狀態列舉
+ * Background task status enumeration
+ */
+export enum BackgroundTaskStatus
+{
+	/** 執行中 / Running */
+	Running = "running",
+	/** 已完成 / Completed */
+	Completed = "completed",
+	/** 發生錯誤 / Error */
+	Error = "error",
+}
+
+/**
  * Arise 工具名稱列舉
  * Arise tool name enum
  *

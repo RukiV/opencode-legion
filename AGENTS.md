@@ -17,6 +17,9 @@ Guidance for agents working in this repository.
 
 > **Note:** When validating TypeScript, only run `pnpm run typecheck`. No need to run `pnpm run build`.
 > If you need to run tests, `pnpm test` already includes type checking, so no need to run typecheck separately.
+>
+> **AGENTS 執行測試規則：** AGENTS 在執行測試時，應使用 `pnpm run test:agent` 替代 `pnpm run test`。
+> **Agent test execution rule:** When running tests, agents should use `pnpm run test:agent` instead of `pnpm run test`.
 
 ```bash
 # Install dependencies
