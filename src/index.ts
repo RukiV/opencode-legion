@@ -13,9 +13,11 @@ import { createTodoEnforcerHook } from "./hooks/todo-enforcer";
 import {
   BackgroundManager,
 } from "./tools/lib/background-manager";
-import { initDebugControl } from "./utils/debug-control";
+import { initDebugControl, logArise2WithLevel } from "./utils/debug-control";
+import { PLUGIN_VERSION_STRING } from "./types/version";
 import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/index';
+import { PLUGIN_NAME } from "./config/plugin-name";
 
 
 /**
@@ -60,6 +62,9 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
    * Sets consoleLogger.enabled and default log level based on config
    */
   initDebugControl(config);
+
+  /** 啟動時發送版本資訊的除錯訊息 / Send version info debug message on startup */
+  logArise2WithLevel('info', () => [`${PLUGIN_NAME}@${PLUGIN_VERSION_STRING}`]);
 
   /**
    * 初始化背景任務管理器

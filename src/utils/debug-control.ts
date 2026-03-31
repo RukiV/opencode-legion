@@ -382,6 +382,8 @@ export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Pa
  * @param methodName - console 方法名稱（如 'log', 'error', 'debug'）/ Console method name (e.g., 'log', 'error', 'debug')
  * @param fn - 回傳參數陣列的函式（延遲執行）/ Function that returns parameter array (lazy execution)
  * @param consoleLog - console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel
+ * @param opts - 選項物件 / Options object
+ * @param opts.force - 強制輸出，無視 logLevel 限制（使用原始 consoleLogger）/ Force output, ignore logLevel limit (uses original consoleLogger)
  *
  * @example
  * import { logArise2WithLevel, setDebugEnabled, setLogLevel } from './debug-control';
@@ -406,10 +408,34 @@ export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Pa
  *
  * // 使用自訂 console 物件
  * logArise2WithLevel('log', () => ["Custom output"], consoleLoggerWithLevel.blue);
+ *
+ * // 強制輸出：無視 logLevel 限制
+ * logArise2WithLevel('debug', () => ["Always output this"], consoleLoggerWithLevel, { force: true });
  */
-export function logArise2WithLevel<M extends IMethods2>(methodName: M, fn: () => Parameters<Console2[M]>, consoleLog: Console2 = consoleLoggerWithLevel)
+export function logArise2WithLevel<M extends IMethods2>(
+	methodName: M,
+	fn: () => Parameters<Console2[M]>,
+	consoleLog: Console2 = consoleLoggerWithLevel,
+	opts?: {
+		/** 強制輸出，無視 logLevel 限制（使用原始 consoleLogger）/ Force output, ignore logLevel limit (uses original consoleLogger) */
+		force?: boolean;
+	}
+): void
 {
-  const level = getMethodLogLevel(methodName);
+	const level = getMethodLogLevel(methodName);
+
+	// force 模式下無視 logLevel，直接使用原始 consoleLogger 輸出
+	// In force mode, ignore logLevel and use original consoleLogger directly
+	if (opts?.force)
+	{
+		const args = fn();
+		// 使用未被包裝過的原始 consoleLogger，繞過等級過濾
+		// Use unwrapped original consoleLogger to bypass level filtering
+		// @ts-ignore
+		consoleLogger[methodName](...args);
+		return;
+	}
+
 	if (canLog(level))
 	{
 		const args = fn();
