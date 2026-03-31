@@ -5,7 +5,7 @@ import {
   EnumOpencodeAgentMode, 
   EnumOpencodeAgentPermission, 
   ALLOWED_LOG_LEVELS,
-  EnumReasoningEffort
+  EnumReasoningEffort,
 } from '../types/enum-opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
