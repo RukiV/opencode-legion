@@ -6,13 +6,7 @@
  * Provides unified message formatting functions to ensure consistent format for all Arise-related messages
  */
 import type { ITSValueOrArrayMaybeReadonly } from "ts-type";
-
-/**
- * Arise 訊息前綴常數
- * Arise message prefix constant
- */
-// export const ARISE_PREFIX = "[arise]" as const;
-export const ARISE_PREFIX = "[opencode-arise]" as const;
+import { ARISE_PREFIX } from "../../types/enums";
 
 type IAllowedMessageInput = ITSValueOrArrayMaybeReadonly<string | undefined>;
 

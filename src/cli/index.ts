@@ -25,7 +25,7 @@ import {
 import { AriseConfigSchema } from "../config/schema";
 import { createJsonHandler } from "../utils/config/jsonc";
 import { getErrorMessage } from "../utils/error";
-import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from '../config/plugin-name';
+import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from '../types/enums';
 import { console } from 'debug-color2';
 
 /**

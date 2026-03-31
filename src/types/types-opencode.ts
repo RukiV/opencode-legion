@@ -105,3 +105,8 @@ export type IHooks = ITSOverwrite<Hooks, {
  */
 export type IPlugin = (input: PluginInput) => Promise<IHooks>;
 
+export interface IModelBody 
+{
+  providerID: string;
+  modelID: string;
+}

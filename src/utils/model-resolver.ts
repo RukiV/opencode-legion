@@ -8,6 +8,7 @@ import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
 import { _isNotEmpty } from "./string/string-utils";
+import { IModelBody } from "../types/types-opencode";
 
 /**
  * 預設模型
@@ -17,6 +18,21 @@ import { _isNotEmpty } from "./string/string-utils";
  * Used when no model is specified at all
  */
 export { DEFAULT_MODEL } from "../types/const-default";
+
+/**
+ * 格式化模型描述
+ * Format model description
+ *
+ * 將 IModelBody 格式化為可讀的字串描述（providerID/modelID）
+ * Format IModelBody into readable string description (providerID/modelID)
+ *
+ * @param modelBody - 模型主體物件
+ * @returns 格式化後的字串（如 "openai/gpt-4o"）
+ */
+export function formatModelBodyDescription(modelBody: IModelBody): string
+{
+	return `${modelBody.providerID}/${modelBody.modelID}`;
+}
 
 /**
  * 從配置中取得代理模型
@@ -29,7 +45,8 @@ export { DEFAULT_MODEL } from "../types/const-default";
 export function getModelFromConfig(
   config: IAriseConfig | undefined,
   shadowName: IAllShadowAgentsName,
-): string | undefined {
+): string | undefined 
+{
   return config?.agents?.[shadowName]?.model;
 }
 
@@ -42,13 +59,16 @@ export function getModelFromConfig(
  */
 export function parseModelString(
   model: string | undefined,
-): { providerID: string; modelID: string } | undefined {
-  if (!_isNotEmpty(model) || _isAutoModel(model)) {
+): IModelBody | undefined
+{
+  if (!_isNotEmpty(model) || _isAutoModel(model))
+  {
     return undefined;
   }
 
   let [providerID, modelID, ...rest] = model.split("/");
-  if (!providerID || !modelID) {
+  if (!providerID || !modelID)
+  {
     return undefined;
   }
 
@@ -69,6 +89,109 @@ export function parseModelString(
   }
 
   return { providerID, modelID };
+}
+
+/**
+ * Combines providerID and modelID into a model string.
+ * 將 providerID 和 modelID 組合成模型字串
+ *
+ * @param providerID - Provider ID (e.g., "openai")
+ * @param modelID - Model ID (e.g., "gpt-4o")
+ * @returns Combined model string in format "provider/model"
+ *
+ * @example
+ * // 基本用法
+ * combineModelID("openai", "gpt-4o");
+ * // Returns: "openai/gpt-4o"
+ *
+ * // 傳入物件
+ * combineModelID({ providerID: "openai", modelID: "gpt-4o" });
+ * // Returns: "openai/gpt-4o"
+ */
+export function combineModelID(
+  providerID: string,
+  modelID: string,
+): string
+export function combineModelID(
+  modelBody: IModelBody,
+  modelID?: undefined,
+): string
+export function combineModelID(
+  providerID: string | IModelBody,
+  modelID?: string,
+): string 
+{
+  if (typeof providerID === "object") 
+  {
+    if (!providerID.providerID || !providerID.modelID)
+    {
+      throw new RangeError(`Invalid model body: ${JSON.stringify(providerID)}`);
+    }
+    return `${providerID.providerID}/${providerID.modelID}`;
+  }
+  return `${providerID}/${modelID}`;
+}
+
+/**
+ * Parses a model string into IModelBody.
+ * 將模型字串解析為 IModelBody
+ *
+ * This is the reverse operation of combineModelID.
+ * 是 combineModelID 的反向操作
+ *
+ * Uses parseModelString internally for the actual parsing.
+ * 內部使用 parseModelString 進行解析
+ *
+ * @param providerID - Provider ID (e.g., "openai") or model string (e.g., "openai/gpt-4o") or IModelBody
+ * @param modelID - Model ID (e.g., "gpt-4o") - optional, only used when first param is providerID string
+ * @returns IModelBody with providerID and modelID
+ *
+ * @example
+ * // 基本用法 (兩個字串參數)
+ * parseModelBody("openai", "gpt-4o");
+ * // Returns: { providerID: "openai", modelID: "gpt-4o" }
+ *
+ * // 傳入 IModelBody
+ * parseModelBody({ providerID: "openai", modelID: "gpt-4o" });
+ * // Returns: { providerID: "openai", modelID: "gpt-4o" }
+ *
+ * // 傳入模型字串
+ * parseModelBody("openai/gpt-4o");
+ * // Returns: { providerID: "openai", modelID: "gpt-4o" }
+ */
+export function parseModelBody(
+  providerID: string,
+  modelID: string,
+): IModelBody
+export function parseModelBody(
+  modelBody: IModelBody,
+  modelID?: undefined,
+): IModelBody
+export function parseModelBody(
+  model: string,
+  modelID?: undefined,
+): IModelBody
+export function parseModelBody(
+  providerID: string | IModelBody,
+  modelID?: string,
+): IModelBody
+{
+  if (typeof providerID === "object") 
+  {
+    return { providerID: providerID.providerID, modelID: providerID.modelID };
+  }
+  
+  // 組合 providerID 和 modelID（如果有 modelID）
+  const modelString = modelID ? `${providerID}/${modelID}` : providerID;
+  
+  // 使用 parseModelString 進行解析
+  const parsed = parseModelString(modelString);
+  if (!parsed)
+  {
+    throw new RangeError(`Invalid model string: "${modelString}"`);
+  }
+  
+  return parsed;
 }
 
 /**
@@ -106,7 +229,8 @@ export function resolveModelContext(
   shadow: IAllShadowAgentsName,
   config?: IAriseConfig,
   userModel?: string,
-): { providerID: string; modelID: string } {
+): IModelBody
+{
   /** 1. 從 config 取得模型設定 / 1. Get model config from config */
   const configModel = getModelFromConfig(config, shadow);
 
@@ -125,7 +249,8 @@ export function resolveModelContext(
   const parsed = parseModelString(effectiveModel);
 
   /** 5. 若解析失敗，使用 DEFAULT_MODEL / 5. If parse fails, use DEFAULT_MODEL */
-  if (!parsed) {
+  if (!parsed)
+  {
     return parseModelString(DEFAULT_MODEL)!;
   }
 
@@ -229,7 +354,8 @@ export function getEffectiveModelWithFallback(
   defaultModel: string | undefined,
   configModel: string | undefined,
   userModel?: string,
-): string {
+): string
+{
   /** 用戶指定的模型擁有最高優先級 */
   return _resolveAutoModelCore(userModel, parentModel, defaultModel)
     /** Config 模型 (configModel) - 若為 AUTO 则使用父模型 */

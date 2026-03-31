@@ -19,7 +19,7 @@
  */
 
 import { describe, expect, test } from "bun:test";
-import { PLUGIN_NAME, LEGACY_PLUGIN_NAME } from "./plugin-name";
+import { PLUGIN_NAME, LEGACY_PLUGIN_NAME } from "../types/enums";
 import { hasPlugin, isPluginNameMatch, getLegacyPluginNamesFromResult, isPluginRegisteredFromResult } from "./io";
 
 /**

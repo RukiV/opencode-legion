@@ -17,7 +17,7 @@ import { initDebugControl, logArise2WithLevel } from "./utils/debug-control";
 import { PLUGIN_VERSION_STRING } from "./types/version";
 import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/index';
-import { PLUGIN_NAME } from "./config/plugin-name";
+import { PLUGIN_NAME } from "./types/enums";
 
 
 /**

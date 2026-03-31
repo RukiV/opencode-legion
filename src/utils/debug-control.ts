@@ -10,7 +10,6 @@
  * - debug.level = EnumLogLevel.Warn（預設 Warn 等級）
  *
  * @module debug-control
- * @see {@link https://github.com/...} for more details
  */
 
 import { consoleLogger } from 'debug-color2/logger';
@@ -79,22 +78,28 @@ let currentLogLevel: ILogLevel = EnumLogLevel.Warn;
  */
 export function initDebugControl(config: IAriseConfig): void
 {
-	// 根據 debug.enabled 設定 consoleLogger（預設 false）
-	// 預設關閉是因為生產環境不需要詳細除錯輸出
-	// Default to false because production doesn't need verbose debug output
+	/**
+	 * 根據 debug.enabled 設定 consoleLogger（預設 false）
+	 * 預設關閉是因為生產環境不需要詳細除錯輸出
+	 * Default to false because production doesn't need verbose debug output
+	 */
 	consoleLogger.enabled = config.debug?.enabled ?? false;
 
-	// 設定預設日誌級別（預設 Warn）
-	// 如果 config.debug.level 存在則使用，否則使用 Warn
+	/**
+	 * 設定預設日誌級別（預設 Warn）
+	 * 如果 config.debug.level 存在則使用，否則使用 Warn
+	 */
 	if (config.debug?.level)
 	{
 		currentLogLevel = config.debug.level;
 	}
 
-	// wrapConsoleLogger 已在模組載入時套用於 consoleLoggerWithLevel
-	// 如需直接使用，請 import { consoleLoggerWithLevel } from './debug-control'
-	// wrapConsoleLogger is applied at module load time to consoleLoggerWithLevel
-	// To use, import { consoleLoggerWithLevel } from './debug-control'
+	/**
+	 * wrapConsoleLogger 已在模組載入時套用於 consoleLoggerWithLevel
+	 * 如需直接使用，請 import { consoleLoggerWithLevel } from './debug-control'
+	 * wrapConsoleLogger is applied at module load time to consoleLoggerWithLevel
+	 * To use, import { consoleLoggerWithLevel } from './debug-control'
+	 */
 }
 
 /**
@@ -150,15 +155,19 @@ export function getLogLevel(): ILogLevel
  */
 export function canLog(level: ILogLevel): boolean
 {
-	// 如果 consoleLogger 未啟用，則不輸出任何日誌
-	// If consoleLogger is not enabled, don't output any logs
+	/**
+	 * 如果 consoleLogger 未啟用，則不輸出任何日誌
+	 * If consoleLogger is not enabled, don't output any logs
+	 */
 	if (!consoleLogger.enabled)
 	{
 		return false;
 	}
 
-	// 檢查當前日誌級別是否允許輸出
-	// Check if current log level allows output
+	/**
+	 * 檢查當前日誌級別是否允許輸出
+	 * Check if current log level allows output
+	 */
 	return LOG_LEVEL_PRIORITY[level] <= LOG_LEVEL_PRIORITY[currentLogLevel];
 }
 
@@ -193,7 +202,7 @@ export function resetDebugControl(): void
 	consoleLogger.enabled = false;
 }
 
-// ==================== 日誌方法包裝 / Log Method Wrapping ====================
+/** ==================== 日誌方法包裝 / Log Method Wrapping ==================== */
 
 /**
  * 日誌方法與等級的對應關係
@@ -249,16 +258,25 @@ function wrapConsoleLogger<T extends Console2>(target: T): T
 		{
 			const value = Reflect.get(obj, prop, receiver);
 
-			// 如果是函數（方法），則包裝
+			/**
+			 * 如果是函數（方法），則包裝
+			 * If the value is a function, wrap it
+			 */
 			if (typeof value === "function")
 			{
-				// 檢查是否為已包裝過的方法（避免重複包裝）
+				/**
+				 * 檢查是否為已包裝過的方法（避免重複包裝）
+				 * Check if already wrapped to avoid double wrapping
+				 */
 				if ((value as unknown as { __wrapped?: boolean }).__wrapped)
 				{
 					return value;
 				}
 
-				// 檢查是否為日誌方法
+				/**
+				 * 檢查是否為日誌方法
+				 * Check if it's a log method
+				 */
 				if (prop in LOG_METHOD_LEVELS)
 				{
 					return function (...args: unknown[]): void
@@ -272,11 +290,17 @@ function wrapConsoleLogger<T extends Console2>(target: T): T
 					};
 				}
 
-				// 其他方法直接返回（保持原樣，包括顏色方法如 .yellow）
+				/**
+				 * 其他方法直接返回（保持原樣，包括顏色方法如 .yellow）
+				 * Return other methods as-is (including color methods like .yellow)
+				 */
 				return value;
 			}
 
-			// 如果是物件（如顏色分支 .yellow），則遞迴包裝
+			/**
+			 * 如果是物件（如顏色分支 .yellow），則遞迴包裝
+			 * If it's an object (e.g., color branch like .yellow), recursively wrap
+			 */
 			if (typeof value === "object" && value !== null)
 			{
 				return wrapConsoleLogger(value as any);
@@ -323,7 +347,7 @@ export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: 
     argv[0] = formatAriseMsg(argv[0]);
   }
 
-  // @ts-ignore
+  /** @ts-ignore */
   consoleLog(...argv);
 }
 
@@ -356,34 +380,37 @@ export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: 
 export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Parameters<T>)
 {
 	if (typeof argv[0] === 'string')
-  {
-    argv[0] = formatAriseMsg(argv[0]);
-  }
+  	{
+    	argv[0] = formatAriseMsg(argv[0]);
+  	}
 
-	// @ts-ignore
-  consoleLog(...argv);
+	/** @ts-ignore */
+  	consoleLog(...argv);
+}
+
+export interface ILogArise2Options 
+{
+  /** console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel */
+	consoleLog?: Console2;
+	/** 強制輸出，無視 logLevel 限制 / Force output, ignore logLevel limit */
+	force?: boolean;
 }
 
 /**
- * 依日誌等級條件輸出 Arise 訊息
- * Output Arise message with log level condition
+ * 依日誌等級條件輸出 Arise 訊息 / Output Arise message with log level condition
  *
  * 此函式會先檢查日誌等級是否允許輸出，通過時才執行 fn() 取得參數並格式化輸出
  * This function first checks if the log level allows output, then executes fn() to get parameters and format output
  *
- * 延遲執行優勢：
+ * 延遲執行優勢 / Lazy execution advantage:
  * - fn() 僅在 canLog 通過時才執行，避免不必要的字串拼接或計算
  * - 適用於昂貴的日誌訊息建構（如 JSON.stringify 大型物件）
  *
- * Lazy execution advantage:
- * - fn() is only executed when canLog passes, avoiding unnecessary string concatenation or computation
- * - Suitable for expensive log message construction (e.g., JSON.stringify large objects)
- *
- * @param methodName - console 方法名稱（如 'log', 'error', 'debug'）/ Console method name (e.g., 'log', 'error', 'debug')
- * @param fn - 回傳參數陣列的函式（延遲執行）/ Function that returns parameter array (lazy execution)
- * @param consoleLog - console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel
- * @param opts - 選項物件 / Options object
- * @param opts.force - 強制輸出，無視 logLevel 限制（使用原始 consoleLogger）/ Force output, ignore logLevel limit (uses original consoleLogger)
+ * @param methodName - console 方法名稱（如 'log', 'error', 'debug'）
+ * @param fn - 回傳參數陣列的函式（延遲執行）
+ * @param opts - 選項物件
+ * @param opts.consoleLog - console 物件，預設為 consoleLoggerWithLevel
+ * @param opts.force - 強制輸出，無視 logLevel 限制
  *
  * @example
  * import { logArise2WithLevel, setDebugEnabled, setLogLevel } from './debug-control';
@@ -391,47 +418,51 @@ export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Pa
  * setDebugEnabled(true);
  * setLogLevel(EnumLogLevel.Debug);
  *
- * // 基本用法：輸出 Info 等級訊息
+ * // 基本用法
  * logArise2WithLevel('log', () => ["Server started on port 3000"]);
  *
- * // 錯誤等級用法
+ * // 錯誤等級
  * logArise2WithLevel('error', () => ["Connection failed:", error.message]);
  *
- * // 除錯等級用法（僅在 Debug 等級時輸出）
+ * // 除錯等級（僅在 Debug 等級時輸出）
  * logArise2WithLevel('debug', () => ["User data:", JSON.stringify(user)]);
  *
- * // 延遲執行範例：昂貴的計算僅在等級通過時執行
+ * // 延遲執行範例
  * logArise2WithLevel('debug', () => {
  *   const expensiveData = computeExpensiveDebugInfo(); // 僅在 Debug 等級時執行
  *   return ["Debug info:", expensiveData];
  * });
  *
  * // 使用自訂 console 物件
- * logArise2WithLevel('log', () => ["Custom output"], consoleLoggerWithLevel.blue);
+ * logArise2WithLevel('log', () => ["Custom output"], { consoleLog: consoleLoggerWithLevel.blue });
  *
- * // 強制輸出：無視 logLevel 限制
- * logArise2WithLevel('debug', () => ["Always output this"], consoleLoggerWithLevel, { force: true });
+ * // 強制輸出
+ * logArise2WithLevel('debug', () => ["Always output this"], { force: true });
+ *
+ * // 組合使用
+ * logArise2WithLevel('debug', () => ["Output with custom console and force"], { consoleLog: consoleLoggerWithLevel.blue, force: true });
  */
 export function logArise2WithLevel<M extends IMethods2>(
 	methodName: M,
 	fn: () => Parameters<Console2[M]>,
-	consoleLog: Console2 = consoleLoggerWithLevel,
-	opts?: {
-		/** 強制輸出，無視 logLevel 限制（使用原始 consoleLogger）/ Force output, ignore logLevel limit (uses original consoleLogger) */
-		force?: boolean;
-	}
+	opts?: ILogArise2Options
 ): void
 {
 	const level = getMethodLogLevel(methodName);
+	const consoleLog = opts?.consoleLog ?? consoleLoggerWithLevel;
 
-	// force 模式下無視 logLevel，直接使用原始 consoleLogger 輸出
-	// In force mode, ignore logLevel and use original consoleLogger directly
+	/**
+	 * force 模式下無視 logLevel，直接使用原始 consoleLogger 輸出
+	 * In force mode, ignore logLevel and use original consoleLogger directly
+	 */
 	if (opts?.force)
 	{
 		const args = fn();
-		// 使用未被包裝過的原始 consoleLogger，繞過等級過濾
-		// Use unwrapped original consoleLogger to bypass level filtering
-		// @ts-ignore
+		/**
+		 * 使用未被包裝的原始 consoleLogger，繞過等級過濾
+		 * Use unwrapped original consoleLogger to bypass level filtering
+		 */
+		/** @ts-ignore */
 		consoleLogger[methodName](...args);
 		return;
 	}
@@ -441,4 +472,54 @@ export function logArise2WithLevel<M extends IMethods2>(
 		const args = fn();
 		logArise2(consoleLog[methodName], args);
 	}
+}
+
+/**
+ * 多行版本的 logArise2WithLevel
+ * Multi-line version of logArise2WithLevel
+ *
+ * 自動將多個字串參數連接成一行輸出，適用於需要輸出多個欄位的場景
+ * Automatically joins multiple string parameters into a single line output, suitable for scenarios that need to output multiple fields
+ *
+ * @param methodName - console 方法名稱（如 'log', 'error', 'debug'）
+ * @param lines - 回傳多行字串陣列的函式（延遲執行）
+ * @param opts - 選項物件
+ * @param opts.consoleLog - console 物件，預設為 consoleLoggerWithLevel
+ * @param opts.force - 強制輸出，無視 logLevel 限制
+ *
+ * @example
+ * import { logArise2WithLevelMulti } from './debug-control';
+ *
+ * // 基本用法 - 自動連接多行
+ * logArise2WithLevelMulti('info', () => [
+ *   `Shadow: ${shadow}`,
+ *   `Model: ${model}`,
+ *   `Description: ${desc}`
+ * ], { force: true });
+ *
+ * // 輸出: [Arise] Shadow: beru | Model: openai/gpt-4o | Description: Search files
+ */
+export function logArise2WithLevelMulti<M extends IMethods2>(
+	methodName: M,
+	lines: () => string[],
+	opts?: ILogArise2Options
+): void
+{
+	/**
+	 * 將多行字串連接成一行
+	 * Join multiple lines into a single line
+	 *
+	 * 使用 " | " 作為分隔符號，方便閱讀
+	 * Use " | " as separator for better readability
+	 */
+	const combinedMessage = lines().join(' | ');
+
+	/**
+	 * 使用 any 類型繞過 TypeScript 推導限制
+	 * Use any type to bypass TypeScript inference limitation
+	 *
+	 * 由於 logArise2WithLevel 使用 M extends IMethods2 進行推導
+	 * 直接傳入字串陣列會導致類型不相容
+	 */
+	logArise2WithLevel(methodName, () => [combinedMessage] as never, opts);
 }
