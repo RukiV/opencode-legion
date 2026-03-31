@@ -4,7 +4,8 @@ import { z } from "zod";
 import { 
   EnumOpencodeAgentMode, 
   EnumOpencodeAgentPermission, 
-  ALLOWED_LOG_LEVELS 
+  ALLOWED_LOG_LEVELS,
+  EnumReasoningEffort
 } from '../types/enum-opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
@@ -721,10 +722,10 @@ Research thoroughly, report concisely.`,
     mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "openai/gpt-5.2",
     steps: 24,
-    /** 高推理努力設定 / High reasoning effort setting */
-    options: {
-      reasoningEffort: "high",
-    },
+/** 高推理努力設定 / High reasoning effort setting */
+options: {
+  reasoningEffort: EnumReasoningEffort.High,
+},
     permission: {
       edit: EnumOpencodeAgentPermission.DENY,
       write: EnumOpencodeAgentPermission.DENY,

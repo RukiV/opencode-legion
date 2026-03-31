@@ -116,3 +116,23 @@ export const ALLOWED_LOG_LEVELS = [
  * Log level type
  */
 export type ILogLevel = ITSTypeAndStringLiteral<EnumLogLevel>;
+
+/**
+ * 推理努力程度列舉
+ * Reasoning effort enumeration
+ *
+ * 控制 Shadow Agent 的推理深度
+ * Controls Shadow Agent's reasoning depth
+ *
+ * - high: 高推理努力，適用於複雜問題
+ * - medium: 中等推理努力
+ * - low: 低推理努力，適用於簡單任務
+ */
+export enum EnumReasoningEffort {
+	/** 高推理努力 / High reasoning effort */
+	High = "high",
+	/** 中等推理努力 / Medium reasoning effort */
+	Medium = "medium",
+	/** 低推理努力 / Low reasoning effort */
+	Low = "low",
+}
