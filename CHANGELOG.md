@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.16](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.15...@bluelovers/opencode-arise@0.1.16) (2026-03-31)
+
+
+
+### ✨　Features
+
+* **auto-resume:** 添加运行时控制参数以支持动态配置 ([f0bd3ff](https://github.com/bluelovers/opencode-arise/commit/f0bd3ff80c94057e0e73c087fbc1460bbcb5465a))
+* **debug:** 添加调试控制模块与运行时工具 ([3f5bf5b](https://github.com/bluelovers/opencode-arise/commit/3f5bf5b357d58fc3820c0fdcb2fee87475379766))
+* **msg:** 支持数组输入的消息格式化函数 ([52edbd2](https://github.com/bluelovers/opencode-arise/commit/52edbd2515025e897e93c7f70195037596b117db))
+* **zod:** add zod schema helper utilities ([e5a0b36](https://github.com/bluelovers/opencode-arise/commit/e5a0b36ef583cac6e497af96199b3fac4b492f71))
+
+
+### 📦　Code Refactoring
+
+* **background-manager:** 添加详细的调试日志以支持自动恢复和任务生命周期跟踪 ([d41a576](https://github.com/bluelovers/opencode-arise/commit/d41a5765e8463eb6fd9fdaf11b607f584ba224f1))
+* **config:** 更新导入路径以反映模块重新定位 ([d841a81](https://github.com/bluelovers/opencode-arise/commit/d841a810d200160b9727f05b01f003f0aaf1e662))
+* **debug:** 统一日志记录方式，使用延迟执行优化性能 ([1907925](https://github.com/bluelovers/opencode-arise/commit/1907925312f9046b852d07f69548ee1eb088d0c0))
+* **logging:** 改进日志输出，添加颜色与格式优化 ([0733a03](https://github.com/bluelovers/opencode-arise/commit/0733a03e315ab2bb56da23531306a209c1b785d9))
+* **msg:** 统一消息前缀与格式化函数使用 ([6776e61](https://github.com/bluelovers/opencode-arise/commit/6776e612df1a63b0c1b631194c8a2234b463797e))
+* **src:** 重構檔案結構，刪除 re-export 並移動檔案至適當目錄 ([28ab207](https://github.com/bluelovers/opencode-arise/commit/28ab20791aa2f024bdea15d244508cb92612253d))
+
+
+### 📚　Documentation
+
+* **background-manager:** 添加配置读取机制流程文档 ([0c33d6a](https://github.com/bluelovers/opencode-arise/commit/0c33d6a21ed8c71d625750d5ae4eaea4a5e181d2))
+* **repo:** 添加中文README文档 ([4cecee2](https://github.com/bluelovers/opencode-arise/commit/4cecee211da9c4bb8251ca2b44c231531701bda2))
+
+
+
 ## [0.1.15](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.14...@bluelovers/opencode-arise@0.1.15) (2026-03-29)
 
 
