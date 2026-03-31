@@ -12,6 +12,7 @@ import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType 
 import { clearSessionModel } from "../config/model-cache";
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
+import { formatAriseMsgLogBody } from "../utils/string/arise-message";
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 
@@ -132,11 +133,10 @@ async function handleSessionIdle(
 	} catch (error)
 	{
 		params.ctx.client.app?.log?.({
-			body: {
-				service: "arise",
-				level: "warn",
+			body: formatAriseMsgLogBody({
 				message: `TODO enforcement failed: ${getErrorMessage(error)}`,
-			},
+				level: "warn",
+			}),
 		});
 	}
 }

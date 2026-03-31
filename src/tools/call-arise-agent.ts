@@ -11,6 +11,7 @@ import {
   formatAriseMsgTitle,
   formatAriseMsgError,
   formatAriseMsgSuccessMultiLine,
+  formatAriseMsgLogBody,
 } from '../utils/string/arise-message';
 
 /**
@@ -101,11 +102,11 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
             },
           }).catch((error) => {
             ctx.client.app.log?.({
-              body: {
-                service: "arise",
-                level: "error",
+              body: formatAriseMsgLogBody({
+                label: "Summon failed",
                 message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
-              },
+                level: "error",
+              }),
             });
           });
 

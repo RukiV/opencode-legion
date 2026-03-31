@@ -24,6 +24,8 @@ import {
     formatAriseMsgTitleCustom,
     formatAriseMsgPrefixId,
     formatAriseMsgSuccessMultiLine,
+    formatAriseMsgSessionTitle,
+    formatAriseMsgLogBody,
   } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
 
@@ -457,11 +459,11 @@ export class BackgroundManager
      * Log retry attempt
      */
     this.ctx.client.app.log?.({
-      body: {
-        service: "arise",
+      body: formatAriseMsgLogBody({
+        label: "Auto-resume",
+        message: `Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
         level: "info",
-        message: `[Auto-resume] Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
-      },
+      }),
     });
 
     /**
@@ -497,7 +499,7 @@ export class BackgroundManager
     try
     {
       const session = await this.ctx.client.session.create({
-        body: { title: `[arise:${task.id} retry ${task.resumeRetryCount}] ${task.description}` },
+        body: { title: formatAriseMsgSessionTitle(task.id, task.description, `retry ${task.resumeRetryCount}`) },
       });
 
       const newSessionId = session.data?.id;
@@ -599,31 +601,31 @@ export class BackgroundManager
             // 通知模式：記錄但不做進一步重試
             // Notify mode: log but don't retry further
             this.ctx.client.app.log?.({
-              body: {
-                service: "arise",
+              body: formatAriseMsgLogBody({
+                label: "Auto-resume",
+                message: `Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
                 level: "warn",
-                message: `[Auto-resume] Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
-              },
+              }),
             });
           } else if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Retry)
           {
             // 遞迴嘗試 auto-resume（會再次檢查 shouldAutoResume）
             // Recursively attempt auto-resume (will check shouldAutoResume again)
             this.ctx.client.app.log?.({
-              body: {
-                service: "arise",
+              body: formatAriseMsgLogBody({
+                label: "Auto-resume",
+                message: `Task ${task.id} retry failed: ${task.error}. Will retry again...`,
                 level: "warn",
-                message: `[Auto-resume] Task ${task.id} retry failed: ${task.error}. Will retry again...`,
-              },
+              }),
             });
             this.performAutoResume(task).catch((e) =>
             {
               this.ctx.client.app.log?.({
-                body: {
-                  service: "arise",
+                body: formatAriseMsgLogBody({
+                  label: "Auto-resume",
+                  message: `Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
                   level: "error",
-                  message: `[Auto-resume] Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
-                },
+                }),
               });
             });
           }
@@ -644,11 +646,11 @@ export class BackgroundManager
       ]);
 
       this.ctx.client.app.log?.({
-        body: {
-          service: "arise",
+        body: formatAriseMsgLogBody({
+          label: "Auto-resume",
+          message: `Failed to create retry session for task ${task.id}: ${task.error}`,
           level: "error",
-          message: `[Auto-resume] Failed to create retry session for task ${task.id}: ${task.error}`,
-        },
+        }),
       });
     }
   }
@@ -699,7 +701,7 @@ export class BackgroundManager
      * Session title includes taskId for identification
      */
     const session = await this.ctx.client.session.create({
-      body: { title: `[arise:${taskId}] ${opts.description}` },
+      body: { title: formatAriseMsgSessionTitle(taskId, opts.description) },
     });
 
     const sessionId = session.data?.id;
@@ -800,11 +802,10 @@ export class BackgroundManager
           this.performAutoResume(task).catch((e) =>
           {
             this.ctx.client.app.log?.({
-              body: {
-                service: "arise",
-                level: "error",
+              body: formatAriseMsgLogBody({
                 message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
-              },
+                level: "error",
+              }),
             });
           });
         }
@@ -1006,16 +1007,16 @@ export class BackgroundManager
          * 非同步執行 auto-resume，不阻塞當前流程
          * Execute auto-resume asynchronously, don't block current flow
          */
-        this.performAutoResume(task).catch((e) =>
-        {
-          this.ctx.client.app.log?.({
-            body: {
-              service: "arise",
-              level: "error",
-              message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
-            },
+          this.performAutoResume(task).catch((e) =>
+          {
+            this.ctx.client.app.log?.({
+              body: formatAriseMsgLogBody({
+                label: "Auto-resume",
+                message: `Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
+                level: "error",
+              }),
+            });
           });
-        });
       }
     }
   }
@@ -1167,13 +1168,13 @@ export class BackgroundManager
       await this.ctx.client.session.abort({ path: { id: task.sessionId } });
     } catch (error)
     {
-      this.ctx.client.app.log?.({
-        body: {
-          service: "arise",
-          level: "warn",
-          message: `Failed to abort session ${task.sessionId}: ${getErrorMessage(error)}`,
-        },
-      });
+            this.ctx.client.app.log?.({
+              body: formatAriseMsgLogBody({
+                label: "Auto-resume",
+                message: `Failed to abort session ${task.sessionId}: ${getErrorMessage(error)}`,
+                level: "warn",
+              }),
+            });
     }
 
     task.status = BackgroundTaskStatus.Error;
