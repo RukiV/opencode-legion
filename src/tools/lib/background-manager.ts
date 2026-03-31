@@ -878,7 +878,7 @@ export class BackgroundManager
   private async pollTaskCompletion(taskId: string): Promise<void>
   {
     const task = this.tasks.get(taskId);
-    if (!task || task.status !== "running") return;
+    if (!task || task.status !== BackgroundTaskStatus.Running) return;
 
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
@@ -1129,7 +1129,7 @@ export class BackgroundManager
   async cancelTask(taskId: string): Promise<boolean>
   {
     const task = this.tasks.get(taskId);
-    if (!task || task.status !== "running") return false;
+    if (!task || task.status !== BackgroundTaskStatus.Running) return false;
 
     try
     {
@@ -1176,7 +1176,7 @@ export class BackgroundManager
          */
         for (const task of this.tasks.values())
         {
-          if (task.sessionId === sessionId && task.status === "running")
+          if (task.sessionId === sessionId && task.status === BackgroundTaskStatus.Running)
           {
             this.pollTaskCompletion(task.id);
           }
