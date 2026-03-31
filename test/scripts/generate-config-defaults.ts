@@ -23,7 +23,7 @@ import { __ROOT } from "../../__root";
 // 引入 Zod Schema 和提取函式
 // Import Zod Schema and extraction function
 import { AriseConfigSchema, IAriseConfig } from "../../src/config/schema";
-import { extractDefaultsFromJSONSchema } from "../../src/config/zod-defaults";
+import { extractDefaultsFromJSONSchema } from "../../src/utils/type/zod-defaults";
 
 // 使用 __ROOT 定義路徑
 // Use __ROOT for paths
