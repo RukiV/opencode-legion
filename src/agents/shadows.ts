@@ -71,7 +71,7 @@ export interface IShadowDescription {
  * Shadow Agents 描述映射
  * Shadow Agents descriptions map
  */
-export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescription> = {
+export const SHADOW_DESCRIPTIONS = {
   [EnumShadowSubAgentsName.Beru]: {
     name: EnumShadowSubAgentsName.Beru,
     title: "Ant King Scout",
@@ -167,7 +167,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
     roleKeywords: ["debug", "complex", "why", "reason", "analyze", "reasoning"],
     supportsBackground: false,
   },
-};
+} satisfies Record<EnumShadowSubAgentsName, IShadowDescription>;
 
 /**
  * 工具函式：取得 Shadow Agent 的簡短描述

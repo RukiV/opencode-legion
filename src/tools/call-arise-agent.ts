@@ -2,6 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { getSessionModel } from "../config/model-cache";
 import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools } from '../types/enums';
+import { EnumLogLevel } from "../types/enum-opencode";
 import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
 import { resolveModelContext, formatModelBodyDescription } from '../utils/model-resolver';
@@ -119,7 +120,7 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
               body: formatAriseMsgLogBody({
                 label: "Summon failed",
                 message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
-                level: "error",
+                level: EnumLogLevel.Error,
               }),
             });
           });

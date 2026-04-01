@@ -15,7 +15,7 @@ import {
     IAllShadowAgentsName,
     BackgroundTaskStatus,
   } from "../../types/enums";
-import { EnumSessionStatusType } from "../../types/enum-opencode";
+import { EnumSessionStatusType, EnumLogLevel } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
@@ -465,7 +465,7 @@ export class BackgroundManager
       body: formatAriseMsgLogBody({
         label: "Auto-resume",
         message: `Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
-        level: "info",
+        level: EnumLogLevel.Info,
       }),
     });
 
@@ -625,7 +625,7 @@ export class BackgroundManager
               body: formatAriseMsgLogBody({
                 label: "Auto-resume",
                 message: `Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
-                level: "warn",
+                level: EnumLogLevel.Warn,
               }),
             });
           } else if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Retry)
@@ -636,7 +636,7 @@ export class BackgroundManager
               body: formatAriseMsgLogBody({
                 label: "Auto-resume",
                 message: `Task ${task.id} retry failed: ${task.error}. Will retry again...`,
-                level: "warn",
+                level: EnumLogLevel.Warn,
               }),
             });
             this.performAutoResume(task).catch((e) =>
@@ -645,7 +645,7 @@ export class BackgroundManager
                 body: formatAriseMsgLogBody({
                   label: "Auto-resume",
                   message: `Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
-                  level: "error",
+                  level: EnumLogLevel.Error,
                 }),
               });
             });
@@ -670,7 +670,7 @@ export class BackgroundManager
         body: formatAriseMsgLogBody({
           label: "Auto-resume",
           message: `Failed to create retry session for task ${task.id}: ${task.error}`,
-          level: "error",
+          level: EnumLogLevel.Error,
         }),
       });
     }
@@ -842,7 +842,7 @@ export class BackgroundManager
             this.ctx.client.app.log?.({
               body: formatAriseMsgLogBody({
                 message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
-                level: "error",
+                level: EnumLogLevel.Error,
               }),
             });
           });
@@ -1051,7 +1051,7 @@ export class BackgroundManager
               body: formatAriseMsgLogBody({
                 label: "Auto-resume",
                 message: `Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
-                level: "error",
+                level: EnumLogLevel.Error,
               }),
             });
           });
@@ -1210,7 +1210,7 @@ export class BackgroundManager
               body: formatAriseMsgLogBody({
                 label: "Auto-resume",
                 message: `Failed to abort session ${task.sessionId}: ${getErrorMessage(error)}`,
-                level: "warn",
+                level: EnumLogLevel.Warn,
               }),
             });
     }

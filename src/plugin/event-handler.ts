@@ -8,7 +8,7 @@
 
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event, EventSessionCreated, EventSessionDeleted, EventSessionIdle } from "@opencode-ai/sdk";
-import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType } from "../types/enum-opencode";
+import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType, EnumLogLevel } from "../types/enum-opencode";
 import { clearSessionModel } from "../config/model-cache";
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
@@ -135,7 +135,7 @@ async function handleSessionIdle(
 		params.ctx.client.app?.log?.({
 			body: formatAriseMsgLogBody({
 				message: `TODO enforcement failed: ${getErrorMessage(error)}`,
-				level: "warn",
+				level: EnumLogLevel.Warn,
 			}),
 		});
 	}

@@ -5,8 +5,9 @@
  * 提供統一的訊息格式化函數，確保所有 Arise 相關訊息有一致的格式
  * Provides unified message formatting functions to ensure consistent format for all Arise-related messages
  */
-import type { ITSValueOrArrayMaybeReadonly } from "ts-type";
+import type { ITSTypeAndStringLiteral, ITSValueOrArrayMaybeReadonly } from "ts-type";
 import { ARISE_PREFIX } from "../../types/const-default";
+import { EnumLogLevel } from "../../types/enum-opencode";
 
 type IAllowedMessageInput = ITSValueOrArrayMaybeReadonly<string | undefined>;
 
@@ -170,12 +171,6 @@ export function formatAriseMsgSessionTitle(taskId: string, description: string, 
 }
 
 /**
- * Arise 訊息日誌級別
- * Arise message log level
- */
-export type EnumAriseMsgLogLevel = "debug" | "info" | "warn" | "error";
-
-/**
  * Arise 訊息日誌選項
  * Arise message log options
  */
@@ -184,7 +179,7 @@ interface IAriseMsgLogOptions
 	/** 訊息內容 */
 	message: string;
 	/** 日誌級別 */
-	level?: EnumAriseMsgLogLevel;
+	level?: EnumLogLevel;
 	/** 標籤（可選） */
 	label?: string;
 }
@@ -198,11 +193,11 @@ interface IAriseMsgLogOptions
  */
 export function formatAriseMsgLogBody(options: IAriseMsgLogOptions): {
 	service: string;
-	level: EnumAriseMsgLogLevel;
+	level: EnumLogLevel;
 	message: string;
 }
 {
-	const { message, level = "info", label } = options;
+	const { message, level = EnumLogLevel.Info, label } = options;
 
 	return {
 		service: "arise",

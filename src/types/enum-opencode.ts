@@ -48,7 +48,8 @@ export type ISessionEventType = ITSTypeAndStringLiteral<EnumSessionEventType>;
  * - SUBAGENT: 子代理（其他 Shadow 使用）
  * - ALL: 所有模式
  */
-export enum EnumOpencodeAgentMode {
+export enum EnumOpencodeAgentMode
+{
 	/** 主代理模式 - 唯一的主要協調者 / Primary mode - the only main coordinator */
 	PRIMARY = "primary",
 	/** 子代理模式 - 被 Monarch 召喚的 Shadow / Subagent mode - Shadows summoned by Monarch */
@@ -68,7 +69,8 @@ export enum EnumOpencodeAgentMode {
  * - DENY: 拒絕執行
  * - ASK: 詢問使用者
  */
-export enum EnumOpencodeAgentPermission {
+export enum EnumOpencodeAgentPermission
+{
 	/** 允許執行 / Allow execution */
 	ALLOW = "allow",
 	/** 拒絕執行 / Deny execution */
@@ -89,7 +91,8 @@ export enum EnumOpencodeAgentPermission {
  * - info: 一般資訊
  * - debug: 除錯資訊
  */
-export enum EnumLogLevel {
+export enum EnumLogLevel 
+{
 	/** 錯誤訊息 / Error messages */
 	Error = "error",
 	/** 警告訊息 / Warning messages */
@@ -128,7 +131,8 @@ export type ILogLevel = ITSTypeAndStringLiteral<EnumLogLevel>;
  * - medium: 中等推理努力
  * - low: 低推理努力，適用於簡單任務
  */
-export enum EnumReasoningEffort {
+export enum EnumReasoningEffort
+{
 	/** 高推理努力 / High reasoning effort */
 	High = "high",
 	/** 中等推理努力 / Medium reasoning effort */
@@ -144,7 +148,8 @@ export enum EnumReasoningEffort {
  * 定義 OpenCode session 的可能狀態
  * Defines possible OpenCode session statuses
  */
-export enum EnumSessionStatusType {
+export enum EnumSessionStatusType
+{
 	/** 閒置（任務完成）/ Idle (task completed) */
 	Idle = "idle",
 	/** 忙碌（執行中）/ Busy (running) */
