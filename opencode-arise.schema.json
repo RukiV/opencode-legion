@@ -3,13 +3,11 @@
   "type": "object",
   "properties": {
     "$schema": {
+      "type": "string",
       "description": "JSON Schema URI / JSON Schema URI",
-      "title": "Schema",
-      "type": "string"
+      "title": "Schema"
     },
     "disabled_shadows": {
-      "description": "要停用的 Shadow Agents 列表 / List of Shadow Agents to disable",
-      "title": "Disabled Shadows",
       "type": "array",
       "items": {
         "type": "string",
@@ -24,11 +22,11 @@
         ],
         "description": "Shadow Agent 名稱 / Shadow Agent name",
         "title": "Shadow Agent Name"
-      }
+      },
+      "description": "要停用的 Shadow Agents 列表 / List of Shadow Agents to disable",
+      "title": "Disabled Shadows"
     },
     "disabled_hooks": {
-      "description": "要停用的 Hook 列表 / List of hooks to disable",
-      "title": "Disabled Hooks",
       "type": "array",
       "items": {
         "type": "string",
@@ -40,23 +38,23 @@
         ],
         "description": "生命週期 Hook 名稱 / Lifecycle hook name",
         "title": "Hook Name"
-      }
+      },
+      "description": "要停用的 Hook 列表 / List of hooks to disable",
+      "title": "Disabled Hooks"
     },
     "show_banner": {
-      "description": "是否顯示歡迎橫幅 / Show welcome banner",
-      "title": "Show Banner",
       "default": true,
-      "type": "boolean"
+      "type": "boolean",
+      "description": "是否顯示歡迎橫幅 / Show welcome banner",
+      "title": "Show Banner"
     },
     "banner_every_session": {
-      "description": "每個工作階段都顯示橫幅 / Show banner every session",
-      "title": "Banner Every Session",
       "default": false,
-      "type": "boolean"
+      "type": "boolean",
+      "description": "每個工作階段都顯示橫幅 / Show banner every session",
+      "title": "Banner Every Session"
     },
     "agents": {
-      "description": "各代理的覆寫設定 / Per-agent override settings",
-      "title": "Agents",
       "type": "object",
       "propertyNames": {
         "type": "string",
@@ -76,100 +74,95 @@
         "type": "object",
         "properties": {
           "model": {
+            "type": "string",
             "description": "要使用的模型名稱 / Model name to use",
-            "title": "Model",
-            "type": "string"
+            "title": "Model"
           },
           "disabled": {
+            "type": "boolean",
             "description": "是否停用此代理 / Whether to disable this agent",
-            "title": "Disabled",
-            "type": "boolean"
+            "title": "Disabled"
           },
           "system_prompt_addon": {
+            "type": "string",
             "description": "系統提示補充內容 / System prompt supplement content",
-            "title": "System Prompt Addon",
-            "type": "string"
+            "title": "System Prompt Addon"
           },
           "poll_interval": {
             "default": 2000,
+            "type": "number",
             "description": "輪詢間隔（毫秒）/ Polling interval in milliseconds",
-            "title": "Poll Interval",
-            "type": "number"
+            "title": "Poll Interval"
           },
           "retry_delay_increment": {
             "default": 5000,
+            "type": "number",
             "description": "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
-            "title": "Retry Delay Increment",
-            "type": "number"
+            "title": "Retry Delay Increment"
           },
           "retry_delay_max": {
             "default": 60000,
+            "type": "number",
             "description": "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
-            "title": "Retry Delay Max",
-            "type": "number"
+            "title": "Retry Delay Max"
           },
           "auto_resume": {
             "type": "object",
             "properties": {
               "enabled": {
-                "default": false,
+                "type": "boolean",
                 "description": "是否啟用自動繼續任務 / Enable auto resume",
-                "title": "Enabled",
-                "type": "boolean"
+                "title": "Enabled"
               },
               "max_retries": {
+                "type": "number",
                 "description": "最大重試次數 / Maximum retry count",
-                "title": "Max Retries",
-                "default": 3,
-                "type": "number"
+                "title": "Max Retries"
               },
               "retry_delay": {
+                "type": "number",
                 "description": "重試延遲（毫秒）/ Retry delay in milliseconds",
-                "title": "Retry Delay",
-                "default": 5000,
-                "type": "number"
+                "title": "Retry Delay"
               },
               "on_error": {
-                "default": "ignore",
-                "description": "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
-                "title": "On Error",
                 "type": "string",
                 "enum": [
                   "ignore",
                   "retry",
                   "notify"
-                ]
+                ],
+                "description": "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+                "title": "On Error"
               },
               "target": {
-                "default": "background",
-                "description": "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
-                "title": "Target",
                 "type": "string",
                 "enum": [
                   "background",
                   "all"
-                ]
+                ],
+                "description": "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+                "title": "Target"
               },
               "prompts": {
                 "type": "object",
                 "properties": {
                   "retry": {
+                    "type": "string",
                     "description": "首次重試時的提示 / Prompt for first retry",
-                    "title": "Retry Prompt",
-                    "type": "string"
+                    "title": "Retry Prompt"
                   },
                   "final": {
+                    "type": "string",
                     "description": "最終重試時的提示 / Prompt for final retry",
-                    "title": "Final Prompt",
-                    "type": "string"
+                    "title": "Final Prompt"
                   },
                   "custom": {
-                    "description": "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
-                    "title": "Custom Prompts",
                     "type": "array",
                     "items": {
                       "type": "string"
-                    }
+                    },
+                    "description": "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
+                    "title": "Custom Prompts"
                   }
                 },
                 "additionalProperties": false,
@@ -177,19 +170,21 @@
                 "title": "Prompts"
               },
               "safety_prompt": {
+                "type": "string",
                 "description": "自動繼續任務前发送的安全检查提示 / Safety check prompt before auto resume",
-                "title": "Safety Prompt",
-                "type": "string"
+                "title": "Safety Prompt"
               }
             },
             "required": [
               "enabled",
+              "max_retries",
+              "retry_delay",
               "on_error",
-              "target"
+              "target",
+              "prompts",
+              "safety_prompt"
             ],
-            "additionalProperties": false,
-            "description": "自動繼續任務設定 / Auto resume settings",
-            "title": "Auto Resume"
+            "additionalProperties": false
           }
         },
         "additionalProperties": false,
@@ -204,22 +199,24 @@
         "tusk",
         "tank",
         "shadow-sovereign"
-      ]
+      ],
+      "description": "各代理的覆寫設定 / Per-agent override settings",
+      "title": "Agents"
     },
     "output_shaping": {
       "type": "object",
       "properties": {
         "max_chars": {
           "default": 12000,
+          "type": "number",
           "description": "最大輸出字元數 / Maximum output characters",
-          "title": "Max Chars",
-          "type": "number"
+          "title": "Max Chars"
         },
         "preserve_errors": {
           "default": true,
+          "type": "boolean",
           "description": "是否保留錯誤輸出 / Preserve error output",
-          "title": "Preserve Errors",
-          "type": "boolean"
+          "title": "Preserve Errors"
         }
       },
       "required": [
@@ -235,17 +232,17 @@
       "properties": {
         "threshold_percent": {
           "default": 80,
-          "description": "觸發壓縮的閾值百分比（50-95）/ Compaction threshold percent (50-95)",
-          "title": "Threshold Percent",
           "type": "number",
           "minimum": 50,
-          "maximum": 95
+          "maximum": 95,
+          "description": "觸發壓縮的閾值百分比（50-95）/ Compaction threshold percent (50-95)",
+          "title": "Threshold Percent"
         },
         "preserve_todos": {
           "default": true,
+          "type": "boolean",
           "description": "保留 TODO 項目 / Preserve TODO items",
-          "title": "Preserve TODOs",
-          "type": "boolean"
+          "title": "Preserve TODOs"
         }
       },
       "required": [
@@ -261,84 +258,84 @@
       "properties": {
         "poll_interval": {
           "default": 2000,
+          "type": "number",
           "description": "輪詢間隔（毫秒）/ Polling interval in milliseconds",
-          "title": "Poll Interval",
-          "type": "number"
+          "title": "Poll Interval"
         },
         "retry_delay_increment": {
           "default": 5000,
+          "type": "number",
           "description": "重試延遲遞增量（毫秒）/ Retry delay increment in milliseconds",
-          "title": "Retry Delay Increment",
-          "type": "number"
+          "title": "Retry Delay Increment"
         },
         "retry_delay_max": {
           "default": 60000,
+          "type": "number",
           "description": "重試延遲最大值（毫秒）/ Maximum retry delay in milliseconds",
-          "title": "Retry Delay Max",
-          "type": "number"
+          "title": "Retry Delay Max"
         },
         "auto_resume": {
           "type": "object",
           "properties": {
             "enabled": {
               "default": false,
+              "type": "boolean",
               "description": "是否啟用自動繼續任務 / Enable auto resume",
-              "title": "Enabled",
-              "type": "boolean"
+              "title": "Enabled"
             },
             "max_retries": {
-              "description": "最大重試次數 / Maximum retry count",
-              "title": "Max Retries",
               "default": 3,
-              "type": "number"
+              "type": "number",
+              "description": "最大重試次數 / Maximum retry count",
+              "title": "Max Retries"
             },
             "retry_delay": {
-              "description": "重試延遲（毫秒）/ Retry delay in milliseconds",
-              "title": "Retry Delay",
               "default": 5000,
-              "type": "number"
+              "type": "number",
+              "description": "重試延遲（毫秒）/ Retry delay in milliseconds",
+              "title": "Retry Delay"
             },
             "on_error": {
               "default": "ignore",
-              "description": "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
-              "title": "On Error",
               "type": "string",
               "enum": [
                 "ignore",
                 "retry",
                 "notify"
-              ]
+              ],
+              "description": "錯誤時的行為：ignore=忽略、retry=重試、notify=通知 / Behavior on error: ignore=ignore, retry=retry, notify=notify",
+              "title": "On Error"
             },
             "target": {
               "default": "background",
-              "description": "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
-              "title": "Target",
               "type": "string",
               "enum": [
                 "background",
                 "all"
-              ]
+              ],
+              "description": "目標任務類型：background=背景任務、all=所有任務 / Target task type: background=background tasks, all=all tasks",
+              "title": "Target"
             },
             "prompts": {
               "type": "object",
               "properties": {
                 "retry": {
+                  "type": "string",
                   "description": "首次重試時的提示 / Prompt for first retry",
-                  "title": "Retry Prompt",
-                  "type": "string"
+                  "title": "Retry Prompt"
                 },
                 "final": {
+                  "type": "string",
                   "description": "最終重試時的提示 / Prompt for final retry",
-                  "title": "Final Prompt",
-                  "type": "string"
+                  "title": "Final Prompt"
                 },
                 "custom": {
-                  "description": "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
-                  "title": "Custom Prompts",
                   "type": "array",
                   "items": {
                     "type": "string"
-                  }
+                  },
+                  "description": "自定義提示陣列，按順序使用 / Custom prompt array, used in order",
+                  "title": "Custom Prompts"
                 }
               },
               "additionalProperties": false,
@@ -346,9 +343,10 @@
               "title": "Prompts"
             },
             "safety_prompt": {
+              "default": "請依序檢查：\n1. 若後續任務明確可行，繼續執行\n2. 若存在潛在風險（如破壞性變更、資料遺失、安全疑慮、或將更動專案外檔案），請先停止並說明風險，請求用戶確認\n3. 若需求模糊或資訊不足，請停止並說明疑點，請求用戶澄清\n4. 若非用戶明確要求撤銷更改或刪除檔案，請先詢問用戶，獲得許可後才執行\n\n**若任務已完成，請複查並總結結果後結束**\n\nCheck in order:\n1. If the next step is clear and actionable, proceed.\n2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.\n3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.\n4. Unless the user explicitly requests to revert changes or delete files, always ask for permission first and only proceed after obtaining user consent.\n\n**If the task is complete, review and summarize the results, then end.**",
+              "type": "string",
               "description": "自動繼續任務前发送的安全检查提示 / Safety check prompt before auto resume",
-              "title": "Safety Prompt",
-              "type": "string"
+              "title": "Safety Prompt"
             }
           },
           "required": [
@@ -375,21 +373,21 @@
       "properties": {
         "enabled": {
           "default": false,
+          "type": "boolean",
           "description": "是否啟用除錯模式 / Enable debug mode",
-          "title": "Enabled",
-          "type": "boolean"
+          "title": "Enabled"
         },
         "level": {
           "default": "warn",
-          "description": "日誌級別：error、warn、info、debug / Log level: error, warn, info, debug",
-          "title": "Level",
           "type": "string",
           "enum": [
             "error",
             "warn",
             "info",
             "debug"
-          ]
+          ],
+          "description": "日誌級別：error、warn、info、debug / Log level: error, warn, info, debug",
+          "title": "Level"
         }
       },
       "required": [

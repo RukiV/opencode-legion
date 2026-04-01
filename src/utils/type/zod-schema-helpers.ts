@@ -158,3 +158,14 @@ export function isZodNullable(schema: z.ZodTypeAny): schema is z.ZodNullable<z.Z
 {
 	return schema.def?.type === "nullable";
 }
+
+export function unwrapZodAllShape<T extends z.ZodObject>(schema: T): IZodUnwrapAll<T>
+{
+	const entries = Object.entries(schema.shape)
+		.map(([key, value]) => {
+			return [key, unwrapZodAll(value)];
+		})
+		;
+
+	return Object.fromEntries(entries) as IZodUnwrapAll<T>;
+}
