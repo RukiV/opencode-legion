@@ -280,25 +280,86 @@ export function getAllShadowNames(): EnumShadowSubAgentsName[] {
 }
 
 /**
- * only for valid ARISE_TOOLS
+ * Arise 工具設定項目結構
+ * Arise tool configuration entry structure
  *
- * @internal
+ * 定義單一 ARISE_TOOLS 項目的最小結構
+ * Defines the minimal structure for a single ARISE_TOOLS entry
+ *
+ * ⚠️ description 和 shortDescription 等同於 agent 的 system prompts，
+ *    直接影響 agent 的工具選擇和參數傳遞行為。
+ * ⚠️ description and shortDescription are effectively agent system prompts,
+ *    directly affecting tool selection and argument passing behavior.
+ * 
+ * 這些描述實際上就是 agent 的 system prompts，agent 會根據這些文字理解
+ * 工具的用途並決定如何使用。描述不準確會導致 agent 選錯工具或傳錯參數。
+ * These descriptions are effectively the agent's system prompts. Agents read
+ * these texts to understand what a tool does and how to use it. Inaccurate
+ * descriptions will cause agents to pick the wrong tool or pass wrong args.
+ * 
+ * @internal - only for valid ARISE_TOOLS satisfies 約束
  */
-interface I_AriseToolsConfigEntry {
+interface I_AriseToolsConfigEntry 
+{
+  /**
+   * ⚠️ 重要：工具完整描述，第一行應與 shortDescription 一致
+   * ⚠️ Important: Tool full description; first line should match shortDescription
+   *
+   * 當 description 不存在時，getAriseToolsConfigEntry 會以 shortDescription 作為替代
+   * When description is missing, getAriseToolsConfigEntry falls back to shortDescription
+   */
 	description?: string;
+	/**
+	 * ⚠️ 重要：工具簡短描述，用於 getAriseToolsMarkdown 列表顯示
+	 * ⚠️ Important: Tool short description, used in getAriseToolsMarkdown list
+	 *
+	 * 這是 agent 在工具列表中看到的第一印象，必須精確傳達工具的核心用途
+	 * This is the agent's first impression in the tool list; must precisely convey core purpose
+	 */
 	shortDescription: string;
+	/** 工具參數定義（Zod Schema）/ Tool arguments definition (Zod Schema) */
 	args: unknown;
 }
 
 /**
- * Arise Tools 描述 (Descriptions)
- * 包含所有工具的完整描述和簡短描述
+ * 召喚工具共用 args
+ * Shared args for summon tools
  *
- * Tool descriptions for Arise plugins
+ * prompt 和 model 的描述在 ARISE_SUMMON / ARISE_BACKGROUND 之間一致
+ * prompt and model descriptions are consistent across ARISE_SUMMON / ARISE_BACKGROUND
+ */
+const SHARED_SUMMON_ARGS = {
+	prompt: z
+		.string()
+		.describe("The task for the shadow agent (be specific)"),
+	model: z
+		.string()
+		.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
+		.optional(),
+  /** 召喚工具共用 description arg 的描述文字 / Shared description arg text for summon tools */
+  description: z
+    .string()
+    .describe("Short description (3-5 words, used in tracking output and background task status)"),
+};
+
+/**
+ * ⚠️ Arise Tools 描述 — 直接影響 agent 行為的 source of truth
+ * ⚠️ Arise Tools Descriptions — source of truth that directly affects agent behavior
+ *
+ * 包含所有工具的完整描述（description）和簡短描述（shortDescription）
+ * Contains full descriptions (description) and short descriptions (shortDescription) for all tools
+ *
+ * 這些描述等同於 agent 的 system prompts，修改會直接影響 agent 的工具選擇和參數傳遞行為。
+ * These descriptions are equivalent to agent system prompts; changes directly affect agent tool selection and argument passing behavior.
+ *
+ * 修改此處後，應同步更新 docs/shadow-summoning-methods.md（人類參考文件）。
+ * After modifying this, sync docs/shadow-summoning-methods.md (human reference document).
+ *
+ * @see I_AriseToolsConfigEntry
  */
 export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SUMMON]: {
-		description: `Invoke a shadow agent synchronously or in background.
+		description: `Summon a shadow agent - sync (returns result) or background (fire-and-forget).
 
 Available shadow agents:
 ${ALLOWED_SHADOWS.map((name) => {
@@ -310,71 +371,63 @@ IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
 - run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
 
-⚠️ For parallel execution WITH retrievable results, use arise_background instead (only beru/tank/bellation).
-
-Model override: Use the 'model' parameter to specify a different model for this shadow agent (format: provider/model, e.g. opencode/big-pickle). If not specified, each shadow agent uses its default model.`,
-		shortDescription: "Invoke a shadow agent (sync or background)",
+⚠️ For parallel execution WITH retrievable results, use arise_background instead (only beru/tank/bellation).`,
+		shortDescription: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)",
 
 		args: {
 			shadow: z
 				.enum(ALLOWED_SHADOWS)
 				.describe("Which shadow agent to summon"),
-			prompt: z
-				.string()
-				.describe("The task/question for the shadow agent (be specific)"),
+			...SHARED_SUMMON_ARGS,
 			run_in_background: z
 				.boolean()
 				.describe("false (DEFAULT) = blocks and returns result directly. true = returns Session ID but NO tool exists to retrieve result later - only use for fire-and-forget. For parallel WITH retrievable results, use arise_background instead.")
 				.optional()
 				.default(false),
-			description: z
-				.string()
-				.describe("Short description of the task (used in tracking output)")
-				.optional(),
-			model: z
-				.string()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
-				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND]: {
-		description: `Launch a shadow agent as a background task for parallel execution.
+		description: `Launch background shadow agent - trackable, retrievable results.
 
 Best for:
 ${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).join("\n")}
 
 Returns a task_id immediately. Use arise_background_status to check status, and arise_background_output to get results.
 
+The 'description' arg will be shown in arise_background_status output for task identification.
+
 ✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.`,
-		shortDescription: "Launch shadow agent as background task (parallel)",
+		shortDescription: "Launch background shadow agent - trackable, retrievable results",
 
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
 				.describe("Which shadow agent to run in background (beru, tank, or bellion)"),
-			prompt: z
-				.string()
-				.describe("The task for the shadow agent"),
-			description: z
-				.string()
-				.describe("Short description (3-5 words, used in arise_background_status)"),
-			model: z
-				.string()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
-				.optional(),
+			...SHARED_SUMMON_ARGS,
 		},
 	} as const,
 	[EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: {
-		shortDescription: "Get the output from a background shadow agent task.",
+		description: `Retrieve the completed output from a background shadow agent task.
+
+Returns the shadow agent's final response after task completion. 
+Use arise_background_status first to check if the task is done before calling this tool.
+
+The task_id must come from a previous arise_background call (format: arise_xxx).`,
+		shortDescription: "Retrieve the completed output from a background shadow agent task",
 
 		args: {
 			task_id: z
 				.string()
-				.describe("The task ID from arise_background"),
+				.describe("The task ID from arise_background (format: arise_xxx)"),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND_STATUS]: {
-		shortDescription: "List all background tasks and their status.",
+		description: `List all background shadow agent tasks and their current status.
+
+Shows task_id, shadow name, status (running/completed/error/cancelled), description, and duration for each task.
+
+Use this to check which tasks are still running before calling arise_background_output. Supports filtering to current session only.`,
+		shortDescription: "List all background shadow agent tasks and their current status",
 
 		args: {
 			current_session_only: z
@@ -384,12 +437,15 @@ Returns a task_id immediately. Use arise_background_status to check status, and 
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: {
-		shortDescription: "Cancel a running background task",
+		description: `Cancel a currently running background shadow agent task.
+
+The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.`,
+		shortDescription: "Cancel a currently running background shadow agent task.",
 
 		args: {
 			task_id: z
 				.string()
-				.describe("The task ID to cancel"),
+				.describe("The task ID to cancel (format: arise_xxx)"),
 		},
 	},
 	[EnumAriseTools.ARISE_LIST_MODELS]: {
