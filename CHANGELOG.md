@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.20](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.18...@bluelovers/opencode-arise@0.1.20) (2026-04-01)
+
+
+### BREAKING CHANGES
+
+* **types:** 集中管理常量并增强模型处理
+
+
+
+### ✨　Features
+
+* **config:** 调整schema格式并添加安全提示默认值 ([6e65988](https://github.com/bluelovers/opencode-arise/commit/6e65988864f0e2f2d3fd7e06d66d649bd46a59fd))
+* **debug:** 增强强制日志输出并重构选项处理 ([9ae8e16](https://github.com/bluelovers/opencode-arise/commit/9ae8e1639da6bf23f21ded211aaa2782ec4467a0))
+* **debug:** 添加启动版本日志与强制输出功能 ([dde6e56](https://github.com/bluelovers/opencode-arise/commit/dde6e5627e7160e7ff24804d586031a66757f24d))
+* **tools:** 检测高负载错误并增加重试延迟 ([1d4beca](https://github.com/bluelovers/opencode-arise/commit/1d4becaa6b8ae5906d769e2fded084476cd5c8f8))
+
+
+### 📦　Code Refactoring
+
+* **config:** 统一JSON Schema属性与Zod链式调用顺序 ([90aec06](https://github.com/bluelovers/opencode-arise/commit/90aec0658c1fd2d735b6b35f9f0cea8bb86374ab))
+* **enums:** 以 EnumLogLevel 統一取代 EnumAriseMsgLogLevel ([bd242fb](https://github.com/bluelovers/opencode-arise/commit/bd242fb7f881686df43eefd3140cda61c8cdf4af))
+* **enums:** 以 enum 取代字串字面值，提升型別安全 ([7d2b4d4](https://github.com/bluelovers/opencode-arise/commit/7d2b4d420a036b73d3936e1946842c6089f093b9))
+* **types:** 集中管理常量并更新导入路径 ([cd6b1e2](https://github.com/bluelovers/opencode-arise/commit/cd6b1e27836ac4fcf93b9e2cbb6c8a024e4299ce))
+* **types:** 集中管理常量并增强模型处理 ([000925c](https://github.com/bluelovers/opencode-arise/commit/000925ca6a169d2edb113bef72deaddb8d0571aa))
+* **zod:** 新增 Zod 语法链结顺序规则并重构类型守卫 ([646ba75](https://github.com/bluelovers/opencode-arise/commit/646ba75335a30c8bcd6c7ddd66548c30ecc5b51d))
+
+
+### 📚　Documentation
+
+* 記錄暗影召喚方式對比並更新工具描述 ([5e428d7](https://github.com/bluelovers/opencode-arise/commit/5e428d7ba004aa145deb3859ef600b62c7d73486))
+* **agents:** 改进工具描述以提高清晰度和准确性 ([a190a79](https://github.com/bluelovers/opencode-arise/commit/a190a792950f89b6f24e6e56fea219a15b8861e0))
+
+
+### 🔖　Miscellaneous
+
+* . ([0b35e6b](https://github.com/bluelovers/opencode-arise/commit/0b35e6b9a1f700daf2f3fdf3e360307a11c622fc))
+
+
+
 ## [0.1.18](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.16...@bluelovers/opencode-arise@0.1.18) (2026-03-31)
 
 
