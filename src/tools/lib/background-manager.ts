@@ -7,7 +7,8 @@ import {
     getAutoResumeConfig,
     getAutoResumeSafetyPrompt,
   } from "../../config/getters";
-import type { IAriseConfig } from "../../config/schema";
+import { DEFAULT_RETRY_DELAY_INCREMENT, HIGH_LOAD_BONUS_DELAY_MS } from "../../types/const-default";
+import { type IAriseConfig } from "../../config/schema";
 import {
     EnumAutoResumeOnError,
     EnumAutoResumeTarget,
@@ -28,6 +29,7 @@ import {
     formatAriseMsgLogBody,
   } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
+import { isHighLoadError } from "../../utils/string/regexp";
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
@@ -467,15 +469,33 @@ export class BackgroundManager
     });
 
     /**
-     * 等待配置的重試延遲
-     * Wait for configured retry delay
+     * 等待配置的重試延遲（偵測高負載時額外增加 10 秒）
+     * Wait for configured retry delay (add 10s bonus when high load detected)
+     *
+     * 若錯誤訊息包含 "under high load"、"retry after"、"please wait" 等模式，
+     * 則在基礎延遲上額外增加 HIGH_LOAD_BONUS_DELAY_MS
+     * If error message contains high load indicators,
+     * add HIGH_LOAD_BONUS_DELAY_MS on top of base delay
      */
+    const baseRetryDelay = autoResumeConfig.retry_delay ?? DEFAULT_RETRY_DELAY_INCREMENT;
+    let totalRetryDelay = baseRetryDelay;
+
+    if (isHighLoadError(task.error))
+    {
+      totalRetryDelay += HIGH_LOAD_BONUS_DELAY_MS;
+
+      logArise2WithLevel("info", () => [
+        `[background-manager]`,
+        `performAutoResume: high load detected in error, adding ${HIGH_LOAD_BONUS_DELAY_MS}ms bonus delay (total: ${totalRetryDelay}ms)`,
+      ]);
+    }
+
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
-      `performAutoResume: waiting retry_delay=${autoResumeConfig.retry_delay ?? 5000}ms before retry`,
+      `performAutoResume: waiting retry_delay=${totalRetryDelay}ms before retry`,
     ]);
 
-    await new Promise((resolve) => setTimeout(resolve, autoResumeConfig.retry_delay ?? 5000));
+    await new Promise((resolve) => setTimeout(resolve, totalRetryDelay));
 
     /**
      * 重置 pending 狀態並增加重試計數
