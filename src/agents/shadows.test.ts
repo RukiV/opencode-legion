@@ -1,6 +1,6 @@
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "./shadows";
-import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName } from '../types/enums';
-import { EnumOpencodeAgentMode } from '../types/enum-opencode';
+import { ALLOWED_SHADOWS, EnumShadowAgentsName, IAllShadowAgentsName, EnumShadowSubAgentsName } from '../types/enums';
+import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission, EnumReasoningEffort } from '../types/enum-opencode';
 
 /**
  * 所有 Shadow Agent名稱陣列
@@ -54,7 +54,7 @@ describe("Shadow Agents", () => {
   test("all other shadows are subagent mode", () => {
     const subagents = ALLOWED_SHADOWS;
     for (const name of subagents) {
-      expect(SHADOW_AGENTS[name].mode).toBe("subagent");
+      expect(SHADOW_AGENTS[name].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
     }
   });
 
@@ -66,8 +66,8 @@ describe("Shadow Agents", () => {
    * Beru is scout, Bellion is strategist, neither should directly edit files
    */
   test("beru and bellion have edit denied", () => {
-    expect(SHADOW_AGENTS.beru.permission?.edit).toBe("deny");
-    expect(SHADOW_AGENTS.bellion.permission?.edit).toBe("deny");
+    expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Beru].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
+    expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Bellion].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
   });
 
   /**
@@ -78,7 +78,7 @@ describe("Shadow Agents", () => {
    * Shadow Sovereign is full power mode, needs high reasoning capability
    */
   test("shadow-sovereign has high reasoning effort", () => {
-    expect(SHADOW_AGENTS["shadow-sovereign"].options?.reasoningEffort).toBe("high");
+    expect(SHADOW_AGENTS[EnumShadowSubAgentsName.ShadowSovereign].options?.reasoningEffort).toBe(EnumReasoningEffort.High);
   });
 
   /**
@@ -109,7 +109,7 @@ describe("OpenCode Overrides", () => {
    * Test 1: build agent uses ALL mode
    */
   test("build has mode all", () => {
-    expect(OPENCODE_OVERRIDES.build.mode).toBe("all");
+    expect(OPENCODE_OVERRIDES.build.mode).toBe(EnumOpencodeAgentMode.ALL);
   });
 
   /**
@@ -117,7 +117,7 @@ describe("OpenCode Overrides", () => {
    * Test 2: plan agent uses ALL mode
    */
   test("plan has mode all", () => {
-    expect(OPENCODE_OVERRIDES.plan.mode).toBe("all");
+    expect(OPENCODE_OVERRIDES.plan.mode).toBe(EnumOpencodeAgentMode.ALL);
   });
 
   /**

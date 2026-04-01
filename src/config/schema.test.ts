@@ -1,5 +1,6 @@
 import { AriseConfigSchema } from "./schema";
 import { createDefaultConfig } from "../types/config-defaults";
+import { EnumShadowSubAgentsName } from "../types/enums";
 
 describe("AriseConfigSchema", () => {
   test("validates default config", () => {
@@ -17,7 +18,7 @@ describe("AriseConfigSchema", () => {
 
   test("validates config with disabled shadows", () => {
     const config = {
-      disabled_shadows: ["beru", "tank"],
+      disabled_shadows: [EnumShadowSubAgentsName.Beru, EnumShadowSubAgentsName.Tank],
     };
     const result = AriseConfigSchema.safeParse(config);
     expect(result.success).toBe(true);

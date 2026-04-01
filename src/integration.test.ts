@@ -1,6 +1,7 @@
 import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 import OpencodeArise from "./index";
-import { ALL_ARISE_TOOLS } from "./types/enums";
+import { ALL_ARISE_TOOLS, EnumShadowAgentsName, EnumShadowSubAgentsName } from "./types/enums";
+import { EnumOpencodeAgentMode } from "./types/enum-opencode";
 
 // Comprehensive mock context
 const createMockCtx = () => ({
@@ -81,7 +82,7 @@ describe("Plugin Integration", () => {
     const mockConfig: Record<string, unknown> = {};
     await hooks.config!(mockConfig);
 
-    expect(mockConfig.default_agent).toBe("monarch");
+    expect(mockConfig.default_agent).toBe(EnumShadowAgentsName.ShadowMonarch);
   });
 
   it("config hook creates all shadow agents", async () => {
@@ -94,13 +95,13 @@ describe("Plugin Integration", () => {
     const agents = mockConfig.agent as Record<string, unknown>;
 
     // All shadows should be registered
-    expect(agents.monarch).toBeDefined();
-    expect(agents.beru).toBeDefined();
-    expect(agents.igris).toBeDefined();
-    expect(agents.bellion).toBeDefined();
-    expect(agents.tusk).toBeDefined();
-    expect(agents.tank).toBeDefined();
-    expect(agents["shadow-sovereign"]).toBeDefined();
+    expect(agents[EnumShadowAgentsName.ShadowMonarch]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.Beru]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.Igris]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.Bellion]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.Tusk]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.Tank]).toBeDefined();
+    expect(agents[EnumShadowSubAgentsName.ShadowSovereign]).toBeDefined();
   });
 
   it("config hook sets correct modes for agents", async () => {
@@ -113,12 +114,12 @@ describe("Plugin Integration", () => {
     const agents = mockConfig.agent as Record<string, any>;
 
     // Monarch is primary
-    expect(agents.monarch.mode).toBe("primary");
+    expect(agents[EnumShadowAgentsName.ShadowMonarch].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
 
     // Others are subagents
-    expect(agents.beru.mode).toBe("subagent");
-    expect(agents.igris.mode).toBe("subagent");
-    expect(agents.bellion.mode).toBe("subagent");
+    expect(agents[EnumShadowSubAgentsName.Beru].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+    expect(agents[EnumShadowSubAgentsName.Igris].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+    expect(agents[EnumShadowSubAgentsName.Bellion].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
   });
 
   it("compaction hook injects context", async () => {

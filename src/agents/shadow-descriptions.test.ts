@@ -380,7 +380,7 @@ describe("getShadowDescription", () => {
 	it("returns description for valid name", () => {
 		const result = getShadowDescription(EnumShadowSubAgentsName.Beru);
 		expect(result).toBeDefined();
-		expect(result?.name).toBe("beru");
+		expect(result?.name).toBe(EnumShadowSubAgentsName.Beru);
 	});
 
 	/**

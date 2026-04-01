@@ -9,6 +9,7 @@ import {
 } from '../types/enum-opencode';
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
+import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 
 /**
  * Shadow Agent 介面
@@ -49,7 +50,7 @@ export type IShadowAgents = {
  */
 export interface IShadowDescription {
   /** 名稱 / Name */
-  name: string;
+  name: EnumShadowSubAgentsName;
   /** 角色標題 / Character title */
   title: string;
   /** 角色象徵 emoji / Character symbol emoji */
@@ -72,7 +73,7 @@ export interface IShadowDescription {
  */
 export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescription> = {
   [EnumShadowSubAgentsName.Beru]: {
-    name: "beru",
+    name: EnumShadowSubAgentsName.Beru,
     title: "Ant King Scout",
     emoji: "🐜",
     role: "Fastest scout",
@@ -88,7 +89,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
   },
 
   [EnumShadowSubAgentsName.Igris]: {
-    name: "igris",
+    name: EnumShadowSubAgentsName.Igris,
     title: "Loyal Knight",
     emoji: "⚔️",
     role: "Precise implementer",
@@ -104,7 +105,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
   },
 
   [EnumShadowSubAgentsName.Bellion]: {
-    name: "bellion",
+    name: EnumShadowSubAgentsName.Bellion,
     title: "Grand Marshal",
     emoji: "🎖️",
     role: "Master strategist",
@@ -120,7 +121,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
   },
 
   [EnumShadowSubAgentsName.Tusk]: {
-    name: "tusk",
+    name: EnumShadowSubAgentsName.Tusk,
     title: "Creative Shadow",
     emoji: "🎨",
     role: "UI/UX specialist",
@@ -136,7 +137,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
   },
 
   [EnumShadowSubAgentsName.Tank]: {
-    name: "tank",
+    name: EnumShadowSubAgentsName.Tank,
     title: "Research Shadow",
     emoji: "🛡️",
     role: "External knowledge gatherer",
@@ -152,7 +153,7 @@ export const SHADOW_DESCRIPTIONS: Record<EnumShadowSubAgentsName, IShadowDescrip
   },
 
   [EnumShadowSubAgentsName.ShadowSovereign]: {
-    name: "shadow-sovereign",
+    name: EnumShadowSubAgentsName.ShadowSovereign,
     title: "Full Power",
     emoji: "👁️",
     role: "Deep reasoning specialist",
@@ -363,7 +364,7 @@ export const ARISE_TOOLS = {
 
 Available shadow agents:
 ${ALLOWED_SHADOWS.map((name) => {
-			const supportsBg = (name === "beru" || name === "tank" || name === "bellion") ? " (supports background)" : "";
+			const supportsBg = (name === EnumShadowSubAgentsName.Beru || name === EnumShadowSubAgentsName.Tank || name === EnumShadowSubAgentsName.Bellion) ? " (supports background)" : "";
 			return `- ${name}: ${getShortDescription(name)}${supportsBg}`;
 		}).join("\n")}
 
@@ -371,8 +372,8 @@ IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
 - run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
 
-⚠️ For parallel execution WITH retrievable results, use arise_background instead (only beru/tank/bellation).`,
-		shortDescription: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)",
+⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_BACKGROUND as const} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+		shortDescription: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)" as const,
 
 		args: {
 			shadow: z
@@ -396,13 +397,13 @@ Returns a task_id immediately. Use arise_background_status to check status, and 
 
 The 'description' arg will be shown in arise_background_status output for task identification.
 
-✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.`,
-		shortDescription: "Launch background shadow agent - trackable, retrievable results",
+✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.` as const,
+		shortDescription: "Launch background shadow agent - trackable, retrievable results" as const,
 
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
-				.describe("Which shadow agent to run in background (beru, tank, or bellion)"),
+				.describe(`Which shadow agent to run in background (${BACKGROUND_SHADOWS.join(', ')})`),
 			...SHARED_SUMMON_ARGS,
 		},
 	} as const,
@@ -412,8 +413,8 @@ The 'description' arg will be shown in arise_background_status output for task i
 Returns the shadow agent's final response after task completion. 
 Use arise_background_status first to check if the task is done before calling this tool.
 
-The task_id must come from a previous arise_background call (format: arise_xxx).`,
-		shortDescription: "Retrieve the completed output from a background shadow agent task",
+The task_id must come from a previous arise_background call (format: arise_xxx).` as const,
+		shortDescription: "Retrieve the completed output from a background shadow agent task" as const,
 
 		args: {
 			task_id: z
@@ -426,8 +427,8 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 
 Shows task_id, shadow name, status (running/completed/error/cancelled), description, and duration for each task.
 
-Use this to check which tasks are still running before calling arise_background_output. Supports filtering to current session only.`,
-		shortDescription: "List all background shadow agent tasks and their current status",
+Use this to check which tasks are still running before calling arise_background_output. Supports filtering to current session only.` as const,
+		shortDescription: "List all background shadow agent tasks and their current status" as const,
 
 		args: {
 			current_session_only: z
@@ -439,8 +440,8 @@ Use this to check which tasks are still running before calling arise_background_
 	[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: {
 		description: `Cancel a currently running background shadow agent task.
 
-The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.`,
-		shortDescription: "Cancel a currently running background shadow agent task.",
+The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.` as const,
+		shortDescription: "Cancel a currently running background shadow agent task." as const,
 
 		args: {
 			task_id: z
@@ -453,8 +454,8 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 
 Use this tool to find the exact model name when you need to specify a model for a shadow.
 
-Returns a formatted list of all available models in the format provider/modelID.`,
-		shortDescription: "List all available models from configured providers.",
+Returns a formatted list of all available models in the format provider/modelID.` as const,
+		shortDescription: "List all available models from configured providers." as const,
 
 		args: {
 			provider: z
@@ -477,8 +478,8 @@ Runtime controls:
 - auto_resume: Enable/disable auto-resume for future failures after this manual retry
 - background_auto_resume: Enable/disable auto-resume specifically for background tasks
 
-Returns the status of the resume attempt.`,
-		shortDescription: "Actively continue/resume a failed task manually",
+Returns the status of the resume attempt.` as const,
+		shortDescription: "Actively continue/resume a failed task manually" as const,
 
 		args: {
 			task_id: z
@@ -511,8 +512,8 @@ The log levels are ordered from least to most verbose:
 - error: Only errors
 - warn: Errors and warnings
 - info: Errors, warnings, and informational messages
-- debug: All messages including debug information`,
-		shortDescription: "Control debug mode (enable/disable/set level)",
+- debug: All messages including debug information` as const,
+		shortDescription: "Control debug mode (enable/disable/set level)" as const,
 
 		args: {
 			enabled: z
@@ -585,7 +586,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
     mode: EnumOpencodeAgentMode.PRIMARY,
     model: "anthropic/claude-opus-4-5",
     steps: 16,
-    prompt: `You are the Shadow Monarch (opencode-arise).
+    prompt: `You are the Shadow Monarch (${LEGACY_PLUGIN_NAME}).
 
 Your role: Interpret user requests and delegate to your Shadow Army Agents with MINIMAL SUFFICIENT effort.
 
@@ -593,7 +594,7 @@ Your role: Interpret user requests and delegate to your Shadow Army Agents with 
 ${getMonarchShadowList()}
 
 ## Primary
-- @shadow-monarch - The main orchestrator (only one)
+- @${EnumShadowAgentsName.ShadowMonarch as const} - The main orchestrator (only one)
 
 ${getAriseToolsSection()}
 
@@ -601,13 +602,13 @@ ${getAriseToolsSection()}
 1. Assess intent before acting. Don't over-delegate.
 2. For trivial tasks, handle directly without summoning shadow agents.
 3. Keep a short TODO list. Mark items in_progress → completed.
-4. Use background tasks for parallel exploration (beru, tank, bellion).
+4. Use background tasks for parallel exploration (${BACKGROUND_SHADOWS.join(', ')}).
 5. Only summon @shadow-sovereign when stuck or for complex architecture.
 6. Verify changes work before declaring done.
 
 ## Summoning Method Rules
 - Need result NOW → arise_summon (default, blocks and returns result)
-- Need result LATER (parallel) → arise_background (beru/tank/bellation only, trackable via arise_background_status/output)
+- Need result LATER (parallel) → arise_background (${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
 - DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
 - ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
 

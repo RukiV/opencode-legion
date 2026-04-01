@@ -2,6 +2,7 @@
 /// <reference types="bun" />
 /// <reference types="bun-types" />
 import { describe, expect, it, test } from "bun:test";
+import { EnumShadowAgentsName } from "../types/enums";
 import {
 	findLastUserMessage,
 	findLastAssistantMessage,
@@ -38,7 +39,7 @@ describe("Session Utils", () => {
 			role,
 			sessionID: "session-123",
 			parentID: "parent-456",
-			agent: "monarch",
+			agent: EnumShadowAgentsName.ShadowMonarch,
 			model: "gpt-4",
 			tools: [ "tool1", "tool2" ],
 		},
@@ -140,7 +141,7 @@ describe("Session Utils", () => {
 
 			expect(result).toMatchObject({
 				sessionID: "session-abc",
-				agent: "monarch",
+				agent: EnumShadowAgentsName.ShadowMonarch,
 				model: "gpt-4",
 				tools: [ "tool1", "tool2" ],
 			});

@@ -7,7 +7,7 @@
  */
 
 import type { IAriseConfig } from "../config/schema";
-import type { IAllShadowAgentsName } from "../types/enums";
+import { EnumShadowAgentsName, type IAllShadowAgentsName } from "../types/enums";
 import type { IShadowAgent } from "../agents/shadows";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents/shadows";
 import { _isAutoModel } from "../utils/model-resolver";
@@ -127,7 +127,7 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 	return async function configHook(opencodeConfig: IOpencodeConfig): Promise<void>
 	{
 		/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
-		opencodeConfig.default_agent = "monarch";
+		opencodeConfig.default_agent = EnumShadowAgentsName.ShadowMonarch;
 
 		/** 設定 Shadow Agent 配置 / Set Shadow agents config */
 		setShadowAgentsConfig({

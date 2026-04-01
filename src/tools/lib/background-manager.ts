@@ -15,6 +15,7 @@ import {
     IAllShadowAgentsName,
     BackgroundTaskStatus,
   } from "../../types/enums";
+import { EnumSessionStatusType } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
@@ -976,7 +977,7 @@ export class BackgroundManager
          * Session idle = 任務完成
          * Session idle = task completed
          */
-        if (status.type === "idle")
+        if (status.type === EnumSessionStatusType.Idle)
         {
           await this.extractResult(task);
            task.status = BackgroundTaskStatus.Completed;
@@ -993,7 +994,7 @@ export class BackgroundManager
          * Session busy/retry = 任務仍在執行，增加重試次數並繼續輪詢
          * Session busy/retry = task still running, increment retry count and continue polling
          */
-        else if (status.type === "busy" || status.type === "retry")
+        else if (status.type === EnumSessionStatusType.Busy || status.type === EnumSessionStatusType.Retry)
         {
           task.retryCount++;
 
@@ -1288,7 +1289,7 @@ export class BackgroundManager
     }
 
     /** 檢查任務是否處於 error 狀態 / Check if task is in error state */
-    if (task.status !== "error" && !force)
+    if (task.status !== BackgroundTaskStatus.Error && !force)
     {
       return formatAriseMsgError(`Task ${taskId} is not in error state (status: ${task.status}). Use force=true to retry anyway.`);
     }

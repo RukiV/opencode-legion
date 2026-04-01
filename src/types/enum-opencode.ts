@@ -136,3 +136,19 @@ export enum EnumReasoningEffort {
 	/** 低推理努力 / Low reasoning effort */
 	Low = "low",
 }
+
+/**
+ * Session 狀態類型列舉
+ * Session status type enumeration
+ *
+ * 定義 OpenCode session 的可能狀態
+ * Defines possible OpenCode session statuses
+ */
+export enum EnumSessionStatusType {
+	/** 閒置（任務完成）/ Idle (task completed) */
+	Idle = "idle",
+	/** 忙碌（執行中）/ Busy (running) */
+	Busy = "busy",
+	/** 重試中 / Retrying */
+	Retry = "retry",
+}
