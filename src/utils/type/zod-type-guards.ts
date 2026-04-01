@@ -7,7 +7,7 @@
  */
 
 import { z } from "zod";
-import { $ZodDefaultDef, $ZodOptionalDef, $ZodType } from "zod/v4/core";
+import { $ZodDefaultDef, $ZodOptionalDef } from "zod/v4/core";
 
 /**
  * 類型守衛：檢查是否為 ZodObject
@@ -52,4 +52,42 @@ export function _isZodDefaultDef(def: z.core.$ZodTypeDef): def is $ZodDefaultDef
 export function _isZodOptionalDef(def: z.core.$ZodTypeDef): def is $ZodOptionalDef
 {
 	return def.type === "optional";
+}
+
+/** ==================== Schema 層級類型守衛 ==================== */
+
+/**
+ * 檢查 Schema 是否為 ZodDefault
+ * Check if schema is ZodDefault
+ *
+ * @param schema - 任意 Zod Schema
+ * @returns 是否為 ZodDefault 類型
+ */
+export function isZodDefault(schema: z.ZodTypeAny): schema is z.ZodDefault<z.ZodTypeAny>
+{
+	return schema.def?.type === "default";
+}
+
+/**
+ * 檢查 Schema 是否為 ZodOptional
+ * Check if schema is ZodOptional
+ *
+ * @param schema - 任意 Zod Schema
+ * @returns 是否為 ZodOptional 類型
+ */
+export function isZodOptional(schema: z.ZodTypeAny): schema is z.ZodOptional<z.ZodTypeAny>
+{
+	return schema.def?.type === "optional";
+}
+
+/**
+ * 檢查 Schema 是否為 ZodNullable
+ * Check if schema is ZodNullable
+ *
+ * @param schema - 任意 Zod Schema
+ * @returns 是否為 ZodNullable 類型
+ */
+export function isZodNullable(schema: z.ZodTypeAny): schema is z.ZodNullable<z.ZodTypeAny>
+{
+	return schema.def?.type === "nullable";
 }

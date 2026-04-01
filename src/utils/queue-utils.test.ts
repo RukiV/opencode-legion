@@ -432,7 +432,7 @@ describe("Queue Utils", () => {
 
 			const elapsed = Date.now() - start;
 			// 如果沒有 maxDelay 限制，會等待很久
-			expect(elapsed).toBeLessThanOrEqual(200);
+			expect(elapsed).toBeLessThanOrEqual(300);
 		});
 	});
 

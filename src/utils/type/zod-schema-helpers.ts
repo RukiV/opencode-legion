@@ -8,7 +8,7 @@
 
 import { z } from "zod";
 
-// ==================== Zod Schema 工廠函數 ====================
+/** ==================== Zod Schema 工廠函數 ==================== */
 
 /**
  * 創建 Zod 任意類型或該類型陣列的聯合 Schema
@@ -25,7 +25,7 @@ export function zodSchemaOrSchemaArray<T extends z.ZodTypeAny>(schema: T): z.Zod
 	return schema.or(z.array(schema));
 }
 
-// ==================== 強制陣列預處理工廠函數 ====================
+/** ==================== 強制陣列預處理工廠函數 ==================== */
 
 /**
  * 創建強制陣列預處理 Schema（泛型版本）
@@ -42,7 +42,7 @@ export function createForceZodArraySchema<T extends z.ZodTypeAny>(itemSchema: T)
 	);
 }
 
-// ==================== 提取原始定義 ====================
+/** ==================== 提取原始定義 ==================== */
 
 /**
  * 從 ZodDefault 提取原始內部類型
@@ -119,44 +119,6 @@ export function unwrapZodAll<T extends z.ZodTypeAny>(schema: T): IZodUnwrapAll<T
 	}
 
 	return schema as IZodUnwrapAll<T>;
-}
-
-// ==================== 類型守衛（用於識別包裝類型） ====================
-
-/**
- * 檢查 Schema 是否為 ZodDefault
- * Check if schema is ZodDefault
- *
- * @param schema - 任意 Zod Schema
- * @returns 是否為 ZodDefault 類型
- */
-export function isZodDefault(schema: z.ZodTypeAny): schema is z.ZodDefault<z.ZodTypeAny>
-{
-	return schema.def?.type === "default";
-}
-
-/**
- * 檢查 Schema 是否為 ZodOptional
- * Check if schema is ZodOptional
- *
- * @param schema - 任意 Zod Schema
- * @returns 是否為 ZodOptional 類型
- */
-export function isZodOptional(schema: z.ZodTypeAny): schema is z.ZodOptional<z.ZodTypeAny>
-{
-	return schema.def?.type === "optional";
-}
-
-/**
- * 檢查 Schema 是否為 ZodNullable
- * Check if schema is ZodNullable
- *
- * @param schema - 任意 Zod Schema
- * @returns 是否為 ZodNullable 類型
- */
-export function isZodNullable(schema: z.ZodTypeAny): schema is z.ZodNullable<z.ZodTypeAny>
-{
-	return schema.def?.type === "nullable";
 }
 
 export function unwrapZodAllShape<T extends z.ZodObject>(schema: T): IZodUnwrapAll<T>

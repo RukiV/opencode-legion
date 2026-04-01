@@ -321,7 +321,9 @@ Model override: Use the 'model' parameter to specify a different model for this 
 				.describe("The task/question for the shadow agent (be specific)"),
 			run_in_background: z
 				.boolean()
-				.describe("true = async (parallel), false = sync (wait for result)"),
+				.describe("true = async (parallel), false = sync (wait for result)")
+        .optional()
+        .default(false),
 			description: z
 				.string()
 				.optional()
