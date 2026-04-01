@@ -298,7 +298,7 @@ interface I_AriseToolsConfigEntry {
  */
 export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SUMMON]: {
-		description: `Invoke a shadow agent synchronously or in background
+		description: `Invoke a shadow agent synchronously or in background.
 
 Available shadow agents:
 ${ALLOWED_SHADOWS.map((name) => {
@@ -306,8 +306,11 @@ ${ALLOWED_SHADOWS.map((name) => {
 			return `- ${name}: ${getShortDescription(name)}${supportsBg}`;
 		}).join("\n")}
 
-Use run_in_background=true for parallel execution (recommended for exploration/research).
-Use run_in_background=false when you need the result immediately.
+IMPORTANT - run_in_background behavior:
+- run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
+- run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
+
+⚠️ For parallel execution WITH retrievable results, use arise_background instead (only beru/tank/bellation).
 
 Model override: Use the 'model' parameter to specify a different model for this shadow agent (format: provider/model, e.g. opencode/big-pickle). If not specified, each shadow agent uses its default model.`,
 		shortDescription: "Invoke a shadow agent (sync or background)",
@@ -321,12 +324,12 @@ Model override: Use the 'model' parameter to specify a different model for this 
 				.describe("The task/question for the shadow agent (be specific)"),
 			run_in_background: z
 				.boolean()
-				.describe("true = async (parallel), false = sync (wait for result)")
+				.describe("false (DEFAULT) = blocks and returns result directly. true = returns Session ID but NO tool exists to retrieve result later - only use for fire-and-forget. For parallel WITH retrievable results, use arise_background instead.")
 				.optional()
 				.default(false),
 			description: z
 				.string()
-				.describe("Short description of the task (for tracking)")
+				.describe("Short description of the task (used in tracking output)")
 				.optional(),
 			model: z
 				.string()
@@ -340,22 +343,24 @@ Model override: Use the 'model' parameter to specify a different model for this 
 Best for:
 ${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).join("\n")}
 
-Returns a task_id immediately. Use arise_background_output to get results later.`,
+Returns a task_id immediately. Use arise_background_status to check status, and arise_background_output to get results.
+
+✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.`,
 		shortDescription: "Launch shadow agent as background task (parallel)",
 
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
-				.describe("Which shadow agent to run in background"),
+				.describe("Which shadow agent to run in background (beru, tank, or bellion)"),
 			prompt: z
 				.string()
 				.describe("The task for the shadow agent"),
 			description: z
 				.string()
-				.describe("Short description (3-5 words)"),
+				.describe("Short description (3-5 words, used in arise_background_status)"),
 			model: z
 				.string()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)")
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
 				.optional(),
 		},
 	} as const,
@@ -543,6 +548,12 @@ ${getAriseToolsSection()}
 4. Use background tasks for parallel exploration (beru, tank, bellion).
 5. Only summon @shadow-sovereign when stuck or for complex architecture.
 6. Verify changes work before declaring done.
+
+## Summoning Method Rules
+- Need result NOW → arise_summon (default, blocks and returns result)
+- Need result LATER (parallel) → arise_background (beru/tank/bellation only, trackable via arise_background_status/output)
+- DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
+- ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
 
 ARISE and lead your shadows to victory.`,
   },

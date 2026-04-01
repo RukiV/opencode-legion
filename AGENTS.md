@@ -329,6 +329,18 @@ config/     - Schema and path utilities
 types/      - TypeScript type definitions
 ```
 
+## Shadow Summoning Methods
+
+四種召喚方式的行為差異、架構洞察、以及使用時的注意事項。
+
+See [docs/shadow-summoning-methods.md](./docs/shadow-summoning-methods.md) for:
+- `arise_summon` vs `arise_background` 的差異
+- 兩套追蹤系統（Session vs Task）的架構斷裂
+- 結果取回能力的對比
+- 提示詞注意事項
+
+**⚠️ 修改召喚行為時，必須同時更新 `src/agents/shadows.ts`（Agent 行為的 source of truth）和 `docs/shadow-summoning-methods.md`（人類參考文件）。**
+
 ## Translation Rules / 翻譯規定
 
 See [docs/TRANSLATION_RULES.md](./docs/TRANSLATION_RULES.md) for the complete translation rules.
