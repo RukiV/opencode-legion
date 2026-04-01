@@ -4,9 +4,10 @@ import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools } from '../types/enums';
 import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
-import { resolveModelContext } from '../utils/model-resolver';
+import { resolveModelContext, formatModelBodyDescription } from '../utils/model-resolver';
 import { extractTextFromMessageParts } from '../utils/string/message';
 import { getErrorMessage } from '../utils/error';
+import { logArise2WithLevel } from '../utils/debug-control';
 import {
   formatAriseMsgTitle,
   formatAriseMsgError,
@@ -77,6 +78,19 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
          */
         const parentModel = getSessionModel(context.sessionID);
         const modelBody = resolveModelContext(parentModel, shadow, config, model);
+
+        /**
+         * 輸出召喚日誌
+         * Output summon log
+         *
+         * 報告啟動的模型名稱、執行模式和任務描述，無視 logLevel 限制
+         * Report the launched model name, execution mode and task description, ignore logLevel limit
+         */
+        logArise2WithLevel('info', () => [
+          `[Arise] Summoned ${shadow} with model: ${formatModelBodyDescription(modelBody)}, run_in_background: ${run_in_background}, description: ${taskDesc}`
+        ], {
+          force: true
+        });
 
         /**
          * 根據執行模式分支

@@ -394,6 +394,66 @@ export interface ILogArise2Options
 	consoleLog?: Console2;
 	/** 強制輸出，無視 logLevel 限制 / Force output, ignore logLevel limit */
 	force?: boolean;
+
+	/**
+	 * 日誌等級 / Log level
+	 * 
+	 * @internal
+	 */
+	level?: ILogLevel;
+	/** 
+	 * 是否輸出 / Whether to output
+	 * 
+	 * @internal
+	 */
+	doLog?: boolean;
+
+	/**
+	 * 方法名稱 / Method name
+	 * 
+	 * @internal
+	 */
+	methodName?: IMethods2;
+}
+
+function _logArise2OptionsCore(methodName: IMethods2 | ILogArise2Options, opts?: ILogArise2Options): Required<ILogArise2Options>
+{
+	if (typeof methodName === 'object')
+	{
+		([opts, methodName] = [methodName ?? {}, void 0 as any]);
+	}
+
+	let { consoleLog, force, methodName: _methodName } = (opts ??= {} as ILogArise2Options);
+
+	methodName ??= (_methodName as IMethods2);
+
+	if (typeof methodName !== 'string' || !methodName.length)
+	{
+		throw new Error('methodName must be a non-empty string');
+	}
+
+	let doLog: boolean;
+	const level = getMethodLogLevel(methodName);
+
+	if (force)
+	{
+		consoleLog ??= consoleLogger;
+		doLog = true;
+	}
+	else
+	{
+		consoleLog ??= consoleLoggerWithLevel;
+		doLog = canLog(level);
+	}
+	
+	return {
+		...opts,
+		consoleLog, 
+		doLog, 
+		level,
+		force,
+		methodName,
+	} satisfies ILogArise2Options as any;
 }
 
 /**
@@ -448,14 +508,14 @@ export function logArise2WithLevel<M extends IMethods2>(
 	opts?: ILogArise2Options
 ): void
 {
-	const level = getMethodLogLevel(methodName);
-	const consoleLog = opts?.consoleLog ?? consoleLoggerWithLevel;
+
+	const { consoleLog, doLog, level, force } = _logArise2OptionsCore(methodName, opts);
 
 	/**
 	 * force 模式下無視 logLevel，直接使用原始 consoleLogger 輸出
 	 * In force mode, ignore logLevel and use original consoleLogger directly
 	 */
-	if (opts?.force)
+	if (force)
 	{
 		const args = fn();
 		/**
@@ -467,7 +527,7 @@ export function logArise2WithLevel<M extends IMethods2>(
 		return;
 	}
 
-	if (canLog(level))
+	if (doLog)
 	{
 		const args = fn();
 		logArise2(consoleLog[methodName], args);
@@ -506,20 +566,21 @@ export function logArise2WithLevelMulti<M extends IMethods2>(
 ): void
 {
 	/**
-	 * 將多行字串連接成一行
-	 * Join multiple lines into a single line
-	 *
-	 * 使用 " | " 作為分隔符號，方便閱讀
-	 * Use " | " as separator for better readability
-	 */
-	const combinedMessage = lines().join(' | ');
-
-	/**
 	 * 使用 any 類型繞過 TypeScript 推導限制
 	 * Use any type to bypass TypeScript inference limitation
 	 *
 	 * 由於 logArise2WithLevel 使用 M extends IMethods2 進行推導
 	 * 直接傳入字串陣列會導致類型不相容
 	 */
-	logArise2WithLevel(methodName, () => [combinedMessage] as never, opts);
+	logArise2WithLevel(methodName, () => {
+		/**
+		 * 將多行字串連接成一行
+		 * Join multiple lines into a single line
+		 *
+		 * 使用 "\n" 作為分隔符號，方便閱讀
+		 * Use "\n" as separator for better readability
+		 */
+		const combinedMessage = lines().join('\n');
+		return [combinedMessage] as any
+	}, opts);
 }

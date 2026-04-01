@@ -16,7 +16,7 @@ import {
   } from "../../types/enums";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
-import { resolveModelContext } from "../../utils/model-resolver";
+import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
 import { getSessionModel } from "../../config/model-cache";
 import {
     formatAriseMsg,
@@ -757,6 +757,23 @@ export class BackgroundManager
       `[background-manager]`,
       `launch: resolved model, parentModel=${parentModel ?? "none"}, finalModelBody=${JSON.stringify(modelBody)}`,
     ]);
+
+    /**
+     * 輸出背景任務啟動日誌
+     * Output background task launch log
+     *
+      * 報告啟動的模型名稱和任務描述，無視 logLevel 限制
+      * Report the launched model name and task description, ignore logLevel limit
+      *
+      * 模型資訊說明：
+      * - parentModel: 父 session 使用的模型（若存在）
+      * - resolvedModel: 解析後的模型（providerID/modelID 格式）
+      */
+    logArise2WithLevel("info", () => [
+      `[Arise] Background launch: ${opts.shadow} with model: ${formatModelBodyDescription(modelBody)} (parent: ${parentModel ?? "none"}), description: ${opts.description}`
+    ], {
+      force: true
+    });
 
     /**
      * 非同步執行 prompt（fire and forget）
