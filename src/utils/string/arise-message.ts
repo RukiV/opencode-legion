@@ -6,7 +6,7 @@
  * Provides unified message formatting functions to ensure consistent format for all Arise-related messages
  */
 import type { ITSValueOrArrayMaybeReadonly } from "ts-type";
-import { ARISE_PREFIX } from "../../types/enums";
+import { ARISE_PREFIX } from "../../types/const-default";
 
 type IAllowedMessageInput = ITSValueOrArrayMaybeReadonly<string | undefined>;
 

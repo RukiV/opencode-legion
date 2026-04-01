@@ -9,7 +9,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs-extra";
 import { npaToDepsValue } from "@yarn-tool/npa-to-deps";
 
-import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "../types/enums";
+import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "../types/const-default";
 import { AriseConfigSchema, type IAriseConfig } from "./schema";
 import { createDefaultConfig } from "../types/config-defaults";
 import { findOpencodeConfig, getAriseConfigPaths } from "./paths";

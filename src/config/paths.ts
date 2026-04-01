@@ -27,11 +27,7 @@ function getHomeDir(): string {
 	return homedir();
 }
 
-/**
- * Arise 配置檔案名稱
- * Arise config file name
- */
-export const CONFIG_FILENAME = "opencode-arise.json";
+import { CONFIG_FILENAME } from "../types/const-default";
 
 /**
  * OpenCode 配置檔案路徑列表

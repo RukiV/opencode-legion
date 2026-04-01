@@ -3,43 +3,9 @@ import { ALL_SHADOW_AGENTS_NAME } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
 import { ALLOWED_AUTO_RESUME_ON_ERROR, ALLOWED_AUTO_RESUME_TARGET, EnumAutoResumeOnError, EnumAutoResumeTarget } from "../types/enums";
-import { AUTO_MODEL } from "../types/const-default";
+import { AUTO_MODEL, DEFAULT_SAFETY_PROMPT, DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../types/const-default";
 import { extractDefaultsFromJSONSchema } from "../utils/type/zod-defaults";
 import { unwrapZodAll, unwrapZodAllShape } from "../utils/type/zod-schema-helpers";
-
-/**
- * 輪詢間隔預設值（毫秒）
- * Default polling interval in milliseconds
- */
-export const DEFAULT_POLL_INTERVAL = 2000 as const;
-
-/**
- * 重試延遲遞增量預設值（毫秒）
- * Default retry delay increment in milliseconds
- */
-export const DEFAULT_RETRY_DELAY_INCREMENT = 5000 as const;
-
-/**
- * 重試延遲最大值預設值（毫秒）
- * Default maximum retry delay in milliseconds
- */
-export const DEFAULT_RETRY_DELAY_MAX = 60000 as const;
-
-export const DEFAULT_SAFETY_PROMPT = `請依序檢查：
-1. 若後續任務明確可行，繼續執行
-2. 若存在潛在風險（如破壞性變更、資料遺失、安全疑慮、或將更動專案外檔案），請先停止並說明風險，請求用戶確認
-3. 若需求模糊或資訊不足，請停止並說明疑點，請求用戶澄清
-4. 若非用戶明確要求撤銷更改或刪除檔案，請先詢問用戶，獲得許可後才執行
-
-**若任務已完成，請複查並總結結果後結束**
-
-Check in order:
-1. If the next step is clear and actionable, proceed.
-2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.
-3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.
-4. Unless the user explicitly requests to revert changes or delete files, always ask for permission first and only proceed after obtaining user consent.
-
-**If the task is complete, review and summarize the results, then end.**` as const;
 
 /**
  * Shadow Agent 名稱 Zod Schema

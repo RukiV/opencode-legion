@@ -39,3 +39,72 @@ export const AutoModelSchema = z.literal(AUTO_MODEL).meta({
  * Used when no model is specified at all
  */
 export const DEFAULT_MODEL = 'opencode/big-pickle' as const;
+
+/**
+ * Arise 訊息前綴常數
+ * Arise message prefix constant
+ */
+export const ARISE_PREFIX = "[opencode-arise]" as const;
+
+/**
+ * OpenCode 插件名稱
+ * OpenCode plugin name
+ */
+export const PLUGIN_NAME = "@bluelovers/opencode-arise" as const;
+
+/**
+ * 舊版 OpenCode 插件名稱（向後相容）
+ * Legacy OpenCode plugin name (backward compatibility)
+ */
+export const LEGACY_PLUGIN_NAME = "opencode-arise" as const;
+
+/**
+ * Arise 配置檔案名稱
+ * Arise config file name
+ */
+export const CONFIG_FILENAME = "opencode-arise.json";
+
+/**
+ * 輪詢間隔預設值（毫秒）
+ * Default polling interval in milliseconds
+ */
+export const DEFAULT_POLL_INTERVAL = 2000 as const;
+
+/**
+ * 重試延遲遞增量預設值（毫秒）
+ * Default retry delay increment in milliseconds
+ */
+export const DEFAULT_RETRY_DELAY_INCREMENT = 5000 as const;
+
+/**
+ * 重試延遲最大值預設值（毫秒）
+ * Default maximum retry delay in milliseconds
+ */
+export const DEFAULT_RETRY_DELAY_MAX = 60000 as const;
+
+/**
+ * @see {@link https://github.com/anomalyco/opencode/blob/2cc738fb1794470d28b6795f2267b9b756d4be88/packages/opencode/src/session/compaction.ts#L320}
+ */
+export const DEFAULT_SAFETY_PROMPT = `請依序檢查：
+1. 若後續任務明確可行，繼續執行
+2. 若存在潛在風險（如破壞性變更、資料遺失、安全疑慮、或將更動專案外檔案），請先停止並說明風險，請求用戶確認
+3. 若需求模糊或資訊不足，請停止並說明疑點，請求用戶澄清
+4. 若非用戶明確要求撤銷更改或刪除檔案，請先詢問用戶，獲得許可後才執行
+
+**若任務已完成，請複查並總結結果後結束**
+
+Check in order:
+1. If the next step is clear and actionable, proceed.
+2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.
+3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.
+4. Unless the user explicitly requests to revert changes or delete files, always ask for permission first and only proceed after obtaining user consent.
+
+**If the task is complete, review and summarize the results, then end.**` as const;
+
+/**
+ * 高負載額外延遲（毫秒）/ High load bonus delay (ms)
+ *
+ * 當偵測到高負載訊息時，額外增加的重試延遲時間
+ * Additional retry delay when high load message is detected
+ */
+export const HIGH_LOAD_BONUS_DELAY_MS = 10_000;

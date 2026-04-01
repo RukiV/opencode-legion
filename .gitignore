@@ -7,6 +7,6 @@ nul
 /__root.d.ts
 /__root.js
 /__root.js.map
-test/temp.ts
-test/temp/
+test/temp*.ts
+test/temp*/
 tsconfig.tsbuildinfo

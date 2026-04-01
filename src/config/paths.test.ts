@@ -8,6 +8,8 @@
 import { describe, expect, test, beforeEach, afterEach, mock } from "bun:test";
 import {
 	CONFIG_FILENAME,
+} from "../types/const-default";
+import {
 	getOpencodeConfigDir,
 	getAriseConfigPath,
 	getAriseConfigPaths,

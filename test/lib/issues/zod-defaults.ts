@@ -1,5 +1,6 @@
 import { IAnyRecord } from "deepmerge-plus";
-import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX, IAriseConfig } from "../../../src/config/schema";
+import { IAriseConfig } from "../../../src/config/schema";
+import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../../../src/types/const-default";
 import { EnumLogLevel } from "../../../src/types/enum-opencode";
 import { EnumAutoResumeOnError, EnumAutoResumeTarget } from "../../../src/types/enums";
 

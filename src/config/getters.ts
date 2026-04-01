@@ -74,7 +74,7 @@ import type { IValueNotPartial } from "../types/types";
 import { createDefaultConfig } from "../types/config-defaults";
 import { deepMerge3 } from "../utils/config/config-merge";
 import type { IAriseConfig } from "./schema";
-import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "./schema";
+import { DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../types/const-default";
 
 /**
  * 配置獲取值型別

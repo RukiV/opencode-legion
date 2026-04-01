@@ -1,21 +1,3 @@
-/**
- * Arise 訊息前綴常數
- * Arise message prefix constant
- */
-export const ARISE_PREFIX = "[opencode-arise]" as const;
-
-/**
- * OpenCode 插件名稱
- * OpenCode plugin name
- */
-export const PLUGIN_NAME = "@bluelovers/opencode-arise" as const;
-
-/**
- * 舊版 OpenCode 插件名稱（向後相容）
- * Legacy OpenCode plugin name (backward compatibility)
- */
-export const LEGACY_PLUGIN_NAME = "opencode-arise" as const;
-
 import type { ITSTypeAndStringLiteral } from 'ts-type';
 
 /**

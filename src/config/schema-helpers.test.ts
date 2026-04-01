@@ -21,7 +21,7 @@ import {
 	DEFAULT_POLL_INTERVAL,
 	DEFAULT_RETRY_DELAY_INCREMENT,
 	DEFAULT_RETRY_DELAY_MAX,
-} from "./schema";
+} from "../types/const-default";
 import { type IAriseConfig } from "./schema";
 import {
 	getPollInterval,
