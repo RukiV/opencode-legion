@@ -322,16 +322,16 @@ Model override: Use the 'model' parameter to specify a different model for this 
 			run_in_background: z
 				.boolean()
 				.describe("true = async (parallel), false = sync (wait for result)")
-        .optional()
-        .default(false),
+				.optional()
+				.default(false),
 			description: z
 				.string()
-				.optional()
-				.describe("Short description of the task (for tracking)"),
+				.describe("Short description of the task (for tracking)")
+				.optional(),
 			model: z
 				.string()
-				.optional()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)"),
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
+				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND]: {
@@ -355,8 +355,8 @@ Returns a task_id immediately. Use arise_background_output to get results later.
 				.describe("Short description (3-5 words)"),
 			model: z
 				.string()
-				.optional()
-				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)"),
+				.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle)")
+				.optional(),
 		},
 	} as const,
 	[EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: {
@@ -374,8 +374,8 @@ Returns a task_id immediately. Use arise_background_output to get results later.
 		args: {
 			current_session_only: z
 				.boolean()
-				.optional()
-				.describe("Only show tasks from current session"),
+				.describe("Only show tasks from current session")
+				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: {
@@ -398,8 +398,8 @@ Returns a formatted list of all available models in the format provider/modelID.
 		args: {
 			provider: z
 				.string()
-				.optional()
-				.describe("Filter models by provider (e.g. 'anthropic', 'openai')"),
+				.describe("Filter models by provider (e.g. 'anthropic', 'openai')")
+				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_CONTINUE]: {
@@ -425,16 +425,16 @@ Returns the status of the resume attempt.`,
 				.describe("The task ID to resume/continue"),
 			force: z
 				.boolean()
-				.optional()
-				.describe("Force retry even if task is not in error state"),
+				.describe("Force retry even if task is not in error state")
+				.optional(),
 			auto_resume: z
 				.boolean()
-				.optional()
-				.describe("Enable auto-resume for future failures after this manual retry"),
+				.describe("Enable auto-resume for future failures after this manual retry")
+				.optional(),
 			background_auto_resume: z
 				.boolean()
-				.optional()
-				.describe("Enable/disable auto-resume specifically for background tasks"),
+				.describe("Enable/disable auto-resume specifically for background tasks")
+				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_DEBUG]: {
@@ -456,12 +456,12 @@ The log levels are ordered from least to most verbose:
 		args: {
 			enabled: z
 				.boolean()
-				.optional()
-				.describe("Enable or disable debug mode"),
+				.describe("Enable or disable debug mode")
+				.optional(),
 			level: z
 				.enum(ALLOWED_LOG_LEVELS)
-				.optional()
-				.describe("Set log level: error, warn, info, debug"),
+				.describe("Set log level: error, warn, info, debug")
+				.optional(),
 		},
 	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;

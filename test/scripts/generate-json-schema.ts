@@ -13,14 +13,37 @@
 import { writeFileSync } from "fs-extra";
 import { join } from "upath2";
 import { z } from "zod";
-
-// 引入專案根路徑
-// Import project root path
 import { __ROOT } from "../../__root";
-
-// 導入 AriseConfigSchema
-// Import AriseConfigSchema
 import { AriseConfigSchema } from "../../src/config/schema";
+import { sortObject } from "sort-object-keys2";
+
+function _sortObject<T extends Record<string, any>>(obj: T): T
+{
+	return sortObject(obj as any, {
+		keys: [
+			'$schema', 
+			'type',
+			'title',
+			'description',
+			'additionalProperties',
+			'default',
+			'required',
+		].concat(Object.keys(obj)),
+		useSource: true,
+	});
+}
+
+function sortObjectDeep<T extends Record<string, any>>(obj: T): T
+{
+	Object.entries(obj).forEach(([key, value]) => {
+		if (typeof value === 'object' && value !== null && !Array.isArray(value)) 
+		{
+			(obj as any)[key] = sortObjectDeep(value);
+		}
+	});
+
+	return _sortObject(obj as any);
+}
 
 /**
  * 生成 JSON Schema
@@ -36,7 +59,7 @@ function generateJSONSchema()
 	// Add standard JSON Schema properties
 	jsonSchema.$schema ||= "http://json-schema.org/draft-07/schema#";
 
-	return jsonSchema;
+	return sortObjectDeep(jsonSchema);
 }
 
 // 主邏輯

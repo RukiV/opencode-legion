@@ -44,6 +44,9 @@ importers:
       regexp-cjk-with-plugin-enabled:
         specifier: ^1.0.23
         version: 1.0.23(@lazy-cjk/jp-table-voice@1.0.40(ts-toolbelt@9.6.0))(cjk-conv@1.2.150(ts-toolbelt@9.6.0))(regexp-parser-event@1.1.47(ts-toolbelt@9.6.0))(ts-toolbelt@9.6.0)
+      sort-object-keys2:
+        specifier: ^3.0.8
+        version: 3.0.8
       ts-type:
         specifier: ^3.0.13
         version: 3.0.13(ts-toolbelt@9.6.0)
