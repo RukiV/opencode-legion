@@ -35,11 +35,11 @@ export const GIT_SUMMARY_ARGS = {
 	log_count: z
 		.number()
 		.meta({
-			description: "Number of recent commits to show (default: 5)",
+			description: "Number of recent commits to show (default: 10)",
 			title: "Log Count",
 		})
 		.optional()
-		.default(5),
+		.default(10),
 	/** 是否包含 diff --stat / Include diff --stat output */
 	diff_stat: z
 		.boolean()
