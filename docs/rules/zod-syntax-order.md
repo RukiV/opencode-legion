@@ -197,6 +197,55 @@ enabled: z.boolean()
 
 ---
 
+## 規則三：`.describe()` 語言規範（嚴格）
+
+**`.describe()` 僅使用英文。雙語註解放在區塊註解中，不放入 `.describe()`。**
+
+`.describe()` 的內容會進入 JSON Schema 和 OpenAPI 文件，應保持單一語言（英文）以確保一致性。雙語說明應使用區塊註解寫在 schema 屬性上方。
+
+```typescript
+// ✅ 正確：區塊註解雙語，.describe() 僅英文
+export const GIT_SUMMARY_ARGS = {
+	/** 顯示近期 commit 數量 / Number of recent commits to show */
+	log_count: z
+		.number()
+		.describe("Number of recent commits to show (default: 5)")
+		.optional()
+		.default(5),
+	/** 是否包含 diff --stat / Include diff --stat output */
+	diff_stat: z
+		.boolean()
+		.meta({
+			description: "Include diff --stat output (default: true)",
+		})
+		.optional()
+		.default(true),
+} as const;
+
+// ❌ 錯誤：.describe() 使用雙語
+log_count: z
+	.number()
+	.describe("顯示近期 commit 數量 / Number of recent commits to show (default: 5)")
+	.optional()
+	.default(5),
+
+// ❌ 錯誤：缺少區塊註解
+log_count: z
+	.number()
+	.describe("Number of recent commits to show (default: 5)")
+	.optional()
+	.default(5),
+```
+
+### 原因
+
+| 位置 | 語言 | 原因 |
+|------|------|------|
+| 區塊註解 `/** ... */` | 雙語（中文 / English） | 給開發者閱讀，IDE 顯示 |
+| `description` | 僅英文 | 進入 JSON Schema / API 文件，保持單一語言 |
+
+---
+
 ## 快速參考
 
 ```

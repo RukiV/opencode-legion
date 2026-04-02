@@ -129,6 +129,31 @@ import type { ShadowName } from "../config/schema";
 import { type PluginInput, someFunction } from "package";
 ```
 
+### 禁止目錄引用（Directory Imports）
+
+**匯入路徑必須明確指定檔案名稱，禁止使用目錄路徑讓 TypeScript 自動解析 `index.ts`。**
+
+當目錄下同時存在同名檔案（如 `schema.ts`）與子目錄（如 `schema/`）時，目錄引用會產生歧義，導致匯入錯誤的模組。
+
+```typescript
+// ❌ 錯誤 - 目錄引用，自動解析 index.ts（可能與 schema.ts 衝突）
+import { GIT_SUMMARY_ARGS } from '../config/schema';
+
+// ✅ 正確 - 明確指定檔案路徑
+import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
+
+// ❌ 錯誤 - 使用 index 命名
+import { GIT_SUMMARY_ARGS } from '../config/schema/index';
+
+// ✅ 正確 - 使用有意義的檔案名稱
+import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
+```
+
+**原則：**
+1. 目錄下的入口檔案應使用有意義的名稱（如 `entry.ts`），而非 `index.ts`
+2. 匯入時必須寫完整路徑，不省略檔名
+3. 當目錄與同名檔案並存時，此規則尤其重要（如 `config/schema.ts` + `config/schema/`）
+
 ### Naming Conventions
 | Type | Convention | Example |
 |------|------------|---------|
@@ -178,6 +203,41 @@ export type IShadowAgents = {
   [P in IAllShadowAgentsName]-?: IShadowAgent<P>;
 };
 ```
+
+### Zod Schema 規範
+
+**新增或重構 schema 時，優先使用 `.meta()` 而非 `.describe()`。**
+
+完整規範參見 `docs/rules/zod-syntax-order.md`，重點摘要：
+
+| 規則 | 說明 |
+|------|------|
+| **鏈結順序** | `.describe()` → `.meta()` → `.optional()` → `.default()` |
+| **優先用 `.meta()`** | 新增 schema 時使用 `.meta({ description, title })` 而非 `.describe()` |
+| **`.describe()` 僅英文** | 雙語放在區塊註解 `/** ... */`，不放入 `.describe()` |
+| **既有程式碼不動** | 修改他人代碼時不主動調換順序 |
+
+```typescript
+// ✅ 正確：新增時優先用 .meta()，區塊註解雙語
+/** 是否啟用 / Enable */
+enabled: z.boolean()
+  .meta({
+    description: "Whether to enable this feature",
+    title: "Enabled",
+  }).optional().default(true),
+
+// ⚠️ 可接受但不推薦：使用 .describe()
+enabled: z.boolean()
+  .describe("Whether to enable this feature")
+  .optional().default(true),
+
+// ❌ 錯誤：.describe() 使用雙語
+enabled: z.boolean()
+  .describe("是否啟用 / Enable")
+  .optional().default(true),
+```
+
+**⚠️ 修改既有 schema 時，保持原始鏈結順序不動（`.default` → `.optional` 不主動調換）。**
 
 ### Comments (Bilingual)
 ```typescript
@@ -357,7 +417,7 @@ See [docs/TRANSLATION_RULES.md](./docs/TRANSLATION_RULES.md) for the complete tr
 | `typescript-unimplemented-handler` | TypeScript type system limitations                       |
 | `test-file-best-practices` | 測試檔案最佳實踐規範。測試位置、命名、快照、fixtures、臨時檔案管理 |
 | `test-snapshot-documentation` | 利用測試快照進行文件化、範例展示、行為展示 |
-| `zod-syntax-order` (docs/rules/zod-syntax-order.md) | Zod Schema 方法鏈結順序（`.meta` → `.default` → `.optional`） |
+| `zod-syntax-order` (docs/rules/zod-syntax-order.md) | Zod Schema 方法鏈結順序（`.meta` → `.default` → `.optional`），`.describe()` 僅英文 |
 
 ---
 
