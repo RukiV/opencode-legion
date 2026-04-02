@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.21](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.20...@bluelovers/opencode-arise@0.1.21) (2026-04-02)
+
+
+
+### ✨　Features
+
+* auto-resume 增加通知與日誌輸出，todo-enforcer 增加日誌 ([17870d7](https://github.com/bluelovers/opencode-arise/commit/17870d7fcdb490d29792e8eed4cb33722045c1b2))
+* **tools:** 新增 arise_git_summary 工具 ([0ad1f9c](https://github.com/bluelovers/opencode-arise/commit/0ad1f9c30bf1fdd8d65776d6af13d379311e4a01))
+
+
+### 📦　Code Refactoring
+
+* **agents:** 集中管理 Shadow Agent prompts 並優化 Beru 提示詞 ([2c13e3b](https://github.com/bluelovers/opencode-arise/commit/2c13e3b7a837374ca264633047f412eea0f6b202))
+
+
+### 📚　Documentation
+
+* 更新 Zod 規則、AGENTS.md 與工作流程文件 ([bfa51ab](https://github.com/bluelovers/opencode-arise/commit/bfa51ab1765461940adebb344455a0852ca858e9))
+
+
+### 🚨　Tests
+
+* **high-load:** 新增 Provider/rate-limited 錯誤偵測測試並重構為 fixtures ([75e898f](https://github.com/bluelovers/opencode-arise/commit/75e898f7ad7fde143cb27fab2c2af5a403f09016))
+
+
+### ♻️　Chores
+
+* Number of recent commits to show (default: 10) ([452709a](https://github.com/bluelovers/opencode-arise/commit/452709adbfc407dec9424e07ed9660c29f69f32f))
+
+
+
 ## [0.1.20](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.18...@bluelovers/opencode-arise@0.1.20) (2026-04-01)
 
 

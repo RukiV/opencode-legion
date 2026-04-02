@@ -1,6 +1,6 @@
 {
   "name": "@bluelovers/opencode-arise",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": false,
   "description": "Solo Leveling themed orchestrator harness for OpenCode - Arise, Shadow Army!",
   "keywords": [
@@ -57,7 +57,7 @@
     "build:tsc": "tsc",
     "postbuild": "node --run build:json-schema",
     "npm:publish:bump": "node --run version:bump && npm publish",
-    "preversion": "echo preversion && pnpm run test && pnpm run build",
+    "preversion": "echo preversion && pnpm run test:agent && pnpm run build",
     "version": "echo version",
     "version:bump": "ynpx yarn-tool version",
     "prepublishOnly": "pnpm run preversion",
