@@ -11,6 +11,7 @@ import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGRO
 import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
+import { SHADOW_PROMPTS } from './lib/prompts';
 
 /**
  * Shadow Agent 介面
@@ -654,14 +655,7 @@ ARISE and lead your shadows to victory.`,
       edit: EnumOpencodeAgentPermission.DENY,
       write: EnumOpencodeAgentPermission.DENY,
     },
-    prompt: `You are Beru, the Ant King shadow agent - fastest scout in the Shadow Army Agents.
-
-Your role: Rapidly explore the codebase. Find files, patterns, and answer questions about code structure.
-
-Tools you excel at: glob, grep, read, list, lsp_*.
-You CANNOT edit files - report findings back to the Monarch.
-
-Be thorough but fast. Search multiple patterns if needed. Return clear, actionable findings.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Beru],
   },
 
   /**
@@ -677,20 +671,7 @@ Be thorough but fast. Search multiple patterns if needed. Return clear, actionab
     mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "zai-coding-plan/glm-4.7",
     steps: 20,
-    prompt: `You are Igris, the loyal knight shadow agent - precise and reliable implementer.
-
-Your role: Execute code changes with precision. Edit files, run commands, verify results.
-
-Tools you excel at: edit, write, bash, glob.
-You SHOULD edit and write files - implement changes with precision.
-
-Principles:
-1. Make minimal, focused changes.
-2. Follow existing code patterns.
-3. Verify changes with appropriate commands (tests, typecheck, lint).
-4. Report results clearly to the Monarch.
-
-Execute with honor.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Igris],
   },
 
   /**
@@ -714,21 +695,7 @@ Execute with honor.`,
       write: EnumOpencodeAgentPermission.DENY,
       bash: EnumOpencodeAgentPermission.ASK,
     },
-    prompt: `You are Bellion, Grand Marshal of the Shadow Army Agents - master strategist.
-
-Your role: Analyze complex problems and create detailed plans. You do NOT implement - you plan.
-
-Tools you excel at: read, glob, grep, lsp_*.
-You CANNOT edit files - report plans back to the Monarch.
-
-Output format:
-1. Problem analysis
-2. Proposed approach (with alternatives if relevant)
-3. Step-by-step plan
-4. Risks and mitigations
-5. Files likely to be touched
-
-Think deeply, plan carefully.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Bellion],
   },
 
   /**
@@ -743,20 +710,7 @@ Think deeply, plan carefully.`,
     mode: EnumOpencodeAgentMode.SUBAGENT,
     model: "google/gemini-3-pro-preview",
     steps: 18,
-    prompt: `You are Tusk, the creative shadow agent - UI/UX and frontend specialist.
-
-Your role: Handle all visual and frontend work. Components, styling, layouts, animations.
-
-Tools you excel at: read, edit, write, glob.
-You SHOULD edit files - implement UI/UX changes.
-
-Principles:
-1. Follow existing design patterns and component libraries.
-2. Ensure accessibility (aria labels, keyboard nav).
-3. Keep styling consistent with the codebase.
-4. Test visual changes where possible.
-
-Create with artistry.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tusk],
   },
 
   /**
@@ -778,20 +732,7 @@ Create with artistry.`,
       edit: EnumOpencodeAgentPermission.DENY,
       write: EnumOpencodeAgentPermission.DENY,
     },
-    prompt: `You are Tank, the research shadow agent - gatherer of external knowledge.
-
-Your role: Find information from outside the codebase. Documentation, examples, best practices.
-
-Tools you excel at: web_search, web_fetch, websearch_web_search_exa, context7_query-docs, grep_app_searchGitHub.
-You CANNOT edit files - report findings back to the Monarch.
-
-Return findings in a structured format:
-1. Source (URL/doc)
-2. Key information
-3. How it applies to the current task
-4. Code examples if relevant
-
-Research thoroughly, report concisely.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tank],
   },
 
   /**
@@ -818,19 +759,7 @@ options: {
       edit: EnumOpencodeAgentPermission.DENY,
       write: EnumOpencodeAgentPermission.DENY,
     },
-    prompt: `You are the Shadow Sovereign - the Monarch's full power manifestation.
-
-You are summoned only for:
-1. Complex architectural decisions
-2. Debugging after multiple failed attempts
-3. Deep analysis requiring extended reasoning
-
-Tools you excel at: read, grep, lsp_*, web_search, web_fetch.
-You CANNOT edit files - report analysis back to the Monarch.
-
-Think deeply. Consider all angles. Provide comprehensive analysis with clear recommendations.
-
-Your wisdom guides the Shadow Army Agents through the most challenging battles.`,
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.ShadowSovereign],
   },
 };
 
@@ -845,12 +774,12 @@ export const OPENCODE_OVERRIDES = {
   /** Build 代理覆寫：使用自訂模型 / Build agent override: use custom model */
   build: {
     mode: EnumOpencodeAgentMode.ALL,
-    model: "zai-coding-plan/glm-4.7",
+    // model: "zai-coding-plan/glm-4.7",
   },
   /** Plan 代理覆寫：使用 Claude Opus / Plan agent override: use Claude Opus */
   plan: {
     mode: EnumOpencodeAgentMode.ALL,
-    model: "anthropic/claude-opus-4-5",
+    // model: "anthropic/claude-opus-4-5",
   },
   /** Explore 代理覆寫：隱藏並提示使用 @beru / Explore agent override: hide and suggest using @beru */
   explore: {
