@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.23](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.21...@bluelovers/opencode-arise@0.1.23) (2026-04-02)
+
+
+
+### ✨　Features
+
+* **agents:** 新增 Esil Radiru 聊天模式代理與權限 enum ([a583051](https://github.com/bluelovers/opencode-arise/commit/a5830514eb3c156b4750938d94277ce03d7462e2))
+
+
+### 📦　Code Refactoring
+
+* **agents:** 強化 Bellion prompt 為策略架構規劃專家定位 ([a2ec55c](https://github.com/bluelovers/opencode-arise/commit/a2ec55cb8b7f7dcd76c678b8279ce07cd8461ab0))
+
+
+
 ## [0.1.21](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.20...@bluelovers/opencode-arise@0.1.21) (2026-04-02)
 
 

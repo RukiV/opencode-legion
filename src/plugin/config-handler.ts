@@ -87,7 +87,7 @@ export function setShadowAgentsConfig(params: {
 			model: resolvedModel,
 			steps: shadow.steps,
 			...(shadow.prompt && { prompt: shadow.prompt }),
-			...(shadow.permission && { permission: _handlePermission(shadow.permission) }),
+			...(shadow.permission && { permission: _handlePermission(shadow.permission) } as any),
 			...(shadow.options && { options: shadow.options }),
 		};
 	}

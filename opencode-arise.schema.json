@@ -25,7 +25,8 @@
           "bellion",
           "tusk",
           "tank",
-          "shadow-sovereign"
+          "shadow-sovereign",
+          "esil-radiru"
         ]
       }
     },
@@ -189,7 +190,8 @@
         "bellion",
         "tusk",
         "tank",
-        "shadow-sovereign"
+        "shadow-sovereign",
+        "esil-radiru"
       ],
       "propertyNames": {
         "type": "string",
@@ -202,7 +204,8 @@
           "bellion",
           "tusk",
           "tank",
-          "shadow-sovereign"
+          "shadow-sovereign",
+          "esil-radiru"
         ]
       }
     },
