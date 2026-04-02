@@ -276,6 +276,21 @@ export class BackgroundManager
    */
   shouldAutoResume(task: BackgroundTask): boolean
   {
+    return this.checkAutoResume(task).should;
+  }
+
+  /**
+   * 檢查是否應該對任務執行 auto-resume（含原因）
+   * Check if auto-resume should be performed on a task (with reason)
+   *
+   * 回傳結果包含 should（是否執行）與 reason（不執行的原因）
+   * Returns result with should (whether to execute) and reason (why not)
+   *
+   * @param task - 背景任務
+   * @returns { should: boolean, reason: string }
+   */
+  private checkAutoResume(task: BackgroundTask): { should: boolean, reason: string }
+  {
     /**
      * 檢查是否為背景任務
      * Check if it's a background task
@@ -308,7 +323,7 @@ export class BackgroundManager
           `[background-manager]`,
           `shouldAutoResume: background task with overrideBackgroundAutoResume=false, returning false`,
         ]);
-        return false;
+        return { should: false, reason: "background auto-resume disabled by runtime override" };
       }
       // override = true 時，繼續檢查其他條件
     } else if (!isBackgroundTask && task.overrideAutoResume !== undefined)
@@ -320,7 +335,7 @@ export class BackgroundManager
           `[background-manager]`,
           `shouldAutoResume: foreground task with overrideAutoResume=false, returning false`,
         ]);
-        return false;
+        return { should: false, reason: "foreground auto-resume disabled by runtime override" };
       }
       // override = true 時，繼續檢查其他條件
     }
@@ -337,7 +352,7 @@ export class BackgroundManager
         `[background-manager]`,
         `shouldAutoResume: auto-resume not enabled, returning false`,
       ]);
-      return false;
+      return { should: false, reason: "auto-resume not enabled in config" };
     }
 
     /**
@@ -350,7 +365,7 @@ export class BackgroundManager
         `[background-manager]`,
         `shouldAutoResume: task status=${task.status} !== 'error', returning false`,
       ]);
-      return false;
+      return { should: false, reason: `task status is '${task.status}', not 'error'` };
     }
 
     /**
@@ -372,7 +387,7 @@ export class BackgroundManager
           `[background-manager]`,
           `shouldAutoResume: target=background but parentSessionId === sessionId (foreground task), returning false`,
         ]);
-        return false;
+        return { should: false, reason: "target=background but task is foreground" };
       }
     }
 
@@ -388,7 +403,7 @@ export class BackgroundManager
         `[background-manager]`,
         `shouldAutoResume: resumeRetryCount=${currentRetryCount} >= max_retries=${maxRetries}, returning false`,
       ]);
-      return false;
+      return { should: false, reason: `max retries exceeded (${currentRetryCount}/${maxRetries})` };
     }
 
     /**
@@ -404,14 +419,57 @@ export class BackgroundManager
         `[background-manager]`,
         `shouldAutoResume: on_error=Ignore, returning false`,
       ]);
-      return false;
+      return { should: false, reason: "on_error is set to 'ignore'" };
     }
 
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
       `shouldAutoResume: all checks passed, returning true`,
     ]);
-    return true;
+    return { should: true, reason: "" };
+  }
+
+  /**
+   * 通知使用者 auto-resume 被跳過
+   * Notify user that auto-resume was skipped
+   *
+   * 同時發送 app.log（記錄日誌）與 tui.showToast（顯示通知）
+   * Sends both app.log (log entry) and tui.showToast (toast notification)
+   *
+   * @param task - 任務物件
+   * @param reason - 跳過原因
+   */
+  private notifyAutoResumeSkipped(task: BackgroundTask, reason: string): void
+  {
+    const message = `Auto-resume skipped for task ${task.id} (${task.shadow}): ${reason}`;
+
+    logArise2WithLevel("info", () => [
+      `[background-manager]`,
+      `notifyAutoResumeSkipped: ${message}`,
+    ]);
+
+    this.ctx.client.app.log?.({
+      body: formatAriseMsgLogBody({
+        label: "Auto-resume",
+        message,
+        level: EnumLogLevel.Info,
+      }),
+    });
+
+    this.ctx.client.tui.showToast?.({
+      body: {
+        title: "Auto-resume Skipped",
+        message,
+        variant: "warning",
+        duration: 5000,
+      },
+    }).catch(() =>
+    {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `notifyAutoResumeSkipped: TUI not available, skipping toast`,
+      ]);
+    });
   }
 
   /**
@@ -467,6 +525,25 @@ export class BackgroundManager
         message: `Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
         level: EnumLogLevel.Info,
       }),
+    });
+
+    /**
+     * 顯示 toast 通知使用者 auto-resume 已觸發
+     * Show toast notification to user that auto-resume was triggered
+     */
+    this.ctx.client.tui.showToast?.({
+      body: {
+        title: "Auto-resume Triggered",
+        message: `Retrying task ${task.id} (${task.shadow}), attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
+        variant: "info",
+        duration: 5000,
+      },
+    }).catch(() =>
+    {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `performAutoResume: TUI not available, skipping toast`,
+      ]);
     });
 
     /**
@@ -826,26 +903,32 @@ export class BackgroundManager
         task.error = getErrorMessage(err);
         task.completedAt = Date.now();
 
+        const resumeCheck = this.checkAutoResume(task);
+
         logArise2WithLevel("error", () => [
           `[background-manager]`,
-          `launch: promptAsync error, taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${this.shouldAutoResume(task)}`,
+          `launch: promptAsync error, taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${resumeCheck.should}${resumeCheck.reason ? `, reason: ${resumeCheck.reason}` : ""}`,
         ]);
 
         /**
          * 檢查是否需要執行 auto-resume
          * Check if auto-resume should be executed
          */
-        if (this.shouldAutoResume(task))
+        if (resumeCheck.should)
         {
           this.performAutoResume(task).catch((e) =>
           {
             this.ctx.client.app.log?.({
               body: formatAriseMsgLogBody({
-                message: `[Auto-resume] Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
+                label: "Auto-resume",
+                message: `Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
                 level: EnumLogLevel.Error,
               }),
             });
           });
+        } else
+        {
+          this.notifyAutoResumeSkipped(task, resumeCheck.reason);
         }
       });
 
@@ -1030,16 +1113,18 @@ export class BackgroundManager
       task.error = getErrorMessage(err);
       task.completedAt = Date.now();
 
+      const resumeCheck = this.checkAutoResume(task);
+
       logArise2WithLevel("error", () => [
         `[background-manager]`,
-        `pollTaskCompletion: taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${this.shouldAutoResume(task)}`,
+        `pollTaskCompletion: taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${resumeCheck.should}${resumeCheck.reason ? `, reason: ${resumeCheck.reason}` : ""}`,
       ]);
 
       /**
        * 檢查是否需要執行 auto-resume
        * Check if auto-resume should be executed
        */
-      if (this.shouldAutoResume(task))
+      if (resumeCheck.should)
       {
         /**
          * 非同步執行 auto-resume，不阻塞當前流程
@@ -1055,6 +1140,9 @@ export class BackgroundManager
               }),
             });
           });
+      } else
+      {
+        this.notifyAutoResumeSkipped(task, resumeCheck.reason);
       }
     }
   }

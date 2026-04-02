@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { formatAriseMsg } from "../utils/string/arise-message";
+import { logArise2WithLevel } from "../utils/debug-control";
 
 /**
  * 未完成 TODO 項目的模式
@@ -78,6 +79,11 @@ export function createTodoEnforcerHook(_ctx: PluginInput) {
         .filter((m) => m.content)
         .slice(-5);
 
+      logArise2WithLevel("debug", () => [
+        `[todo-enforcer]`,
+        `checkCompletion: scanning ${lastAssistantMessages.length} messages (total: ${messages.length})`,
+      ]);
+
       /** 是否有待處理項目 / Whether there are pending items */
       let hasPending = false;
       /** 是否有進行中項目 / Whether there are in-progress items */
@@ -114,11 +120,21 @@ export function createTodoEnforcerHook(_ctx: PluginInput) {
       /** 只要有任一種類型的未完成項目就算數 / Any type of incomplete item counts */
       const hasIncompleteTodos = hasPending || hasInProgress;
 
+      logArise2WithLevel("debug", () => [
+        `[todo-enforcer]`,
+        `checkCompletion: hasPending=${hasPending}, hasInProgress=${hasInProgress}, hasIncompleteTodos=${hasIncompleteTodos}`,
+      ]);
+
       /**
        * 如果有未完成的 TODO，返回提醒訊息
        * If there are incomplete TODOs, return a reminder message
        */
       if (hasIncompleteTodos) {
+        logArise2WithLevel("info", () => [
+          `[todo-enforcer]`,
+          `checkCompletion: incomplete TODOs detected (pending=${hasPending}, in_progress=${hasInProgress})`,
+        ]);
+
         return {
           hasIncompleteTodos: true,
           reminderMessage: formatAriseMsg(`Shadow Monarch notice: You have incomplete TODOs. ${
