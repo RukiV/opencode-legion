@@ -235,6 +235,8 @@ export enum EnumAriseTools {
 	ARISE_CONTINUE = "arise_continue",
 	/** 控制除錯模式 (開啟/關閉/設定等級) / Control debug mode (enable/disable/set level) */
 	ARISE_DEBUG = "arise_debug",
+	/** 一次性取得 Git 狀態摘要（status、diff stat、log）/ Get Git status summary in one shot */
+	ARISE_GIT_SUMMARY = "arise_git_summary",
 }
 
 /**
@@ -250,4 +252,5 @@ export const ALL_ARISE_TOOLS = [
 	EnumAriseTools.ARISE_LIST_MODELS,
 	EnumAriseTools.ARISE_CONTINUE,
 	EnumAriseTools.ARISE_DEBUG,
+	EnumAriseTools.ARISE_GIT_SUMMARY,
 ] as const satisfies EnumAriseTools[];

@@ -8,6 +8,7 @@ import {
 import { createListModelsTool } from './list-models';
 import { createContinueTool } from './continue-tool';
 import { createDebugTool } from './debug-tools';
+import { createGitSummaryTool } from './git-summary';
 import { EnumAriseTools } from '../types/enums';
 import { IAriseTools } from '../types/types';
 import { BackgroundManager } from './lib/background-manager';
@@ -43,5 +44,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		[EnumAriseTools.ARISE_CONTINUE]: createContinueTool(backgroundManager),
 		/** 除錯控制工具 / Debug control tool */
 		[EnumAriseTools.ARISE_DEBUG]: createDebugTool(),
+		/** Git 狀態摘要工具 / Git status summary tool */
+		[EnumAriseTools.ARISE_GIT_SUMMARY]: createGitSummaryTool(),
 	} satisfies IAriseTools
 }

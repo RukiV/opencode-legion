@@ -10,6 +10,7 @@ import {
 import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
+import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
 
 /**
  * Shadow Agent 介面
@@ -525,6 +526,23 @@ The log levels are ordered from least to most verbose:
 				.describe("Set log level: error, warn, info, debug")
 				.optional(),
 		},
+	},
+	[EnumAriseTools.ARISE_GIT_SUMMARY]: {
+		description: `Get a Git repository status summary in one shot.
+
+Runs multiple git commands and returns a consolidated report:
+- git status: current branch, tracking info, staged/unstaged changes
+- git diff --stat: summary of changed files with insertions/deletions
+- git log --oneline -N: recent commit history (configurable count)
+
+Optional parameters:
+- log_count: number of recent commits to show (default: 5)
+- diff_stat: whether to include diff --stat (default: true)
+
+Returns a formatted summary suitable for quick repository state assessment.` as const,
+		shortDescription: "Get Git status summary (status + diff stat + recent log)" as const,
+
+		args: GIT_SUMMARY_ARGS,
 	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;
 
