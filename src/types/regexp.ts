@@ -26,4 +26,4 @@ import { zhRegExpWithPluginEnabled } from "regexp-cjk-with-plugin-enabled";
  *
  * @see docs/zhRegExpWithPluginEnabled.md
  */
-export const HIGH_LOAD_PATTERN: RegExp = new zhRegExpWithPluginEnabled('under\\s+high\\s+load|retry.+(?:after|wait)|please.+wait|高負載|後重試|再試行|高負荷', 'i');
+export const HIGH_LOAD_PATTERN: RegExp = new zhRegExpWithPluginEnabled('under\\s+high\\s+load|retry.+(?:after|wait)|please.+wait|高負載|後重試|再試行|高負荷|Provider\\s*(?:returned\\s*)?error|rate.*limit(?:ed|s)?', 'i');

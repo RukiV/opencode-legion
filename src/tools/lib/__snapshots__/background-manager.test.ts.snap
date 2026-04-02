@@ -1,3 +1,3 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
-exports[`isHighLoadError constants HIGH_LOAD_PATTERN is a RegExp 1`] = `/[uｕ][nｎ][dｄ][eｅ][rｒ]\\s+[hｈ][iｉ][gｇ][hｈ]\\s+[lｌ][oｏ][aａ][dｄ]|[rｒ][eｅ][tｔ][rｒ][yｙ].+(?:[aａ][fｆ][tｔ][eｅ][rｒ]|[wｗ][aａ][iｉ][tｔ])|[pｐ][lｌ][eｅ][aａ][sｓ][eｅ].+[wｗ][aａ][iｉ][tｔ]|高[負负][載载]|[后後]重[試试]|[再在][試试][型形行]|高[負负]荷/i`;
+exports[`isHighLoadError constants HIGH_LOAD_PATTERN is a RegExp 1`] = `/[uｕ][nｎ][dｄ][eｅ][rｒ]\\s+[hｈ][iｉ][gｇ][hｈ]\\s+[lｌ][oｏ][aａ][dｄ]|[rｒ][eｅ][tｔ][rｒ][yｙ].+(?:[aａ][fｆ][tｔ][eｅ][rｒ]|[wｗ][aａ][iｉ][tｔ])|[pｐ][lｌ][eｅ][aａ][sｓ][eｅ].+[wｗ][aａ][iｉ][tｔ]|高[負负][載载]|[后後]重[試试]|[再在][試试][型形行]|高[負负]荷|[PpＰｐ][rｒ][oｏ][vｖ][iｉ][dｄ][eｅ][rｒ]\\s*(?:[rｒ][eｅ][tｔ][uｕ][rｒ][nｎ][eｅ][dｄ]\\s*)?[eｅ][rｒ][rｒ][oｏ][rｒ]|[rｒ][aａ][tｔ][eｅ].*[lｌ][iｉ][mｍ][iｉ][tｔ](?:[eｅ][dｄ]|[sｓ])?/i`;

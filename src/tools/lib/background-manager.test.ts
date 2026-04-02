@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import { HIGH_LOAD_BONUS_DELAY_MS } from "../../types/const-default";
 import { HIGH_LOAD_PATTERN } from "../../types/regexp";
 import { isHighLoadError } from "../../utils/string/regexp";
+import { shouldMatchGroups, shouldNotMatchGroups } from "../../../test/fixtures/high-load-error-test-cases";
 
 /**
  * 高負載偵測測試
@@ -14,106 +15,52 @@ describe("isHighLoadError", () =>
 	/** ==================== Messages that should match ==================== */
 	describe("should detect high load messages", () =>
 	{
-		it("matches 'under high load'", () =>
+		for (const group of shouldMatchGroups)
 		{
-			expect(
-				isHighLoadError(
-					"The server cluster is currently under high load. Please retry after a short wait."
-				)
-			).toBe(true);
-		});
-
-		it("matches 'retry after'", () =>
-		{
-			expect(
-				isHighLoadError("Rate limited. Retry after 30 seconds.")
-			).toBe(true);
-		});
-
-		it("matches 'please wait'", () =>
-		{
-			expect(
-				isHighLoadError("Too many requests. Please wait before retrying.")
-			).toBe(true);
-		});
-
-		it("matches '高負載' (Chinese)", () =>
-		{
-			expect(
-				isHighLoadError("伺服器目前處於高負載狀態，請稍後重試")
-			).toBe(true);
-		});
-
-		it("matches '後重試' (Chinese)", () =>
-		{
-			expect(
-				isHighLoadError("請求過於頻繁，請於後重試")
-			).toBe(true);
-		});
-
-		it("matches '后重试' (Simplified Chinese)", () =>
-		{
-			expect(
-				isHighLoadError("8 秒后重试")
-			).toBe(true);
-		});
-
-		it("matches Japanese high load message with retry", () =>
-		{
-			expect(
-				isHighLoadError("8秒後に再試行: サーバークラスターは現在、高負荷となっています。しばらくお待ちいただいてから再試行してください。ご協力ありがとうございます。(2064)（第3回試行）")
-			).toBe(true);
-		});
-
-		it("matches case insensitive", () =>
-		{
-			expect(
-				isHighLoadError("UNDER HIGH LOAD detected")
-			).toBe(true);
-			expect(
-				isHighLoadError("Please WAIT for a moment")
-			).toBe(true);
-		});
+			describe(group.name, () =>
+			{
+				for (const testCase of group.testCases)
+				{
+					it(testCase.name, () =>
+					{
+						expect(isHighLoadError(testCase.input)).toBe(testCase.expected);
+					});
+				}
+			});
+		}
 	});
 
 	/** ==================== 不應匹配的訊息 ==================== */
 	/** ==================== Messages that should NOT match ==================== */
 	describe("should NOT match non-high-load errors", () =>
 	{
-		it("does not match generic errors", () =>
+		for (const group of shouldNotMatchGroups)
 		{
-			expect(
-				isHighLoadError("Connection refused")
-			).toBe(false);
-		});
+			describe(group.name, () =>
+			{
+				for (const testCase of group.testCases)
+				{
+					it(testCase.name, () =>
+					{
+						expect(isHighLoadError(testCase.input)).toBe(testCase.expected);
+					});
+				}
+			});
+		}
 
-		it("does not match timeout errors", () =>
+		/** null 與 undefined 由 isHighLoadError 內部處理，需獨立測試 */
+		/** null and undefined are handled internally by isHighLoadError, tested separately */
+		describe("非字串輸入", () =>
 		{
-			expect(
-				isHighLoadError("Request timeout after 30000ms")
-			).toBe(false);
-		});
+			it("does not match null", () =>
+			{
+				expect(isHighLoadError(null)).toBe(false);
+			});
 
-		it("does not match auth errors", () =>
-		{
-			expect(
-				isHighLoadError("Unauthorized: invalid API key")
-			).toBe(false);
-		});
-
-		it("does not match empty string", () =>
-		{
-			expect(isHighLoadError("")).toBe(false);
-		});
-
-		it("does not match null", () =>
-		{
-			expect(isHighLoadError(null)).toBe(false);
-		});
-
-		it("does not match undefined", () =>
-		{
-			expect(isHighLoadError(undefined)).toBe(false);
+			it("does not match undefined", () =>
+			{
+				expect(isHighLoadError(undefined)).toBe(false);
+			});
 		});
 	});
 
