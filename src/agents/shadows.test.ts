@@ -53,8 +53,16 @@ describe("Shadow Agents", () => {
    */
   test("all other shadows are subagent mode", () => {
     const subagents = ALLOWED_SHADOWS;
-    for (const name of subagents) {
-      expect(SHADOW_AGENTS[name].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+    for (const name of subagents) 
+    {
+      if (name === EnumShadowSubAgentsName.EsilRadiru)
+      {
+        expect(SHADOW_AGENTS[name].mode).toBeDefined();
+      }
+      else
+      {
+        expect(SHADOW_AGENTS[name].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+      }
     }
   });
 

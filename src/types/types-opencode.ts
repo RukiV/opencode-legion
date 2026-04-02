@@ -17,7 +17,8 @@ import { ARISE_TOOLS } from '../agents/shadows';
 import type { IAriseTools } from './types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
 import { type Hooks, type PluginInput, tool, Plugin } from '@opencode-ai/plugin';
-import type { ITSOverwrite } from 'ts-type';
+import type { ITSOverwrite, ITSPartialRecord, ITSTypeAndStringLiteral } from 'ts-type';
+import { EnumOpencodeAgentPermission } from './enum-opencode';
 
 /**
  * Zod 原始結構類型
@@ -110,3 +111,109 @@ export interface IModelBody
   providerID: string;
   modelID: string;
 }
+
+/**
+ * Shadow Agent 權限鍵值列舉（不含 Bash）
+ * Shadow Agent permission keys enum (excluding Bash)
+ *
+ * 對應 OpenCode 可用權限列表
+ * Reference: https://opencode.ai/docs/permissions/#available-permissions
+ *
+ * | 分類 | Key | 說明 / Description |
+ * |------|-----|----------------------|
+ * | 檔案操作 | read | 讀取檔案 (matches file path) |
+ * | 檔案操作 | edit | 檔案修改 (covers edit, write, patch, multiedit) |
+ * | 檔案操作 | glob | 檔案 glob (matches glob pattern) |
+ * | 檔案操作 | grep | 內容搜尋 (matches regex pattern) |
+ * | 檔案操作 | list | 列出目錄 (matches directory path) |
+ * | 執行操作 | task | 啟動子代理 (matches subagent type) |
+ * | 執行操作 | skill | 載入 skill (matches skill name) |
+ * | 執行操作 | lsp | LSP 查詢 (currently non-granular) |
+ * | 執行操作 | question | 執行中提問 |
+ * | 網路操作 | webfetch | 請求 URL (matches URL) |
+ * | 網路操作 | websearch | 網路搜尋 (matches query) |
+ * | 網路操作 | codesearch | 代碼搜尋 (matches query) |
+ * | 安全防護 | external_directory | 存取工作目錄外的路徑 |
+ * | 安全防護 | doom_loop | 相同工具呼叫重複 3 次 |
+ *
+ * @note Bash 使用 pattern matching，單獨定義於 {@see EnumShadowAgentPermissionKey2.bash}
+ */
+export const enum EnumShadowAgentPermissionKey
+{
+	/** 讀取檔案 (matches file path) / Read a file */
+	Read = 'read',
+
+	/** 檔案修改 (covers edit, write, patch, multiedit) / All file modifications */
+	Edit = 'edit',
+
+	/** 
+	 * 檔案寫入 (covers write, patch, multiedit) / File writing
+	 * 
+	 * 向後相容性 / Backward compatibility
+	 */
+	Write = 'write',
+
+	/** 檔案 glob (matches glob pattern) / File globbing */
+	Glob = 'glob',
+
+	/** 內容搜尋 (matches regex pattern) / Content search */
+	Grep = 'grep',
+
+	/** 列出目錄 (matches directory path) / List files in a directory */
+	List = 'list',
+
+	/** 啟動子代理 (matches subagent type) / Launch subagents */
+	Task = 'task',
+
+	/** 載入 skill (matches skill name) / Load a skill */
+	Skill = 'skill',
+
+	/** LSP 查詢 (currently non-granular) / Run LSP queries */
+	Lsp = 'lsp',
+
+	/** 執行中提問 / Ask the user questions during execution */
+	Question = 'question',
+
+	/** 請求 URL (matches URL) / Fetch a URL */
+	Webfetch = 'webfetch',
+
+	/** 網路搜尋 (matches query) / Web search */
+	Websearch = 'websearch',
+
+	/** 代碼搜尋 (matches query) / Code search */
+	Codesearch = 'codesearch',
+
+	/** 存取工作目錄外的路徑 / Touch paths outside the working directory */
+	ExternalDirectory = 'external_directory',
+
+	/** 相同工具呼叫重複 3 次 / Same tool call repeats 3 times with identical input */
+	DoomLoop = 'doom_loop',
+}
+
+/**
+ * Shadow Agent Bash 權限鍵值
+ * Shadow Agent Bash permission key
+ *
+ * Bash 使用 pattern matching (如 "git *"、"npm *")
+ */
+export const enum EnumShadowAgentPermissionKey2
+{
+	/** 執行指令 (matches parsed commands) / Run shell commands */
+	Bash = 'bash',
+}
+
+export type IShadowAgentPermissionCore<P extends string> = Record<P, EnumOpencodeAgentPermission>;
+
+/**
+ * Shadow Agent 權限介面
+ * Shadow Agent permission interface
+ *
+ * @example
+ * {
+ *   edit: EnumOpencodeAgentPermission.DENY,
+ *   write: EnumOpencodeAgentPermission.DENY,  // 向後相容性 / Backward compatibility
+ *   bash: { "git *": "allow", "npm *": "deny" }
+ * }
+ */
+export type IShadowAgentPermission = ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey>, EnumOpencodeAgentPermission> 
+	& ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey2>, EnumOpencodeAgentPermission | ITSPartialRecord<string, EnumOpencodeAgentPermission>>;

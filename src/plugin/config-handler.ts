@@ -13,6 +13,7 @@ import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents/shadows";
 import { _isAutoModel } from "../utils/model-resolver";
 import { deepMerge } from "../utils/config/config-merge";
 import { type Config } from "@opencode-ai/sdk";
+import { _handlePermission } from "../config/schema/utils";
 
 /**
  * OpenCode 配置介面
@@ -86,7 +87,7 @@ export function setShadowAgentsConfig(params: {
 			model: resolvedModel,
 			steps: shadow.steps,
 			...(shadow.prompt && { prompt: shadow.prompt }),
-			...(shadow.permission && { permission: shadow.permission }),
+			...(shadow.permission && { permission: _handlePermission(shadow.permission) }),
 			...(shadow.options && { options: shadow.options }),
 		};
 	}

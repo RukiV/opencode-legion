@@ -1,5 +1,5 @@
 import { type Agent } from '@opencode-ai/sdk';
-import type { ITSPickExtra } from 'ts-type';
+import type { ITSPartialRecord, ITSPickExtra } from 'ts-type';
 import { z } from "zod";
 import { 
   EnumOpencodeAgentMode, 
@@ -12,6 +12,7 @@ import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
 import { SHADOW_PROMPTS } from './lib/prompts';
+import { IShadowAgentPermission } from '../types/types-opencode';
 
 /**
  * Shadow Agent 介面
@@ -31,8 +32,33 @@ export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsN
   model: string;
   /** 最大步驟數 / Maximum steps */
   steps: number;
-  /** 權限設定（可選）/ Permission settings (optional) */
-  permission?: Record<string, EnumOpencodeAgentPermission>;
+  /**
+   * Shadow Agent 權限鍵值列舉（不含 Bash）
+   * Shadow Agent permission keys enum (excluding Bash)
+   *
+   * 對應 OpenCode 可用權限列表
+   * Reference: https://opencode.ai/docs/permissions/#available-permissions
+   *
+   * | 分類 | Key | 說明 / Description |
+   * |------|-----|----------------------|
+   * | 檔案操作 | read | 讀取檔案 (matches file path) |
+   * | 檔案操作 | edit | 檔案修改 (covers edit, write, patch, multiedit) |
+   * | 檔案操作 | glob | 檔案 glob (matches glob pattern) |
+   * | 檔案操作 | grep | 內容搜尋 (matches regex pattern) |
+   * | 檔案操作 | list | 列出目錄 (matches directory path) |
+   * | 執行操作 | task | 啟動子代理 (matches subagent type) |
+   * | 執行操作 | skill | 載入 skill (matches skill name) |
+   * | 執行操作 | lsp | LSP 查詢 (currently non-granular) |
+   * | 執行操作 | question | 執行中提問 |
+   * | 網路操作 | webfetch | 請求 URL (matches URL) |
+   * | 網路操作 | websearch | 網路搜尋 (matches query) |
+   * | 網路操作 | codesearch | 代碼搜尋 (matches query) |
+   * | 安全防護 | external_directory | 存取工作目錄外的路徑 |
+   * | 安全防護 | doom_loop | 相同工具呼叫重複 3 次 |
+   *
+   * @note Bash 使用 pattern matching，單獨定義於 {@see EnumShadowAgentPermissionKey2.bash}
+   */
+  permission?: IShadowAgentPermission;
 }
 
 /**
@@ -53,6 +79,8 @@ export type IShadowAgents = {
 export interface IShadowDescription {
   /** 名稱 / Name */
   name: EnumShadowSubAgentsName;
+  /** 顯示名稱 / Display name (optional, add Chinese only when unambiguous) */
+  displayName?: string;
   /** 角色標題 / Character title */
   title: string;
   /** 角色象徵 emoji / Character symbol emoji */
@@ -76,6 +104,7 @@ export interface IShadowDescription {
 export const SHADOW_DESCRIPTIONS = {
   [EnumShadowSubAgentsName.Beru]: {
     name: EnumShadowSubAgentsName.Beru,
+    displayName: "Beru",
     title: "Ant King Scout",
     emoji: "🐜",
     role: "Fastest scout",
@@ -92,6 +121,7 @@ export const SHADOW_DESCRIPTIONS = {
 
   [EnumShadowSubAgentsName.Igris]: {
     name: EnumShadowSubAgentsName.Igris,
+    displayName: "Igris (伊格利特)",
     title: "Loyal Knight",
     emoji: "⚔️",
     role: "Precise implementer",
@@ -108,6 +138,7 @@ export const SHADOW_DESCRIPTIONS = {
 
   [EnumShadowSubAgentsName.Bellion]: {
     name: EnumShadowSubAgentsName.Bellion,
+    displayName: "Bellion (貝利昂)",
     title: "Grand Marshal",
     emoji: "🎖️",
     role: "Master strategist",
@@ -124,6 +155,7 @@ export const SHADOW_DESCRIPTIONS = {
 
   [EnumShadowSubAgentsName.Tusk]: {
     name: EnumShadowSubAgentsName.Tusk,
+    displayName: "Tusk (塔斯克)",
     title: "Creative Shadow",
     emoji: "🎨",
     role: "UI/UX specialist",
@@ -140,6 +172,7 @@ export const SHADOW_DESCRIPTIONS = {
 
   [EnumShadowSubAgentsName.Tank]: {
     name: EnumShadowSubAgentsName.Tank,
+    displayName: "Tank",
     title: "Research Shadow",
     emoji: "🛡️",
     role: "External knowledge gatherer",
@@ -156,6 +189,7 @@ export const SHADOW_DESCRIPTIONS = {
 
   [EnumShadowSubAgentsName.ShadowSovereign]: {
     name: EnumShadowSubAgentsName.ShadowSovereign,
+    displayName: "Shadow Sovereign (闇影君主)",
     title: "Full Power",
     emoji: "👁️",
     role: "Deep reasoning specialist",
@@ -167,6 +201,23 @@ export const SHADOW_DESCRIPTIONS = {
       "Recovery strategies",
     ],
     roleKeywords: ["debug", "complex", "why", "reason", "analyze", "reasoning"],
+    supportsBackground: false,
+  },
+
+  [EnumShadowSubAgentsName.EsilRadiru]: {
+    name: EnumShadowSubAgentsName.EsilRadiru,
+    displayName: "Esil Radiru (艾希．拉迪勒)",
+    title: "Demon Noble Lady",
+    emoji: "🔥",
+    role: "Chat companion",
+    capabilities: "Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
+    bestFor: [
+      "Casual conversation and chat",
+      "Understanding user intent and feelings",
+      "Clarifying requirements through dialogue",
+      "Emotional support and encouragement",
+    ],
+    roleKeywords: ["chat", "talk", "conversation", "feel", "intent", "understand", "emotion", "how", "what do you think", "help"],
     supportsBackground: false,
   },
 } satisfies Record<EnumShadowSubAgentsName, IShadowDescription>;
@@ -760,6 +811,27 @@ options: {
       write: EnumOpencodeAgentPermission.DENY,
     },
     prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.ShadowSovereign],
+  },
+
+  /**
+   * Esil Radiru - 惡魔貴族少女，聊天模式顧問
+   * Esil Radiru - Demon noble lady, chat mode companion
+   *
+   * 不同於其他 Shadow Agents 專注於任務，你專注於理解用戶意圖與情感交流
+   * Unlike other Shadow Agents who focus on Tasks, You focus on Understanding
+   */
+  [EnumShadowSubAgentsName.EsilRadiru]: {
+    name: EnumShadowSubAgentsName.EsilRadiru,
+    description: "🔥 Chat Companion - Warm conversational dialogue, emotional understanding",
+    mode: EnumOpencodeAgentMode.ALL,
+    model: "x-ai/grok-4",
+    steps: 12,
+    permission: {
+      edit: EnumOpencodeAgentPermission.DENY,
+      write: EnumOpencodeAgentPermission.DENY,
+      webfetch: EnumOpencodeAgentPermission.ALLOW,
+    },
+    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.EsilRadiru],
   },
 };
 

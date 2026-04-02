@@ -6,7 +6,8 @@ exports[`getMonarchShadowList generates correctly formatted list 1`] = `
 - @bellion - Master strategist. Strategic planning, architecture analysis, complex problem decomposition (supports background)
 - @tusk - UI/UX specialist. Frontend development, UI/UX design, styling, components, animations
 - @tank - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
-- @shadow-sovereign - Deep reasoning specialist. Deep reasoning, complex debugging, architecture decisions, failure recovery"
+- @shadow-sovereign - Deep reasoning specialist. Deep reasoning, complex debugging, architecture decisions, failure recovery
+- @esil-radiru - Chat companion. Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification"
 `;
 
 exports[`suggestShadowAgent snapshot test complex query 1`] = `
@@ -25,7 +26,8 @@ exports[`getShadowAgentsMarkdownTable generates correct Markdown table 1`] = `
 | 🎖️ **bellion** | Master strategist | Planning complex refactoring, Architecture design decisions |
 | 🎨 **tusk** | UI/UX specialist | Building UI components, Styling and layouts |
 | 🛡️ **tank** | External knowledge gatherer | Finding external documentation, Researching best practices |
-| 👁️ **shadow-sovereign** | Deep reasoning specialist | Complex architectural decisions, Debugging after multiple failed attempts |"
+| 👁️ **shadow-sovereign** | Deep reasoning specialist | Complex architectural decisions, Debugging after multiple failed attempts |
+| 🔥 **esil-radiru** | Chat companion | Casual conversation and chat, Understanding user intent and feelings |"
 `;
 
 exports[`getAllShadowNames snapshot test 1`] = `
@@ -36,6 +38,7 @@ exports[`getAllShadowNames snapshot test 1`] = `
   "tusk",
   "tank",
   "shadow-sovereign",
+  "esil-radiru",
 ]
 `;
 
@@ -64,6 +67,10 @@ exports[`Snapshot tests for description outputs getShortDescription outputs are 
   {
     "description": "👁️ Deep reasoning specialist - Deep reasoning, complex debugging, architecture decisions, failure recovery",
     "name": "shadow-sovereign",
+  },
+  {
+    "description": "🔥 Chat companion - Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
+    "name": "esil-radiru",
   },
 ]
 `;
@@ -153,6 +160,20 @@ Best for:
 Background: Not supported"
 ,
     "name": "shadow-sovereign",
+  },
+  {
+    "description": 
+"🔥 Esil-radiru - Demon Noble Lady
+Role: Chat companion
+Capabilities: Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification
+Best for:
+  • Casual conversation and chat
+  • Understanding user intent and feelings
+  • Clarifying requirements through dialogue
+  • Emotional support and encouragement
+Background: Not supported"
+,
+    "name": "esil-radiru",
   },
 ]
 `;

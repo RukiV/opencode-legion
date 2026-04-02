@@ -74,6 +74,19 @@ export const enum EnumShadowSubAgentsName
 	 * Deep reasoning, complex debugging
 	 */
 	ShadowSovereign = "shadow-sovereign",
+
+	/**
+	 * 🔥 Esil Radiru
+	 *
+	 * 惡魔貴族少女，聊天模式顧問
+	 * Demon noble lady, chat mode companion
+	 *
+	 * 渴望理解人類情感，特別是「思念」與「愛」
+	 * 善於傾聽、對話、情感交流
+	 * Longing for understanding human emotions, especially "longing" and "love"
+	 * Good at listening, conversation, emotional exchange
+	 */
+	EsilRadiru = "esil-radiru",
 }
 
 /**
@@ -87,6 +100,7 @@ export const ALLOWED_SHADOWS = [
 	EnumShadowSubAgentsName.Tusk,
 	EnumShadowSubAgentsName.Tank,
 	EnumShadowSubAgentsName.ShadowSovereign,
+	EnumShadowSubAgentsName.EsilRadiru,
 ] as const satisfies EnumShadowSubAgentsName[];
 
 export const BACKGROUND_SHADOWS = [
