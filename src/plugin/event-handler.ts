@@ -9,10 +9,10 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event, EventSessionCreated, EventSessionDeleted, EventSessionIdle } from "@opencode-ai/sdk";
 import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType, EnumLogLevel } from "../types/enum-opencode";
-import { clearSessionModel } from "../config/model-cache";
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
+import { clearSessionModel } from '../config/lib/session-cache';
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 

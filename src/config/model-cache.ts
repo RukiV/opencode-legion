@@ -27,77 +27,6 @@ import { formatDate, fromNow } from "../utils/date/dayjs";
 import { IOpenCodeProvider, IOpenCodeProviderCore, IOpenCodeProviderModelCost } from '../types/opencode/types-provider';
 import { sortObject } from "sort-object-keys2";
 
-/**
- * 會話模型緩存 Map
- * Session model cache Map
- *
- * Key: sessionId - 會話唯一識別符
- * Value: 模型字串 - 格式為 provider/modelID，如 "anthropic/claude-sonnet-4"
- *
- * Key: sessionId - unique session identifier
- * Value: model string - format provider/modelID, e.g., "anthropic/claude-sonnet-4"
- */
-const sessionModelCache = new Map<string, string>();
-
-/**
- * 緩存會話使用的模型
- * Cache session model
- *
- * 在會話開始時調用，將模型資訊存入緩存
- * Called at session start, stores model info in cache
- *
- * @param sessionId - 會話 ID
- * @param providerId - 模型提供者 ID（如 "anthropic"）
- * @param modelId - 模型 ID（如 "claude-sonnet-4"）
- */
-export function cacheSessionModel(sessionId: string, providerId: string, modelId: string): void
-{
-	/** 組合為標準格式 provider/modelID / Combine into standard format provider/modelID */
-	const modelString = `${providerId}/${modelId}`;
-	sessionModelCache.set(sessionId, modelString);
-}
-
-/**
- * 取得會話使用的模型
- * Get session model
- *
- * 根據 sessionId 取得之前緩存的模型字串
- * Gets previously cached model string based on sessionId
- *
- * @param sessionId - 會話 ID
- * @returns 模型字串，如 "anthropic/claude-sonnet-4"，若無則回傳 undefined
- */
-export function getSessionModel(sessionId: string): string | undefined
-{
-	return sessionModelCache.get(sessionId);
-}
-
-/**
- * 清除會話的模型緩存
- * Clear session model cache
- *
- * 當會話結束時調用，釋放記憶體
- * Called when session ends to free memory
- *
- * @param sessionId - 會話 ID
- */
-export function clearSessionModel(sessionId: string): void
-{
-	sessionModelCache.delete(sessionId);
-}
-
-/**
- * 清除所有模型緩存
- * Clear all session models
- *
- * 用於測試或完全重置
- * Used for testing or complete reset
- */
-export function clearAllSessionModels(): void
-{
-	sessionModelCache.clear();
-}
-
 // ============================================================
 // Providers Cache / 提供者緩存
 // ============================================================
@@ -153,23 +82,33 @@ export interface IProviderHistoryItem
 }
 
 /**
- * 歷史記錄結構（以 providerId -> modelId 分類）
- * History record structure (grouped by providerId -> modelId)
+ * 歷史記錄結構（以 providerId 分類）
+ * History record structure (grouped by providerId)
  *
  * @example
  * {
  *   "anthropic": {
- *     "claude-4-opus": {
- *       "firstSeen": 1775221827009,
- *       "lastSeen": 1775221827009,
- *       "status": "active"
+ *     "models": {
+ *       "claude-4-opus": {
+ *         "providerId": "anthropic",
+ *         "modelId": "claude-4-opus",
+ *         "firstSeen": 1775221827009,
+ *         "lastSeen": 1775221827009,
+ *         "status": "active"
+ *       }
  *     }
  *   }
  * }
  */
 export interface IProviderHistory
 {
-	[providerId: string]: {
+	[providerId: string]: IProviderHistoryData;
+}
+
+export interface IProviderHistoryData
+{
+  /** 模型映射（key 為模型 ID） */
+	models: {
 		[modelId: string]: IProviderHistoryItem;
 	};
 }
@@ -350,12 +289,14 @@ export function extractProviderModels(providers: IOpenCodeProvider[]): IProvider
 	{
 		if (provider.models)
 		{
-			result[provider.id] = {};
+			result[provider.id] = {
+				models: {},
+			};
 
 			for (const [modelKey, model] of Object.entries(provider.models))
 			{
 				const modelId = model?.id ?? model?.name ?? modelKey;
-				result[provider.id][modelId] = {
+				result[provider.id].models[modelId] = {
 					providerId: provider.id,
 					modelId,
 					firstSeen: now,
@@ -415,17 +356,22 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 	const result: IProviderHistory = {};
 
 	// 複製舊記錄並更新狀態
-	for (const [providerId, models] of Object.entries(oldHistory))
+	for (const [providerId, providerData] of Object.entries(oldHistory))
 	{
-		result[providerId] = {};
+		// 處理舊格式（沒有 models 屬性）或新格式
+		const models = providerData?.models ?? {};
+
+		result[providerId] = {
+			models: {},
+		};
 
 		for (const [modelId, item] of Object.entries(models))
 		{
 			// 檢查新資料中是否存在這個模型
-			if (newModels[providerId]?.[modelId])
+			if (newModels[providerId]?.models?.[modelId])
 			{
 				// 模型仍然存在，更新 lastSeen 並設為 active
-				result[providerId][modelId] = {
+				result[providerId].models[modelId] = {
 					...item,
 					lastSeen: now,
 					status: EnumProviderHistoryStatus.Active,
@@ -434,7 +380,7 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 			else
 			{
 				// 模型已被移除，設為 removed（保留記錄）
-				result[providerId][modelId] = {
+				result[providerId].models[modelId] = {
 					...item,
 					status: EnumProviderHistoryStatus.Removed,
 				};
@@ -443,18 +389,20 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 	}
 
 	// 新資料中剩餘的項目是新增的模型
-	for (const [providerId, models] of Object.entries(newModels))
+	for (const [providerId, providerData] of Object.entries(newModels))
 	{
 		if (!result[providerId])
 		{
-			result[providerId] = {};
+			result[providerId] = {
+				models: {},
+			};
 		}
 
-		for (const [modelId, item] of Object.entries(models))
+		for (const [modelId, item] of Object.entries(providerData.models))
 		{
-			if (!result[providerId][modelId])
+			if (!result[providerId].models[modelId])
 			{
-				result[providerId][modelId] = item;
+				result[providerId].models[modelId] = item;
 			}
 		}
 	}
@@ -484,9 +432,9 @@ export function calculateHistoryUpdateStats(
 	const modelsPerProvider: Record<string, number> = {};
 	let totalModelCount = 0;
 
-	for (const [providerId, models] of Object.entries(newHistory))
+	for (const [providerId, providerData] of Object.entries(newHistory))
 	{
-		const modelCount = Object.keys(models).length;
+		const modelCount = Object.keys(providerData.models).length;
 		modelsPerProvider[providerId] = modelCount;
 		totalModelCount += modelCount;
 	}
@@ -498,11 +446,11 @@ export function calculateHistoryUpdateStats(
 
 	if (oldHistory)
 	{
-		for (const [providerId, models] of Object.entries(newHistory))
+		for (const [providerId, providerData] of Object.entries(newHistory))
 		{
-			for (const [modelId, item] of Object.entries(models))
+			for (const [modelId, item] of Object.entries(providerData.models))
 			{
-				const oldItem = oldHistory[providerId]?.[modelId];
+				const oldItem = oldHistory[providerId]?.models?.[modelId];
 
 				if (!oldItem)
 				{
@@ -518,11 +466,11 @@ export function calculateHistoryUpdateStats(
 		}
 
 		// 移除的模型
-		for (const [providerId, models] of Object.entries(oldHistory))
+		for (const [providerId, providerData] of Object.entries(oldHistory))
 		{
-			for (const [modelId] of Object.entries(models))
+			for (const [modelId] of Object.entries(providerData.models))
 			{
-				if (!newHistory[providerId]?.[modelId])
+				if (!newHistory[providerId]?.models?.[modelId])
 				{
 					removedModels++;
 				}

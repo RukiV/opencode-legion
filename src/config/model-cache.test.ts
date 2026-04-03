@@ -26,10 +26,6 @@
 /// <reference types="bun" />
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import {
-	cacheSessionModel,
-	getSessionModel,
-	clearSessionModel,
-	clearAllSessionModels,
 	extractProviderModels,
 	updateHistoryRecords,
 	type IProviderHistory,
@@ -37,6 +33,7 @@ import {
 	EnumProviderHistoryStatus,
 } from "./model-cache";
 import { IOpenCodeProvider, IOpenCodeProviderCore } from "../types/opencode/types-provider";
+import { cacheSessionModel, clearAllSessionModels, clearSessionModel, getSessionModel } from './lib/session-cache';
 
 /** 固定時間戳用於測試 */
 const FIXED_TIMESTAMP = 1775233205504;
@@ -240,11 +237,11 @@ describe("history records", () => {
 
 			const result = extractProviderModels(providers);
 
-			// 驗證結構：providerId -> modelId -> IProviderHistoryItem
+			// 驗證結構：providerId -> IProviderHistoryData -> models -> modelId -> IProviderHistoryItem
 			expect(result).toHaveProperty("anthropic");
 			expect(result).toHaveProperty("openai");
-			expect(Object.keys(result.anthropic)).toHaveLength(2);
-			expect(Object.keys(result.openai)).toHaveLength(1);
+			expect(Object.keys(result.anthropic.models)).toHaveLength(2);
+			expect(Object.keys(result.openai.models)).toHaveLength(1);
 			expect(result).toMatchSnapshot();
 		});
 
@@ -260,7 +257,7 @@ describe("history records", () => {
 			const result = extractProviderModels(providers);
 
 			expect(result).toHaveProperty("empty-provider");
-			expect(Object.keys(result["empty-provider"])).toHaveLength(0);
+			expect(Object.keys(result["empty-provider"].models)).toHaveLength(0);
 			expect(result).toMatchSnapshot();
 		});
 	});
@@ -278,8 +275,8 @@ describe("history records", () => {
 			const result = updateHistoryRecords(undefined, newProviders);
 
 			expect(result).toHaveProperty("anthropic");
-			expect(result.anthropic).toHaveProperty("claude-3-5");
-			expect(result.anthropic["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
+			expect(result.anthropic.models).toHaveProperty("claude-3-5");
+			expect(result.anthropic.models["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
 			expect(result).toMatchSnapshot();
 		});
 
@@ -287,21 +284,25 @@ describe("history records", () => {
 			/** 標記被移除的模型為 removed / Mark removed models as removed */
 			const oldHistory: IProviderHistory = {
 				anthropic: {
-					"claude-3-5": {
-						providerId: "anthropic",
-						modelId: "claude-3-5",
-						firstSeen: 1000,
-						lastSeen: 2000,
-						status: EnumProviderHistoryStatus.Active,
+					models: {
+						"claude-3-5": {
+							providerId: "anthropic",
+							modelId: "claude-3-5",
+							firstSeen: 1000,
+							lastSeen: 2000,
+							status: EnumProviderHistoryStatus.Active,
+						},
 					},
 				},
 				openai: {
-					"gpt-4": {
-						providerId: "openai",
-						modelId: "gpt-4",
-						firstSeen: 1500,
-						lastSeen: 2500,
-						status: EnumProviderHistoryStatus.Active,
+					models: {
+						"gpt-4": {
+							providerId: "openai",
+							modelId: "gpt-4",
+							firstSeen: 1500,
+							lastSeen: 2500,
+							status: EnumProviderHistoryStatus.Active,
+						},
 					},
 				},
 			};
@@ -319,11 +320,11 @@ describe("history records", () => {
 			// 應該有兩個 provider：anthropic 仍 active，openai 的 gpt-4 變為 removed
 			expect(result).toHaveProperty("anthropic");
 			expect(result).toHaveProperty("openai");
-			expect(result.anthropic["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
-			expect(result.anthropic["claude-3-5"].firstSeen).toBe(1000); // firstSeen 保持不變
+			expect(result.anthropic.models["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
+			expect(result.anthropic.models["claude-3-5"].firstSeen).toBe(1000); // firstSeen 保持不變
 
-			expect(result.openai["gpt-4"].status).toBe(EnumProviderHistoryStatus.Removed);
-			expect(result.openai["gpt-4"].firstSeen).toBe(1500); // firstSeen 保持不變
+			expect(result.openai.models["gpt-4"].status).toBe(EnumProviderHistoryStatus.Removed);
+			expect(result.openai.models["gpt-4"].firstSeen).toBe(1500); // firstSeen 保持不變
 
 			expect(result).toMatchSnapshot();
 		});
@@ -332,12 +333,14 @@ describe("history records", () => {
 			/** 重新激活之前移除的模型 / Re-activate previously removed model */
 			const oldHistory: IProviderHistory = {
 				anthropic: {
-					"claude-3-5": {
-						providerId: "anthropic",
-						modelId: "claude-3-5",
-						firstSeen: 1000,
-						lastSeen: 2000,
-						status: EnumProviderHistoryStatus.Removed, // 之前被移除
+					models: {
+						"claude-3-5": {
+							providerId: "anthropic",
+							modelId: "claude-3-5",
+							firstSeen: 1000,
+							lastSeen: 2000,
+							status: EnumProviderHistoryStatus.Removed, // 之前被移除
+						},
 					},
 				},
 			};
@@ -352,9 +355,9 @@ describe("history records", () => {
 
 			const result = updateHistoryRecords(oldHistory, newProviders);
 
-			expect(result.anthropic["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
-			expect(result.anthropic["claude-3-5"].firstSeen).toBe(1000); // firstSeen 保持不變
-			expect(result.anthropic["claude-3-5"].lastSeen).toBeGreaterThan(2000); // lastSeen 更新
+			expect(result.anthropic.models["claude-3-5"].status).toBe(EnumProviderHistoryStatus.Active);
+			expect(result.anthropic.models["claude-3-5"].firstSeen).toBe(1000); // firstSeen 保持不變
+			expect(result.anthropic.models["claude-3-5"].lastSeen).toBeGreaterThan(2000); // lastSeen 更新
 
 			expect(result).toMatchSnapshot();
 		});
@@ -363,12 +366,14 @@ describe("history records", () => {
 			/** 跨更新保持 firstSeen 不變 / Preserve firstSeen across updates */
 			const oldHistory: IProviderHistory = {
 				test: {
-					"model-a": {
-						providerId: "test",
-						modelId: "model-a",
-						firstSeen: 1000,
-						lastSeen: 2000,
-						status: EnumProviderHistoryStatus.Active,
+					models: {
+						"model-a": {
+							providerId: "test",
+							modelId: "model-a",
+							firstSeen: 1000,
+							lastSeen: 2000,
+							status: EnumProviderHistoryStatus.Active,
+						},
 					},
 				},
 			};
@@ -382,8 +387,8 @@ describe("history records", () => {
 
 			const result = updateHistoryRecords(oldHistory, newProviders);
 
-			expect(result.test["model-a"].firstSeen).toBe(1000);
-			expect(result.test["model-a"].lastSeen).toBeGreaterThan(2000);
+			expect(result.test.models["model-a"].firstSeen).toBe(1000);
+			expect(result.test.models["model-a"].lastSeen).toBeGreaterThan(2000);
 			expect(result).toMatchSnapshot();
 		});
 	});

@@ -1,5 +1,4 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { getSessionModel } from "../config/model-cache";
 import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools } from '../types/enums';
 import { EnumLogLevel } from "../types/enum-opencode";
@@ -15,6 +14,7 @@ import {
   formatAriseMsgSuccessMultiLine,
   formatAriseMsgLogBody,
 } from '../utils/string/arise-message';
+import { getSessionModel } from '../config/lib/session-cache';
 
 /**
  * 建立呼叫 Arise Agent 的工具

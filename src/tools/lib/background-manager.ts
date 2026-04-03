@@ -19,7 +19,6 @@ import { EnumSessionStatusType, EnumLogLevel } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
-import { getSessionModel } from "../../config/model-cache";
 import {
     formatAriseMsg,
     formatAriseMsgError,
@@ -31,6 +30,7 @@ import {
   } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
 import { isHighLoadError } from "../../utils/string/regexp";
+import { getSessionModel } from '../../config/lib/session-cache';
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===

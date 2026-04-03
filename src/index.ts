@@ -2,7 +2,6 @@ import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import { type IAriseConfig } from "./config/schema";
 import { EnumHookName } from "./types/enums";
 import { loadAriseConfig } from "./config/io";
-import { cacheSessionModel, clearSessionModel } from "./config/model-cache";
 import { _isAutoModel } from "./utils/model-resolver";
 import { createConfigHandler } from "./plugin/config-handler";
 import { createFullEventHandler, extractSessionId } from "./plugin/event-handler";
@@ -18,6 +17,7 @@ import { PLUGIN_VERSION_STRING } from "./types/version";
 import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/index';
 import { PLUGIN_NAME } from "./types/const-default";
+import { cacheSessionModel, clearSessionModel } from './config/lib/session-cache';
 
 
 /**

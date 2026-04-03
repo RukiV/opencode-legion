@@ -3,28 +3,32 @@
 exports[`history records extractProviderModels extracts all provider-model combinations 1`] = `
 {
   "anthropic": {
-    "claude-3-5-sonnet": {
-      "firstSeen": 1775234243989,
-      "lastSeen": 1775234243989,
-      "modelId": "claude-3-5-sonnet",
-      "providerId": "anthropic",
-      "status": "active",
-    },
-    "claude-4-opus": {
-      "firstSeen": 1775234243989,
-      "lastSeen": 1775234243989,
-      "modelId": "claude-4-opus",
-      "providerId": "anthropic",
-      "status": "active",
+    "models": {
+      "claude-3-5-sonnet": {
+        "firstSeen": 1775238974689,
+        "lastSeen": 1775238974689,
+        "modelId": "claude-3-5-sonnet",
+        "providerId": "anthropic",
+        "status": "active",
+      },
+      "claude-4-opus": {
+        "firstSeen": 1775238974689,
+        "lastSeen": 1775238974689,
+        "modelId": "claude-4-opus",
+        "providerId": "anthropic",
+        "status": "active",
+      },
     },
   },
   "openai": {
-    "gpt-4-turbo": {
-      "firstSeen": 1775234243989,
-      "lastSeen": 1775234243989,
-      "modelId": "gpt-4-turbo",
-      "providerId": "openai",
-      "status": "active",
+    "models": {
+      "gpt-4-turbo": {
+        "firstSeen": 1775238974689,
+        "lastSeen": 1775238974689,
+        "modelId": "gpt-4-turbo",
+        "providerId": "openai",
+        "status": "active",
+      },
     },
   },
 }
@@ -32,19 +36,23 @@ exports[`history records extractProviderModels extracts all provider-model combi
 
 exports[`history records extractProviderModels handles empty models 1`] = `
 {
-  "empty-provider": {},
+  "empty-provider": {
+    "models": {},
+  },
 }
 `;
 
 exports[`history records updateHistoryRecords creates new history from empty 1`] = `
 {
   "anthropic": {
-    "claude-3-5": {
-      "firstSeen": 1775234243990,
-      "lastSeen": 1775234243990,
-      "modelId": "claude-3-5",
-      "providerId": "anthropic",
-      "status": "active",
+    "models": {
+      "claude-3-5": {
+        "firstSeen": 1775238974690,
+        "lastSeen": 1775238974690,
+        "modelId": "claude-3-5",
+        "providerId": "anthropic",
+        "status": "active",
+      },
     },
   },
 }
@@ -53,21 +61,25 @@ exports[`history records updateHistoryRecords creates new history from empty 1`]
 exports[`history records updateHistoryRecords marks removed models as removed 1`] = `
 {
   "anthropic": {
-    "claude-3-5": {
-      "firstSeen": 1000,
-      "lastSeen": 1775234243990,
-      "modelId": "claude-3-5",
-      "providerId": "anthropic",
-      "status": "active",
+    "models": {
+      "claude-3-5": {
+        "firstSeen": 1000,
+        "lastSeen": 1775238974690,
+        "modelId": "claude-3-5",
+        "providerId": "anthropic",
+        "status": "active",
+      },
     },
   },
   "openai": {
-    "gpt-4": {
-      "firstSeen": 1500,
-      "lastSeen": 2500,
-      "modelId": "gpt-4",
-      "providerId": "openai",
-      "status": "removed",
+    "models": {
+      "gpt-4": {
+        "firstSeen": 1500,
+        "lastSeen": 2500,
+        "modelId": "gpt-4",
+        "providerId": "openai",
+        "status": "removed",
+      },
     },
   },
 }
@@ -76,12 +88,14 @@ exports[`history records updateHistoryRecords marks removed models as removed 1`
 exports[`history records updateHistoryRecords re-activates previously removed model 1`] = `
 {
   "anthropic": {
-    "claude-3-5": {
-      "firstSeen": 1000,
-      "lastSeen": 1775234243991,
-      "modelId": "claude-3-5",
-      "providerId": "anthropic",
-      "status": "active",
+    "models": {
+      "claude-3-5": {
+        "firstSeen": 1000,
+        "lastSeen": 1775238974690,
+        "modelId": "claude-3-5",
+        "providerId": "anthropic",
+        "status": "active",
+      },
     },
   },
 }
@@ -90,12 +104,14 @@ exports[`history records updateHistoryRecords re-activates previously removed mo
 exports[`history records updateHistoryRecords preserves firstSeen across updates 1`] = `
 {
   "test": {
-    "model-a": {
-      "firstSeen": 1000,
-      "lastSeen": 1775234243991,
-      "modelId": "model-a",
-      "providerId": "test",
-      "status": "active",
+    "models": {
+      "model-a": {
+        "firstSeen": 1000,
+        "lastSeen": 1775238974690,
+        "modelId": "model-a",
+        "providerId": "test",
+        "status": "active",
+      },
     },
   },
 }
