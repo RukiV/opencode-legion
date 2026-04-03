@@ -47,8 +47,8 @@ export function _getHomeConfigDir(): string
  * @type {string[]}
  */
 export const OPENCODE_CONFIG_PATHS = [
-	resolve(getHomeDir(), ".config/opencode/opencode.json"),
 	resolve(getHomeDir(), ".config/opencode/opencode.jsonc"),
+	resolve(getHomeDir(), ".config/opencode/opencode.json"),
 ];
 
 /**
