@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.26](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.25...@bluelovers/opencode-arise@0.1.26) (2026-04-03)
+
+
+
+### 📦　Code Refactoring
+
+* **config:** 調整 OPENCODE_CONFIG_PATHS 順序，jsonc 優先於 json ([dd4bbd6](https://github.com/bluelovers/opencode-arise/commit/dd4bbd66ffe017b5cb6b96db8a4ff73759e4ce50))
+
+
+
 ## [0.1.25](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.24...@bluelovers/opencode-arise@0.1.25) (2026-04-03)
 
 
