@@ -117,3 +117,13 @@ export const HIGH_LOAD_BONUS_DELAY_MS = 10_000;
  * Stored under getHomeConfigDirArise()
  */
 export const PROVIDERS_CACHE_FILENAME = "providers-cache.json";
+
+/**
+ * 提供者歷史紀錄檔案名稱（永久保存）
+ * Providers history file name (permanent)
+ *
+ * 儲存於 getHomeConfigDirArise() 下
+ * Stored under getHomeConfigDirArise()
+ */
+export const PROVIDERS_HISTORY_FILENAME = "providers-history.json";
+export const DEFAULT_DATE_TIME_FORMAT = "YYYY-MM-DD HH:mm:ss ZZ";

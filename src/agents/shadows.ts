@@ -385,15 +385,15 @@ interface I_AriseToolsConfigEntry
 const SHARED_SUMMON_ARGS = {
 	prompt: z
 		.string()
-		.describe("The task for the shadow agent (be specific)"),
+		.meta({ description: "The task for the shadow agent (be specific)" }),
 	model: z
 		.string()
-		.describe("Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)")
+		.meta({ description: "Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)" })
 		.optional(),
   /** 召喚工具共用 description arg 的描述文字 / Shared description arg text for summon tools */
   description: z
     .string()
-    .describe("Short description (3-5 words, used in tracking output and background task status)"),
+    .meta({ description: "Short description (3-5 words, used in tracking output and background task status)" }),
 };
 
 /**
@@ -431,11 +431,11 @@ IMPORTANT - run_in_background behavior:
 		args: {
 			shadow: z
 				.enum(ALLOWED_SHADOWS)
-				.describe("Which shadow agent to summon"),
+				.meta({ description: "Which shadow agent to summon" }),
 			...SHARED_SUMMON_ARGS,
 			run_in_background: z
 				.boolean()
-				.describe("false (DEFAULT) = blocks and returns result directly. true = returns Session ID but NO tool exists to retrieve result later - only use for fire-and-forget. For parallel WITH retrievable results, use arise_background instead.")
+				.meta({ description: "false (DEFAULT) = blocks and returns result directly. true = returns Session ID but NO tool exists to retrieve result later - only use for fire-and-forget. For parallel WITH retrievable results, use arise_background instead." })
 				.optional()
 				.default(false),
 		},
@@ -456,7 +456,7 @@ The 'description' arg will be shown in arise_background_status output for task i
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
-				.describe(`Which shadow agent to run in background (${BACKGROUND_SHADOWS.join(', ')})`),
+				.meta({ description: `Which shadow agent to run in background (${BACKGROUND_SHADOWS.join(', ')})`, title: "Shadow Agent" }),
 			...SHARED_SUMMON_ARGS,
 		},
 	} as const,
@@ -472,7 +472,7 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 		args: {
 			task_id: z
 				.string()
-				.describe("The task ID from arise_background (format: arise_xxx)"),
+				.meta({ description: "The task ID from arise_background (format: arise_xxx)", title: "Task ID" }),
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND_STATUS]: {
@@ -486,7 +486,7 @@ Use this to check which tasks are still running before calling arise_background_
 		args: {
 			current_session_only: z
 				.boolean()
-				.describe("Only show tasks from current session")
+				.meta({ description: "Only show tasks from current session", title: "Current Session Only" })
 				.optional(),
 		},
 	},
@@ -499,7 +499,7 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 		args: {
 			task_id: z
 				.string()
-				.describe("The task ID to cancel (format: arise_xxx)"),
+				.meta({ description: "The task ID to cancel (format: arise_xxx)", title: "Task ID" }),
 		},
 	},
 	[EnumAriseTools.ARISE_LIST_MODELS]: {
@@ -513,8 +513,12 @@ Returns a formatted list of all available models in the format provider/modelID.
 		args: {
 			provider: z
 				.string()
-				.describe("Filter models by provider (e.g. 'anthropic', 'openai')")
+				.meta({ description: "Filter models by provider (e.g. 'anthropic', 'openai')", title: "Provider" })
 				.optional(),
+			forceRefresh: z
+				.boolean()
+				.meta({ description: "Force refresh cache, ignore existing cached data", title: "Force Refresh" })
+				.default(false),
 		},
 	},
 	[EnumAriseTools.ARISE_CONTINUE]: {
@@ -537,18 +541,18 @@ Returns the status of the resume attempt.` as const,
 		args: {
 			task_id: z
 				.string()
-				.describe("The task ID to resume/continue"),
+				.meta({ description: "The task ID to resume/continue", title: "Task ID" }),
 			force: z
 				.boolean()
-				.describe("Force retry even if task is not in error state")
+				.meta({ description: "Force retry even if task is not in error state", title: "Force Retry" })
 				.optional(),
 			auto_resume: z
 				.boolean()
-				.describe("Enable auto-resume for future failures after this manual retry")
+				.meta({ description: "Enable auto-resume for future failures after this manual retry", title: "Auto Resume" })
 				.optional(),
 			background_auto_resume: z
 				.boolean()
-				.describe("Enable/disable auto-resume specifically for background tasks")
+				.meta({ description: "Enable/disable auto-resume specifically for background tasks", title: "Background Auto Resume" })
 				.optional(),
 		},
 	},
@@ -571,11 +575,11 @@ The log levels are ordered from least to most verbose:
 		args: {
 			enabled: z
 				.boolean()
-				.describe("Enable or disable debug mode")
+				.meta({ description: "Enable or disable debug mode", title: "Enabled" })
 				.optional(),
 			level: z
 				.enum(ALLOWED_LOG_LEVELS)
-				.describe("Set log level: error, warn, info, debug")
+				.meta({ description: "Set log level: error, warn, info, debug", title: "Log Level" })
 				.optional(),
 		},
 	},
