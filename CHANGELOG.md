@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.24](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.23...@bluelovers/opencode-arise@0.1.24) (2026-04-03)
+
+
+### BREAKING CHANGES
+
+* **config:** ProvidersCache 介面重新命名為 IProvidersCache
+
+
+
+### ✨　Features
+
+* **config:** 新增 model cache 歷史記錄功能 ([54aeb6c](https://github.com/bluelovers/opencode-arise/commit/54aeb6cfe49522c9e98aef78b6dcfd1c4324f899))
+
+
+### 📦　Code Refactoring
+
+* **agents:** 使用 composePrompt 重構 Shadow Agents prompts 結構 ([2f7b512](https://github.com/bluelovers/opencode-arise/commit/2f7b512811ba0c9da2d576fdafbbc1957ef5e8bf))
+* **agents:** 使用 composePrompt 重構 TANK_PROMPT 為結構化格式 ([cce30aa](https://github.com/bluelovers/opencode-arise/commit/cce30aa19ceb5c6fffddbd6bd65276cc27bee6b7))
+* **agents:** 使用 composePrompt 重構 Shadow Agents prompts 結構 ([0dc7d4a](https://github.com/bluelovers/opencode-arise/commit/0dc7d4a711d868686cdbde7e3c2ed5a5b2d03c13))
+* **tools:** 新增除錯日誌追蹤背景任務與代理召喚流程 ([b1dea49](https://github.com/bluelovers/opencode-arise/commit/b1dea49ac7f688cd80713e8981ef5b690c050d6a))
+
+
+### ♻️　Chores
+
+* **agents:** 新增測試說明註解提示如何產生 prompt 快照 ([66f7f61](https://github.com/bluelovers/opencode-arise/commit/66f7f618c8352e725e06b07a4d6d61ec5eeed7b4))
+
+
+
 ## [0.1.23](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.21...@bluelovers/opencode-arise@0.1.23) (2026-04-02)
 
 
