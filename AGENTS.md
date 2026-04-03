@@ -384,7 +384,7 @@ import { createDefaultConfig } from "../types/config-defaults";
 ```
 agents/     - Shadow agents (monarch, beru, igris, bellion, tusk, tank, shadow-sovereign)
 hooks/      - Lifecycle hooks (arise-banner, output-shaper, compaction-preserver, todo-enforcer)
-tools/      - Custom tools (call-arise-agent, background tasks)
+tools/      - Custom tools (arise-summon, background tasks)
 config/     - Schema and path utilities
 types/      - TypeScript type definitions
 ```

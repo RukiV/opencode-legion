@@ -1,11 +1,11 @@
-# list-models
+# arise_list_models
 
 List all available models from configured providers.
 
 ## Usage
 
 ```
-list-models
+arise_list_models
 ```
 
 ## Arguments
@@ -56,7 +56,7 @@ Results are cached for efficiency. Use `provider` argument to filter and reduce 
 ## Use Cases
 
 - Check available models before invoking a shadow with specific model
-- Filter by provider: `list-models provider=openrouter`
+- Filter by provider: `arise_list_models provider=openrouter`
 - Find free tier models for cost-effective operations
 
 ## See Also

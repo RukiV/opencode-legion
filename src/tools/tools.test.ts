@@ -1,11 +1,11 @@
 import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
-import { createCallAriseAgentTool } from "./call-arise-agent";
+import { createCallAriseAgentTool } from "./arise-summon";
 import {
   createBackgroundTaskTool,
   createBackgroundOutputTool,
   createBackgroundStatusTool,
   createBackgroundCancelTool,
-} from "./background-tools";
+} from "./arise-background";
 import { BackgroundManager } from "./lib/background-manager";
 
 // Mock context for testing

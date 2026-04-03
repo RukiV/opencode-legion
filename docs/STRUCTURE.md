@@ -41,9 +41,9 @@ opencode-arise/
 │   │
 │   ├── tools/                    # 自訂工具
 │   │   ├── plugin-tools.ts       # 插件工具工廠
-│   │   ├── background-tools.ts   # 背景任務工具（重複 Zod import）
+│   │   ├── arise-background.ts   # 背景任務工具（重複 Zod import）
 │   │   ├── background-manager.ts # 背景任務管理器
-│   │   ├── call-arise-agent.ts   # 召喚 Agent 工具
+│   │   ├── arise-summon.ts       # 召喚 Agent 工具
 │   │   ├── tool-names.ts         # 工具名稱枚舉（重複 Zod import）
 │   │   ├── tools.test.ts         # 工具測試
 │   │   └── index.ts              # Barrel export
@@ -107,7 +107,7 @@ const TEST_DIR = __TEST_TEMP;
 
 | 問題 | 位置 | 說明 |
 |------|------|------|
-| **重複 Zod import** | `tools/background-tools.ts`<br>`tools/tool-names.ts` | 完全相同的 import 語句 |
+| **重複 Zod import** | `tools/arise-background.ts`<br>`tools/tool-names.ts` | 完全相同的 import 語句 |
 | **過度使用常數** | `config/plugin-name.ts` | `PLUGIN_NAME`/`LEGACY_PLUGIN_NAME` 有 87 處引用 |
 | **大型檔案** | `config/io.ts` | ~700 行，可考慮分離 concerns |
 

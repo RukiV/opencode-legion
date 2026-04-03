@@ -30,7 +30,7 @@ export function createContinueTool(manager: BackgroundManager) {
 			 * Debug log: Start manual retry execution
 			 */
 			logArise2WithLevel("debug", () => [
-			  `[continue-tool]`,
+			  `[arise-continue]`,
 			  `Starting manual retry for task: ${args.task_id}, force: ${args.force ?? false}`,
 			]);
 
@@ -47,7 +47,7 @@ export function createContinueTool(manager: BackgroundManager) {
 			 * Debug log: Manual retry result
 			 */
 			logArise2WithLevel("debug", () => [
-			  `[continue-tool]`,
+			  `[arise-continue]`,
 			  `Manual retry result for ${args.task_id}: ${result}`,
 			]);
 

@@ -242,7 +242,7 @@ export function createGitSummaryTool()
 **檔案：** `src/tools/index.ts`
 
 ```typescript
-import { createGitSummaryTool } from './git-summary';
+import { createGitSummaryTool } from './arise-git-summary';
 
 export function createPluginTools(ctx: PluginInput, backgroundManager: BackgroundManager, config: IAriseConfig): IAriseTools
 {
@@ -279,7 +279,7 @@ D:\...\node_modules\@opencode-ai\plugin\package.json
 **解決方案：** 將核心邏輯抽離到 `src/utils/`，避免直接或間接匯入 `@opencode-ai/plugin`。
 
 ```
-❌ src/tools/git-summary.ts 匯入 shadows.ts → 匯入 @opencode-ai/plugin → 失敗
+❌ src/tools/arise-git-summary.ts 匯入 shadows.ts → 匯入 @opencode-ai/plugin → 失敗
 ✅ src/utils/git-summary.ts 僅匯入 child_process → 成功
 ```
 
@@ -328,7 +328,7 @@ z.number().describe("...").default(5).optional()
 | 描述 | `src/agents/shadows.ts` | +工具描述、引用 schema 常數 |
 | Schema | `src/config/schema/entry.ts` | **新檔案**，Zod raw shape + 推導型別 |
 | 核心 | `src/utils/git-summary.ts` | **新檔案**，獨立邏輯 + re-export 型別 |
-| 包裝 | `src/tools/git-summary.ts` | **新檔案**，OpenCode 整合 |
+| 包裝 | `src/tools/arise-git-summary.ts` | **新檔案**，OpenCode 整合 |
 | 註冊 | `src/tools/index.ts` | 匯入 + 註冊 |
 | 驗證 | `test/temp/git-summary-standalone.ts` | 獨立執行腳本 |
 
