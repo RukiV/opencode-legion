@@ -4,6 +4,8 @@
  *
  * Monarch 的 prompt 保留在 shadows.ts（依賴動態函式，避免 circular dependency）
  * Monarch's prompt stays in shadows.ts (depends on dynamic functions, avoids circular dependency)
+ * 
+ * @note 使用 `pnpm test src/agents/lib/prompts.test.ts` 產生快照 檢視最終結果
  */
 
 import { EnumShadowSubAgentsName } from '../../types/enums';
