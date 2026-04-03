@@ -7,38 +7,13 @@
  */
 
 import { ITSTypeAndStringLiteral } from "ts-type";
+import { EnumOpenCodeEventType } from "./opencode/enum-event";
 
 /**
- * 會話事件類型列舉
- * Session event types enumeration
- *
- * 定義我們處理的會話事件類型
- * Defines the session event types we handle
+ * 重新匯出 EnumOpenCodeEventType 供外部使用
+ * Re-export EnumOpenCodeEventType for external use
  */
-export enum EnumSessionEventType
-{
-	/** 會話創建 / Session created */
-	SessionCreated = "session.created",
-	/** 會話閒置 / Session idle */
-	SessionIdle = "session.idle",
-	/** 會話刪除 / Session deleted */
-	SessionDeleted = "session.deleted",
-}
-
-export const SUPPORTED_SESSION_EVENT_TYPES = [
-	EnumSessionEventType.SessionCreated,
-	EnumSessionEventType.SessionIdle,
-	EnumSessionEventType.SessionDeleted,
-] as const;
-
-/**
- * 會話事件類型
- * Session event types
- *
- * 定義我們處理的會話事件類型
- * Defines the session event types we handle
- */
-export type ISessionEventType = ITSTypeAndStringLiteral<EnumSessionEventType>;
+export { EnumOpenCodeEventType };
 
 /**
  * Shadow Agent 模式
@@ -91,7 +66,7 @@ export enum EnumOpencodeAgentPermission
  * - info: 一般資訊
  * - debug: 除錯資訊
  */
-export enum EnumLogLevel 
+export enum EnumLogLevel
 {
 	/** 錯誤訊息 / Error messages */
 	Error = "error",

@@ -15,7 +15,7 @@ import {
     IAllShadowAgentsName,
     BackgroundTaskStatus,
   } from "../../types/enums";
-import { EnumSessionStatusType, EnumLogLevel } from "../../types/enum-opencode";
+import { EnumSessionStatusType, EnumLogLevel, EnumOpenCodeEventType } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
@@ -1320,9 +1320,9 @@ export class BackgroundManager
    */
   handleEvent(event: Event): void
   {
-    if (event.type === "session.idle")
+    if (event.type === EnumOpenCodeEventType.SessionIdle)
     {
-      const sessionId = (event as { properties?: { sessionID?: string } }).properties?.sessionID;
+      const sessionId = event.properties?.sessionID;
       if (sessionId)
       {
         /**

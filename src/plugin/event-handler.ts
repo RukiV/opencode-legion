@@ -8,30 +8,15 @@
 
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event, EventSessionCreated, EventSessionDeleted, EventSessionIdle } from "@opencode-ai/sdk";
-import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType, EnumLogLevel } from "../types/enum-opencode";
+import { EnumLogLevel } from "../types/enum-opencode";
 import { getErrorMessage } from "../utils/error";
-import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
+import { ITSPickExtra } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
 import { clearSessionModel, getSessionModel } from '../config/lib/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
+import { EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
-
-/**
- * 檢查是否為會話事件
- * Check if event is a session event
- *
- * @param eventType - 事件類型 / Event type
- * @returns 是否為會話事件 / Whether it's a session event
- */
-export function isSessionEvent(eventType: string): eventType is ISessionEventType
-{
-	return (
-		eventType === EnumSessionEventType.SessionCreated ||
-		eventType === EnumSessionEventType.SessionIdle ||
-		eventType === EnumSessionEventType.SessionDeleted
-	);
-}
 
 /**
  * 從事件中提取會話 ID
@@ -215,7 +200,7 @@ export function createFullEventHandler(
 
 		switch (eventType)
 		{
-			case EnumSessionEventType.SessionCreated:
+			case EnumOpenCodeEventTypeWithSession.SessionCreated:
 				await handleSessionCreated(event, params);
 				/**
 				 * session created 時模型可能尚未快取（model 在 chat.params 鉤子中記錄），
@@ -231,7 +216,7 @@ export function createFullEventHandler(
 					}),
 				});
 				break;
-			case EnumSessionEventType.SessionIdle:
+			case EnumOpenCodeEventTypeWithSession.SessionIdle:
 				params.ctx.client.app?.log?.({
 					body: formatAriseMsgLogBody({
 						message: `session idle: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
@@ -241,7 +226,7 @@ export function createFullEventHandler(
 				});
 				await handleSessionIdle(event, params);
 				break;
-			case EnumSessionEventType.SessionDeleted:
+			case EnumOpenCodeEventTypeWithSession.SessionDeleted:
 				handleSessionDeleted(event, params);
 				params.ctx.client.app?.log?.({
 					body: formatAriseMsgLogBody({
