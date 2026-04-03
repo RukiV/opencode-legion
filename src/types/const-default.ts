@@ -108,3 +108,12 @@ Check in order:
  * Additional retry delay when high load message is detected
  */
 export const HIGH_LOAD_BONUS_DELAY_MS = 10_000;
+
+/**
+ * 提供者緩存檔案名稱
+ * Providers cache file name
+ *
+ * 儲存於 getHomeConfigDirArise() 下
+ * Stored under getHomeConfigDirArise()
+ */
+export const PROVIDERS_CACHE_FILENAME = "providers-cache.json";
