@@ -12,7 +12,8 @@ import { EnumSessionEventType, SUPPORTED_SESSION_EVENT_TYPES, ISessionEventType,
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra, ITSTypeAndStringLiteral } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
-import { clearSessionModel } from '../config/lib/session-cache';
+import { clearSessionModel, getSessionModel } from '../config/lib/session-cache';
+import { BackgroundManager } from "../tools/lib/background-manager";
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 
@@ -173,9 +174,7 @@ export interface ICreateEventHandlerParams
 			reminderMessage?: string;
 		}>;
 	} | null;
-	backgroundManager: {
-		handleEvent: (event: Event) => void;
-	};
+	backgroundManager: BackgroundManager;
 }
 
 /**
@@ -198,23 +197,79 @@ export function createFullEventHandler(
 	return async function fullEventHandler(input: { event: Event }): Promise<void>
 	{
 		const event = input.event;
+		const eventType = event.type;
+		const sessionId = extractSessionId(event);
+		const model = sessionId ? getSessionModel(sessionId) : undefined;
+
+		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
+		params.ctx.client.app?.log?.({
+			body: formatAriseMsgLogBody({
+				message: `event received: type=${eventType}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+				level: EnumLogLevel.Debug,
+				label: "event-handler",
+			}),
+		});
 
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
 
-		switch (event.type)
+		switch (eventType)
 		{
 			case EnumSessionEventType.SessionCreated:
 				await handleSessionCreated(event, params);
+				/**
+				 * session created 時模型可能尚未快取（model 在 chat.params 鉤子中記錄），
+				 * 因此首次日誌顯示 N/A，後續事件會顯示正確模型
+				 * Model may not be cached yet at session created (model is recorded in chat.params hook),
+				 * so first log shows N/A, subsequent events show correct model
+				 */
+				params.ctx.client.app?.log?.({
+					body: formatAriseMsgLogBody({
+						message: `session created: sessionId=${sessionId ?? "N/A"}, model=${model ?? "pending (will be set on first chat)"}`,
+						level: EnumLogLevel.Info,
+						label: "session",
+					}),
+				});
 				break;
 			case EnumSessionEventType.SessionIdle:
+				params.ctx.client.app?.log?.({
+					body: formatAriseMsgLogBody({
+						message: `session idle: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+						level: EnumLogLevel.Debug,
+						label: "session",
+					}),
+				});
 				await handleSessionIdle(event, params);
 				break;
 			case EnumSessionEventType.SessionDeleted:
 				handleSessionDeleted(event, params);
+				params.ctx.client.app?.log?.({
+					body: formatAriseMsgLogBody({
+						message: `session deleted: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}, cache cleared`,
+						level: EnumLogLevel.Info,
+						label: "session",
+					}),
+				});
 				break;
 			default:
-				// 未處理的事件類型 / No handler for other event types
+				/**
+				 * 記錄未處理的事件類型，有助於：
+				 * 1. 發現 OpenCode 新增的事件類型
+				 * 2. 評估是否需要新增對應的處理器
+				 * 3. 除錯時追蹤事件流向
+				 *
+				 * Log unhandled event types for:
+				 * 1. Discovering new event types added by OpenCode
+				 * 2. Evaluating whether new handlers are needed
+				 * 3. Tracing event flow during debugging
+				 */
+				params.ctx.client.app?.log?.({
+					body: formatAriseMsgLogBody({
+						message: `unhandled event type: ${eventType}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+						level: EnumLogLevel.Debug,
+						label: "event-handler",
+					}),
+				});
 				break;
 		}
 	};
@@ -246,5 +301,3 @@ function extractTextFromMessageParts(parts: unknown[]): string
 		})
 		.join("");
 }
-
-
