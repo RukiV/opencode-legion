@@ -7,7 +7,6 @@ import { logArise2WithLevel } from '../utils/debug-control';
 import { tzDayjs, fromNow } from '../utils/date/dayjs';
 import { DEFAULT_DATE_TIME_FORMAT } from "../types/const-default";
 import {
-  type CachedProvider,
   type IProvidersCache,
   getProvidersCache,
   setProvidersCache,
@@ -17,6 +16,7 @@ import {
   formatAriseMsgError,
   formatAriseMsgSuccess,
 } from '../utils/string/arise-message';
+import { IOpenCodeProvider } from '../types/opencode/types-provider';
 
 /**
  * 格式化模型列表
@@ -25,7 +25,7 @@ import {
  * @param provider - 提供者資料
  * @returns 格式化後的模型列表
  */
-function formatModelsForProvider(provider: CachedProvider): string[]
+function formatModelsForProvider(provider: IOpenCodeProvider): string[]
 {
 	const lines: string[] = [];
 
@@ -79,11 +79,11 @@ export function createListModelsTool(ctx: PluginInput)
 			{
 				/** 檢查是否有有效的緩存 / Check if valid cache exists */
 				const cached = forceRefresh ? null : getProvidersCache();
-				let providers: CachedProvider[];
+				let providers: IOpenCodeProvider[];
 
 				if (cached)
 				{
-					providers = cached.providers;
+					providers = cached.data;
 					fromCache = true;
 					/** 計算緩存剩餘時間 / Calculate remaining cache time */
 					const now = Date.now();
@@ -116,7 +116,7 @@ export function createListModelsTool(ctx: PluginInput)
 					/** 輸出預設提供者日誌 / Log default provider */
 					logArise2WithLevel("info", () => ["Default provider:", providersResult.data.default]);
 
-					providers = providersResult.data.providers as CachedProvider[];
+					providers = providersResult.data.providers as unknown as IOpenCodeProvider[];
 
 					/** 緩存結果 / Cache the result (傳入舊緩存用於比較差異與歷史記錄) */
 					if (providers && providers.length > 0)

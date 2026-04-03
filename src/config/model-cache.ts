@@ -14,14 +14,18 @@
  * This will automatically inherit the model from Monarch's session
  */
 
-import { outputFileSync, readFileSync, pathExistsSync as existsSync } from "fs-extra";
+import { outputFileSync, pathExistsSync as existsSync, readFileSync } from "fs-extra";
 import { resolve } from "path";
 
+import type { ToolContext } from "@opencode-ai/plugin";
 import { getHomeConfigDirArise } from "./paths";
 import { PROVIDERS_CACHE_FILENAME, PROVIDERS_HISTORY_FILENAME } from "../types/const-default";
-import { diff, type IDiffNode, DiffEdit, DiffDeleted, DiffNew, DiffArray, EnumKinds } from "@bluelovers/deep-diff";
+import { diff, DiffArray, DiffDeleted, DiffEdit, DiffNew, EnumKinds } from "@bluelovers/deep-diff";
 import { typeNarrowed } from "ts-type-predicates";
-import { array_unique } from "array-hyper-unique";
+import { logArise2WithLevel } from "../utils/debug-control";
+import { formatDate, fromNow } from "../utils/date/dayjs";
+import { IOpenCodeProvider, IOpenCodeProviderCore, IOpenCodeProviderModelCost } from '../types/opencode/types-provider';
+import { sortObject } from "sort-object-keys2";
 
 /**
  * 會話模型緩存 Map
@@ -99,34 +103,15 @@ export function clearAllSessionModels(): void
 // ============================================================
 
 /**
- * 提供者資料結構
- * Provider data structure
- *
- * 從 OpenCode SDK config.providers() 取得
- * Obtained from OpenCode SDK config.providers()
+ * 歷史記錄狀態列舉
+ * History record status enumeration
  */
-export interface CachedProvider
+export enum EnumProviderHistoryStatus
 {
-	/** 提供者 ID（如 "anthropic"、"openai"） */
-	id: string;
-	/** 提供者名稱 */
-	name?: string;
-	/** 模型映射（key 為模型 ID） */
-	models?: Record<string, {
-		/** 模型 ID */
-		id?: string;
-		/** 模型名稱 */
-		name?: string;
-		/** 模型限制 */
-		limit?: {
-			/** 上下文窗口大小 */
-			context?: number;
-			/** 輸出限制 */
-			output?: number;
-		};
-	}>;
-	/** 是否為預設提供者 */
-	default?: boolean;
+	/** 模型仍在使用中 / Model is still in use */
+	Active = "active",
+	/** 模型已被移除 / Model has been removed */
+	Removed = "removed",
 }
 
 /**
@@ -135,14 +120,14 @@ export interface CachedProvider
  */
 export interface IProvidersCache
 {
-	/** 緩存的提供者列表 */
-	providers: CachedProvider[];
+	/** 緩存的提供者列表（陣列格式） */
+	data: IOpenCodeProvider[];
+	/** 提供者映射（以 id 為 key 的 Map 格式，方便快速查詢，不包含 models 以減少檔案大小） */
+	providers: Record<string, IOpenCodeProviderCore>;
 	/** 緩存時間戳 */
 	timestamp: number;
 	/** 過期時間（毫秒），預設 5 分鐘 */
 	expiresIn: number;
-	/** 歷史記錄（不會刪除的廠商與模型，以 providerId -> modelId 分類） */
-	history?: IProviderHistory;
 }
 
 /**
@@ -162,7 +147,7 @@ export interface IProviderHistoryItem
 	/** 最後出現時間戳 */
 	lastSeen: number;
 	/** 狀態（active 已移除） */
-	status: "active" | "removed";
+	status: EnumProviderHistoryStatus;
 	/** 是否為免費模型（若確定能知道） */
 	free?: boolean;
 }
@@ -254,7 +239,7 @@ function loadProvidersCacheFromFile(): IProvidersCache | null
 		const data = JSON.parse(content) as IProvidersCache;
 
 		// 驗證資料結構
-		if (!data.providers || !Array.isArray(data.providers) || typeof data.timestamp !== "number")
+		if (!	data.data || !Array.isArray(	data.data) || typeof data.timestamp !== "number")
 		{
 			return null;
 		}
@@ -356,7 +341,7 @@ function saveProvidersHistoryToFile(history: IProviderHistory): void
  * @param providers - 提供者列表
  * @returns 以 providerId -> modelId 分類的歷史記錄
  */
-export function extractProviderModels(providers: CachedProvider[]): IProviderHistory
+export function extractProviderModels(providers: IOpenCodeProvider[]): IProviderHistory
 {
 	const now = Date.now();
 	const result: IProviderHistory = {};
@@ -375,13 +360,33 @@ export function extractProviderModels(providers: CachedProvider[]): IProviderHis
 					modelId,
 					firstSeen: now,
 					lastSeen: now,
-					status: "active",
+					status: EnumProviderHistoryStatus.Active,
 				};
 			}
 		}
 	}
 
 	return result;
+}
+
+/**
+ * 更新歷史記錄的統計資訊
+ * Update history records statistics
+ */
+export interface IHistoryUpdateStats
+{
+	/** 提供商數量 */
+	providerCount: number;
+	/** 模型總數量 */
+	totalModelCount: number;
+	/** 各提供商的模型數量 */
+	modelsPerProvider: Record<string, number>;
+	/** 本次新增的模型數量 */
+	addedModels: number;
+	/** 本次移除的模型數量 */
+	removedModels: number;
+	/** 狀態變動的模型數量 */
+	changedModels: number;
 }
 
 /**
@@ -395,7 +400,7 @@ export function extractProviderModels(providers: CachedProvider[]): IProviderHis
  * @returns 更新後的歷史記錄
  */
 export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
-	newProviders: CachedProvider[],
+	newProviders: IOpenCodeProvider[],
 ): IProviderHistory
 {
 	const now = Date.now();
@@ -423,7 +428,7 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 				result[providerId][modelId] = {
 					...item,
 					lastSeen: now,
-					status: "active",
+					status: EnumProviderHistoryStatus.Active,
 				};
 			}
 			else
@@ -431,7 +436,7 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 				// 模型已被移除，設為 removed（保留記錄）
 				result[providerId][modelId] = {
 					...item,
-					status: "removed",
+					status: EnumProviderHistoryStatus.Removed,
 				};
 			}
 		}
@@ -458,17 +463,199 @@ export function updateHistoryRecords(oldHistory: IProviderHistory | undefined,
 }
 
 /**
+ * 計算歷史更新統計資訊
+ * Calculate history update statistics
+ *
+ * @param oldHistory - 舊的歷史記錄
+ * @param newHistory - 新的歷史記錄
+ * @param providers - 新的提供者列表
+ * @returns 統計資訊
+ */
+export function calculateHistoryUpdateStats(
+	oldHistory: IProviderHistory | undefined,
+	newHistory: IProviderHistory,
+	providers: IOpenCodeProvider[],
+): IHistoryUpdateStats
+{
+	// 計算提供商數量與模型數量
+	const providerCount = Object.keys(newHistory).length;
+
+	// 各提供商的模型數量
+	const modelsPerProvider: Record<string, number> = {};
+	let totalModelCount = 0;
+
+	for (const [providerId, models] of Object.entries(newHistory))
+	{
+		const modelCount = Object.keys(models).length;
+		modelsPerProvider[providerId] = modelCount;
+		totalModelCount += modelCount;
+	}
+
+	// 計算變動
+	let addedModels = 0;
+	let removedModels = 0;
+	let changedModels = 0;
+
+	if (oldHistory)
+	{
+		for (const [providerId, models] of Object.entries(newHistory))
+		{
+			for (const [modelId, item] of Object.entries(models))
+			{
+				const oldItem = oldHistory[providerId]?.[modelId];
+
+				if (!oldItem)
+				{
+					// 新增的模型
+					addedModels++;
+				}
+				else if (oldItem.status !== item.status)
+				{
+					// 狀態變動（active <-> removed）
+					changedModels++;
+				}
+			}
+		}
+
+		// 移除的模型
+		for (const [providerId, models] of Object.entries(oldHistory))
+		{
+			for (const [modelId] of Object.entries(models))
+			{
+				if (!newHistory[providerId]?.[modelId])
+				{
+					removedModels++;
+				}
+			}
+		}
+	}
+	else
+	{
+		// 首次建立，全部視為新增
+		addedModels = totalModelCount;
+	}
+
+	return {
+		providerCount,
+		totalModelCount,
+		modelsPerProvider,
+		addedModels,
+		removedModels,
+		changedModels,
+	};
+}
+
+/**
+ * 產生提供者緩存更新的報告文字
+ * Generate provider cache update report text
+ *
+ * @param stats - 歷史更新統計資訊
+ * @param timestamp - 更新時間戳（可選）
+ * @returns 格式化的報告文字
+ */
+export function generateProviderCacheReport(stats: IHistoryUpdateStats, timestamp?: number): string
+{
+	const timestampStr = timestamp
+		? `\n  ⏰ Updated at: ${formatDate(timestamp)} (${fromNow(timestamp)})`
+		: "";
+
+	const lines: string[] = [
+		"",
+		"═".repeat(50),
+		"  Provider Cache Updated / 提供者緩存已更新",
+		"═".repeat(50),
+		"",
+		`  📊 Provider Count / 提供商數量: ${stats.providerCount}`,
+		`  🤖 Total Models / 模型總數: ${stats.totalModelCount}`,
+		"",
+		"  📦 Models per Provider / 各提供商模型數量:",
+		...Object.entries(stats.modelsPerProvider).map(([providerId, count]) =>
+			`     - ${providerId}: ${count} models`
+		),
+		"",
+		"  📈 Changes / 變動情況:",
+		`     🟢 Added / 新增: ${stats.addedModels} models`,
+		`     🔴 Removed / 移除: ${stats.removedModels} models`,
+		`     🟡 Changed / 變動: ${stats.changedModels} models`,
+		"",
+		`  💾 Cache saved to: ~/.config/opencode-arise/${PROVIDERS_CACHE_FILENAME}`,
+		`  📜 History saved to: ~/.config/opencode-arise/${PROVIDERS_HISTORY_FILENAME}`,
+		timestampStr,
+		"=".repeat(50),
+	];
+
+	return lines.join("\n");
+}
+
+/**
+ * 發送提供者緩存更新通知
+ * Send provider cache update notification
+ *
+ * 若傳入 ctx 且 TUI 可用，則發送 toast 通知
+ * If ctx is passed and TUI is available, sends toast notification
+ *
+ * @param stats - 歷史更新統計資訊
+ * @param ctx - ToolContext（可選）
+ * @param timestamp - 更新時間戳（可選）
+ */
+export async function notifyProviderCacheUpdate(
+	stats: IHistoryUpdateStats,
+	ctx?: ToolContext,
+	timestamp?: number,
+): Promise<void>
+{
+	// 先輸出日誌
+	// Output log first
+	const reportText = generateProviderCacheReport(stats);
+	logArise2WithLevel("info", () => [reportText]);
+
+	// 如果有傳入 ctx，嘗試發送 TUI 通知
+	// If ctx is provided, try to send TUI notification
+	if (ctx)
+	{
+		const changeSummary = [
+			stats.addedModels > 0 ? `+${stats.addedModels} added` : null,
+			stats.removedModels > 0 ? `-${stats.removedModels} removed` : null,
+			stats.changedModels > 0 ? `~${stats.changedModels} changed` : null,
+		].filter(Boolean).join(", ");
+
+		const title = "Provider Cache Updated";
+		const message = `${stats.providerCount} providers, ${stats.totalModelCount} models (${changeSummary})`;
+
+		try
+		{
+			// @ts-expect-error ctx.client.tui 可能不存在 / ctx.client.tui may not exist
+			await ctx.client.tui?.showToast?.({
+				body: {
+					title,
+					message,
+					variant: "info",
+					duration: 5000,
+				},
+			});
+		}
+		catch
+		{
+			// TUI 可能不可用（非互動模式）
+			// TUI may not be available (non-interactive mode)
+		}
+	}
+}
+
+/**
  * 設定提供者緩存
  * Set providers cache
  *
  * @param providers - 提供者列表
  * @param expiresIn - 過期時間（毫秒），預設 5 分鐘
  * @param oldCache - 舊的緩存（用於計算差異與歷史記錄）
+ * @param ctx - ToolContext（可選），用於發送 TUI 通知
  */
 export function setProvidersCache(
-	providers: CachedProvider[],
+	providers: IOpenCodeProvider[],
 	expiresIn: number = DEFAULT_PROVIDERS_CACHE_TTL,
 	oldCache?: IProvidersCache | null,
+	ctx?: ToolContext,
 ): void
 {
 	const now = Date.now();
@@ -487,11 +674,30 @@ export function setProvidersCache(
 		historyFromFile = updateHistoryRecords(historyFromFile, providers);
 	}
 
+	// 緩存物件不包含 history（歷史記錄單獨儲存於 providers-history.json）
+	// Cache object does NOT include history (history is stored separately in providers-history.json)
+	// providers Record 不包含 models（使用 IOpenCodeProviderCore），以減少檔案大小
+	const providersRecord = providers.reduce((acc, p) => {
+		acc[p.id] = {
+			id: p.id,
+			source: p.source,
+			name: p.name,
+			env: p.env,
+			options: p.options,
+			default: p.default,
+		};
+		return acc;
+	}, {} as Record<string, IOpenCodeProviderCore>);
+
+  sortObject(providersRecord, {
+    useSource: true,
+  });
+
 	const cache: IProvidersCache = {
-		providers,
+		data: providers,
+		providers: providersRecord,
 		timestamp: now,
 		expiresIn,
-		history: historyFromFile,
 	};
 
 	// 更新記憶體緩存
@@ -502,6 +708,18 @@ export function setProvidersCache(
 
 	// 獨立儲存歷史紀錄（永久保存）
 	saveProvidersHistoryToFile(historyFromFile);
+
+	// 計算並輸出統計日誌
+	// Calculate and output statistics log
+	const stats = calculateHistoryUpdateStats(loadProvidersHistoryFromFile() ?? undefined, historyFromFile, providers);
+
+	// 呼叫通知函數（包含日誌輸出）
+	// Call notification function (includes log output)
+	notifyProviderCacheUpdate(stats, ctx, now).catch(() =>
+	{
+		// 忽略通知錯誤
+		// Ignore notification errors
+	});
 }
 
 /**
@@ -802,4 +1020,74 @@ export function diffsToMarkdownTable(diffs: IProviderDiffResult[]): string
 	}
 
 	return lines.join("\n");
+}
+
+/**
+ * 免費模型資訊
+ * Free model information
+ */
+export interface IFreeModelInfo
+{
+	/** 提供者 ID */
+	providerId: string;
+	/** 模型 ID */
+	modelId: string;
+	/** 模型名稱 */
+	name?: string;
+	/** 模型費用資訊 */
+	cost: IOpenCodeProviderModelCost;
+}
+
+/**
+ * 檢查模型是否為免費模型
+ * Check if a model is free
+ *
+ * 免費模型的定義：input 和 output費用都為 0
+ * Free model definition: both input and output costs are 0
+ *
+ * @param cost - 模型費用資訊
+ * @returns 是否為免費模型
+ */
+export function isFreeModel(cost: IOpenCodeProviderModelCost | undefined): boolean
+{
+	if (!cost)
+	{
+		return false;
+	}
+
+	return cost.input === 0 && cost.output === 0;
+}
+
+/**
+ * 從 providers 中找出所有免費模型
+ * Find all free models from providers
+ *
+ * @param providers - 提供者列表
+ * @returns 免費模型資訊陣列
+ */
+export function findFreeModels(providers: IOpenCodeProvider[]): IFreeModelInfo[]
+{
+	const freeModels: IFreeModelInfo[] = [];
+
+	for (const provider of providers)
+	{
+		if (provider.models)
+		{
+			for (const [modelKey, model] of Object.entries(provider.models))
+			{
+				if (isFreeModel(model.cost))
+				{
+					const modelId = model?.id ?? model?.name ?? modelKey;
+					freeModels.push({
+						providerId: provider.id,
+						modelId,
+						name: model.name,
+						cost: model.cost!,
+					});
+				}
+			}
+		}
+	}
+
+	return freeModels;
 }
