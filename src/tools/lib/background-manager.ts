@@ -1499,10 +1499,25 @@ Use arise_background_output("${task.id}") to check the result.`
    */
   private _publicSchedulePolling(taskId: string): void
   {
+    /**
+     * 狀態日誌：開始公開輪詢
+     * Status log: starting public polling
+     */
     const task = this.tasks.get(taskId);
     if (task)
     {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `_publicSchedulePolling: taskId=${taskId}, shadow=${task.shadow}, status=${task.status}`,
+      ]);
+
       this.schedulePolling(taskId, task.shadow as IAllShadowAgentsName);
+    } else
+    {
+      logArise2WithLevel("debug", () => [
+        `[background-manager]`,
+        `_publicSchedulePolling: task not found for taskId=${taskId}`,
+      ]);
     }
   }
 

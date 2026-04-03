@@ -55,6 +55,15 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
 
       try {
         /**
+         * 狀態日誌：開始召喚
+         * Status log: starting summon
+         */
+        logArise2WithLevel("debug", () => [
+          `[arise-summon]`,
+          `Starting summon: shadow=${shadow}, description=${taskDesc}, run_in_background=${run_in_background}`,
+        ], { force: true });
+
+        /**
          * 建立新的 Session
          * Create new session
          *
@@ -67,6 +76,15 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
 
         const sessionId = session.data?.id;
         if (!sessionId) {
+          /**
+           * 狀態日誌：建立 session 失敗
+           * Status log: session creation failed
+           */
+          logArise2WithLevel("error", () => [
+            `[arise-summon]`,
+            `Failed to create session for ${shadow}: no session ID returned`,
+          ], { force: true });
+
           return formatAriseMsgError(`Failed to create session for ${shadow}`);
         }
 
@@ -79,6 +97,15 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
          */
         const parentModel = getSessionModel(context.sessionID);
         const modelBody = resolveModelContext(parentModel, shadow, config, model);
+
+        /**
+         * 狀態日誌：解析模型完成
+         * Status log: model resolved
+         */
+        logArise2WithLevel("debug", () => [
+          `[arise-summon]`,
+          `Model resolved: ${formatModelBodyDescription(modelBody)}, sessionId=${sessionId}`,
+        ], { force: true });
 
         /**
          * 輸出召喚日誌
@@ -102,6 +129,15 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
          */
         if (run_in_background) {
           /**
+           * 狀態日誌：開始非同步執行
+           * Status log: starting async execution
+           */
+          logArise2WithLevel("debug", () => [
+            `[arise-summon]`,
+            `Starting async execution: sessionId=${sessionId}, shadow=${shadow}`,
+          ], { force: true });
+
+          /**
            * 非同步模式（Fire and forget）
            * Async mode (Fire and forget)
            *
@@ -115,21 +151,50 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
               model: modelBody,
               parts: [{ type: "text", text: prompt }],
             },
-          }).catch((error) => {
-            ctx.client.app.log?.({
-              body: formatAriseMsgLogBody({
-                label: "Summon failed",
-                message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
-                level: EnumLogLevel.Error,
-              }),
+          })
+            .then(() => {
+              /**
+               * 狀態日誌：非同步執行完成（Promise resolved）
+               * Status log: async execution completed (Promise resolved)
+               */
+              logArise2WithLevel("debug", () => [
+                `[arise-summon]`,
+                `Async execution resolved: sessionId=${sessionId}, shadow=${shadow}`,
+              ], { force: true });
+            })
+            .catch((error) => {
+              /**
+               * 狀態日誌：非同步執行錯誤
+               * Status log: async execution error
+               */
+              logArise2WithLevel("error", () => [
+                `[arise-summon]`,
+                `Async execution failed: sessionId=${sessionId}, shadow=${shadow}, error=${getErrorMessage(error)}`,
+              ], { force: true });
+
+              ctx.client.app.log?.({
+                body: formatAriseMsgLogBody({
+                  label: "Summon failed",
+                  message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
+                  level: EnumLogLevel.Error,
+                }),
+              });
             });
-          });
 
           return formatAriseMsgSuccessMultiLine(
             `Summoned ${shadow} in background.`,
             `Task: ${taskDesc}\nSession ID: ${sessionId}\n\nThe shadow is working. Continue with your work.`
           );
         } else {
+          /**
+           * 狀態日誌：開始同步執行
+           * Status log: starting sync execution
+           */
+          logArise2WithLevel("debug", () => [
+            `[arise-summon]`,
+            `Starting sync execution: sessionId=${sessionId}, shadow=${shadow}`,
+          ], { force: true });
+
           /**
            * 同步模式（等待完成）
            * Sync mode (wait for completion)
@@ -145,6 +210,15 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
               parts: [{ type: "text", text: prompt }],
             },
           });
+
+          /**
+           * 狀態日誌：同步執行完成
+           * Status log: sync execution completed
+           */
+          logArise2WithLevel("debug", () => [
+            `[arise-summon]`,
+            `Sync execution completed: sessionId=${sessionId}, shadow=${shadow}`,
+          ], { force: true });
 
           /** 取得 session 的訊息歷史 / Get session message history */
           const messages = await ctx.client.session.messages({
