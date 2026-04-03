@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.25](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.24...@bluelovers/opencode-arise@0.1.25) (2026-04-03)
+
+
+
+### ✨　Features
+
+* **config:** 重構 provider 類型並新增快取統計與免費模型功能 ([02d3702](https://github.com/bluelovers/opencode-arise/commit/02d3702c23665b3c661c2f9c1a1533e2cad79add))
+* **event-handler:** 為事件處理器增加日誌輸出並報告模型名稱 ([87913c3](https://github.com/bluelovers/opencode-arise/commit/87913c34bf682f222d56aff1daf5d2ae91970c99))
+* **tools:** ARISE_GIT_SUMMARY 新增 cwd 參數支援指定目標目錄 ([82cc99e](https://github.com/bluelovers/opencode-arise/commit/82cc99e00751ecdd14fa1a4d88b17a237dbd7ccf))
+* **types:** 新增 EnumOpenCodeEventType 列舉並替換字串值 ([4db2af2](https://github.com/bluelovers/opencode-arise/commit/4db2af20a8c1c6d8fd28ca599053d00b1e760e6e))
+
+
+### 📦　Code Refactoring
+
+* **config:** 重構 provider 歷史記錄結構並分離 session cache ([135b36a](https://github.com/bluelovers/opencode-arise/commit/135b36a389283b945f825137426e2bcdc18a8e67))
+* **tools:** 依 EnumAriseTools 命名重命名工具檔案並更新所有引用 ([e61b44f](https://github.com/bluelovers/opencode-arise/commit/e61b44fada6cf0804cd65165faaacc3da7d52556))
+* **utils:** 將 git-summary 輸出改為 markdown code block 格式 ([ac82b3d](https://github.com/bluelovers/opencode-arise/commit/ac82b3d86281c2e6f6ee3af6e2856ac5423bfcd1))
+
+
+### 🚨　Tests
+
+* **api:** 新增 API 供應商測試資料 fixture 檔案 ([f30cf02](https://github.com/bluelovers/opencode-arise/commit/f30cf02e91b07e41eb4a86e635b7346764aa0704))
+
+
+
 ## [0.1.24](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.23...@bluelovers/opencode-arise@0.1.24) (2026-04-03)
 
 
