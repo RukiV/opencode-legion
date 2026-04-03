@@ -49,6 +49,14 @@ export const GIT_SUMMARY_ARGS = {
 		})
 		.optional()
 		.default(true),
+	/** 目標目錄路徑（相對於專案根目錄或絕對路徑）/ Target directory path (relative to project root or absolute path) */
+	cwd: z
+		.string()
+		.meta({
+			description: "Target directory to run git commands in (relative to project root or absolute path). Defaults to current working directory.",
+			title: "Working Directory",
+		})
+		.optional(),
 } as const;
 
 /**

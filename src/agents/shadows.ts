@@ -592,8 +592,9 @@ Runs multiple git commands and returns a consolidated report:
 - git log --oneline -N: recent commit history (configurable count)
 
 Optional parameters:
-- log_count: number of recent commits to show (default: 5)
+- log_count: number of recent commits to show (default: 10)
 - diff_stat: whether to include diff --stat (default: true)
+- cwd: target directory to run git commands in (relative to project root or absolute path)
 
 Returns a formatted summary suitable for quick repository state assessment.` as const,
 		shortDescription: "Get Git status summary (status + diff stat + recent log)" as const,

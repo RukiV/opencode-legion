@@ -45,17 +45,18 @@ export interface IGitSummaryResult
  * Execute shell command and return output
  *
  * @param command - 要執行的指令 / Command to execute
+ * @param options - execSync 選項（如 cwd、timeout 等）/ execSync options (e.g. cwd, timeout)
  * @returns 指令輸出 / Command output
  */
-export function execCommand(command: string): string
+export function execCommand(command: string, options?: { cwd?: string; timeout?: number }): string
 {
 	try
 	{
 		return execSync(command, {
 			encoding: 'utf-8',
-			timeout: 10000,
-			stdio: ['pipe', 'pipe', 'pipe'],
-		}).trim();
+			timeout: options?.timeout ?? 10000,
+			cwd: options?.cwd,
+		}) as string;
 	}
 	catch (error: any)
 	{
@@ -85,11 +86,17 @@ export function execCommand(command: string): string
  */
 export function getGitSummary(options: IGitSummaryOptions = {}): IGitSummaryResult
 {
-	const { log_count = 5, diff_stat = true } = options;
+	const { log_count = 5, diff_stat = true, cwd } = options;
 
-	const status = execCommand('git status');
-	const diffStat = diff_stat ? execCommand('git diff --stat') : '';
-	const log = execCommand(`git log --oneline -${log_count}`);
+	const execOpts = {
+		encoding: 'utf-8' as const,
+		timeout: 10000,
+		cwd,
+	};
+
+	const status = execCommand('git status', execOpts);
+	const diffStat = diff_stat ? execCommand('git diff --stat', execOpts) : '';
+	const log = execCommand(`git log --oneline -${log_count}`, execOpts);
 
 	return {
 		status,
