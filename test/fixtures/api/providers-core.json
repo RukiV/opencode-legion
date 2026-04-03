@@ -1,0 +1,58 @@
+{
+  "openrouter": {
+    "id": "openrouter",
+    "source": "api",
+    "name": "OpenRouter",
+    "env": [
+      "OPENROUTER_API_KEY"
+    ],
+    "options": {
+      "headers": {
+        "HTTP-Referer": "https://opencode.ai/",
+        "X-Title": "opencode"
+      }
+    }
+  },
+  "kilo": {
+    "id": "kilo",
+    "source": "api",
+    "name": "Kilo Gateway",
+    "env": [
+      "KILO_API_KEY"
+    ],
+    "options": {
+      "headers": {
+        "HTTP-Referer": "https://opencode.ai/",
+        "X-Title": "opencode"
+      }
+    }
+  },
+  "ollama-cloud": {
+    "id": "ollama-cloud",
+    "source": "api",
+    "name": "Ollama Cloud",
+    "env": [
+      "OLLAMA_API_KEY"
+    ],
+    "options": {}
+  },
+  "opencode": {
+    "id": "opencode",
+    "source": "api",
+    "name": "OpenCode Zen",
+    "env": [
+      "OPENCODE_API_KEY"
+    ],
+    "options": {}
+  },
+  "google": {
+    "id": "google",
+    "source": "api",
+    "name": "Google",
+    "env": [
+      "GOOGLE_GENERATIVE_AI_API_KEY",
+      "GEMINI_API_KEY"
+    ],
+    "options": {}
+  }
+}
