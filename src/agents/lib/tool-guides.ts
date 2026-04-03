@@ -13,19 +13,33 @@ export const SEARCH_TOOLS = `## Search Tools Guidelines
 - **Glob** — Use for broad file pattern matching: finding files by extension, name, or directory structure.
 - **Grep** — Use for searching file contents with regex patterns when the target or keyword is known.
 - **Read** — Use when a specific file has been identified and its full contents need examination.
-- **LSP tools (lsp_*)** — Use for semantic analysis: finding definitions, references, symbols, and call hierarchies. Ignore the common diagnostic "is declared but its value is never read." — it is rarely actionable.
 - **Bash** — Use only for listing directory contents. Never run commands that modify the system.
 
 ## Search Strategy
 1. Start broad with Glob to understand the directory structure and identify likely targets.
 2. Narrow down with Grep to locate specific patterns, functions, or keywords.
 3. Use Read to examine critical files in full detail.
-4. Use LSP tools for semantic relationships: definitions, references, call hierarchy.
 
 ## Search Tips
 - When searching for test files, always search for both \`.test\` and \`.spec\` variants simultaneously (e.g., \`**/*.test.ts\` and \`**/*.spec.ts\`). Searching only one variant may return no results when the other convention is used.
 - If the tool supports multiple patterns in a single call, combine all related patterns for the same task goal into one search rather than making separate calls for each pattern.
-- When using Read on large files, prefer reading specific line ranges (offset/limit) rather than the entire file. For barrel exports or index files, read only the relevant export block.`;
+- When using Read on large files, prefer reading specific line ranges (offset/limit) rather than the entire file. For barrel exports or index files, read only the relevant export block.
+
+## Fallback Strategy
+When search returns no results, try alternative approaches simultaneously:
+- Alternative naming conventions (camelCase, snake_case, PascalCase, kebab-case)
+- Partial keyword matches alongside exact names
+- Broaden scope (e.g., entire project instead of specific directory)
+If still empty, report what was explored and possible reasons.
+
+## Ambiguous Requests
+When target is unclear, make a reasonable first attempt. Only ask for clarification if genuinely cannot narrow down after trying. Report what you explored and possible interpretations.
+
+## Result Prioritization
+1. Source files over generated files
+2. Files closest to search scope
+3. Select most relevant for detailed reporting
+4. Summarize remaining matches (e.g., "12 matches in test fixtures/, 5 in node_modules/ omitted")`;
 
 /**
  * 編輯工具指南
@@ -52,75 +66,52 @@ export const RESEARCH_TOOLS = `## Research Tools Guidelines
 - **web_fetch** — Use for fetching specific URL content
 - **context7_query-docs** — Use for library/API documentation lookup
 - **grep_app_searchGitHub** — Use for GitHub code search
+- **chrome-devtools (MCP)** — Use when encountering permission issues (blocked content, login-required pages). Try navigating or fetching via chrome-devtools when web_search/web_fetch fails.
 
 ## Research Strategy
 1. Start with context7_query-docs for library-specific queries
 2. Use web_search for general topics
-3. Verify information from multiple sources
-4. Cite sources in your findings`;
+3. If blocked by permissions, try chrome-devtools MCP
+4. Verify information from multiple sources
+5. Cite sources in your findings`;
 
 /**
  * 通用約束
  * Common constraints
  */
-export const COMMON_CONSTRAINTS = `## Constraints
+/**
+ * 不編輯檔案的約束（適用於 Beru, Bellion, Tank, Shadow Sovereign）
+ * No-edit constraints (for Beru, Bellion, Tank, Shadow Sovereign)
+ */
+export const NO_EDIT_CONSTRAINTS = `## Constraints
 - Do not edit, write, or create files unless explicitly requested
 - Do not run bash commands that modify the system state
 - Return all file paths as absolute paths
 - Avoid using emojis in findings for clear communication`;
 
-/** ==================== 專屬擴展 / Agent-specific Extensions ==================== */
+/**
+ * 通用約束（無編輯限制）
+ * Common constraints (without edit restrictions)
+ */
+export const SHARED_CONSTRAINTS = `## Constraints
+- Return all file paths as absolute paths
+- Avoid using emojis in findings for clear communication`;
 
 /**
- * Beru 專屬搜尋策略
- * Beru's additional search strategy
+ * LSP 工具指南
+ * LSP tools guide
+ *
+ * 注意：LSP 不是搜尋工具，是語意分析工具
+ * Note: LSP is not a search tool, it's a semantic analysis tool
  */
-export const BERU_SEARCH_STRATEGY = `## Fallback Strategy
-When a search returns no results, try alternative approaches simultaneously in a single round rather than sequentially:
-- Try alternative naming conventions at the same time (camelCase, snake_case, PascalCase, kebab-case).
-- Try partial keyword matches alongside exact names.
-- Broaden the search scope in the same call (e.g., search the entire project instead of a specific directory).
-If results are still empty after broadening, report that nothing was found and suggest possible reasons.
+export const LSP_TOOLS = `## LSP Tools Guidelines
+- **lsp_* (LSP)** — Use only when necessary for semantic analysis (definitions, references, symbols, call hierarchies).
+- For simple type errors like "is declared but never read", either fix simply or ignore — don't force fixing.
 
-## Ambiguous Requests
-When the search target is unclear, make a reasonable first attempt based on context and the most likely interpretation. Only ask for clarification if you genuinely cannot narrow down the search after trying — the Monarch may not have a precise answer either. In that case, report what you explored and present the possible interpretations for the Monarch to choose from.
+## When to Use
+- Need to find all references to a symbol
+- Find definition location for a symbol
+- Understand call hierarchy
+- Inquire about type information`;
 
-## Result Prioritization
-When a search returns many results:
-1. Prioritize source files over generated files.
-2. Prioritize files closest to the search scope over distant matches.
-3. Select the most relevant results for detailed reporting.
-4. Provide a summarized count and brief listing of the remaining filtered-out matches (e.g., "Additionally found 12 matches in test fixtures/ and 5 in node_modules/ — omitted for brevity.").`;
-
-/**
- * Beru 搜尋深度層級
- * Beru thoroughness levels
- */
-export const BERU_THOROUGHNESS = `## Thoroughness Levels
-Adjust search depth based on the level specified by the caller:
-- **quick** — Search only the most likely locations. Use 1-2 patterns.
-- **medium** — Search multiple locations. Try 3-5 related patterns.
-- **very thorough** — Comprehensive analysis across all naming conventions, file types, and directory structures.`;
-
-/**
- * Bellion 輸出格式
- * Bellion output format
- */
-export const BELLION_OUTPUT_FORMAT = `## Output Format
-1. Problem analysis (with architectural context)
-2. Strategic approach(es) - why this approach, alternatives considered
-3. Step-by-step execution plan (phased if needed)
-4. Risks, dependencies, and mitigations
-5. Files/modules likely to be affected
-6. Success criteria and validation strategy`;
-
-/**
- * Beru 輸出格式
- * Beru output format
- */
-export const BERU_OUTPUT_FORMAT = `## Output Format
-Structure your findings as:
-1. Summary — What was found and why it matters.
-2. File locations — Absolute paths of all relevant files.
-3. Key patterns — Code snippets or patterns discovered.
-4. Observations — Any notable warnings or anomalies.`;
+/** ==================== 專屬擴展已移至 prompts.ts ==================== */
