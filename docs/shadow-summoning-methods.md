@@ -250,6 +250,49 @@ Agent 行為的真正控制來源是 `shadows.ts` 中的工具描述（`ARISE_TO
 
 ---
 
+## 安全設計考量 (Security Design Considerations)
+
+### 為什麼只有 Beru、Tank、Bellion 支援 Background？
+
+這是 **有意的 AGENT 權限設計**，不是 bug 或限制。
+
+| Agent | 主要能力 | 適合 Background? | 理由 |
+|-------|---------|------------------|------|
+| **Beru** | 🔍 搜尋/探索 | ✅ | 只讀操作，不會修改檔案 |
+| **Tank** | 🌐 網路搜尋 | ✅ | 只讀操作，不會修改檔案 |
+| **Bellion** | 📊 策略分析 | ✅ | 只讀操作，不會修改檔案 |
+| **Igris** | ✏️ 編輯檔案 | ❌ | 寫入操作，並行恐衝突 |
+| **Tusk** | 🎨 UI 創作 | ❌ | 寫入操作，並行恐衝突 |
+| **Shadow Sovereign** | 🔍 深度審查 | ❌ | 需要同步討論確認 |
+
+#### 設計邏輯
+
+**只允許「只讀操作」的 Agent 使用 Background 模式：**
+
+1. **避免檔案衝突** — 多個 Agent 同時編輯同一個檔案會導致覆蓋
+2. **確保順序可控** — 寫入操作需要明確的執行順序
+3. **易於追蹤責任** — 知道哪個 Agent 做了什麼修改
+
+#### 並行風險
+
+如果允許 `Igris` 或 `Tusk` 使用 `arise_background`：
+
+```
+場景：並行執行兩個 Igris 任務
+├── Igris A 編輯 file.ts
+├── Igris B 也編輯 file.ts
+└── 後執行的覆蓋先執行的結果 → 資料丟失
+```
+
+#### 結論
+
+> **BACKGROUND_SHADOWS = [beru, tank, bellion] 是合理的安全設計**
+> 
+> - 需要寫入的 Agent 必須使用 Sync 模式（`arise_summon`）
+> - 確保執行順序、結果可控、責任明確
+
+---
+
 ## 測試記錄
 
 - **測試日期：** 2026-04-01
