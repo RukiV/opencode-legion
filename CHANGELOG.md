@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.31](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.30...@bluelovers/opencode-arise@0.1.31) (2026-04-04)
+
+
+
+### 🚨　Tests
+
+* **model-resolver:** 所有快照改用 property matcher 驗證 ([d41e5d8](https://github.com/bluelovers/opencode-arise/commit/d41e5d8bce26de3e1d540f763fdb07016ca52965))
+
+
+
 ## [0.1.30](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.29...@bluelovers/opencode-arise@0.1.30) (2026-04-04)
 
 
