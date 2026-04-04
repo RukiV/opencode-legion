@@ -5,9 +5,9 @@
 
 import { AUTO_MODEL, DEFAULT_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
-import { SHADOW_AGENTS, type IShadowAgents } from "../agents/shadows";
+import { SHADOW_AGENTS } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
-import { _isNotEmpty } from "./string/string-utils";
+import { _isEmpty, _isNotEmpty, _trimLazy, normalizeModelString } from "./string/string-utils";
 import { IModelBody } from "../types/types-opencode";
 
 /**
@@ -43,11 +43,11 @@ export function formatModelBodyDescription(modelBody: IModelBody): string
  * @returns 配置中指定的模型，若無則回傳 undefined
  */
 export function getModelFromConfig(
-  config: IAriseConfig | undefined,
-  shadowName: IAllShadowAgentsName,
-): string | undefined 
+	config: IAriseConfig | undefined,
+	shadowName: IAllShadowAgentsName,
+): string | undefined
 {
-  return config?.agents?.[shadowName]?.model;
+	return config?.agents?.[shadowName]?.model;
 }
 
 /**
@@ -109,27 +109,27 @@ export function parseModelString(
  * // Returns: "openai/gpt-4o"
  */
 export function combineModelID(
-  providerID: string,
-  modelID: string,
+	providerID: string,
+	modelID: string,
 ): string
 export function combineModelID(
-  modelBody: IModelBody,
-  modelID?: undefined,
+	modelBody: IModelBody,
+	modelID?: undefined,
 ): string
 export function combineModelID(
-  providerID: string | IModelBody,
-  modelID?: string,
-): string 
+	providerID: string | IModelBody,
+	modelID?: string,
+): string
 {
-  if (typeof providerID === "object") 
-  {
-    if (!providerID.providerID || !providerID.modelID)
-    {
-      throw new RangeError(`Invalid model body: ${JSON.stringify(providerID)}`);
-    }
-    return `${providerID.providerID}/${providerID.modelID}`;
-  }
-  return `${providerID}/${modelID}`;
+	if (typeof providerID === "object")
+	{
+		if (!providerID.providerID || !providerID.modelID)
+		{
+			throw new RangeError(`Invalid model body: ${JSON.stringify(providerID)}`);
+		}
+		return `${providerID.providerID}/${providerID.modelID}`;
+	}
+	return `${providerID}/${modelID}`;
 }
 
 /**
@@ -160,38 +160,38 @@ export function combineModelID(
  * // Returns: { providerID: "openai", modelID: "gpt-4o" }
  */
 export function parseModelBody(
-  providerID: string,
-  modelID: string,
+	providerID: string,
+	modelID: string,
 ): IModelBody
 export function parseModelBody(
-  modelBody: IModelBody,
-  modelID?: undefined,
+	modelBody: IModelBody,
+	modelID?: undefined,
 ): IModelBody
 export function parseModelBody(
-  model: string,
-  modelID?: undefined,
+	model: string,
+	modelID?: undefined,
 ): IModelBody
 export function parseModelBody(
-  providerID: string | IModelBody,
-  modelID?: string,
+	providerID: string | IModelBody,
+	modelID?: string,
 ): IModelBody
 {
-  if (typeof providerID === "object") 
-  {
-    return { providerID: providerID.providerID, modelID: providerID.modelID };
-  }
-  
-  // 組合 providerID 和 modelID（如果有 modelID）
-  const modelString = modelID ? `${providerID}/${modelID}` : providerID;
-  
-  // 使用 parseModelString 進行解析
-  const parsed = parseModelString(modelString);
-  if (!parsed)
-  {
-    throw new RangeError(`Invalid model string: "${modelString}"`);
-  }
-  
-  return parsed;
+	if (typeof providerID === "object")
+	{
+		return { providerID: providerID.providerID, modelID: providerID.modelID };
+	}
+
+	// 組合 providerID 和 modelID（如果有 modelID）
+	const modelString = modelID ? `${providerID}/${modelID}` : providerID;
+
+	// 使用 parseModelString 進行解析
+	const parsed = parseModelString(modelString);
+	if (!parsed)
+	{
+		throw new RangeError(`Invalid model string: "${modelString}"`);
+	}
+
+	return parsed;
 }
 
 /**
@@ -278,7 +278,7 @@ export function _isAutoModel(model?: string): model is typeof AUTO_MODEL
  */
 export function _isDefinedAndNotAutoModel<T extends string>(model?: T): model is NonNullable<T>
 {
-  return _isNotEmpty(model) && !_isAutoModel(model)
+	return _isNotEmpty(model) && !_isAutoModel(model)
 }
 
 /**
@@ -297,12 +297,12 @@ export function _isDefinedAndNotAutoModel<T extends string>(model?: T): model is
  */
 export function _resolveAutoModelBase(parentModel?: string, defaultModel?: string): string
 {
-  if (_isDefinedAndNotAutoModel(parentModel))
-  {
-    return parentModel;
-  }
+	if (_isDefinedAndNotAutoModel(parentModel))
+	{
+		return parentModel;
+	}
 
-  return _isDefinedAndNotAutoModel(defaultModel) ? defaultModel : DEFAULT_MODEL;
+	return _isDefinedAndNotAutoModel(defaultModel) ? defaultModel : DEFAULT_MODEL;
 }
 
 /**
@@ -322,14 +322,14 @@ export function _resolveAutoModelBase(parentModel?: string, defaultModel?: strin
  */
 export function _resolveAutoModelCore(model?: string, parentModel?: string, defaultModel?: string): string | undefined
 {
-  if (_isNotEmpty(model))
-  {
-    if (_isAutoModel(model))
-    {
-      return _resolveAutoModelBase(parentModel, defaultModel);
-    }
-    return model;
-  }
+	if (_isNotEmpty(model))
+	{
+		if (_isAutoModel(model))
+		{
+			return _resolveAutoModelBase(parentModel, defaultModel);
+		}
+		return model;
+	}
 }
 
 /**
@@ -350,24 +350,24 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  * @returns 有效模型字串
  */
 export function getEffectiveModelWithFallback(
-  parentModel: string | undefined,
-  defaultModel: string | undefined,
-  configModel: string | undefined,
-  userModel?: string,
+	parentModel: string | undefined,
+	defaultModel: string | undefined,
+	configModel: string | undefined,
+	userModel?: string,
 ): string
 {
-  /** 用戶指定的模型擁有最高優先級 */
-  return _resolveAutoModelCore(userModel, parentModel, defaultModel)
-    /** Config 模型 (configModel) - 若為 AUTO 则使用父模型 */
-    ?? _resolveAutoModelCore(configModel, parentModel, defaultModel)
-    /**
-     * Shadow 預設模型 (defaultModel) - 若為 AUTO 则使用父模型
-     */
-    ?? _resolveAutoModelCore(defaultModel, parentModel, void 0)
-    /**
-     * 父模型（檢查 parentModel 在 DEFAULT_MODEL 之前）
-     * -> 最終 fallback (DEFAULT_MODEL)
-     */
-    ?? _resolveAutoModelBase(parentModel, void 0)
-    ;
+	/** 用戶指定的模型擁有最高優先級 */
+	return _resolveAutoModelCore(userModel, parentModel, defaultModel)
+		/** Config 模型 (configModel) - 若為 AUTO 则使用父模型 */
+		?? _resolveAutoModelCore(configModel, parentModel, defaultModel)
+		/**
+		 * Shadow 預設模型 (defaultModel) - 若為 AUTO 则使用父模型
+		 */
+		?? _resolveAutoModelCore(defaultModel, parentModel, void 0)
+		/**
+		 * 父模型（檢查 parentModel 在 DEFAULT_MODEL 之前）
+		 * -> 最終 fallback (DEFAULT_MODEL)
+		 */
+		?? _resolveAutoModelBase(parentModel, void 0)
+		;
 }
