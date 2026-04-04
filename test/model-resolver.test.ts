@@ -126,26 +126,32 @@ describe("getEffectiveModelWithFallback", () =>
 	{
 		it("should return userModel when specified", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", undefined, "user-model")).toBe("user-model");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, "user-model/model")).toBe("user-model/model");
 		});
 
 		it("should fallback to parentModel when userModel is AUTO_MODEL", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", "config", AUTO_MODEL)).toBe("parent");
-			expect(getEffectiveModelWithFallback("parent", "default", undefined, AUTO_MODEL)).toBe("parent");
-			expect(getEffectiveModelWithFallback(undefined, "default", undefined, AUTO_MODEL)).toBe("default");
+			/**
+			 * userModel 為 AUTO 時，直接回退到 parentModel
+			 * When userModel is AUTO, fallback directly to parentModel
+			 *
+			 * 不檢查 configModel（AUTO 表示用戶不想使用 config 設定）
+			 * Skip configModel (AUTO means user doesn't want config setting)
+			 */
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config/model", AUTO_MODEL)).toBe("parent/model");
+			expect(getEffectiveModelWithFallback(undefined, "default/model", "config/model", AUTO_MODEL)).toBe("default/model");
 			expect(getEffectiveModelWithFallback(undefined, undefined, undefined, AUTO_MODEL)).toBe(DEFAULT_MODEL);
 		});
 
 		it("should skip userModel when undefined", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", undefined, undefined)).toBe("default");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, undefined)).toBe("default/model");
 		});
 
 		it("should return configModel when userModel is undefined/invalid", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", "config-model", undefined)).toBe("config-model");
-			expect(getEffectiveModelWithFallback("parent", "default", "config-model", "")).toBe("config-model");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", undefined)).toBe("config-model/model");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", "")).toBe("config-model/model");
 		});
 	});
 
@@ -153,13 +159,12 @@ describe("getEffectiveModelWithFallback", () =>
 	{
 		it("should return configModel when specified", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", "config-model", undefined)).toBe("config-model");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", undefined)).toBe("config-model/model");
 		});
 
-		it("should fallback to parentModel when configModel is AUTO_MODEL", () =>
+		it("should fallback when configModel is AUTO_MODEL", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", AUTO_MODEL, undefined)).toBe("parent");
-			expect(getEffectiveModelWithFallback(undefined, "default", AUTO_MODEL, undefined)).toBe("default");
+			expect(getEffectiveModelWithFallback(undefined, "default/model", AUTO_MODEL, undefined)).toBe("default/model");
 			expect(getEffectiveModelWithFallback(undefined, undefined, AUTO_MODEL, undefined)).toBe(DEFAULT_MODEL);
 		});
 	});
@@ -168,12 +173,12 @@ describe("getEffectiveModelWithFallback", () =>
 	{
 		it("should return defaultModel when specified", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", "default", undefined, undefined)).toBe("default");
+			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, undefined)).toBe("default/model");
 		});
 
 		it("should fallback when defaultModel is AUTO_MODEL", () =>
 		{
-			expect(getEffectiveModelWithFallback("parent", AUTO_MODEL, undefined, undefined)).toBe("parent");
+			expect(getEffectiveModelWithFallback("parent/model", AUTO_MODEL, undefined, undefined)).toBe("parent/model");
 			expect(getEffectiveModelWithFallback(undefined, AUTO_MODEL, undefined, undefined)).toBe(DEFAULT_MODEL);
 		});
 	});

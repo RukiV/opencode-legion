@@ -19,6 +19,7 @@ import { SHADOW_AGENTS } from "../agents/shadows";
 import type { IAllShadowAgentsName } from "../types/enums";
 import { _isEmpty, _isNotEmpty, _trimLazy, normalizeModelString } from "./string/string-utils";
 import { IModelBody } from "../types/types-opencode";
+import { enableANSIColors } from "bun";
 
 /**
  * 預設模型
@@ -764,7 +765,6 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  *
  * 特殊處理：
  * Special handling:
- * - userModel 若為 AUTO，會被設為 undefined，讓 fallback 鏈繼續
  * - 每個層級的 AUTO 都會觸發 _resolveAutoModelBase 回退邏輯
  *
  * @param parentModel - 父會話模型 / Parent session model
@@ -793,20 +793,26 @@ export function getEffectiveModelWithFallback(
 	userModel?: string,
 ): string
 {
-	/**
-	 * 若 userModel 為 AUTO，設為 undefined 讓 fallback 鏈繼續
-	 * If userModel is AUTO, set to undefined to let fallback chain continue
-	 */
-	if (parseModelString(userModel).detectAutoModelBody)
+	if (_trimLazy(userModel)?.length)
+	{
+		if (parseModelString(userModel).detectAutoModelBody === 1)
+		{
+			userModel = AUTO_MODEL;
+		}
+	}
+	else 
 	{
 		userModel = void 0;
 	}
 
-	/**
-	 * 若 configModel 為 AUTO，設為 undefined 讓 fallback 鏈繼續
-	 * If configModel is AUTO, set to undefined to let fallback chain continue
-	 */
-	if (parseModelString(configModel).detectAutoModelBody)
+	if (_trimLazy(configModel)?.length)
+	{
+		if (parseModelString(configModel).detectAutoModelBody === 1)
+		{
+			configModel = AUTO_MODEL;
+		}
+	}
+	else
 	{
 		configModel = void 0;
 	}

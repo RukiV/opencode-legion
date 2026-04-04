@@ -322,13 +322,13 @@ describe("getEffectiveModelWithFallback", () => {
 		expect(result).toBe("user/model");
 	});
 
-	test("用戶指定 AUTO 時，回退到 configModel", () => {
+	test("用戶指定 AUTO 時，回退到 parentModel", () => {
 		/**
-		 * AUTO 會繼續往下檢查 fallback 鏈
-		 * AUTO continues to check fallback chain
+		 * userModel 為 AUTO 時，直接回退到 parentModel
+		 * When userModel is AUTO, fallback directly to parentModel
 		 *
-		 * 優先順序：userModel(AUTO) → configModel → defaultModel → parentModel
-		 * Priority: userModel(AUTO) → configModel → defaultModel → parentModel
+		 * 不檢查 configModel（AUTO 表示用戶不想使用 config 設定）
+		 * Skip configModel (AUTO means user doesn't want config setting)
 		 */
 		const result = getEffectiveModelWithFallback(
 			"parent/model",
@@ -336,7 +336,7 @@ describe("getEffectiveModelWithFallback", () => {
 			"config/model",
 			AUTO_MODEL,
 		);
-		expect(result).toBe("config/model");
+		expect(result).toBe("parent/model");
 	});
 
 	test("Config 模型次於用戶指定但優先於 Shadow 預設", () => {
@@ -363,7 +363,7 @@ describe("getEffectiveModelWithFallback", () => {
 			AUTO_MODEL,
 			undefined,
 		);
-		expect(result).toBe("default/model");
+		expect(result).toBe("parent/model");
 	});
 
 	test("當無 Config 模型時，使用 Shadow 預設", () => {
@@ -666,13 +666,13 @@ describe("resolveModelContext", () => {
 		});
 	});
 
-	test("當呼叫時指定 AUTO 時，回退到 configModel", () => {
+	test("當呼叫時指定 AUTO 時，回退到 parentModel", () => {
 		/**
-		 * userModel 為 AUTO 時 fallback 到 configModel
-		 * userModel AUTO falls back to configModel
+		 * userModel 為 AUTO 時，直接回退到 parentModel
+		 * userModel AUTO falls back directly to parentModel
 		 *
-		 * 優先順序：userModel(AUTO) → configModel → defaultModel
-		 * Priority: userModel(AUTO) → configModel → defaultModel
+		 * 不檢查 configModel（AUTO 表示用戶不想使用 config 設定）
+		 * Skip configModel (AUTO means user doesn't want config setting)
 		 */
 		const config = {
 			agents: {
@@ -686,8 +686,8 @@ describe("resolveModelContext", () => {
 			AUTO_MODEL,
 		);
 		expect(result).toEqual({
-			providerID: "config",
-			modelID: "model",
+			providerID: "anthropic",
+			modelID: "claude-3",
 		});
 	});
 
