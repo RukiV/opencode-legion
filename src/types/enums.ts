@@ -234,15 +234,15 @@ export enum BackgroundTaskStatus
  */
 export enum EnumAriseTools {
 	/** 同步或非同步召喚 shadow agent 執行任務 / Invoke a shadow agent synchronously or in background */
-	ARISE_SUMMON = "arise_summon",
+	ARISE_SYNC_SUMMON = "arise_summon",
 	/** 以背景任務方式啟動 shadow agent (平行執行) / Launch shadow agent as background task (parallel) */
-	ARISE_BACKGROUND = "arise_background",
+	ARISE_ASYNC_BACKGROUND = "arise_background",
 	/** 取得背景任務的輸出結果 / Get result from background task */
-	ARISE_BACKGROUND_OUTPUT = "arise_background_output",
+	ARISE_ASYNC_BACKGROUND_OUTPUT = "arise_background_output",
 	/** 列出所有背景任務及其狀態 / List all background tasks and their status */
-	ARISE_BACKGROUND_STATUS = "arise_background_status",
+	ARISE_ASYNC_BACKGROUND_STATUS = "arise_background_status",
 	/** 取消執行中的背景任務 / Cancel a running background task */
-	ARISE_BACKGROUND_CANCEL = "arise_background_cancel",
+	ARISE_ASYNC_BACKGROUND_CANCEL = "arise_background_cancel",
 	/** 列出所有可用的模型 / List all available models */
 	ARISE_LIST_MODELS = "arise_list_models",
 	/** 主動繼續執行失敗的任務 / Actively continue/resume a failed task */
@@ -258,11 +258,11 @@ export enum EnumAriseTools {
  * All Arise tools array
  */
 export const ALL_ARISE_TOOLS = [
-	EnumAriseTools.ARISE_SUMMON,
-	EnumAriseTools.ARISE_BACKGROUND,
-	EnumAriseTools.ARISE_BACKGROUND_OUTPUT,
-	EnumAriseTools.ARISE_BACKGROUND_STATUS,
-	EnumAriseTools.ARISE_BACKGROUND_CANCEL,
+	EnumAriseTools.ARISE_SYNC_SUMMON,
+	EnumAriseTools.ARISE_ASYNC_BACKGROUND,
+	EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT,
+	EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS,
+	EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL,
 	EnumAriseTools.ARISE_LIST_MODELS,
 	EnumAriseTools.ARISE_CONTINUE,
 	EnumAriseTools.ARISE_DEBUG,

@@ -181,7 +181,7 @@ const SHARED_SUMMON_ARGS = {
  * @see I_AriseToolsConfigEntry
  */
 export const ARISE_TOOLS = {
-	[EnumAriseTools.ARISE_SUMMON]: {
+	[EnumAriseTools.ARISE_SYNC_SUMMON]: {
 		description: composePrompt({
 			header: [
 				"Summon a shadow agent - sync (returns result) or background (fire-and-forget)." as const,
@@ -200,10 +200,10 @@ ${ALLOWED_SHADOWS.map((name) =>
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
 - run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
 
-⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
 			],
 			footer: [
-				createSummoningStrategy(EnumAriseTools.ARISE_SUMMON),
+				createSummoningStrategy(EnumAriseTools.ARISE_SYNC_SUMMON),
 			],
 		}),
 
@@ -221,7 +221,7 @@ ${ALLOWED_SHADOWS.map((name) =>
 				.default(false),
 		},
 	},
-	[EnumAriseTools.ARISE_BACKGROUND]: {
+	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: {
 		description: composePrompt({
 			header: [
 				"Launch background shadow agent - trackable, retrievable results." as const,
@@ -237,7 +237,7 @@ The 'description' arg will be shown in arise_background_status output for task i
 ✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.` as const,
 			],
 			footer: [
-				createSummoningStrategy(EnumAriseTools.ARISE_BACKGROUND),
+				createSummoningStrategy(EnumAriseTools.ARISE_ASYNC_BACKGROUND),
 			],
 		}),
 
@@ -253,7 +253,7 @@ The 'description' arg will be shown in arise_background_status output for task i
 			...SHARED_SUMMON_ARGS,
 		},
 	} as const,
-	[EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: {
+	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT]: {
 		description: `Retrieve the completed output from a background shadow agent task.
 
 Returns the shadow agent's final response after task completion. 
@@ -268,7 +268,7 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 				.meta({ description: "The task ID from arise_background (format: arise_xxx)", title: "Task ID" }),
 		},
 	},
-	[EnumAriseTools.ARISE_BACKGROUND_STATUS]: {
+	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: {
 		description: `List all background shadow agent tasks and their current status.
 
 Shows task_id, shadow name, status (running/completed/error/cancelled), description, and duration for each task.
@@ -283,7 +283,7 @@ Use this to check which tasks are still running before calling arise_background_
 				.optional(),
 		},
 	},
-	[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: {
+	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: {
 		description: `Cancel a currently running background shadow agent task.
 
 The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.` as const,

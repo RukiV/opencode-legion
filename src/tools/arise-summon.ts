@@ -31,7 +31,7 @@ export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig)
   const {
     description,
     args,
-  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_SUMMON);
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_SYNC_SUMMON);
 
   return tool2({
     description,

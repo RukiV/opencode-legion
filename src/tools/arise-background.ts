@@ -28,9 +28,9 @@ export function createBackgroundTaskTool(manager: BackgroundManager){
   const {
     description,
     args,
-  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND);
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_ASYNC_BACKGROUND);
 
-  return tool2<EnumAriseTools.ARISE_BACKGROUND>({
+  return tool2<EnumAriseTools.ARISE_ASYNC_BACKGROUND>({
     description,
     args,
 
@@ -102,9 +102,9 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
   const {
     description,
     args,
-  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_OUTPUT);
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT);
 
-  return tool2<EnumAriseTools.ARISE_BACKGROUND_OUTPUT>({
+  return tool2<EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT>({
     description,
     args,
 
@@ -197,9 +197,9 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
   const {
     description,
     args,
-  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_STATUS);
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS);
 
-  return tool2<EnumAriseTools.ARISE_BACKGROUND_STATUS>({
+  return tool2<EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS>({
     description,
     args,
 
@@ -269,9 +269,9 @@ export function createBackgroundCancelTool(manager: BackgroundManager) {
   const {
     description,
     args,
-  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_BACKGROUND_CANCEL);
+  } = getAriseToolsConfigEntry(EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL);
 
-  return tool2<EnumAriseTools.ARISE_BACKGROUND_CANCEL>({
+  return tool2<EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL>({
     description,
     args,
 

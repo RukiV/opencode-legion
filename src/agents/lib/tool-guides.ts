@@ -14,14 +14,14 @@ import { BACKGROUND_SHADOWS, EnumAriseTools } from "../../types/enums";
  * @param toolName - 工具名稱 / Tool name
  * @returns 格式化後的字串 / Formatted string
  */
-export function getInitialTestDescription<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+export function getInitialTestDescription<T extends EnumAriseTools.ARISE_SYNC_SUMMON | EnumAriseTools.ARISE_ASYNC_BACKGROUND>(toolName?: T)
 {
-	if (toolName === EnumAriseTools.ARISE_SUMMON)
+	if (toolName === EnumAriseTools.ARISE_SYNC_SUMMON)
 	{
 		return "Summon 1 sync (arise_summon)" as const;
 	}
 
-	if (toolName === EnumAriseTools.ARISE_BACKGROUND)
+	if (toolName === EnumAriseTools.ARISE_ASYNC_BACKGROUND)
 	{
 		return "Summon 1 async (arise_background)" as const;
 	}
@@ -36,14 +36,14 @@ export function getInitialTestDescription<T extends EnumAriseTools.ARISE_SUMMON 
  * @param toolName - 工具名稱 / Tool name
  * @returns 格式化後的字串 / Formatted string
  */
-export function getThenDecideDescription<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+export function getThenDecideDescription<T extends EnumAriseTools.ARISE_SYNC_SUMMON | EnumAriseTools.ARISE_ASYNC_BACKGROUND>(toolName?: T)
 {
-	if (toolName === EnumAriseTools.ARISE_SUMMON)
+	if (toolName === EnumAriseTools.ARISE_SYNC_SUMMON)
 	{
 		return "Then decide: use arise_summon or batch multiple sync" as const;
 	}
 
-	if (toolName === EnumAriseTools.ARISE_BACKGROUND)
+	if (toolName === EnumAriseTools.ARISE_ASYNC_BACKGROUND)
 	{
 		return "Then decide: use arise_background or batch multiple async" as const;
 	}
@@ -277,11 +277,11 @@ export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
  * @returns createSummoningStrategy 字串 / createSummoningStrategy string
  * @see SUMMONING_STRATEGY_FLOWCHART - 流程圖 / Flowchart
  */
-export function createSummoningStrategy<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+export function createSummoningStrategy<T extends EnumAriseTools.ARISE_SYNC_SUMMON | EnumAriseTools.ARISE_ASYNC_BACKGROUND>(toolName?: T)
 {
 	const initialTest = getInitialTestDescription(toolName);
 	const thenDecide = getThenDecideDescription(toolName);
-	
+
 	return `## Summoning Strategy
 
 ### Before Summoning

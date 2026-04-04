@@ -29,15 +29,15 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 {
 	return {
 		/** 同步/非同步召喚 Shadow 工具 / Sync/async summon Shadow tool */
-		[EnumAriseTools.ARISE_SUMMON]: createCallAriseAgentTool(ctx, config),
+		[EnumAriseTools.ARISE_SYNC_SUMMON]: createCallAriseAgentTool(ctx, config),
 		/** 啟動背景任務工具 / Launch background task tool */
-		[EnumAriseTools.ARISE_BACKGROUND]: createBackgroundTaskTool(backgroundManager),
+		[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: createBackgroundTaskTool(backgroundManager),
 		/** 取得背景任務輸出工具 / Get background task output tool */
-		[EnumAriseTools.ARISE_BACKGROUND_OUTPUT]: createBackgroundOutputTool(backgroundManager),
+		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT]: createBackgroundOutputTool(backgroundManager),
 		/** 列出背景任務狀態工具 / List background task status tool */
-		[EnumAriseTools.ARISE_BACKGROUND_STATUS]: createBackgroundStatusTool(backgroundManager),
+		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: createBackgroundStatusTool(backgroundManager),
 		/** 取消背景任務工具 / Cancel background task tool */
-		[EnumAriseTools.ARISE_BACKGROUND_CANCEL]: createBackgroundCancelTool(backgroundManager),
+		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: createBackgroundCancelTool(backgroundManager),
 		/** 列出可用模型工具 / List available models tool @see docs/tools/list-models.md */
 		[EnumAriseTools.ARISE_LIST_MODELS]: createListModelsTool(ctx),
 		/** 主動繼續/重試失敗任務工具 / Actively continue/retry failed task tool */
