@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.29](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.28...@bluelovers/opencode-arise@0.1.29) (2026-04-04)
+
+
+### BREAKING CHANGES
+
+* **model-resolver:** `getEffectiveModelWithFallback(userModel, defaultModel, configModel, AUTO)` 的返回值从 `configModel` 变更为 `parentModel
+
+
+
+### 🐛　Bug Fixes
+
+* **model:** 修復背景任務未傳入 config 的模型解析 Bug + 完善模型檢查機制 ([cd91347](https://github.com/bluelovers/opencode-arise/commit/cd91347ba7b6c6b512fee739b9ebfd4889f96bfe))
+* **model-resolver:** 修复 AUTO 模型回退逻辑，改为直接跳过 configModel 回退到 parentModel ([ba45e1b](https://github.com/bluelovers/opencode-arise/commit/ba45e1b323beec5d8262ef569fc6ba8c9f27e79a))
+
+
+### ✨　Features
+
+* **agents:** 添加影子代理权限配置 ([2bf7a68](https://github.com/bluelovers/opencode-arise/commit/2bf7a68a2bb8ea1583effdce691c31777b5dc348))
+
+
+### 📦　Code Refactoring
+
+* **utils:** 新增字串處理工具函數並重構 model-resolver ([877de87](https://github.com/bluelovers/opencode-arise/commit/877de87b72e8e0566064668a212f85c6f853b94c))
+
+
+### 📚　Documentation
+
+* 添加 OpenCode 配置參考與執行階段分析文檔 ([f775368](https://github.com/bluelovers/opencode-arise/commit/f775368b544a2e6c4b8d501cb7564276159464ad))
+
+
+
 ## [0.1.28](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.26...@bluelovers/opencode-arise@0.1.28) (2026-04-04)
 
 
