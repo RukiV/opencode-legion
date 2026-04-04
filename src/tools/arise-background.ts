@@ -14,6 +14,7 @@ import {
   formatAriseMsgInfo,
   formatAriseMsgMulti,
 } from "../utils/string/arise-message";
+import { createAgentToolListModels } from './arise-list-models';
 
 /**
  * 建立背景任務工具
@@ -24,7 +25,7 @@ import {
  *
  * @param manager - BackgroundManager 實例
  */
-export function createBackgroundTaskTool(manager: BackgroundManager){
+export function createAgentToolAriseBackgroundTask(manager: BackgroundManager){
   const {
     description,
     args,
@@ -98,7 +99,7 @@ Use arise_background_output("${task.id}") when you need the result.`
  *
  * @param manager - BackgroundManager 實例
  */
-export function createBackgroundOutputTool(manager: BackgroundManager) {
+export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager) {
   const {
     description,
     args,
@@ -192,7 +193,7 @@ export function createBackgroundOutputTool(manager: BackgroundManager) {
  *
  * @param manager - BackgroundManager 實例
  */
-export function createBackgroundStatusTool(manager: BackgroundManager) {
+export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager) {
 
   const {
     description,
@@ -265,7 +266,7 @@ export function createBackgroundStatusTool(manager: BackgroundManager) {
  *
  * @param manager - BackgroundManager 實例
  */
-export function createBackgroundCancelTool(manager: BackgroundManager) {
+export function createAgentToolAriseBackgroundCancel(manager: BackgroundManager) {
   const {
     description,
     args,

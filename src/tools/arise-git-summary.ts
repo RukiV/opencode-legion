@@ -10,6 +10,7 @@ import { getAriseToolsConfigEntry } from '../agents/shadows';
 import { tool2 } from '../types/types-opencode';
 import { formatAriseMsgError, formatAriseMsgSuccess } from '../utils/string/arise-message';
 import { getGitSummary, formatGitSummary } from '../utils/git-summary';
+import { createAgentToolListModels } from './arise-list-models';
 
 /**
  * 建立 Git 狀態摘要工具
@@ -17,7 +18,7 @@ import { getGitSummary, formatGitSummary } from '../utils/git-summary';
  *
  * @see docs/shadow-summoning-methods.md
  */
-export function createGitSummaryTool()
+export function createAgentToolGitSummary()
 {
 	const {
 		description,

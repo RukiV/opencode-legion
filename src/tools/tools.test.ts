@@ -1,10 +1,10 @@
 import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
-import { createCallAriseAgentTool } from "./arise-summon";
+import { createAgentToolAriseSyncSummon } from "./arise-summon";
 import {
-  createBackgroundTaskTool,
-  createBackgroundOutputTool,
-  createBackgroundStatusTool,
-  createBackgroundCancelTool,
+  createAgentToolAriseBackgroundTask,
+  createAgentToolAriseBackgroundOutput,
+  createAgentToolAriseBackgroundStatus,
+  createAgentToolAriseBackgroundCancel,
 } from "./arise-background";
 import { BackgroundManager } from "./lib/background-manager";
 
@@ -32,7 +32,7 @@ const mockCtx = {
 
 describe("arise_summon tool", () => {
   it("has correct structure", () => {
-    const tool = createCallAriseAgentTool(mockCtx);
+    const tool = createAgentToolAriseSyncSummon(mockCtx);
 
     expect(tool).toMatchObject({
       description: expect.stringContaining("shadow"),
@@ -42,7 +42,7 @@ describe("arise_summon tool", () => {
   });
 
   it("has all required args", () => {
-    const tool = createCallAriseAgentTool(mockCtx);
+    const tool = createAgentToolAriseSyncSummon(mockCtx);
 
     expect(tool.args).toMatchObject({
       shadow: expect.anything(),
@@ -53,7 +53,7 @@ describe("arise_summon tool", () => {
   });
 
   it("lists all shadows in description", () => {
-    const tool = createCallAriseAgentTool(mockCtx);
+    const tool = createAgentToolAriseSyncSummon(mockCtx);
 
     expect(tool.description).toContain("beru");
     expect(tool.description).toContain("igris");
@@ -69,7 +69,7 @@ describe("Background tools", () => {
 
   describe("arise_background tool", () => {
     it("has correct structure", () => {
-      const tool = createBackgroundTaskTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundTask(backgroundManager);
 
       expect(tool).toBeDefined();
       expect(tool.description).toContain("background");
@@ -82,7 +82,7 @@ describe("Background tools", () => {
 
   describe("arise_background_output tool", () => {
     it("has correct structure", () => {
-      const tool = createBackgroundOutputTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundOutput(backgroundManager);
 
       expect(tool).toBeDefined();
       expect(tool.args.task_id).toBeDefined();
@@ -90,7 +90,7 @@ describe("Background tools", () => {
     });
 
     it("returns not found for invalid task_id", async () => {
-      const tool = createBackgroundOutputTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundOutput(backgroundManager);
       const result = await tool.execute({ task_id: "invalid-id" });
 
       expect(result).toContain("not found");
@@ -99,14 +99,14 @@ describe("Background tools", () => {
 
   describe("arise_background_status tool", () => {
     it("has correct structure", () => {
-      const tool = createBackgroundStatusTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundStatus(backgroundManager);
 
       expect(tool).toBeDefined();
       expect(typeof tool.execute).toBe("function");
     });
 
     it("returns empty message when no tasks", async () => {
-      const tool = createBackgroundStatusTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundStatus(backgroundManager);
       const mockContext = { sessionID: "test", messageID: "test", agent: "test", abort: new AbortController().signal };
       const result = await tool.execute({ current_session_only: false }, mockContext);
 
@@ -116,7 +116,7 @@ describe("Background tools", () => {
 
   describe("arise_background_cancel tool", () => {
     it("has correct structure", () => {
-      const tool = createBackgroundCancelTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundCancel(backgroundManager);
 
       expect(tool).toBeDefined();
       expect(tool.args.task_id).toBeDefined();
@@ -124,7 +124,7 @@ describe("Background tools", () => {
     });
 
     it("returns failure for invalid task_id", async () => {
-      const tool = createBackgroundCancelTool(backgroundManager);
+      const tool = createAgentToolAriseBackgroundCancel(backgroundManager);
       const result = await tool.execute({ task_id: "invalid-id" });
 
       expect(result).toContain("Could not cancel");

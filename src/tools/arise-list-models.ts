@@ -17,6 +17,7 @@ import {
   formatAriseMsgSuccess,
 } from '../utils/string/arise-message';
 import { IOpenCodeProvider } from '../types/opencode/types-provider';
+import { createAgentToolAriseSyncSummon } from './arise-summon';
 
 /**
  * 格式化模型列表
@@ -58,7 +59,7 @@ function formatModelsForProvider(provider: IOpenCodeProvider): string[]
  * @see docs/tools/list-models.md
  * @param ctx - Plugin 上下文
  */
-export function createListModelsTool(ctx: PluginInput)
+export function createAgentToolListModels(ctx: PluginInput)
 {
 	const {
 		description,

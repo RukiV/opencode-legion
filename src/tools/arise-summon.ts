@@ -27,7 +27,7 @@ import { getSessionModel } from '../config/lib/session-cache';
  * @param config - Arise 配置物件
  * @returns Arise Agent 工具定義
  */
-export function createCallAriseAgentTool(ctx: PluginInput, config: IAriseConfig) {
+export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseConfig) {
   const {
     description,
     args,

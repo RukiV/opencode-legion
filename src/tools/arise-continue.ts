@@ -4,6 +4,7 @@ import { EnumAriseTools } from "../types/enums";
 import { getAriseToolsConfigEntry } from "../agents/shadows";
 import { tool2 } from '../types/types-opencode';
 import { consoleLoggerWithLevel, logArise2WithLevel } from "../utils/debug-control";
+import { createAgentToolListModels } from './arise-list-models';
 
 /**
  * 建立主動繼續工具
@@ -14,7 +15,7 @@ import { consoleLoggerWithLevel, logArise2WithLevel } from "../utils/debug-contr
  *
  * @param manager - BackgroundManager 實例
  */
-export function createContinueTool(manager: BackgroundManager) {
+export function createAgentToolContinue(manager: BackgroundManager) {
 	const {
 		description,
 		args,

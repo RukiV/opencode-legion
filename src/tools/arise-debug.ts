@@ -19,6 +19,7 @@ import
 	} from '../utils/debug-control';
 import { formatAriseMsgSuccess, formatAriseMsgError } from '../utils/string/arise-message';
 import type { ILogLevel } from '../types/enum-opencode';
+import { createAgentToolListModels } from './arise-list-models';
 
 /**
  * 建立除錯控制工具
@@ -27,7 +28,7 @@ import type { ILogLevel } from '../types/enum-opencode';
  * 允許在執行期開啟/關閉除錯模式，以及設定日誌級別
  * Allows enabling/disabling debug mode and setting log level at runtime
  */
-export function createDebugTool()
+export function createAgentToolDebug()
 {
 	const {
 		description,
