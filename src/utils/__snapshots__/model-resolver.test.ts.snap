@@ -1,0 +1,37 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`parseModelString 當模型字串不包含斜線時，返回 detectAutoModelBody=2 1`] = `
+{
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "claude-sonnet-4",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`parseModelString 當模型字串只有斜線前段時，返回 detectAutoModelBody=1 1`] = `
+{
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "anthropic",
+    },
+  },
+}
+`;
+
+exports[`parseModelString 當模型字串只有斜線後段時，返回 detectAutoModelBody=1 1`] = `
+{
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "claude-sonnet-4",
+      "providerID": undefined,
+    },
+  },
+}
+`;

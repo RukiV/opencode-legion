@@ -258,8 +258,18 @@ const model = sessionId ? getSessionModel(sessionId) : undefined;
 
 當任一層級的模型值為 `AUTO`（或變體如 `auto`、` AUTO `、`AUTO/.` 等），會觸發回退邏輯：
 
+| 層級 | AUTO 行為 |
+|------|-----------|
+| `userModel` 為 AUTO | **直接回退到 `parentModel`**，不檢查 `configModel`（AUTO 表示「沿用父會話模型」） |
+| `configModel` 為 AUTO | 回退到 `parentModel` → `defaultModel` |
+| `defaultModel` 為 AUTO | 回退到 `parentModel` → `DEFAULT_MODEL` |
+| `parentModel` 為 AUTO | 回退到 `DEFAULT_MODEL` |
+
 ```
-AUTO → parentModel → defaultModel → DEFAULT_MODEL
+userModel = AUTO → parentModel → defaultModel → DEFAULT_MODEL
+configModel = AUTO → parentModel → defaultModel → DEFAULT_MODEL
+defaultModel = AUTO → parentModel → DEFAULT_MODEL
+parentModel = AUTO → DEFAULT_MODEL
 ```
 
 ---

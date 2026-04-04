@@ -268,3 +268,15 @@ export const ALL_ARISE_TOOLS = [
 	EnumAriseTools.ARISE_DEBUG,
 	EnumAriseTools.ARISE_GIT_SUMMARY,
 ] as const satisfies EnumAriseTools[];
+
+export enum EnumDetectAutoModelBody
+{
+	/** Detect auto model body */
+	Auto = 1,
+	/** Detect auto model body with model */
+	AutoWithModel = 2,
+	/** Detect auto model body with provider */
+	AutoWithProvider = 3,
+	/** Normal model */
+	Normal = 0,
+}

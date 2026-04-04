@@ -54,21 +54,21 @@ export function normalizeModelString(inputModel: string): string
 {
 	let result = _trimLazy(inputModel);
 
-	// 重複去除直到穩定（處理多重疊加如 `//./`）
-	// Repeat until stable (handles stacked patterns like `//./`)
-	let prev: string;
-	do
-	{
-		prev = result;
-		result = result
-			// 去除開頭的 /. 或 ./ 或 /
-			// Remove leading /. or ./ or /
-			.replace(/^[\\\/\.\s]+/g, '')
-			// 去除結尾的 /. 或 ./ 或 /
-			// Remove trailing /. or ./ or /
-			.replace(/[\\\/\.\s]+$/g, '');
-	}
-	while (result !== prev);
+	// // 重複去除直到穩定（處理多重疊加如 `//./`）
+	// // Repeat until stable (handles stacked patterns like `//./`)
+	// let prev: string;
+	// do
+	// {
+	// 	prev = result;
+	// 	result = result
+	// 		// 去除開頭的 /. 或 ./ 或 /
+	// 		// Remove leading /. or ./ or /
+	// 		.replace(/^[\\\/\.\s]+/g, '')
+	// 		// 去除結尾的 /. 或 ./ 或 /
+	// 		// Remove trailing /. or ./ or /
+	// 		.replace(/[\\\/\.\s]+$/g, '');
+	// }
+	// while (result !== prev);
 
-	return result;
+	return result?.replace(/^[\\\/\.\s]+|[\\\/\.\s]+$/g, '');
 }

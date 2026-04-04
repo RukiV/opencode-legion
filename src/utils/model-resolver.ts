@@ -16,10 +16,9 @@
 import { AUTO_MODEL, DEFAULT_MODEL } from "../types/const-default";
 import type { IAriseConfig } from "../config/schema";
 import { SHADOW_AGENTS } from "../agents/shadows";
-import type { IAllShadowAgentsName } from "../types/enums";
+import { EnumDetectAutoModelBody, type IAllShadowAgentsName } from "../types/enums";
 import { _isEmpty, _isNotEmpty, _trimLazy, normalizeModelString } from "./string/string-utils";
 import { IModelBody } from "../types/types-opencode";
-import { enableANSIColors } from "bun";
 
 /**
  * 預設模型
@@ -173,6 +172,9 @@ export type IParseModelStringResult = ReturnType<typeof _detectAutoModelBody>;
  */
 export function parseModelString(
 	model: string | undefined,
+	opts?: {
+		throwError?: boolean;
+	}
 ): IParseModelStringResult
 {
 	model = _trimLazy(model);
@@ -184,7 +186,7 @@ export function parseModelString(
 
 	/** 步驟 1：標準化模型字串（去除開頭/結尾的多餘分隔符） */
 	/** Step 1: Normalize model string (remove leading/trailing excess separators) */
-	const normalized = normalizeModelString(model);
+	const normalized = model.replace(/^[.\s]+|[.\s]+$/g, '');
 
 	/** 步驟 2：標準化後再次檢查 AUTO（處理 "AUTO/."、"/AUTO" 等變體） */
 	/** Step 2: Re-check AUTO after normalization (handles variants like "AUTO/.", "/AUTO") */
@@ -194,25 +196,38 @@ export function parseModelString(
 	}
 
 	let [providerID, modelID, ...rest] = normalized.split("/");
-	if (!providerID || !modelID)
-	{
-		return _detectAutoModelBody(void 0);
-	}
+	// if (!providerID || !modelID)
+	// {
+	// 	return _detectAutoModelBody({
+	// 		providerID,
+	// 		modelID: modelID?.length ? [modelID, ...rest].join('/') : modelID,
+	// 	});
+	// }
 
 	if (rest.length)
 	{
+		if (!modelID?.length)
+		{
+			throw new RangeError(`Invalid model string "${model}": empty segment detected (consecutive slashes or leading/trailing slash)`);
+		}
+
 		for (let n of rest)
 		{
 			if (n?.length)
 			{
 				modelID += '/' + n;
 			}
-			else
+			else if (opts?.throwError)
 			{
 				// Double slash (//) or trailing slash (/xxx/) produces empty string in split
 				throw new RangeError(`Invalid model string "${model}": empty segment detected (consecutive slashes or leading/trailing slash)`);
 			}
 		}
+	}
+
+	if (!model.includes('/'))
+	{
+		[modelID, providerID] = [providerID, void 0 as any];
 	}
 
 	/**
@@ -277,15 +292,15 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 	const providerID = normalizeModelString(modelBody?.providerID ?? '').toUpperCase();
 	const modelID = normalizeModelString(modelBody?.modelID ?? '').toUpperCase();
 
-	const detectAutoProvider = !providerID.length || _isAutoModel(providerID) || providerID === 'UNDEFINED' || providerID === 'NULL';
-	const detectAutoModel = !modelID.length || _isAutoModel(modelID) || modelID === 'UNDEFINED' || modelID === 'NULL';
+	const detectAutoProvider = !providerID.length || _isAutoModel(providerID) || ['UNDEFINED', 'NULL', '.'].includes(providerID);
+	const detectAutoModel = !modelID.length || _isAutoModel(modelID) || ['UNDEFINED', 'NULL', '.'].includes(modelID);
 
 	if (detectAutoProvider)
 	{
 		if (detectAutoModel)
 		{
 			return {
-				detectAutoModelBody: 1 as const,
+				detectAutoModelBody: EnumDetectAutoModelBody.Auto as const,
 				modelBody: void 0,
 			};
 		}
@@ -295,7 +310,7 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 			 * @todo: 未來也許可以嘗試實作：依照模型名稱自動搜尋可用的提供商
 			 * @todo: Future possibility: auto-discover available providers by model name
 			 */
-			detectAutoModelBody: 2 as const,
+			detectAutoModelBody: EnumDetectAutoModelBody.AutoWithModel as const,
 			modelBody: {
 				providerID: void 0,
 				modelID: modelBody!.modelID!,
@@ -310,7 +325,7 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 			 * @todo: 未來也許可以嘗試實作：依照提供商自動搜尋可用的模型
 			 * @todo: Future possibility: auto-discover available models by provider
 			 */
-			detectAutoModelBody: 3 as const,
+			detectAutoModelBody: EnumDetectAutoModelBody.AutoWithProvider as const,
 			modelBody: {
 				providerID: modelBody!.providerID!,
 				modelID: void 0,
@@ -319,7 +334,7 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 	}
 
 	return {
-		detectAutoModelBody: 0 as const,
+		detectAutoModelBody: EnumDetectAutoModelBody.Normal as const,
 		modelBody: {
 			providerID: modelBody!.providerID!,
 			modelID: modelBody!.modelID!,
@@ -499,9 +514,9 @@ export function parseModelBody(
  * │    → effectiveModel                     │  Determine effective model
  * │                                         │
  * │    優先順序 / Priority:                 │
- * │    userModel → configModel →            │
- * │    defaultModel → parentModel →         │
- * │    DEFAULT_MODEL                        │
+ * │    userModel（AUTO → 跳至 parentModel）  │
+ * │    configModel → defaultModel →          │
+ * │    parentModel → DEFAULT_MODEL           │
  * └────────┬────────────────────────────────┘
  *          ▼
  * ┌─────────────────────────────────────────┐
@@ -740,20 +755,21 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  * 1. userModel（用戶指定）
  *    │
  *    ├─ 有效模型 → 直接回傳
- *    ├─ AUTO → 回退到 parentModel → defaultModel → DEFAULT_MODEL
- *    └─ undefined → 往下檢查
+ *    ├─ AUTO → 直接回退到 parentModel → defaultModel → DEFAULT_MODEL
+ *    │          （不檢查 configModel，AUTO 表示「沿用父會話模型」）
+ *    └─ undefined/空值 → 往下檢查
  *    ▼
  * 2. configModel（opencode-arise.json 中 agents.<agent>.model）
  *    │
  *    ├─ 有效模型 → 直接回傳
- *    ├─ AUTO → 回退到 parentModel → defaultModel → DEFAULT_MODEL
- *    └─ undefined → 往下檢查
+ *    ├─ AUTO → 回退到 parentModel → defaultModel
+ *    └─ undefined/空值 → 往下檢查
  *    ▼
  * 3. defaultModel（SHADOW_AGENTS[shadow].model）
  *    │
  *    ├─ 有效模型 → 直接回傳
  *    ├─ AUTO → 回退到 parentModel → DEFAULT_MODEL
- *    └─ undefined → 往下檢查
+ *    └─ undefined/空值 → 往下檢查
  *    ▼
  * 4. parentModel（父會話模型，從 session cache 取得）
  *    │
@@ -765,7 +781,12 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  *
  * 特殊處理：
  * Special handling:
- * - 每個層級的 AUTO 都會觸發 _resolveAutoModelBase 回退邏輯
+ * - userModel 為 AUTO 時，**直接回退到 parentModel**，不檢查 configModel
+ *   When userModel is AUTO, **fallback directly to parentModel**, skip configModel
+ * - configModel 為 AUTO 時，回退到 parentModel
+ *   When configModel is AUTO, fallback to parentModel
+ * - 所有 AUTO 變體（大小寫、空白、分隔符）都會被正規化為 AUTO_MODEL
+ *   All AUTO variants (case, whitespace, separators) are normalized to AUTO_MODEL
  *
  * @param parentModel - 父會話模型 / Parent session model
  * @param defaultModel - Shadow 預設模型 / Shadow default model
@@ -778,8 +799,16 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  * getEffectiveModelWithFallback("parent/model", "default/model", "config/model", "user/model");
  * // Returns: "user/model"
  *
- * // 用戶指定 AUTO → 使用父模型
+ * // 用戶指定 AUTO → 直接回退到 parentModel（不檢查 configModel）
  * getEffectiveModelWithFallback("parent/model", "default/model", "config/model", "AUTO");
+ * // Returns: "parent/model"
+ *
+ * // 用戶未指定且 config 為 undefined → 使用 defaultModel
+ * getEffectiveModelWithFallback("parent/model", "default/model", undefined, undefined);
+ * // Returns: "default/model"
+ *
+ * // configModel 為 AUTO → 回退到 parentModel
+ * getEffectiveModelWithFallback("parent/model", "default/model", "AUTO", undefined);
  * // Returns: "parent/model"
  *
  * // 全部 undefined → 使用 DEFAULT_MODEL
@@ -795,12 +824,12 @@ export function getEffectiveModelWithFallback(
 {
 	if (_trimLazy(userModel)?.length)
 	{
-		if (parseModelString(userModel).detectAutoModelBody === 1)
+		if (parseModelString(userModel).detectAutoModelBody)
 		{
 			userModel = AUTO_MODEL;
 		}
 	}
-	else 
+	else
 	{
 		userModel = void 0;
 	}
@@ -819,7 +848,7 @@ export function getEffectiveModelWithFallback(
 
 	/** 用戶指定的模型擁有最高優先級 */
 	return _resolveAutoModelCore(userModel, parentModel, defaultModel)
-		/** Config 模型 (configModel) - 若為 AUTO 则使用父模型 */
+		/** Config 模型 (configModel) */
 		?? _resolveAutoModelCore(configModel, parentModel, defaultModel)
 		/**
 		 * Shadow 預設模型 (defaultModel) - 若為 AUTO 则使用父模型

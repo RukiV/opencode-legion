@@ -41,8 +41,9 @@ import {
 	DEFAULT_MODEL,
 	_isAutoModel,
 } from "./model-resolver";
-import { EnumShadowSubAgentsName, EnumShadowAgentsName } from "../types/enums";
+import { EnumShadowSubAgentsName, EnumShadowAgentsName, EnumDetectAutoModelBody } from "../types/enums";
 import { normalizeModelString } from './string/string-utils';
+import { IModelBody } from "../types/types-opencode";
 
 /**
  * DEFAULT_MODEL 常量測試
@@ -462,25 +463,51 @@ describe("parseModelString", () => {
 		expect(result.modelBody).toBeUndefined();
 	});
 
-	test("當模型字串不包含斜線時，返回 detectAutoModelBody=1", () => {
+	test("當模型字串不包含斜線時，返回 detectAutoModelBody=2", () => {
 		/** 缺少斜線無法區分 provider 和 model / Cannot distinguish provider and model without slash */
 		const result = parseModelString("claude-sonnet-4");
-		expect(result.detectAutoModelBody).toBe(1);
-		expect(result.modelBody).toBeUndefined();
+
+		expect({
+			result
+		}).toMatchSnapshot({
+			result: {
+				detectAutoModelBody: EnumDetectAutoModelBody.AutoWithModel,
+				modelBody: {
+					modelID: 'claude-sonnet-4',
+				} as Partial<IModelBody>,
+			},
+		})
 	});
 
 	test("當模型字串只有斜線前段時，返回 detectAutoModelBody=1", () => {
 		/** modelID 為空 / modelID is empty */
 		const result = parseModelString("anthropic/");
-		expect(result.detectAutoModelBody).toBe(1);
-		expect(result.modelBody).toBeUndefined();
+
+		expect({
+			result
+		}).toMatchSnapshot({
+			result: {
+				detectAutoModelBody: EnumDetectAutoModelBody.AutoWithProvider,
+				modelBody: {
+					providerID: 'anthropic',
+				} as Partial<IModelBody>,
+			},
+		})
 	});
 
 	test("當模型字串只有斜線後段時，返回 detectAutoModelBody=1", () => {
 		/** providerID 為空 / providerID is empty */
 		const result = parseModelString("/claude-sonnet-4");
-		expect(result.detectAutoModelBody).toBe(1);
-		expect(result.modelBody).toBeUndefined();
+		expect({
+			result
+		}).toMatchSnapshot({
+			result: {
+				detectAutoModelBody: EnumDetectAutoModelBody.AutoWithModel,
+				modelBody: {
+					modelID: 'claude-sonnet-4',
+				} as Partial<IModelBody>,
+			},
+		})
 	});
 
 	test("當模型字串為空字串時，返回 detectAutoModelBody=1", () => {
@@ -491,9 +518,7 @@ describe("parseModelString", () => {
 
 	test("consecutive slashes return detectAutoModelBody=1 (normalized away)", () => {
 		/** 連續斜線被 normalizeModelString 處理為無效 / Consecutive slashes are normalized to invalid */
-		const result = parseModelString("anthropic//claude");
-		expect(result.detectAutoModelBody).toBe(1);
-		expect(result.modelBody).toBeUndefined();
+		expect(() => parseModelString("anthropic//claude")).toThrow();
 	});
 
 	test("AUTO/. is treated as AUTO, returns detectAutoModelBody=1", () => {
@@ -539,12 +564,12 @@ describe("parseModelString", () => {
 	});
 
 	test("normal model with trailing /. is normalized correctly", () => {
-		/** 正常模型字串帶尾隨 /. 會被標準化 / Normal model string with trailing /. gets normalized */
-		const result = parseModelString("openai/gpt-4/.");
-		expect(result.detectAutoModelBody).toBe(0);
-		expect(result.modelBody).toEqual({
-			providerID: "openai",
-			modelID: "gpt-4",
+		expect(parseModelString("openai/gpt-4/.")).toEqual({
+			detectAutoModelBody: 0,
+			modelBody: {
+				providerID: "openai",
+				modelID: "gpt-4",
+			},
 		});
 	});
 
