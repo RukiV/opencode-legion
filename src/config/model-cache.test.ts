@@ -20,11 +20,15 @@
  * 4. Isolation of cache clearing
  * 5. Independence of multiple sessions
  * 6. History record functionality (non-deletion, status update)
+ *
+ * Timer Mocks:
+ * - Jest: https://jestjs.io/docs/timer-mocks
+ * - Bun: https://bun.com/reference/node/test/default/MockTimers
  */
 
 // @noUnusedParameters:false
 /// <reference types="bun" />
-import { describe, expect, test, beforeEach, afterEach } from "bun:test";
+import { describe, expect, test, beforeEach, afterEach, setSystemTime } from "bun:test";
 import {
 	extractProviderModels,
 	updateHistoryRecords,
@@ -210,12 +214,20 @@ describe("cache operations", () => {
  * 歷史記錄功能測試
  * History record functionality tests
  *
- * 注意：此測試不 Mock Date.now()，因此時間戳會隨執行時間變化
- * 這是預期行為 - 實作邏輯正確（firstSeen 保留，lastSeen 更新）
- * Note: These tests don't mock Date.now(), so timestamps will vary with execution time
- * This is expected behavior - implementation logic is correct (firstSeen preserved, lastSeen updated)
+ * 注意：使用 setSystemTime 來固定時間戳，確保 snapshot 穩定
+ * Note: Use setSystemTime to fix timestamps for stable snapshots
  */
 describe("history records", () => {
+	beforeEach(() => {
+		/** 固定時間戳為 1775296134613 */
+		setSystemTime(1775296134613);
+	});
+
+	afterEach(() => {
+		/** 恢復真實時間 */
+		setSystemTime(undefined);
+	});
+
 	describe("extractProviderModels", () => {
 		test("extracts all provider-model combinations", () => {
 			/** 提取所有廠商與模型的組合 / Extract all provider-model combinations */

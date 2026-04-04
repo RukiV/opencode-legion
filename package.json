@@ -44,7 +44,8 @@
   ],
   "scripts": {
     "pretest": "echo node --run typecheck",
-    "test": "cross-env NO_COLOR=1 FORCE_COLOR=0 bun --env-file=.env.test test --update-snapshots",
+    "test": "node --run test:agent --",
+    "test:bun": "cross-env NO_COLOR=1 FORCE_COLOR=0 bun --env-file=.env.test test --update-snapshots",
     "test:agent": "cross-env AGENT=1 pnpm run test",
     "test:color": "bun test --update-snapshots",
     "posttest": "echo posttest",
