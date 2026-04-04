@@ -914,7 +914,7 @@ exports[`resolveModelContext config 模型優先 1`] = `
 }
 `;
 
-exports[`resolveModelContext config AUTO → defaultModel 1`] = `
+exports[`resolveModelContext config AUTO → parentModel 1`] = `
 {
   "config": {
     "agents": {
@@ -923,7 +923,7 @@ exports[`resolveModelContext config AUTO → defaultModel 1`] = `
       },
     },
   },
-  "name": "config AUTO → defaultModel",
+  "name": "config AUTO → parentModel",
   "parentModel": "anthropic/claude-3",
   "result": {
     "modelID": "claude-3",

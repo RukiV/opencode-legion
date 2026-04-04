@@ -115,12 +115,14 @@ describe("_isDefinedAndNotAutoModel", () =>
  */
 describe("_resolveAutoModelBase", () =>
 {
-	for (const { name, parentModel, defaultModel } of resolveAutoModelBaseCases)
+	for (const { name, parentModel, defaultModel, expected } of resolveAutoModelBaseCases)
 	{
 		it(name, () =>
 		{
 			const result = _resolveAutoModelBase(parentModel, defaultModel);
-			expect({ name, parentModel, defaultModel, result }).toMatchSnapshot();
+			expect({ name, parentModel, defaultModel, result }).toMatchSnapshot({
+				result: expected,
+			});
 		});
 	}
 });
@@ -135,12 +137,14 @@ describe("_resolveAutoModelBase", () =>
  */
 describe("_resolveAutoModelCore", () =>
 {
-	for (const { name, model, parentModel, defaultModel } of resolveAutoModelCoreCases)
+	for (const { name, model, parentModel, defaultModel, expected } of resolveAutoModelCoreCases)
 	{
 		it(name, () =>
 		{
 			const result = _resolveAutoModelCore(model, parentModel, defaultModel);
-			expect({ name, model, parentModel, defaultModel, result }).toMatchSnapshot();
+			expect({ name, model, parentModel, defaultModel, result }).toMatchSnapshot({
+				result: expected,
+			});
 		});
 	}
 });
@@ -155,12 +159,14 @@ describe("_resolveAutoModelCore", () =>
  */
 describe("getEffectiveModelWithFallback", () =>
 {
-	for (const { name, parentModel, defaultModel, configModel, userModel } of fallbackChainCases)
+	for (const { name, parentModel, defaultModel, configModel, userModel, expected } of fallbackChainCases)
 	{
 		it(name, () =>
 		{
 			const result = getEffectiveModelWithFallback(parentModel, defaultModel, configModel, userModel);
-			expect({ name, parentModel, defaultModel, configModel, userModel, result }).toMatchSnapshot();
+			expect({ name, parentModel, defaultModel, configModel, userModel, result }).toMatchSnapshot({
+				result: expected,
+			});
 		});
 	}
 });
@@ -175,7 +181,7 @@ describe("getEffectiveModelWithFallback", () =>
  */
 describe("parseModelString", () =>
 {
-	for (const { name, input, shouldThrow } of modelStringCases)
+	for (const { name, input, shouldThrow, expectedDetectType, expectedModelBody } of modelStringCases)
 	{
 		it(name, () =>
 		{
@@ -188,7 +194,12 @@ describe("parseModelString", () =>
 			const result = parseModelString(input);
 			/** 驗證非 void 欄位 / Validate non-void fields */
 			expect(typeof result.detectAutoModelBody).toBe('number');
-			expect({ name, input, result }).toMatchSnapshot();
+			expect({ name, input, result }).toMatchSnapshot({
+				result: {
+					detectAutoModelBody: expectedDetectType,
+					modelBody: expectedModelBody,
+				},
+			});
 		});
 	}
 });
@@ -203,14 +214,19 @@ describe("parseModelString", () =>
  */
 describe("_detectAutoModelBody", () =>
 {
-	for (const { name, input } of detectAutoBodyCases)
+	for (const { name, input, expectedDetectType, expectedModelBody } of detectAutoBodyCases)
 	{
 		it(name, () =>
 		{
 			const result = _detectAutoModelBody(input);
 			/** 驗證非 void 欄位 / Validate non-void fields */
 			expect(typeof result.detectAutoModelBody).toBe('number');
-			expect({ name, input, result }).toMatchSnapshot();
+			expect({ name, input, result }).toMatchSnapshot({
+				result: {
+					detectAutoModelBody: expectedDetectType,
+					modelBody: expectedModelBody,
+				},
+			});
 		});
 	}
 });
@@ -225,7 +241,7 @@ describe("_detectAutoModelBody", () =>
  */
 describe("resolveModelContext", () =>
 {
-	for (const { name, parentModel, shadow, config, userModel } of resolveContextCases)
+	for (const { name, parentModel, shadow, config, userModel, expectedModelBody } of resolveContextCases)
 	{
 		it(name, () =>
 		{
@@ -233,7 +249,9 @@ describe("resolveModelContext", () =>
 			/** 驗證非 void 欄位 / Validate non-void fields */
 			expect(typeof result.providerID).toBe('string');
 			expect(typeof result.modelID).toBe('string');
-			expect({ name, parentModel, shadow, config, userModel, result }).toMatchSnapshot();
+			expect({ name, parentModel, shadow, config, userModel, result }).toMatchSnapshot({
+				result: expectedModelBody,
+			});
 		});
 	}
 });
