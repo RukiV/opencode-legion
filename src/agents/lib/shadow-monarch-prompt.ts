@@ -15,7 +15,7 @@ import { EnumShadowAgentsName } from '../../types/enums';
 import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
 import { getMonarchShadowList, getAriseToolsSection } from './shadow-descriptions';
 import { composePrompt } from '../../utils/string/prompt-utils';
-import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, SUMMONING_STRATEGY } from './tool-guides';
+import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy } from './tool-guides';
 
 /**
  * Shadow Monarch Prompt
@@ -49,8 +49,8 @@ ${getMonarchShadowList()}
 	footer: [
 		SUMMONING_METHOD_RULES,
 
-		`ARISE and lead your shadows to victory.`,
+		createSummoningStrategy(),
 
-		SUMMONING_STRATEGY(),
+		`ARISE and lead your shadows to victory.`,
 	],
 });

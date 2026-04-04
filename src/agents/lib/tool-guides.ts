@@ -185,7 +185,7 @@ export const WHEN_TO_SUMMON = `## When to Summon Which Agent
  * 召喚策略流程圖（ Monarch 專用）
  * Summoning strategy flowchart (for Monarch only)
  *
- * @see SUMMONING_STRATEGY - 詳細策略說明 / Detailed strategy guide
+ * @see createSummoningStrategy - 詳細策略說明 / Detailed strategy guide
  */
 export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
 
@@ -274,14 +274,14 @@ export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
  * Summoning strategy guide (for Monarch only)
  *
  * @param toolName - 工具名稱（可選）/ Tool name (optional)
- * @returns SUMMONING_STRATEGY 字串 / SUMMONING_STRATEGY string
+ * @returns createSummoningStrategy 字串 / createSummoningStrategy string
  * @see SUMMONING_STRATEGY_FLOWCHART - 流程圖 / Flowchart
  */
-export function SUMMONING_STRATEGY<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+export function createSummoningStrategy<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
 {
 	const initialTest = getInitialTestDescription(toolName);
 	const thenDecide = getThenDecideDescription(toolName);
-
+	
 	return `## Summoning Strategy
 
 ### Before Summoning

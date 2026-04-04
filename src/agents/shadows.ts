@@ -37,7 +37,7 @@ import {
 	getAriseToolsSection,
 } from './lib/shadow-descriptions';
 import { SHADOW_MONARCH_PROMPT } from './lib/shadow-monarch-prompt';
-import { SUMMONING_STRATEGY } from './lib/tool-guides';
+import { createSummoningStrategy } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
 
 /**
@@ -184,7 +184,7 @@ export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SUMMON]: {
 		description: composePrompt({
 			header: [
-				"Summon a shadow agent - sync (returns result) or background (fire-and-forget).",
+				"Summon a shadow agent - sync (returns result) or background (fire-and-forget)." as const,
 			],
 			body: [
 				`Available shadow agents:
@@ -194,7 +194,7 @@ ${ALLOWED_SHADOWS.map((name) =>
 						? " (supports background)"
 						: "";
 					return `- ${name}: ${getShortDescription(name)}${supportsBg}`;
-				}).join("\n")}`,
+				}).join("\n")}` as const,
 
 				`IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
@@ -203,7 +203,7 @@ ${ALLOWED_SHADOWS.map((name) =>
 ⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
 			],
 			footer: [
-				SUMMONING_STRATEGY(EnumAriseTools.ARISE_SUMMON),
+				createSummoningStrategy(EnumAriseTools.ARISE_SUMMON),
 			],
 		}),
 
@@ -224,7 +224,7 @@ ${ALLOWED_SHADOWS.map((name) =>
 	[EnumAriseTools.ARISE_BACKGROUND]: {
 		description: composePrompt({
 			header: [
-				"Launch background shadow agent - trackable, retrievable results.",
+				"Launch background shadow agent - trackable, retrievable results." as const,
 			],
 			body: [
 				`Best for:
@@ -234,10 +234,10 @@ ${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).jo
 
 The 'description' arg will be shown in arise_background_status output for task identification.
 
-✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.`,
+✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.` as const,
 			],
 			footer: [
-				SUMMONING_STRATEGY(EnumAriseTools.ARISE_BACKGROUND),
+				createSummoningStrategy(EnumAriseTools.ARISE_BACKGROUND),
 			],
 		}),
 
