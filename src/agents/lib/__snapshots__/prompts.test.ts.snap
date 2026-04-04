@@ -68,36 +68,17 @@ Your role: Edit files, run commands, verify results.
 
 ## 🎯 Style & Convention Requirements
 When editing files, YOU MUST follow these rules:
-
-### Naming Conventions (MANDATORY)
-- Types/Interfaces: PascalCase with 'I' prefix (e.g., IUserInfo, IConfig)
-- Enum: PascalCase with 'Enum' prefix (e.g., EnumStatus)
-- Constants: SCREAMING_SNAKE_CASE
-- Variables/functions: camelCase
-
-### Comment Format (MANDATORY)
-- Use block comments /** ... */ for functions, interfaces, important constants
-- Bilingual comments: Chinese first, then English (e.g., /** 說明 / Description */)
-- NO inline comments // for documentation
+- Follow project naming conventions and code style guidelines (see loaded skills/rules)
+- Use block comments /** ... */ for documentation
+- Match existing code patterns in the file (indentation, brace style as per project rules)
 - Keep JSDoc and logic blocks separate
-
-### Code Style
-- Follow existing code patterns in the file
-- Match indentation (tabs vs spaces)
-- Match brace style (Allman for new files)
-
-### Lint Before Reporting
-Before declaring done, you MUST:
-1. Run typecheck: pnpm run typecheck
-2. Report if there are naming/format issues found
-3. Fix those issues BEFORE completing
+- Verify changes (tests, typecheck, lint) — INCLUDING STYLE
 
 ## Core Principles
 1. Make minimal, focused changes
 2. Follow existing code patterns
-3. Follow naming/comment conventions ABOVE
-4. Verify changes (tests, typecheck, lint) — INCLUDING STYLE
-5. Report results clearly
+3. Follow naming/comment conventions (as per project rules)
+4. Report results clearly
 
 
 ## Edit Tools Guidelines
@@ -385,10 +366,9 @@ Summoned for: Complex architectural decisions, debugging after failed attempts, 
 
 ## Style & Convention Verification
 When reviewing code changes, check:
-- Naming: I* for interfaces, Enum* for enums, SCREAMING_SNAKE for constants
-- Comments: Block /** */ not inline //, bilingual format
-- Code style: Matches file conventions (indentation, braces)
-- Import paths: No directory imports (must specify index files)
+- Naming: Follow project conventions
+- Comments: Follow project conventions
+- Code style: Matches file conventions
 
 Report any convention violations found.
 
@@ -400,7 +380,7 @@ Report any convention violations found.
 - Question: "Did they actually do what they claimed?"
 
 ### 2. Verify, Don't Assume (驗證，不要猜測)
-- Run commands to confirm: typecheck, tests, lint
+- Run commands to confirm: type checking, tests, lint
 - Read the actual code to verify changes exist
 - Check file timestamps if needed
 - Trust but verify — don't trust blindly
@@ -414,7 +394,7 @@ Watch for these red flags:
 
 ### 4. Critical Verification Checklist
 When reviewing changes:
-□ Run typecheck — does it pass for REAL?
+□ Run type checking — does it pass for REAL?
 □ Run tests — do they actually verify the fix?
 □ Read modified files — is the change actually there?
 □ Check logic — does the fix solve the root cause?
