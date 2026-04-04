@@ -11,11 +11,11 @@
  * Shared tool guidelines: see tool-guides.ts
  */
 
-import { BACKGROUND_SHADOWS, EnumShadowAgentsName } from '../../types/enums';
+import { EnumShadowAgentsName } from '../../types/enums';
 import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
 import { getMonarchShadowList, getAriseToolsSection } from './shadow-descriptions';
 import { composePrompt } from '../../utils/string/prompt-utils';
-import { SUMMONING_METHOD_RULES } from './tool-guides';
+import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, SUMMONING_STRATEGY } from './tool-guides';
 
 /**
  * Shadow Monarch Prompt
@@ -35,16 +35,21 @@ ${getMonarchShadowList()}
 
 		getAriseToolsSection(),
 
+		WHEN_TO_SUMMON,
+
+		// SUMMONING_STRATEGY_FLOWCHART,
+
 		`## Principles
 1. Assess intent before acting. Don't over-delegate.
 2. For trivial tasks, handle directly without summoning shadow agents.
-3. Keep a short TODO list. Mark items in_progress → completed.
-4. Use background tasks for parallel exploration (${BACKGROUND_SHADOWS.join(', ')}).
-5. Only summon @shadow-sovereign when stuck or for complex architecture.
-6. Verify changes work before declaring done.`,
+3. Verify changes work before declaring done.`,
+
+		TODO_LIST_GUIDE,
 	],
 	footer: [
 		SUMMONING_METHOD_RULES,
+
+		SUMMONING_STRATEGY(),
 
 		`ARISE and lead your shadows to victory.`,
 	],

@@ -3,7 +3,53 @@
  * Tool Usage Guides
  */
 
-import { BACKGROUND_SHADOWS } from "../../types/enums";
+import { BACKGROUND_SHADOWS, EnumAriseTools } from "../../types/enums";
+
+/** ==================== 工具指南 / Tool Guides ==================== */
+
+/**
+ * 產生 Initial Test 召喚描述
+ * Generate Initial Test summon description
+ *
+ * @param toolName - 工具名稱 / Tool name
+ * @returns 格式化後的字串 / Formatted string
+ */
+export function getInitialTestDescription<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+{
+	if (toolName === EnumAriseTools.ARISE_SUMMON)
+	{
+		return "Summon 1 sync (arise_summon)" as const;
+	}
+
+	if (toolName === EnumAriseTools.ARISE_BACKGROUND)
+	{
+		return "Summon 1 async (arise_background)" as const;
+	}
+
+	return "Summon 1 sync (arise_summon) + 1 async (arise_background) SEPARATELY" as const;
+}
+
+/**
+ * 產生 Then decide 描述
+ * Generate Then decide description
+ *
+ * @param toolName - 工具名稱 / Tool name
+ * @returns 格式化後的字串 / Formatted string
+ */
+export function getThenDecideDescription<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+{
+	if (toolName === EnumAriseTools.ARISE_SUMMON)
+	{
+		return "Then decide: use arise_summon or batch multiple sync" as const;
+	}
+
+	if (toolName === EnumAriseTools.ARISE_BACKGROUND)
+	{
+		return "Then decide: use arise_background or batch multiple async" as const;
+	}
+
+	return "Then decide: use arise_summon, arise_background, or batch" as const;
+}
 
 /** ==================== 工具指南 / Tool Guides ==================== */
 
@@ -41,7 +87,7 @@ When target is unclear, make a reasonable first attempt. Only ask for clarificat
 1. Source files over generated files
 2. Files closest to search scope
 3. Select most relevant for detailed reporting
-4. Summarize remaining matches (e.g., "12 matches in test fixtures/, 5 in node_modules/ omitted")`;
+4. Summarize remaining matches (e.g., "12 matches in test fixtures/, 5 in node_modules/ omitted")` as const;
 
 /**
  * 編輯工具指南
@@ -57,7 +103,7 @@ export const EDIT_TOOLS = `## Edit Tools Guidelines
 1. Always Read before Edit - never edit without reading first
 2. Make minimal, focused changes
 3. Preserve existing code style and patterns
-4. Verify changes after editing (typecheck/tests)`;
+4. Verify changes after editing (typecheck/tests)` as const;
 
 /**
  * 外部研究工具指南
@@ -75,7 +121,7 @@ export const RESEARCH_TOOLS = `## Research Tools Guidelines
 2. Use web_search for general topics
 3. If blocked by permissions, try chrome-devtools MCP
 4. Verify information from multiple sources
-5. Cite sources in your findings`;
+5. Cite sources in your findings` as const;
 
 /**
  * 通用約束
@@ -89,7 +135,7 @@ export const NO_EDIT_CONSTRAINTS = `## Constraints
 - Do not edit, write, or create files unless explicitly requested
 - Do not run bash commands that modify the system state
 - Return all file paths as absolute paths
-- Avoid using emojis in findings for clear communication`;
+- Avoid using emojis in findings for clear communication` as const;
 
 /**
  * 通用約束（無編輯限制）
@@ -97,7 +143,7 @@ export const NO_EDIT_CONSTRAINTS = `## Constraints
  */
 export const SHARED_CONSTRAINTS = `## Constraints
 - Return all file paths as absolute paths
-- Avoid using emojis in findings for clear communication`;
+- Avoid using emojis in findings for clear communication` as const;
 
 /**
  * LSP 工具指南
@@ -114,15 +160,160 @@ export const LSP_TOOLS = `## LSP Tools Guidelines
 - Need to find all references to a symbol
 - Find definition location for a symbol
 - Understand call hierarchy
-- Inquire about type information`;
+- Inquire about type information` as const;
 
 /**
  * 召喚方法規則（ Monarch 專用）
  * Summoning method rules (for Monarch only)
  */
 export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
-- Need result NOW → arise_summon (default, blocks and returns result)
-- Need result LATER (parallel) → arise_background (${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
+- Need result NOW → arise_summon (sync, blocks and returns result)
+- Need result LATER (parallel) → arise_background (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
 - DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
-- ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.` as const;
+- ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
+- When summoning shadow agents: If no TODO list exists, write the task goals to TODO first` as const;
 
+/**
+ * 召喚時機指南（ Monarch 專用）
+ * When to summon which agent (for Monarch only)
+ */
+export const WHEN_TO_SUMMON = `## When to Summon Which Agent
+- Use background tasks for parallel exploration (beru, tank, bellion)
+- Summon @shadow-sovereign when stuck or for complex architecture` as const;
+
+/**
+ * 召喚策略流程圖（ Monarch 專用）
+ * Summoning strategy flowchart (for Monarch only)
+ *
+ * @see SUMMONING_STRATEGY - 詳細策略說明 / Detailed strategy guide
+ */
+export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
+
+┌─────────────────────────────────────────────────────────────┐
+│                     開始 / Start                            │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. 檢查任務範圍 / Check Task Scope                        │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ 可交付？Yes → 繼續                              │   │
+│     │ No → 拆分任務 (split task)                      │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. 檢查衝突 / Check Conflicts                             │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ 會修改相同檔案？                                │   │
+│     │ Yes → 有依賴關係？                               │   │
+│     │   ├─ Yes → 順序執行 (sequential)                │   │
+│     │   └─ No → 標記高風險 (high risk)                │   │
+│     │ No → 繼續                                      │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. 首次召喚？ / First Time?                              │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ Yes → 初始測試 (Initial Test)                   │   │
+│     │   - 1 sync (arise_summon)                       │   │
+│     │   - 1 async (arise_background)                  │   │
+│     │   → 測量時間與結果                               │   │
+│     │ No → 根據歷史調整                                │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. 選擇數量 / Choose Quantity                            │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ 確定？→ 使用評估數量                            │   │
+│     │ 不確定？→ 安全閾值 (1-3)                        │   │
+│     │ 高風險？→ 單一召喚                              │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. 執行召喚 / Execute Summon                             │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ sync → arise_summon (等結果)                    │   │
+│     │ async → arise_background (並行)                 │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  6. 監控結果 / Monitor Results                            │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ 成功？→ 記錄時間                                 │   │
+│     │   → 可增加數量 (+1)                             │   │
+│     │ 失敗？→ 記錄問題                                │   │
+│     │   → 回退安全閾值                               │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│  7. 評估與下次 / Evaluate for Next                        │
+│     ┌─────────────────────────────────────────────────┐   │
+│     │ 性能下降？→ 停止增加                            │   │
+│     │ 時間穩定？→ 繼續漸進                            │   │
+│     │ 新任務類型？→ 從 Step 1 重新                    │   │
+│     └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+                      結束 / End` as const;
+
+/**
+ * 召喚策略指南（ Monarch 專用）
+ * Summoning strategy guide (for Monarch only)
+ *
+ * @param toolName - 工具名稱（可選）/ Tool name (optional)
+ * @returns SUMMONING_STRATEGY 字串 / SUMMONING_STRATEGY string
+ * @see SUMMONING_STRATEGY_FLOWCHART - 流程圖 / Flowchart
+ */
+export function SUMMONING_STRATEGY<T extends EnumAriseTools.ARISE_SUMMON | EnumAriseTools.ARISE_BACKGROUND>(toolName?: T)
+{
+	const initialTest = getInitialTestDescription(toolName);
+	const thenDecide = getThenDecideDescription(toolName);
+
+	return `## Summoning Strategy
+
+### Before Summoning
+1. Check scope: Is the task deliverable in 1-2 steps?
+2. Check conflicts: Will tasks modify the same files?
+3. Check dependencies: Does Task B need Task A result?
+
+### Initial Test (First Time)
+- ${initialTest}
+- Measure: completion time, success/failure
+- ${thenDecide}
+
+### Gradual Scaling
+- Start with 1-3 summons (safety threshold)
+- After success, add 1 more
+- Monitor execution time
+- Stop when performance degrades
+
+### Safety Threshold
+- Total summons: 1-3 max when uncertain
+- High risk tasks → use 1 at a time
+- After confirming capability → scale up gradually` as const;
+}
+
+/**
+ * TODO List 管理指南（ Monarch 專用）
+ * TODO List management guide (for Monarch only)
+ */
+export const TODO_LIST_GUIDE = `## TODO List Management
+- Keep a short TODO list. Mark items in_progress → completed
+- When executing tasks: If no TODO list exists, plan and create one before executing
+- For large tasks: Use phased planning, not everything at once
+  - Plan only the current phase (3-5 items max)
+  - After completing phase, plan the next phase
+  - This avoids over-planning and keeps the list short and flexible` as const;
