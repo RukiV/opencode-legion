@@ -1,6 +1,6 @@
 {
   "name": "@bluelovers/opencode-arise",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "private": false,
   "description": "Solo Leveling themed orchestrator harness for OpenCode - Arise, Shadow Army!",
   "keywords": [
@@ -46,7 +46,7 @@
     "pretest": "echo node --run typecheck",
     "test": "node --run test:agent --",
     "test:bun": "cross-env NO_COLOR=1 FORCE_COLOR=0 bun --env-file=.env.test test --update-snapshots",
-    "test:agent": "cross-env AGENT=1 pnpm run test",
+    "test:agent": "cross-env AGENT=1 pnpm run test:bun",
     "test:color": "bun test --update-snapshots",
     "posttest": "echo posttest",
     "prebuild": "node --run build:version && node --run build:config-defaults && node --run clean",

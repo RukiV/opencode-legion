@@ -3,6 +3,8 @@
  * Tool Usage Guides
  */
 
+import { BACKGROUND_SHADOWS } from "../../types/enums";
+
 /** ==================== 工具指南 / Tool Guides ==================== */
 
 /**
@@ -114,4 +116,13 @@ export const LSP_TOOLS = `## LSP Tools Guidelines
 - Understand call hierarchy
 - Inquire about type information`;
 
-/** ==================== 專屬擴展已移至 prompts.ts ==================== */
+/**
+ * 召喚方法規則（ Monarch 專用）
+ * Summoning method rules (for Monarch only)
+ */
+export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
+- Need result NOW → arise_summon (default, blocks and returns result)
+- Need result LATER (parallel) → arise_background (${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
+- DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
+- ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.` as const;
+
