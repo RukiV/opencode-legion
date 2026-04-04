@@ -49,8 +49,8 @@ ${getMonarchShadowList()}
 	footer: [
 		SUMMONING_METHOD_RULES,
 
-		SUMMONING_STRATEGY(),
-
 		`ARISE and lead your shadows to victory.`,
+
+		SUMMONING_STRATEGY(),
 	],
 });

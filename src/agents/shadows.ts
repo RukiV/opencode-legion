@@ -182,19 +182,31 @@ const SHARED_SUMMON_ARGS = {
  */
 export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SUMMON]: {
-		description: `Summon a shadow agent - sync (returns result) or background (fire-and-forget).
+		description: composePrompt({
+			header: [
+				"Summon a shadow agent - sync (returns result) or background (fire-and-forget).",
+			],
+			body: [
+				`Available shadow agents:
+${ALLOWED_SHADOWS.map((name) =>
+				{
+					const supportsBg = (name === EnumShadowSubAgentsName.Beru || name === EnumShadowSubAgentsName.Tank || name === EnumShadowSubAgentsName.Bellion)
+						? " (supports background)"
+						: "";
+					return `- ${name}: ${getShortDescription(name)}${supportsBg}`;
+				}).join("\n")}`,
 
-Available shadow agents:
-${ALLOWED_SHADOWS.map((name) => {
-			const supportsBg = (name === EnumShadowSubAgentsName.Beru || name === EnumShadowSubAgentsName.Tank || name === EnumShadowSubAgentsName.Bellion) ? " (supports background)" : "";
-			return `- ${name}: ${getShortDescription(name)}${supportsBg}`;
-		}).join("\n")}
-
-IMPORTANT - run_in_background behavior:
+				`IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
 - run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
 
-⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_BACKGROUND as const} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+			],
+			footer: [
+				SUMMONING_STRATEGY(EnumAriseTools.ARISE_SUMMON),
+			],
+		}),
+
 		shortDescription: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)" as const,
 
 		args: {
@@ -210,16 +222,25 @@ IMPORTANT - run_in_background behavior:
 		},
 	},
 	[EnumAriseTools.ARISE_BACKGROUND]: {
-		description: `Launch background shadow agent - trackable, retrievable results.
+		description: composePrompt({
+			header: [
+				"Launch background shadow agent - trackable, retrievable results.",
+			],
+			body: [
+				`Best for:
+${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).join("\n")}`,
 
-Best for:
-${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).join("\n")}
-
-Returns a task_id immediately. Use arise_background_status to check status, and arise_background_output to get results.
+				`Returns a task_id immediately. Use arise_background_status to check status, and arise_background_output to get results.
 
 The 'description' arg will be shown in arise_background_status output for task identification.
 
-✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.` as const,
+✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.`,
+			],
+			footer: [
+				SUMMONING_STRATEGY(EnumAriseTools.ARISE_BACKGROUND),
+			],
+		}),
+
 		shortDescription: "Launch background shadow agent - trackable, retrievable results" as const,
 
 		args: {
