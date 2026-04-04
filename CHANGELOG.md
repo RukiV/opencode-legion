@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.30](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.29...@bluelovers/opencode-arise@0.1.30) (2026-04-04)
+
+
+
+### 🐛　Bug Fixes
+
+* **model:** 修复 AUTO 模型回退逻辑，userModel 为 AUTO 时直接回退到 parentModel ([3b3e890](https://github.com/bluelovers/opencode-arise/commit/3b3e89091b46957ce10d33835304602b870ffe53))
+
+
+### 🚨　Tests
+
+* **model-resolver:** 重構測試為 fixture 驅動 + 快照驗證 ([138382f](https://github.com/bluelovers/opencode-arise/commit/138382f34b7761a007cae2c371379249423367e8))
+
+
+
 ## [0.1.29](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.28...@bluelovers/opencode-arise@0.1.29) (2026-04-04)
 
 

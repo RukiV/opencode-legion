@@ -21,7 +21,7 @@
  *
  * @type {string}
  */
-export const PLUGIN_VERSION = "0.1.29" as const;
+export const PLUGIN_VERSION = "0.1.30" as const;
 
 /**
  * 插件版本號字串（含 v 前綴）
@@ -29,7 +29,7 @@ export const PLUGIN_VERSION = "0.1.29" as const;
  *
  * @type {string}
  */
-export const PLUGIN_VERSION_STRING = "v0.1.29" as const;
+export const PLUGIN_VERSION_STRING = "v0.1.30" as const;
 
 /**
  * 插件首頁
