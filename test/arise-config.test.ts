@@ -15,14 +15,14 @@ import {
 	ALL_SHADOW_AGENTS_NAME,
 } from "../src/types/enums";
 import { ALL_ARISE_TOOLS, EnumAriseTools } from "../src/types/enums";
-import { ARISE_TOOLS, getAriseToolsSection } from "../src/agents/shadows";
+import { ARISE_TOOLS, SHADOW_AGENTS } from "../src/agents/shadows";
 import {
 	SHADOW_DESCRIPTIONS,
 	getMonarchShadowList,
 	getShortDescription,
 	getAllShadowNames,
-} from "../src/agents/shadows";
-import { SHADOW_AGENTS } from "../src/agents/shadows";
+	getAriseToolsSection,
+} from "../src/agents/lib/shadow-descriptions";
 
 /**
  * 測試群組：Shadow Agents 配置完整性

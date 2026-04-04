@@ -17,7 +17,7 @@ import {
 	getShadowAgentsMarkdownTable,
 	getShadowDescription,
 	getAllShadowNames,
-} from "./shadows";
+} from "./lib/shadow-descriptions";
 import {
 	ALLOWED_SHADOWS,
 	BACKGROUND_SHADOWS,
