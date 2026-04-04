@@ -1,0 +1,1023 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`_isAutoModel 標準 AUTO 1`] = `
+{
+  "input": "AUTO",
+  "name": "標準 AUTO",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel 小寫 auto 1`] = `
+{
+  "input": "auto",
+  "name": "小寫 auto",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel 混合大小寫 Auto 1`] = `
+{
+  "input": "Auto",
+  "name": "混合大小寫 Auto",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel 首尾空白 1`] = `
+{
+  "input": " AUTO ",
+  "name": "首尾空白",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel 含換行符 1`] = `
+{
+  "input": 
+"AUTO
+"
+,
+  "name": "含換行符",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel 含 Tab 1`] = `
+{
+  "input": "	AUTO	",
+  "name": "含 Tab",
+  "result": true,
+}
+`;
+
+exports[`_isAutoModel undefined 1`] = `
+{
+  "input": undefined,
+  "name": "undefined",
+  "result": false,
+}
+`;
+
+exports[`_isAutoModel 空字串 1`] = `
+{
+  "input": "",
+  "name": "空字串",
+  "result": false,
+}
+`;
+
+exports[`_isAutoModel 純空白 1`] = `
+{
+  "input": "   ",
+  "name": "純空白",
+  "result": false,
+}
+`;
+
+exports[`_isAutoModel 正常模型 1`] = `
+{
+  "input": "openai/gpt-4o",
+  "name": "正常模型",
+  "result": false,
+}
+`;
+
+exports[`_isAutoModel AUTO_MODEL 字串 1`] = `
+{
+  "input": "AUTO_MODEL",
+  "name": "AUTO_MODEL 字串",
+  "result": false,
+}
+`;
+
+exports[`_isAutoModel AUTO-1 1`] = `
+{
+  "input": "AUTO-1",
+  "name": "AUTO-1",
+  "result": false,
+}
+`;
+
+exports[`_isNotEmpty 正常字串 1`] = `
+{
+  "input": "gpt-4",
+  "name": "正常字串",
+  "result": true,
+}
+`;
+
+exports[`_isNotEmpty abc 1`] = `
+{
+  "input": "abc",
+  "name": "abc",
+  "result": true,
+}
+`;
+
+exports[`_isNotEmpty 含首尾空白 1`] = `
+{
+  "input": "  abc  ",
+  "name": "含首尾空白",
+  "result": true,
+}
+`;
+
+exports[`_isNotEmpty 空字串 1`] = `
+{
+  "input": "",
+  "name": "空字串",
+  "result": false,
+}
+`;
+
+exports[`_isNotEmpty 純空白 1`] = `
+{
+  "input": "   ",
+  "name": "純空白",
+  "result": false,
+}
+`;
+
+exports[`_isNotEmpty undefined 1`] = `
+{
+  "input": undefined,
+  "name": "undefined",
+  "result": false,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel gpt-4 1`] = `
+{
+  "input": "gpt-4",
+  "name": "gpt-4",
+  "result": true,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel claude-3 1`] = `
+{
+  "input": "claude-3",
+  "name": "claude-3",
+  "result": true,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel AUTO 1`] = `
+{
+  "input": "AUTO",
+  "name": "AUTO",
+  "result": false,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel 空字串 1`] = `
+{
+  "input": "",
+  "name": "空字串",
+  "result": false,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel 純空白 1`] = `
+{
+  "input": "   ",
+  "name": "純空白",
+  "result": false,
+}
+`;
+
+exports[`_isDefinedAndNotAutoModel undefined 1`] = `
+{
+  "input": undefined,
+  "name": "undefined",
+  "result": false,
+}
+`;
+
+exports[`_resolveAutoModelBase parentModel 有效 1`] = `
+{
+  "defaultModel": "default-model",
+  "name": "parentModel 有效",
+  "parentModel": "parent-model",
+  "result": "parent-model",
+}
+`;
+
+exports[`_resolveAutoModelBase parentModel undefined 1`] = `
+{
+  "defaultModel": "default-model",
+  "name": "parentModel undefined",
+  "parentModel": undefined,
+  "result": "default-model",
+}
+`;
+
+exports[`_resolveAutoModelBase parentModel AUTO 1`] = `
+{
+  "defaultModel": "default-model",
+  "name": "parentModel AUTO",
+  "parentModel": "AUTO",
+  "result": "default-model",
+}
+`;
+
+exports[`_resolveAutoModelBase parentModel 空字串 1`] = `
+{
+  "defaultModel": "default-model",
+  "name": "parentModel 空字串",
+  "parentModel": "",
+  "result": "default-model",
+}
+`;
+
+exports[`_resolveAutoModelBase 兩者都 undefined 1`] = `
+{
+  "defaultModel": undefined,
+  "name": "兩者都 undefined",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+}
+`;
+
+exports[`_resolveAutoModelBase 兩者都 AUTO 1`] = `
+{
+  "defaultModel": "AUTO",
+  "name": "兩者都 AUTO",
+  "parentModel": "AUTO",
+  "result": "opencode/big-pickle",
+}
+`;
+
+exports[`_resolveAutoModelBase 兩者都空字串 1`] = `
+{
+  "defaultModel": "",
+  "name": "兩者都空字串",
+  "parentModel": "",
+  "result": "opencode/big-pickle",
+}
+`;
+
+exports[`_resolveAutoModelCore model 有效 1`] = `
+{
+  "defaultModel": "default",
+  "model": "gpt-4",
+  "name": "model 有效",
+  "parentModel": "parent",
+  "result": "gpt-4",
+}
+`;
+
+exports[`_resolveAutoModelCore model AUTO, 有 parent 1`] = `
+{
+  "defaultModel": "default",
+  "model": "AUTO",
+  "name": "model AUTO, 有 parent",
+  "parentModel": "parent",
+  "result": "parent",
+}
+`;
+
+exports[`_resolveAutoModelCore model AUTO, 無 parent 有 default 1`] = `
+{
+  "defaultModel": "default",
+  "model": "AUTO",
+  "name": "model AUTO, 無 parent 有 default",
+  "parentModel": undefined,
+  "result": "default",
+}
+`;
+
+exports[`_resolveAutoModelCore model AUTO, 全無 1`] = `
+{
+  "defaultModel": undefined,
+  "model": "AUTO",
+  "name": "model AUTO, 全無",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+}
+`;
+
+exports[`_resolveAutoModelCore model undefined 1`] = `
+{
+  "defaultModel": "default",
+  "model": undefined,
+  "name": "model undefined",
+  "parentModel": "parent",
+  "result": undefined,
+}
+`;
+
+exports[`_resolveAutoModelCore model 空字串 1`] = `
+{
+  "defaultModel": "default",
+  "model": "",
+  "name": "model 空字串",
+  "parentModel": "parent",
+  "result": undefined,
+}
+`;
+
+exports[`_resolveAutoModelCore model 純空白 1`] = `
+{
+  "defaultModel": "default",
+  "model": "   ",
+  "name": "model 純空白",
+  "parentModel": "parent",
+  "result": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback userModel 優先 1`] = `
+{
+  "configModel": "config/model",
+  "defaultModel": "default/model",
+  "name": "userModel 優先",
+  "parentModel": "parent/model",
+  "result": "user/model",
+  "userModel": "user/model",
+}
+`;
+
+exports[`getEffectiveModelWithFallback userModel AUTO → parentModel 1`] = `
+{
+  "configModel": "config/model",
+  "defaultModel": "default/model",
+  "name": "userModel AUTO → parentModel",
+  "parentModel": "parent/model",
+  "result": "parent/model",
+  "userModel": "AUTO",
+}
+`;
+
+exports[`getEffectiveModelWithFallback userModel AUTO → defaultModel (無 parent) 1`] = `
+{
+  "configModel": "config/model",
+  "defaultModel": "default/model",
+  "name": "userModel AUTO → defaultModel (無 parent)",
+  "parentModel": undefined,
+  "result": "default/model",
+  "userModel": "AUTO",
+}
+`;
+
+exports[`getEffectiveModelWithFallback userModel AUTO → DEFAULT_MODEL (全無) 1`] = `
+{
+  "configModel": undefined,
+  "defaultModel": undefined,
+  "name": "userModel AUTO → DEFAULT_MODEL (全無)",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+  "userModel": "AUTO",
+}
+`;
+
+exports[`getEffectiveModelWithFallback configModel 優先 (無 userModel) 1`] = `
+{
+  "configModel": "config/model",
+  "defaultModel": "default/model",
+  "name": "configModel 優先 (無 userModel)",
+  "parentModel": "parent/model",
+  "result": "config/model",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback configModel AUTO → parentModel 1`] = `
+{
+  "configModel": "AUTO",
+  "defaultModel": "default/model",
+  "name": "configModel AUTO → parentModel",
+  "parentModel": "parent/model",
+  "result": "parent/model",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback configModel AUTO → defaultModel (無 parent) 1`] = `
+{
+  "configModel": "AUTO",
+  "defaultModel": "default/model",
+  "name": "configModel AUTO → defaultModel (無 parent)",
+  "parentModel": undefined,
+  "result": "default/model",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback configModel AUTO → DEFAULT_MODEL (全無) 1`] = `
+{
+  "configModel": "AUTO",
+  "defaultModel": undefined,
+  "name": "configModel AUTO → DEFAULT_MODEL (全無)",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback defaultModel 優先 (無 userModel/config) 1`] = `
+{
+  "configModel": undefined,
+  "defaultModel": "default/model",
+  "name": "defaultModel 優先 (無 userModel/config)",
+  "parentModel": "parent/model",
+  "result": "default/model",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback defaultModel AUTO → parentModel 1`] = `
+{
+  "configModel": undefined,
+  "defaultModel": "AUTO",
+  "name": "defaultModel AUTO → parentModel",
+  "parentModel": "parent/model",
+  "result": "parent/model",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback defaultModel AUTO → DEFAULT_MODEL (無 parent) 1`] = `
+{
+  "configModel": undefined,
+  "defaultModel": "AUTO",
+  "name": "defaultModel AUTO → DEFAULT_MODEL (無 parent)",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+  "userModel": undefined,
+}
+`;
+
+exports[`getEffectiveModelWithFallback 全部 undefined → DEFAULT_MODEL 1`] = `
+{
+  "configModel": undefined,
+  "defaultModel": undefined,
+  "name": "全部 undefined → DEFAULT_MODEL",
+  "parentModel": undefined,
+  "result": "opencode/big-pickle",
+  "userModel": undefined,
+}
+`;
+
+exports[`parseModelString 標準格式 1`] = `
+{
+  "input": "openai/gpt-4o",
+  "name": "標準格式",
+  "result": {
+    "detectAutoModelBody": 0,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`parseModelString 含版本號 1`] = `
+{
+  "input": "openai/gpt-4-0613",
+  "name": "含版本號",
+  "result": {
+    "detectAutoModelBody": 0,
+    "modelBody": {
+      "modelID": "gpt-4-0613",
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`parseModelString 多段 modelID 1`] = `
+{
+  "input": "azure/gpt-4/deployment-name",
+  "name": "多段 modelID",
+  "result": {
+    "detectAutoModelBody": 0,
+    "modelBody": {
+      "modelID": "gpt-4/deployment-name",
+      "providerID": "azure",
+    },
+  },
+}
+`;
+
+exports[`parseModelString undefined 1`] = `
+{
+  "input": undefined,
+  "name": "undefined",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString 空字串 1`] = `
+{
+  "input": "",
+  "name": "空字串",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString 缺少斜線 1`] = `
+{
+  "input": "claude-sonnet-4",
+  "name": "缺少斜線",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "claude-sonnet-4",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`parseModelString 只有 provider 1`] = `
+{
+  "input": "anthropic/",
+  "name": "只有 provider",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "anthropic",
+    },
+  },
+}
+`;
+
+exports[`parseModelString 只有 modelID 1`] = `
+{
+  "input": "/claude-sonnet-4",
+  "name": "只有 modelID",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "claude-sonnet-4",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`parseModelString AUTO 標準 1`] = `
+{
+  "input": "AUTO",
+  "name": "AUTO 標準",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString AUTO 小寫 1`] = `
+{
+  "input": "auto",
+  "name": "AUTO 小寫",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString AUTO 含空白 1`] = `
+{
+  "input": " AUTO ",
+  "name": "AUTO 含空白",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString AUTO/. 1`] = `
+{
+  "input": "AUTO/.",
+  "name": "AUTO/.",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString /AUTO 1`] = `
+{
+  "input": "/AUTO",
+  "name": "/AUTO",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString ./AUTO/. 1`] = `
+{
+  "input": "./AUTO/.",
+  "name": "./AUTO/.",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`parseModelString AUTO/gpt-4 1`] = `
+{
+  "input": "AUTO/gpt-4",
+  "name": "AUTO/gpt-4",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "gpt-4",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`parseModelString openai/AUTO 1`] = `
+{
+  "input": "openai/AUTO",
+  "name": "openai/AUTO",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`parseModelString openai/gpt-4/. 1`] = `
+{
+  "input": "openai/gpt-4/.",
+  "name": "openai/gpt-4/.",
+  "result": {
+    "detectAutoModelBody": 0,
+    "modelBody": {
+      "modelID": "gpt-4",
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody 完整模型 1`] = `
+{
+  "input": {
+    "modelID": "gpt-4o",
+    "providerID": "openai",
+  },
+  "name": "完整模型",
+  "result": {
+    "detectAutoModelBody": 0,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody undefined 輸入 1`] = `
+{
+  "input": undefined,
+  "name": "undefined 輸入",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`_detectAutoModelBody 空物件 1`] = `
+{
+  "input": {},
+  "name": "空物件",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`_detectAutoModelBody 兩者都是 AUTO 1`] = `
+{
+  "input": {
+    "modelID": "AUTO",
+    "providerID": "AUTO",
+  },
+  "name": "兩者都是 AUTO",
+  "result": {
+    "detectAutoModelBody": 1,
+    "modelBody": undefined,
+  },
+}
+`;
+
+exports[`_detectAutoModelBody provider=AUTO 1`] = `
+{
+  "input": {
+    "modelID": "gpt-4o",
+    "providerID": "AUTO",
+  },
+  "name": "provider=AUTO",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody provider=空字串 1`] = `
+{
+  "input": {
+    "modelID": "gpt-4o",
+    "providerID": "",
+  },
+  "name": "provider=空字串",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody provider=undefined 字串 1`] = `
+{
+  "input": {
+    "modelID": "gpt-4o",
+    "providerID": "undefined",
+  },
+  "name": "provider=undefined 字串",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody provider=null 字串 1`] = `
+{
+  "input": {
+    "modelID": "gpt-4o",
+    "providerID": "null",
+  },
+  "name": "provider=null 字串",
+  "result": {
+    "detectAutoModelBody": 2,
+    "modelBody": {
+      "modelID": "gpt-4o",
+      "providerID": undefined,
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody modelID=AUTO 1`] = `
+{
+  "input": {
+    "modelID": "AUTO",
+    "providerID": "openai",
+  },
+  "name": "modelID=AUTO",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody modelID=空字串 1`] = `
+{
+  "input": {
+    "modelID": "",
+    "providerID": "openai",
+  },
+  "name": "modelID=空字串",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody modelID=undefined 字串 1`] = `
+{
+  "input": {
+    "modelID": "undefined",
+    "providerID": "openai",
+  },
+  "name": "modelID=undefined 字串",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody modelID=null 字串 1`] = `
+{
+  "input": {
+    "modelID": "null",
+    "providerID": "openai",
+  },
+  "name": "modelID=null 字串",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`_detectAutoModelBody modelID=. 1`] = `
+{
+  "input": {
+    "modelID": ".",
+    "providerID": "openai",
+  },
+  "name": "modelID=.",
+  "result": {
+    "detectAutoModelBody": 3,
+    "modelBody": {
+      "modelID": undefined,
+      "providerID": "openai",
+    },
+  },
+}
+`;
+
+exports[`resolveModelContext 使用 Shadow 預設模型 1`] = `
+{
+  "config": undefined,
+  "name": "使用 Shadow 預設模型",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "claude-haiku-4-5",
+    "providerID": "anthropic",
+  },
+  "shadow": "beru",
+  "userModel": undefined,
+}
+`;
+
+exports[`resolveModelContext config 模型優先 1`] = `
+{
+  "config": {
+    "agents": {
+      "beru": {
+        "model": "config/model",
+      },
+    },
+  },
+  "name": "config 模型優先",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "model",
+    "providerID": "config",
+  },
+  "shadow": "beru",
+  "userModel": undefined,
+}
+`;
+
+exports[`resolveModelContext config AUTO → defaultModel 1`] = `
+{
+  "config": {
+    "agents": {
+      "beru": {
+        "model": "AUTO",
+      },
+    },
+  },
+  "name": "config AUTO → defaultModel",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "claude-3",
+    "providerID": "anthropic",
+  },
+  "shadow": "beru",
+  "userModel": undefined,
+}
+`;
+
+exports[`resolveModelContext userModel 優先 1`] = `
+{
+  "config": {
+    "agents": {
+      "beru": {
+        "model": "config/model",
+      },
+    },
+  },
+  "name": "userModel 優先",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "model",
+    "providerID": "user",
+  },
+  "shadow": "beru",
+  "userModel": "user/model",
+}
+`;
+
+exports[`resolveModelContext userModel AUTO → parentModel 1`] = `
+{
+  "config": {
+    "agents": {
+      "beru": {
+        "model": "config/model",
+      },
+    },
+  },
+  "name": "userModel AUTO → parentModel",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "claude-3",
+    "providerID": "anthropic",
+  },
+  "shadow": "beru",
+  "userModel": "AUTO",
+}
+`;
+
+exports[`resolveModelContext 無 config 無 userModel 1`] = `
+{
+  "config": undefined,
+  "name": "無 config 無 userModel",
+  "parentModel": "anthropic/claude-3",
+  "result": {
+    "modelID": "claude-haiku-4-5",
+    "providerID": "anthropic",
+  },
+  "shadow": "beru",
+  "userModel": undefined,
+}
+`;
+
+exports[`resolveModelContext 全部 undefined → DEFAULT_MODEL 1`] = `
+{
+  "config": undefined,
+  "name": "全部 undefined → DEFAULT_MODEL",
+  "parentModel": undefined,
+  "result": {
+    "modelID": "big-pickle",
+    "providerID": "opencode",
+  },
+  "shadow": "Fake-Shadow",
+  "userModel": undefined,
+}
+`;
+
+exports[`resolveModelContext 多段 modelID 1`] = `
+{
+  "config": {
+    "agents": {
+      "beru": {
+        "model": "azure/openai/gpt-4",
+      },
+    },
+  },
+  "name": "多段 modelID",
+  "parentModel": undefined,
+  "result": {
+    "modelID": "openai/gpt-4",
+    "providerID": "azure",
+  },
+  "shadow": "beru",
+  "userModel": undefined,
+}
+`;

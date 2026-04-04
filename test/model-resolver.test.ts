@@ -1,193 +1,239 @@
+/**
+ * 模型解析工具測試
+ * Model resolver utility tests
+ *
+ * 測試所有模型解析相關函數，使用 fixtures 資料驅動 + 快照驗證
+ * Tests all model resolution related functions, using fixture-driven + snapshot validation
+ *
+ * 測試範圍 / Test coverage:
+ * - _isAutoModel: AUTO 模型檢測 / AUTO model detection
+ * - _isNotEmpty: 非空字串檢測 / Non-empty string detection
+ * - _isDefinedAndNotAutoModel: 有效模型檢測 / Valid model detection
+ * - _resolveAutoModelBase: AUTO 基礎回退 / AUTO base fallback
+ * - _resolveAutoModelCore: AUTO 核心解析 / AUTO core resolution
+ * - getEffectiveModelWithFallback: 有效模型解析 / Effective model resolution
+ * - parseModelString: 模型字串解析 / Model string parsing
+ * - _detectAutoModelBody: AUTO 模型主體檢測 / AUTO model body detection
+ * - resolveModelContext: 完整模型上下文解析 / Full model context resolution
+ */
 /// <reference types="bun" />
 /// <reference types="node" />
+
 import { describe, expect, it } from "bun:test";
 import { AUTO_MODEL, DEFAULT_MODEL } from "../src/types/const-default";
+import { EnumDetectAutoModelBody, EnumShadowSubAgentsName } from "../src/types/enums";
+import type { IAllShadowAgentsName } from "../src/types/enums";
+import type { IModelBody } from "../src/types/types-opencode";
 import {
+	_detectAutoModelBody,
 	_isAutoModel,
 	_isDefinedAndNotAutoModel,
 	_resolveAutoModelBase,
 	_resolveAutoModelCore,
 	getEffectiveModelWithFallback,
+	parseModelString,
+	resolveModelContext,
 } from "../src/utils/model-resolver";
 import { _isNotEmpty } from "../src/utils/string/string-utils";
+import { autoVariantCases } from "./fixtures/model-resolver/auto-variants";
+import { detectAutoBodyCases } from "./fixtures/model-resolver/detect-auto-body";
+import { fallbackChainCases } from "./fixtures/model-resolver/fallback-chains";
+import { isDefinedAndNotAutoModelCases } from "./fixtures/model-resolver/is-defined-and-not-auto-model";
+import { isNotEmptyCases } from "./fixtures/model-resolver/is-not-empty";
+import { modelStringCases } from "./fixtures/model-resolver/model-strings";
+import { resolveAutoModelBaseCases } from "./fixtures/model-resolver/resolve-auto-model-base";
+import { resolveAutoModelCoreCases } from "./fixtures/model-resolver/resolve-auto-model-core";
+import { resolveContextCases } from "./fixtures/model-resolver/resolve-context";
 
+// ============================================================
+// _isAutoModel
+// ============================================================
+
+/**
+ * _isAutoModel 函數測試
+ * _isAutoModel function tests
+ */
 describe("_isAutoModel", () =>
 {
-	it("should return true for AUTO_MODEL", () =>
+	for (const { name, input } of autoVariantCases)
 	{
-		expect(_isAutoModel(AUTO_MODEL)).toBe(true);
-	});
-
-	it("should return false for non-AUTO values", () =>
-	{
-		expect(_isAutoModel("gpt-4")).toBe(false);
-		expect(_isAutoModel("")).toBe(false);
-	});
-
-	it("should return false for undefined", () =>
-	{
-		expect(_isAutoModel(undefined)).toBe(false);
-	});
+		it(name, () =>
+		{
+			const result = _isAutoModel(input);
+			expect({ name, input, result }).toMatchSnapshot();
+		});
+	}
 });
 
+// ============================================================
+// _isNotEmpty
+// ============================================================
+
+/**
+ * _isNotEmpty 函數測試
+ * _isNotEmpty function tests
+ */
 describe("_isNotEmpty", () =>
 {
-	it("should return true for non-empty strings", () =>
+	for (const { name, input } of isNotEmptyCases)
 	{
-		expect(_isNotEmpty("gpt-4")).toBe(true);
-		expect(_isNotEmpty("abc")).toBe(true);
-		expect(_isNotEmpty("  abc  ")).toBe(true);
-	});
-
-	it("should return false for empty strings", () =>
-	{
-		expect(_isNotEmpty("")).toBe(false);
-		expect(_isNotEmpty("   ")).toBe(false);
-	});
-
-	it("should return false for undefined", () =>
-	{
-		expect(_isNotEmpty(undefined)).toBe(false);
-	});
+		it(name, () =>
+		{
+			const result = _isNotEmpty(input);
+			expect({ name, input, result }).toMatchSnapshot();
+		});
+	}
 });
 
+// ============================================================
+// _isDefinedAndNotAutoModel
+// ============================================================
+
+/**
+ * _isDefinedAndNotAutoModel 函數測試
+ * _isDefinedAndNotAutoModel function tests
+ */
 describe("_isDefinedAndNotAutoModel", () =>
 {
-	it("should return true for valid models", () =>
+	for (const { name, input } of isDefinedAndNotAutoModelCases)
 	{
-		expect(_isDefinedAndNotAutoModel("gpt-4")).toBe(true);
-		expect(_isDefinedAndNotAutoModel("claude-3")).toBe(true);
-	});
-
-	it("should return false for AUTO_MODEL", () =>
-	{
-		expect(_isDefinedAndNotAutoModel(AUTO_MODEL)).toBe(false);
-	});
-
-	it("should return false for empty strings", () =>
-	{
-		expect(_isDefinedAndNotAutoModel("")).toBe(false);
-		expect(_isDefinedAndNotAutoModel("   ")).toBe(false);
-	});
-
-	it("should return false for undefined", () =>
-	{
-		expect(_isDefinedAndNotAutoModel(undefined)).toBe(false);
-	});
+		it(name, () =>
+		{
+			const result = _isDefinedAndNotAutoModel(input);
+			expect({ name, input, result }).toMatchSnapshot();
+		});
+	}
 });
 
+// ============================================================
+// _resolveAutoModelBase
+// ============================================================
+
+/**
+ * _resolveAutoModelBase 函數測試
+ * _resolveAutoModelBase function tests
+ */
 describe("_resolveAutoModelBase", () =>
 {
-	it("should return parentModel when it is valid", () =>
+	for (const { name, parentModel, defaultModel } of resolveAutoModelBaseCases)
 	{
-		expect(_resolveAutoModelBase("parent-model", "default-model")).toBe("parent-model");
-	});
-
-	it("should return defaultModel when parentModel is invalid", () =>
-	{
-		expect(_resolveAutoModelBase(undefined, "default-model")).toBe("default-model");
-		expect(_resolveAutoModelBase(AUTO_MODEL, "default-model")).toBe("default-model");
-		expect(_resolveAutoModelBase("", "default-model")).toBe("default-model");
-	});
-
-	it("should return DEFAULT_MODEL when both are invalid", () =>
-	{
-		expect(_resolveAutoModelBase(undefined, undefined)).toBe(DEFAULT_MODEL);
-		expect(_resolveAutoModelBase(AUTO_MODEL, AUTO_MODEL)).toBe(DEFAULT_MODEL);
-		expect(_resolveAutoModelBase("", "")).toBe(DEFAULT_MODEL);
-	});
+		it(name, () =>
+		{
+			const result = _resolveAutoModelBase(parentModel, defaultModel);
+			expect({ name, parentModel, defaultModel, result }).toMatchSnapshot();
+		});
+	}
 });
 
+// ============================================================
+// _resolveAutoModelCore
+// ============================================================
+
+/**
+ * _resolveAutoModelCore 函數測試
+ * _resolveAutoModelCore function tests
+ */
 describe("_resolveAutoModelCore", () =>
 {
-	it("should return model when it is valid", () =>
+	for (const { name, model, parentModel, defaultModel } of resolveAutoModelCoreCases)
 	{
-		expect(_resolveAutoModelCore("gpt-4", "parent", "default")).toBe("gpt-4");
-	});
-
-	it("should return fallback when model is AUTO_MODEL", () =>
-	{
-		expect(_resolveAutoModelCore(AUTO_MODEL, "parent", "default")).toBe("parent");
-		expect(_resolveAutoModelCore(AUTO_MODEL, undefined, "default")).toBe("default");
-		expect(_resolveAutoModelCore(AUTO_MODEL, undefined, undefined)).toBe(DEFAULT_MODEL);
-	});
-
-	it("should return undefined for empty values", () =>
-	{
-		expect(_resolveAutoModelCore(undefined, "parent", "default")).toBeUndefined();
-		expect(_resolveAutoModelCore("", "parent", "default")).toBeUndefined();
-		expect(_resolveAutoModelCore("   ", "parent", "default")).toBeUndefined();
-	});
+		it(name, () =>
+		{
+			const result = _resolveAutoModelCore(model, parentModel, defaultModel);
+			expect({ name, model, parentModel, defaultModel, result }).toMatchSnapshot();
+		});
+	}
 });
 
+// ============================================================
+// getEffectiveModelWithFallback
+// ============================================================
+
+/**
+ * getEffectiveModelWithFallback 函數測試
+ * getEffectiveModelWithFallback function tests
+ */
 describe("getEffectiveModelWithFallback", () =>
 {
-	describe("userModel 優先級", () =>
+	for (const { name, parentModel, defaultModel, configModel, userModel } of fallbackChainCases)
 	{
-		it("should return userModel when specified", () =>
+		it(name, () =>
 		{
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, "user-model/model")).toBe("user-model/model");
+			const result = getEffectiveModelWithFallback(parentModel, defaultModel, configModel, userModel);
+			expect({ name, parentModel, defaultModel, configModel, userModel, result }).toMatchSnapshot();
 		});
+	}
+});
 
-		it("should fallback to parentModel when userModel is AUTO_MODEL", () =>
-		{
-			/**
-			 * userModel 為 AUTO 時，直接回退到 parentModel
-			 * When userModel is AUTO, fallback directly to parentModel
-			 *
-			 * 不檢查 configModel（AUTO 表示用戶不想使用 config 設定）
-			 * Skip configModel (AUTO means user doesn't want config setting)
-			 */
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config/model", AUTO_MODEL)).toBe("parent/model");
-			expect(getEffectiveModelWithFallback(undefined, "default/model", "config/model", AUTO_MODEL)).toBe("default/model");
-			expect(getEffectiveModelWithFallback(undefined, undefined, undefined, AUTO_MODEL)).toBe(DEFAULT_MODEL);
-		});
+// ============================================================
+// parseModelString
+// ============================================================
 
-		it("should skip userModel when undefined", () =>
-		{
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, undefined)).toBe("default/model");
-		});
-
-		it("should return configModel when userModel is undefined/invalid", () =>
-		{
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", undefined)).toBe("config-model/model");
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", "")).toBe("config-model/model");
-		});
-	});
-
-	describe("configModel 優先級", () =>
+/**
+ * parseModelString 函數測試
+ * parseModelString function tests
+ */
+describe("parseModelString", () =>
+{
+	for (const { name, input, shouldThrow } of modelStringCases)
 	{
-		it("should return configModel when specified", () =>
+		it(name, () =>
 		{
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", "config-model/model", undefined)).toBe("config-model/model");
-		});
+			if (shouldThrow)
+			{
+				expect(() => parseModelString(input)).toThrow();
+				return;
+			}
 
-		it("should fallback when configModel is AUTO_MODEL", () =>
-		{
-			expect(getEffectiveModelWithFallback(undefined, "default/model", AUTO_MODEL, undefined)).toBe("default/model");
-			expect(getEffectiveModelWithFallback(undefined, undefined, AUTO_MODEL, undefined)).toBe(DEFAULT_MODEL);
+			const result = parseModelString(input);
+			/** 驗證非 void 欄位 / Validate non-void fields */
+			expect(typeof result.detectAutoModelBody).toBe('number');
+			expect({ name, input, result }).toMatchSnapshot();
 		});
-	});
+	}
+});
 
-	describe("defaultModel 優先級", () =>
+// ============================================================
+// _detectAutoModelBody
+// ============================================================
+
+/**
+ * _detectAutoModelBody 函數測試
+ * _detectAutoModelBody function tests
+ */
+describe("_detectAutoModelBody", () =>
+{
+	for (const { name, input } of detectAutoBodyCases)
 	{
-		it("should return defaultModel when specified", () =>
+		it(name, () =>
 		{
-			expect(getEffectiveModelWithFallback("parent/model", "default/model", undefined, undefined)).toBe("default/model");
+			const result = _detectAutoModelBody(input);
+			/** 驗證非 void 欄位 / Validate non-void fields */
+			expect(typeof result.detectAutoModelBody).toBe('number');
+			expect({ name, input, result }).toMatchSnapshot();
 		});
+	}
+});
 
-		it("should fallback when defaultModel is AUTO_MODEL", () =>
-		{
-			expect(getEffectiveModelWithFallback("parent/model", AUTO_MODEL, undefined, undefined)).toBe("parent/model");
-			expect(getEffectiveModelWithFallback(undefined, AUTO_MODEL, undefined, undefined)).toBe(DEFAULT_MODEL);
-		});
-	});
+// ============================================================
+// resolveModelContext
+// ============================================================
 
-	describe("最終 fallback", () =>
+/**
+ * resolveModelContext 函數測試
+ * resolveModelContext function tests
+ */
+describe("resolveModelContext", () =>
+{
+	for (const { name, parentModel, shadow, config, userModel } of resolveContextCases)
 	{
-		it("should return DEFAULT_MODEL when all are undefined", () =>
+		it(name, () =>
 		{
-			expect(getEffectiveModelWithFallback(undefined, undefined, undefined, undefined)).toBe(DEFAULT_MODEL);
+			const result = resolveModelContext(parentModel, shadow, config, userModel);
+			/** 驗證非 void 欄位 / Validate non-void fields */
+			expect(typeof result.providerID).toBe('string');
+			expect(typeof result.modelID).toBe('string');
+			expect({ name, parentModel, shadow, config, userModel, result }).toMatchSnapshot();
 		});
-	});
+	}
 });
