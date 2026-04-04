@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.28](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.26...@bluelovers/opencode-arise@0.1.28) (2026-04-04)
+
+
+
+### 📦　Code Refactoring
+
+* **agents:** 重新命名 ARISE 工具列舉值以區分同步/非同步類型 ([1902b6c](https://github.com/bluelovers/opencode-arise/commit/1902b6c7283169043f909b7d0567e8099ca9fbe5))
+* **agents:** 將 SUMMONING_STRATEGY 函式重新命名為 createSummoningStrategy ([a6969d6](https://github.com/bluelovers/opencode-arise/commit/a6969d6d250d4c9beb8bca4ea33d3879490b4765))
+* **agents:** 使用 composePrompt 重構 ARISE_SUMMON 與 ARISE_BACKGROUND 描述 ([f12fc98](https://github.com/bluelovers/opencode-arise/commit/f12fc984e70660fc9ae22c6bfc407d0c62da7c13))
+* **agents:** 將 SUMMONING_STRATEGY 改為函數並新增工具參數支援 ([71b3d5b](https://github.com/bluelovers/opencode-arise/commit/71b3d5b0970357efc774e2f0170a176cbf9e30bc))
+* **agents:** 重构 Shadow Monarch prompt 为结构化格式并提取共享规则 ([f38049e](https://github.com/bluelovers/opencode-arise/commit/f38049e8c4b852a8316a0bd69811eccc3485fda2))
+* **agents:** 簡化提示詞中的風格規範描述 ([9c7d25f](https://github.com/bluelovers/opencode-arise/commit/9c7d25f47351bb280b7eb730a68ee80698968dd7))
+* **agents:** 重構 Shadow Agents 程式碼，分離 concern 至獨立檔案 ([670707c](https://github.com/bluelovers/opencode-arise/commit/670707c076a02feae3bd03fc385dc92d512835ba))
+* **test:** 更新 API provider 快取與歷史記錄 fixture 資料 ([8a799d7](https://github.com/bluelovers/opencode-arise/commit/8a799d7b78ff9102d49ec16f35d4eac3d85d5ac6))
+* **tools:** 重新命名工具建立函式並統一添加 AgentTool 前綴 ([dc47846](https://github.com/bluelovers/opencode-arise/commit/dc47846db32cfda04d0fd25ffa089871c499fab5))
+
+
+### 💎　Styles
+
+* **agents:** 統一代碼縮排格式為tab並美化結構 ([dbedd19](https://github.com/bluelovers/opencode-arise/commit/dbedd1931191fd3c256ff03255d4bd97faf682df))
+
+
+### 🚨　Tests
+
+* **config:** 新增 setSystemTime Mock 確保 snapshot 時間戳穩定 ([eb1afc9](https://github.com/bluelovers/opencode-arise/commit/eb1afc9ef0c723291cc54eb485b7c313c820616b))
+
+
+### ♻️　Chores
+
+* **config:** 移除 test 指令碼中多餘的 `--` 結尾 ([fad14a9](https://github.com/bluelovers/opencode-arise/commit/fad14a96f185c69935a6fc2c6f52807a9ca1b7fd))
+
+
+
 ## [0.1.26](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.25...@bluelovers/opencode-arise@0.1.26) (2026-04-03)
 
 
