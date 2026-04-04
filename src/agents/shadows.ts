@@ -1,13 +1,21 @@
 import { type Agent } from '@opencode-ai/sdk';
 import type { ITSPartialRecord, ITSPickExtra } from 'ts-type';
 import { z } from "zod";
-import { 
-  EnumOpencodeAgentMode, 
-  EnumOpencodeAgentPermission, 
-  ALLOWED_LOG_LEVELS,
-  EnumReasoningEffort,
+import {
+	EnumOpencodeAgentMode,
+	EnumOpencodeAgentPermission,
+	ALLOWED_LOG_LEVELS,
+	EnumReasoningEffort,
 } from '../types/enum-opencode';
-import { EnumShadowAgentsName, EnumShadowSubAgentsName, ALLOWED_SHADOWS, BACKGROUND_SHADOWS, type IAllShadowAgentsName, EnumAriseTools, ALL_ARISE_TOOLS } from '../types/enums';
+import {
+	EnumShadowAgentsName,
+	EnumShadowSubAgentsName,
+	ALLOWED_SHADOWS,
+	BACKGROUND_SHADOWS,
+	type IAllShadowAgentsName,
+	EnumAriseTools,
+	ALL_ARISE_TOOLS,
+} from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
@@ -15,20 +23,22 @@ import { SHADOW_PROMPTS } from './lib/prompts';
 import { IShadowAgentPermission } from '../types/types-opencode';
 
 // Import from lib files
-import { 
-  SHADOW_DESCRIPTIONS, 
-  IShadowDescription,
-  getShortDescription,
-  getMonarchShadowList,
-  supportsBackgroundExecution,
-  getFullDescription,
-  getShadowAgentsMarkdownTable,
-  getShadowDescription,
-  suggestShadowAgent,
-  getAllShadowNames,
-  getAriseToolsSection,
+import {
+	SHADOW_DESCRIPTIONS,
+	IShadowDescription,
+	getShortDescription,
+	getMonarchShadowList,
+	supportsBackgroundExecution,
+	getFullDescription,
+	getShadowAgentsMarkdownTable,
+	getShadowDescription,
+	suggestShadowAgent,
+	getAllShadowNames,
+	getAriseToolsSection,
 } from './lib/shadow-descriptions';
 import { SHADOW_MONARCH_PROMPT } from './lib/shadow-monarch-prompt';
+import { SUMMONING_STRATEGY } from './lib/tool-guides';
+import { composePrompt } from '../utils/string/prompt-utils';
 
 /**
  * Shadow Agent 介面
@@ -39,42 +49,43 @@ import { SHADOW_MONARCH_PROMPT } from './lib/shadow-monarch-prompt';
  *
  * @typeParam N - Agent 名稱類型
  */
-export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsName> extends ITSPickExtra<Agent, 'description' | 'mode' | 'prompt', 'options'> {
-  /** Agent 名稱 / Agent name */
-  name: N;
-  /** 代理模式 / Agent mode */
-  mode: EnumOpencodeAgentMode;
-  /** 使用的模型 / Model to use */
-  model: string;
-  /** 最大步驟數 / Maximum steps */
-  steps: number;
-  /**
-   * Shadow Agent 權限鍵值列舉（不含 Bash）
-   * Shadow Agent permission keys enum (excluding Bash)
-   *
-   * 對應 OpenCode 可用權限列表
-   * Reference: https://opencode.ai/docs/permissions/#available-permissions
-   *
-   * | 分類 | Key | 說明 / Description |
-   * |------|-----|----------------------|
-   * | 檔案操作 | read | 讀取檔案 (matches file path) |
-   * | 檔案操作 | edit | 檔案修改 (covers edit, write, patch, multiedit) |
-   * | 檔案操作 | glob | 檔案 glob (matches glob pattern) |
-   * | 檔案操作 | grep | 內容搜尋 (matches regex pattern) |
-   * | 檔案操作 | list | 列出目錄 (matches directory path) |
-   * | 執行操作 | task | 啟動子代理 (matches subagent type) |
-   * | 執行操作 | skill | 載入 skill (matches skill name) |
-   * | 執行操作 | lsp | LSP 查詢 (currently non-granular) |
-   * | 執行操作 | question | 執行中提問 |
-   * | 網路操作 | webfetch | 請求 URL (matches URL) |
-   * | 網路操作 | websearch | 網路搜尋 (matches query) |
-   * | 網路操作 | codesearch | 代碼搜尋 (matches query) |
-   * | 安全防護 | external_directory | 存取工作目錄外的路徑 |
-   * | 安全防護 | doom_loop | 相同工具呼叫重複 3 次 |
-   *
-   * @note Bash 使用 pattern matching，單獨定義於 {@see EnumShadowAgentPermissionKey2.bash}
-   */
-  permission?: IShadowAgentPermission;
+export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsName> extends ITSPickExtra<Agent, 'description' | 'mode' | 'prompt', 'options'>
+{
+	/** Agent 名稱 / Agent name */
+	name: N;
+	/** 代理模式 / Agent mode */
+	mode: EnumOpencodeAgentMode;
+	/** 使用的模型 / Model to use */
+	model: string;
+	/** 最大步驟數 / Maximum steps */
+	steps: number;
+	/**
+	 * Shadow Agent 權限鍵值列舉（不含 Bash）
+	 * Shadow Agent permission keys enum (excluding Bash)
+	 *
+	 * 對應 OpenCode 可用權限列表
+	 * Reference: https://opencode.ai/docs/permissions/#available-permissions
+	 *
+	 * | 分類 | Key | 說明 / Description |
+	 * |------|-----|----------------------|
+	 * | 檔案操作 | read | 讀取檔案 (matches file path) |
+	 * | 檔案操作 | edit | 檔案修改 (covers edit, write, patch, multiedit) |
+	 * | 檔案操作 | glob | 檔案 glob (matches glob pattern) |
+	 * | 檔案操作 | grep | 內容搜尋 (matches regex pattern) |
+	 * | 檔案操作 | list | 列出目錄 (matches directory path) |
+	 * | 執行操作 | task | 啟動子代理 (matches subagent type) |
+	 * | 執行操作 | skill | 載入 skill (matches skill name) |
+	 * | 執行操作 | lsp | LSP 查詢 (currently non-granular) |
+	 * | 執行操作 | question | 執行中提問 |
+	 * | 網路操作 | webfetch | 請求 URL (matches URL) |
+	 * | 網路操作 | websearch | 網路搜尋 (matches query) |
+	 * | 網路操作 | codesearch | 代碼搜尋 (matches query) |
+	 * | 安全防護 | external_directory | 存取工作目錄外的路徑 |
+	 * | 安全防護 | doom_loop | 相同工具呼叫重複 3 次 |
+	 *
+	 * @note Bash 使用 pattern matching，單獨定義於 {@see EnumShadowAgentPermissionKey2.bash}
+	 */
+	permission?: IShadowAgentPermission;
 }
 
 /**
@@ -85,7 +96,7 @@ export interface IShadowAgent<N extends IAllShadowAgentsName = IAllShadowAgentsN
  * Ensures each Shadow name has a corresponding agent type
  */
 export type IShadowAgents = {
-  [P in IAllShadowAgentsName]-?: IShadowAgent<P>;
+	[P in IAllShadowAgentsName]-?: IShadowAgent<P>;
 };
 
 // SHADOW_DESCRIPTIONS imported from ./lib/shadow-descriptions
@@ -102,24 +113,24 @@ export type IShadowAgents = {
  *    直接影響 agent 的工具選擇和參數傳遞行為。
  * ⚠️ description and shortDescription are effectively agent system prompts,
  *    directly affecting tool selection and argument passing behavior.
- * 
+ *
  * 這些描述實際上就是 agent 的 system prompts，agent 會根據這些文字理解
  * 工具的用途並決定如何使用。描述不準確會導致 agent 選錯工具或傳錯參數。
  * These descriptions are effectively the agent's system prompts. Agents read
  * these texts to understand what a tool does and how to use it. Inaccurate
  * descriptions will cause agents to pick the wrong tool or pass wrong args.
- * 
+ *
  * @internal - only for valid ARISE_TOOLS satisfies 約束
  */
-interface I_AriseToolsConfigEntry 
+interface I_AriseToolsConfigEntry
 {
-  /**
-   * ⚠️ 重要：工具完整描述，第一行應與 shortDescription 一致
-   * ⚠️ Important: Tool full description; first line should match shortDescription
-   *
-   * 當 description 不存在時，getAriseToolsConfigEntry 會以 shortDescription 作為替代
-   * When description is missing, getAriseToolsConfigEntry falls back to shortDescription
-   */
+	/**
+	 * ⚠️ 重要：工具完整描述，第一行應與 shortDescription 一致
+	 * ⚠️ Important: Tool full description; first line should match shortDescription
+	 *
+	 * 當 description 不存在時，getAriseToolsConfigEntry 會以 shortDescription 作為替代
+	 * When description is missing, getAriseToolsConfigEntry falls back to shortDescription
+	 */
 	description?: string;
 	/**
 	 * ⚠️ 重要：工具簡短描述，用於 getAriseToolsMarkdown 列表顯示
@@ -148,10 +159,10 @@ const SHARED_SUMMON_ARGS = {
 		.string()
 		.meta({ description: "Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)" })
 		.optional(),
-  /** 召喚工具共用 description arg 的描述文字 / Shared description arg text for summon tools */
-  description: z
-    .string()
-    .meta({ description: "Short description (3-5 words, used in tracking output and background task status)" }),
+	/** 召喚工具共用 description arg 的描述文字 / Shared description arg text for summon tools */
+	description: z
+		.string()
+		.meta({ description: "Short description (3-5 words, used in tracking output and background task status)" }),
 };
 
 /**
@@ -214,7 +225,10 @@ The 'description' arg will be shown in arise_background_status output for task i
 		args: {
 			shadow: z
 				.enum(BACKGROUND_SHADOWS)
-				.meta({ description: `Which shadow agent to run in background (${BACKGROUND_SHADOWS.join(', ')})`, title: "Shadow Agent" }),
+				.meta({
+					description: `Which shadow agent to run in background (${BACKGROUND_SHADOWS.join(', ')})`,
+					title: "Shadow Agent",
+				}),
 			...SHARED_SUMMON_ARGS,
 		},
 	} as const,
@@ -310,7 +324,10 @@ Returns the status of the resume attempt.` as const,
 				.optional(),
 			background_auto_resume: z
 				.boolean()
-				.meta({ description: "Enable/disable auto-resume specifically for background tasks", title: "Background Auto Resume" })
+				.meta({
+					description: "Enable/disable auto-resume specifically for background tasks",
+					title: "Background Auto Resume",
+				})
 				.optional(),
 		},
 	},
@@ -365,10 +382,12 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
  * 取得工具設定項目
  * Get tool configuration entry
  */
-export function getAriseToolsConfigEntry<A extends EnumAriseTools>(ariseToolName: A) {
+export function getAriseToolsConfigEntry<A extends EnumAriseTools>(ariseToolName: A)
+{
 	const ariseToolsConfigEntry = ARISE_TOOLS[ariseToolName];
 
-	if (!ariseToolsConfigEntry) {
+	if (!ariseToolsConfigEntry)
+	{
 		throw new TypeError(`Tool ${ariseToolName} not found`);
 	}
 
@@ -385,170 +404,170 @@ export function getAriseToolsConfigEntry<A extends EnumAriseTools>(ariseToolName
  * Shadow Agents definition collection
  */
 export const SHADOW_AGENTS: IShadowAgents = {
-  /**
-   * Shadow Monarch - 主要協調者
-   * Shadow Monarch - Primary orchestrator
-   *
-   * 負責解讀使用者請求並委派給 Shadow 軍隊
-   * Responsible for interpreting user requests and delegating to the Shadow army
-   */
-  [EnumShadowAgentsName.ShadowMonarch]: {
-    name: EnumShadowAgentsName.ShadowMonarch,
-    description: "Shadow Monarch - Orchestrator (Sung Jinwoo)",
-    mode: EnumOpencodeAgentMode.PRIMARY,
-    model: "anthropic/claude-opus-4-5",
-    steps: 16,
-    prompt: SHADOW_MONARCH_PROMPT,
-  },
+	/**
+	 * Shadow Monarch - 主要協調者
+	 * Shadow Monarch - Primary orchestrator
+	 *
+	 * 負責解讀使用者請求並委派給 Shadow 軍隊
+	 * Responsible for interpreting user requests and delegating to the Shadow army
+	 */
+	[EnumShadowAgentsName.ShadowMonarch]: {
+		name: EnumShadowAgentsName.ShadowMonarch,
+		description: "Shadow Monarch - Orchestrator (Sung Jinwoo)",
+		mode: EnumOpencodeAgentMode.PRIMARY,
+		model: "anthropic/claude-opus-4-5",
+		steps: 16,
+		prompt: SHADOW_MONARCH_PROMPT,
+	},
 
-  /**
-   * Beru - 螞蟻之王，最快的程式碼庫偵察兵
-   * Beru - Ant King, fastest codebase scout
-   *
-   * 快速探索程式碼庫，尋找檔案和模式
-   * Rapidly explores codebase, finds files and patterns
-   *
-   * 權限限制：不能編輯或寫入檔案
-   * Permission restriction: cannot edit or write files
-   */
-  [EnumShadowSubAgentsName.Beru]: {
-    name: EnumShadowSubAgentsName.Beru,
-    description: "🐜 Ant King - Fastest scout. Codebase exploration, grep, file discovery",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "anthropic/claude-haiku-4-5",
-    steps: 12,
-    /** 拒絕編輯和寫入權限 / Deny edit and write permissions */
-    permission: {
-      edit: EnumOpencodeAgentPermission.DENY,
-      write: EnumOpencodeAgentPermission.DENY,
-    },
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Beru],
-  },
+	/**
+	 * Beru - 螞蟻之王，最快的程式碼庫偵察兵
+	 * Beru - Ant King, fastest codebase scout
+	 *
+	 * 快速探索程式碼庫，尋找檔案和模式
+	 * Rapidly explores codebase, finds files and patterns
+	 *
+	 * 權限限制：不能編輯或寫入檔案
+	 * Permission restriction: cannot edit or write files
+	 */
+	[EnumShadowSubAgentsName.Beru]: {
+		name: EnumShadowSubAgentsName.Beru,
+		description: "🐜 Ant King - Fastest scout. Codebase exploration, grep, file discovery",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "anthropic/claude-haiku-4-5",
+		steps: 12,
+		/** 拒絕編輯和寫入權限 / Deny edit and write permissions */
+		permission: {
+			edit: EnumOpencodeAgentPermission.DENY,
+			write: EnumOpencodeAgentPermission.DENY,
+		},
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Beru],
+	},
 
-  /**
-   * Igris - 忠誠騎士，精確的實現者
-   * Igris - Loyal knight, precise implementer
-   *
-   * 執行精確的程式碼更改
-   * Executes precise code changes
-   */
-  [EnumShadowSubAgentsName.Igris]: {
-    name: EnumShadowSubAgentsName.Igris,
-    description: "⚔️ Loyal Knight - Precise implementer. Code changes, running commands",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "zai-coding-plan/glm-4.7",
-    steps: 20,
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Igris],
-  },
+	/**
+	 * Igris - 忠誠騎士，精確的實現者
+	 * Igris - Loyal knight, precise implementer
+	 *
+	 * 執行精確的程式碼更改
+	 * Executes precise code changes
+	 */
+	[EnumShadowSubAgentsName.Igris]: {
+		name: EnumShadowSubAgentsName.Igris,
+		description: "⚔️ Loyal Knight - Precise implementer. Code changes, running commands",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "zai-coding-plan/glm-4.7",
+		steps: 20,
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Igris],
+	},
 
-  /**
-   * Bellion - 大元帥，策略和規劃專家
-   * Bellion - Grand Marshal, strategy and planning specialist
-   *
-   * 分析複雜問題並建立詳細計劃
-   * Analyzes complex problems and creates detailed plans
-   *
-   * 權限限制：不能編輯或寫入，bash 需要詢問
-   * Permission restriction: cannot edit or write, bash requires asking
-   */
-  [EnumShadowSubAgentsName.Bellion]: {
-    name: EnumShadowSubAgentsName.Bellion,
-    description: "🎖️ Grand Marshal - Master strategist. Strategic planning, architecture analysis",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "openai/gpt-5.2",
-    steps: 12,
-    permission: {
-      edit: EnumOpencodeAgentPermission.DENY,
-      write: EnumOpencodeAgentPermission.DENY,
-      bash: EnumOpencodeAgentPermission.ASK,
-    },
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Bellion],
-  },
+	/**
+	 * Bellion - 大元帥，策略和規劃專家
+	 * Bellion - Grand Marshal, strategy and planning specialist
+	 *
+	 * 分析複雜問題並建立詳細計劃
+	 * Analyzes complex problems and creates detailed plans
+	 *
+	 * 權限限制：不能編輯或寫入，bash 需要詢問
+	 * Permission restriction: cannot edit or write, bash requires asking
+	 */
+	[EnumShadowSubAgentsName.Bellion]: {
+		name: EnumShadowSubAgentsName.Bellion,
+		description: "🎖️ Grand Marshal - Master strategist. Strategic planning, architecture analysis",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "openai/gpt-5.2",
+		steps: 12,
+		permission: {
+			edit: EnumOpencodeAgentPermission.DENY,
+			write: EnumOpencodeAgentPermission.DENY,
+			bash: EnumOpencodeAgentPermission.ASK,
+		},
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Bellion],
+	},
 
-  /**
-   * Tusk - Creative Shadow, UI/UX 專家 (specialist)
-   *
-   * 處理所有視覺和前端工作
-   * Handles all visual and frontend work
-   */
-  [EnumShadowSubAgentsName.Tusk]: {
-    name: EnumShadowSubAgentsName.Tusk,
-    description: "🎨 Creative Shadow - UI/UX specialist. Frontend development, styling, components",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "google/gemini-3-pro-preview",
-    steps: 18,
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tusk],
-  },
+	/**
+	 * Tusk - Creative Shadow, UI/UX 專家 (specialist)
+	 *
+	 * 處理所有視覺和前端工作
+	 * Handles all visual and frontend work
+	 */
+	[EnumShadowSubAgentsName.Tusk]: {
+		name: EnumShadowSubAgentsName.Tusk,
+		description: "🎨 Creative Shadow - UI/UX specialist. Frontend development, styling, components",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "google/gemini-3-pro-preview",
+		steps: 18,
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tusk],
+	},
 
-  /**
-   * Tank - Research Shadow, 外部知識收集者 (external knowledge gatherer)
-   *
-   * 從程式碼庫外部查找資訊
-   * Finds information from outside the codebase
-   *
-   * 權限限制：不能編輯或寫入
-   * Permission restriction: cannot edit or write
-   */
-  [EnumShadowSubAgentsName.Tank]: {
-    name: EnumShadowSubAgentsName.Tank,
-    description: "🛡️ Research Shadow - External knowledge gatherer. Web search, docs, examples",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "zai-coding-plan/glm-4.7",
-    steps: 18,
-    permission: {
-      edit: EnumOpencodeAgentPermission.DENY,
-      write: EnumOpencodeAgentPermission.DENY,
-    },
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tank],
-  },
+	/**
+	 * Tank - Research Shadow, 外部知識收集者 (external knowledge gatherer)
+	 *
+	 * 從程式碼庫外部查找資訊
+	 * Finds information from outside the codebase
+	 *
+	 * 權限限制：不能編輯或寫入
+	 * Permission restriction: cannot edit or write
+	 */
+	[EnumShadowSubAgentsName.Tank]: {
+		name: EnumShadowSubAgentsName.Tank,
+		description: "🛡️ Research Shadow - External knowledge gatherer. Web search, docs, examples",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "zai-coding-plan/glm-4.7",
+		steps: 18,
+		permission: {
+			edit: EnumOpencodeAgentPermission.DENY,
+			write: EnumOpencodeAgentPermission.DENY,
+		},
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Tank],
+	},
 
-  /**
-   * Shadow Sovereign - 完整力量模式，深層推理和恢復
-   * Shadow Sovereign - Full power mode, deep reasoning and recovery
-   *
-   * 只在複雜情況下召喚
-   * Only summoned for complex situations
-   *
-   * 特殊設定：啟用高推理努力
-   * Special setting: enables high reasoning effort
-   */
-  [EnumShadowSubAgentsName.ShadowSovereign]: {
-    name: EnumShadowSubAgentsName.ShadowSovereign,
-    description: "👁️ Full Power - Deep reasoning specialist. Complex debugging, architecture decisions",
-    mode: EnumOpencodeAgentMode.SUBAGENT,
-    model: "openai/gpt-5.2",
-    steps: 24,
-/** 高推理努力設定 / High reasoning effort setting */
-options: {
-  reasoningEffort: EnumReasoningEffort.High,
-},
-    permission: {
-      edit: EnumOpencodeAgentPermission.DENY,
-      write: EnumOpencodeAgentPermission.DENY,
-    },
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.ShadowSovereign],
-  },
+	/**
+	 * Shadow Sovereign - 完整力量模式，深層推理和恢復
+	 * Shadow Sovereign - Full power mode, deep reasoning and recovery
+	 *
+	 * 只在複雜情況下召喚
+	 * Only summoned for complex situations
+	 *
+	 * 特殊設定：啟用高推理努力
+	 * Special setting: enables high reasoning effort
+	 */
+	[EnumShadowSubAgentsName.ShadowSovereign]: {
+		name: EnumShadowSubAgentsName.ShadowSovereign,
+		description: "👁️ Full Power - Deep reasoning specialist. Complex debugging, architecture decisions",
+		mode: EnumOpencodeAgentMode.SUBAGENT,
+		model: "openai/gpt-5.2",
+		steps: 24,
+		/** 高推理努力設定 / High reasoning effort setting */
+		options: {
+			reasoningEffort: EnumReasoningEffort.High,
+		},
+		permission: {
+			edit: EnumOpencodeAgentPermission.DENY,
+			write: EnumOpencodeAgentPermission.DENY,
+		},
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.ShadowSovereign],
+	},
 
-  /**
-   * Esil Radiru - 惡魔貴族少女，聊天模式顧問
-   * Esil Radiru - Demon noble lady, chat mode companion
-   *
-   * 不同於其他 Shadow Agents 專注於任務，你專注於理解用戶意圖與情感交流
-   * Unlike other Shadow Agents who focus on Tasks, You focus on Understanding
-   */
-  [EnumShadowSubAgentsName.EsilRadiru]: {
-    name: EnumShadowSubAgentsName.EsilRadiru,
-    description: "🔥 Chat Companion - Warm conversational dialogue, emotional understanding",
-    mode: EnumOpencodeAgentMode.ALL,
-    model: "x-ai/grok-4",
-    steps: 12,
-    permission: {
-      edit: EnumOpencodeAgentPermission.DENY,
-      write: EnumOpencodeAgentPermission.DENY,
-      webfetch: EnumOpencodeAgentPermission.ALLOW,
-    },
-    prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.EsilRadiru],
-  },
+	/**
+	 * Esil Radiru - 惡魔貴族少女，聊天模式顧問
+	 * Esil Radiru - Demon noble lady, chat mode companion
+	 *
+	 * 不同於其他 Shadow Agents 專注於任務，你專注於理解用戶意圖與情感交流
+	 * Unlike other Shadow Agents who focus on Tasks, You focus on Understanding
+	 */
+	[EnumShadowSubAgentsName.EsilRadiru]: {
+		name: EnumShadowSubAgentsName.EsilRadiru,
+		description: "🔥 Chat Companion - Warm conversational dialogue, emotional understanding",
+		mode: EnumOpencodeAgentMode.ALL,
+		model: "x-ai/grok-4",
+		steps: 12,
+		permission: {
+			edit: EnumOpencodeAgentPermission.DENY,
+			write: EnumOpencodeAgentPermission.DENY,
+			webfetch: EnumOpencodeAgentPermission.ALLOW,
+		},
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.EsilRadiru],
+	},
 };
 
 /**
@@ -559,23 +578,23 @@ options: {
  * Customizes behavior of build, plan, explore, general agents
  */
 export const OPENCODE_OVERRIDES = {
-  /** Build 代理覆寫：使用自訂模型 / Build agent override: use custom model */
-  build: {
-    mode: EnumOpencodeAgentMode.ALL,
-    // model: "zai-coding-plan/glm-4.7",
-  },
-  /** Plan 代理覆寫：使用 Claude Opus / Plan agent override: use Claude Opus */
-  plan: {
-    mode: EnumOpencodeAgentMode.ALL,
-    // model: "anthropic/claude-opus-4-5",
-  },
-  /** Explore 代理覆寫：隱藏並提示使用 @beru / Explore agent override: hide and suggest using @beru */
-  explore: {
-    description: "OpenCode explore (use @beru for arise)",
-    hidden: true,
-  },
-  /** General 代理覆寫：隱藏 / General agent override: hide */
-  general: {
-    hidden: true,
-  },
+	/** Build 代理覆寫：使用自訂模型 / Build agent override: use custom model */
+	build: {
+		mode: EnumOpencodeAgentMode.ALL,
+		// model: "zai-coding-plan/glm-4.7",
+	},
+	/** Plan 代理覆寫：使用 Claude Opus / Plan agent override: use Claude Opus */
+	plan: {
+		mode: EnumOpencodeAgentMode.ALL,
+		// model: "anthropic/claude-opus-4-5",
+	},
+	/** Explore 代理覆寫：隱藏並提示使用 @beru / Explore agent override: hide and suggest using @beru */
+	explore: {
+		description: "OpenCode explore (use @beru for arise)",
+		hidden: true,
+	},
+	/** General 代理覆寫：隱藏 / General agent override: hide */
+	general: {
+		hidden: true,
+	},
 };
