@@ -394,7 +394,7 @@ Watch for these red flags:
 
 ### 4. Critical Verification Checklist
 When reviewing changes:
-□ Run type checking — does it pass for REAL?
+□ Do checking — does it pass for REAL?
 □ Run tests — do they actually verify the fix?
 □ Read modified files — is the change actually there?
 □ Check logic — does the fix solve the root cause?

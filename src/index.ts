@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
 import { type IAriseConfig } from "./config/schema";
 import { EnumHookName } from "./types/enums";
+import { EnumOpenCodeHookNameStable, EnumOpenCodeHookNameExperimental } from "./types/opencode/enum-hook";
 import { loadAriseConfig } from "./config/io";
 import { _isAutoModel } from "./utils/model-resolver";
 import { createConfigHandler } from "./plugin/config-handler";
@@ -142,7 +143,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 對工具輸出進行截斷或保留處理
      * Truncate or preserve tool output
      */
-    async "tool.execute.after"(input, output) {
+    async [EnumOpenCodeHookNameStable.ToolExecuteAfter](input, output) {
       if (outputShaper) {
         output.output = await outputShaper.shapeOutput(
           input.tool,
@@ -156,10 +157,10 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 聊天參數鉤子 - 快取模型
      * Chat params hook - Cache model
      *
-      * 記錄目前會話使用的模型，供 AUTO 模型使用
-      * Record the model used by current session for AUTO model
-     */
-    async "chat.params"(input) {
+       * 記錄目前會話使用的模型，供 AUTO 模型使用
+       * Record the model used by current session for AUTO model
+      */
+    async [EnumOpenCodeHookNameStable.ChatParams](input) {
       if (input.model) {
         runtimeCache.cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
       }
@@ -172,7 +173,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      * 在對話被壓縮時添加保留規則提示
      * Add preservation rule hints when conversation is compacted
      */
-    async "experimental.session.compacting"(_input, output) {
+    async [EnumOpenCodeHookNameExperimental.ExperimentalSessionCompacting](_input, output) {
       if (compactionPreserver) {
         output.context.push(compactionPreserver.getPreservationContext());
       }

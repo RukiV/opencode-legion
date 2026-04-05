@@ -9,7 +9,7 @@
 import type { ITSRequiredWith } from 'ts-type';
 import { EnumAriseTools } from '../../types/enums';
 import { ARISE_TOOLS } from '../shadows';
-import { getAriseToolsMarkdown } from './tool-descriptions';
+import { getAriseToolsMarkdown } from './arise-tools-descriptions';
 
 /**
  * 取得工具列表的格式化字串 (含 OpenCode 內建 task 工具)

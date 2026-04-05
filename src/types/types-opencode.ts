@@ -170,9 +170,6 @@ export const enum EnumShadowAgentPermissionKey
 	/** LSP 查詢 (currently non-granular) / Run LSP queries */
 	Lsp = 'lsp',
 
-	/** 執行中提問 / Ask the user questions during execution */
-	Question = 'question',
-
 	/** 請求 URL (matches URL) / Fetch a URL */
 	Webfetch = 'webfetch',
 
@@ -206,6 +203,9 @@ export const enum EnumShadowAgentPermissionKeyInvalid
 
 	/** 相同工具呼叫重複 3 次 / Same tool call repeats 3 times with identical input */
 	DoomLoop = 'doom_loop',
+
+	/** 執行中提問 / Ask the user questions during execution */
+	Question = 'question',
 }
 
 export const SHADOW_AGENT_PERMISSION_KEY_INVALID = [

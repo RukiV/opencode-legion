@@ -19,7 +19,7 @@ import {
 import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
-import { SHADOW_PROMPTS } from './lib/prompts';
+import { SHADOW_PROMPTS } from './lib/shadow-prompts';
 import { IShadowAgentPermission } from '../types/types-opencode';
 
 // Import from lib files
@@ -33,9 +33,9 @@ import {
 	suggestShadowAgent,
 	getAllShadowNames,
 } from './lib/shadow-descriptions';
-import { TOOL_SHORT_DESCRIPTIONS } from './lib/tool-descriptions';
+import { TOOL_SHORT_DESCRIPTIONS } from './lib/arise-tools-descriptions';
 import { getAriseToolsSection } from './lib/arise-tools-utils';
-import { SHADOW_MONARCH_PROMPT } from './lib/shadow-monarch-prompt';
+import { SHADOW_MONARCH_PROMPT } from './lib/shadow-prompt-monarch';
 import { createSummoningStrategy } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
 

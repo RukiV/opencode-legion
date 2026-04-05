@@ -7,7 +7,7 @@
  */
 
 import { describe, expect, it } from "bun:test";
-import { SHADOW_PROMPTS } from "./prompts";
+import { SHADOW_PROMPTS } from "./shadow-prompts";
 import { EnumShadowSubAgentsName } from "../../types/enums";
 import { SHADOW_DESCRIPTIONS } from "./shadow-descriptions";
 import { tsObjectEntries } from "ts-type-object-entries";
