@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.32](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.31...@bluelovers/opencode-arise@0.1.32) (2026-04-05)
+
+
+### BREAKING CHANGES
+
+* **config:** 移除會導致崩潰的權限鍵值並新增除錯日誌
+
+
+
+### 🐛　Bug Fixes
+
+* **config:** 移除會導致崩潰的權限鍵值並新增除錯日誌 ([0e924f1](https://github.com/bluelovers/opencode-arise/commit/0e924f19229243c1924dff9217c4e0d60aa24344))
+
+
+
 ## [0.1.31](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.30...@bluelovers/opencode-arise@0.1.31) (2026-04-04)
 
 
