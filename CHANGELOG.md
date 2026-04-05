@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.33](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.32...@bluelovers/opencode-arise@0.1.33) (2026-04-05)
+
+
+
+### 🐛　Bug Fixes
+
+* **config:** 修正權限類型拼寫並新增無效鍵值檢測 ([92decf1](https://github.com/bluelovers/opencode-arise/commit/92decf120574175d7e16d27b91023e9f2fa30a48))
+
+
+### ✨　Features
+
+* **cache:** 新增 RuntimeCache 類別實作階段快取系統 ([a32dcec](https://github.com/bluelovers/opencode-arise/commit/a32dcec6d84199b53aeafa4ccc3c44c9695cdd4d))
+
+
+
 ## [0.1.32](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.31...@bluelovers/opencode-arise@0.1.32) (2026-04-05)
 
 
