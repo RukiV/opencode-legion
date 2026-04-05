@@ -1,5 +1,7 @@
 
-import { IShadowAgentPermission } from "../../types/types-opencode";
+import { EnumShadowAgentsName } from "../../types/enums";
+import { IShadowAgentPermission, SHADOW_AGENT_PERMISSION_KEY_INVALID } from "../../types/types-opencode";
+import { logArise2WithLevel } from "../../utils/debug-control";
 
 /**
  * 處理 Shadow Agent 權限的相容性
@@ -18,10 +20,23 @@ import { IShadowAgentPermission } from "../../types/types-opencode";
  * @param permission - 原始權限物件 / Original permission object
  * @returns 處理後的權限物件 / Processed permission object
  */
-export function _handlePermission<T extends IShadowAgentPermission>(permission: T) 
+export function _handlePermission<T extends IShadowAgentPermission>(permission: T, runtime?: {
+  agentsName?: EnumShadowAgentsName;
+}) 
 {
   permission.edit = permission.edit ?? permission.write;
   permission.write = permission.write ?? permission.edit;
+
+  Object.keys(permission).forEach(key => {
+    if (SHADOW_AGENT_PERMISSION_KEY_INVALID.includes(key as any)) {
+      logArise2WithLevel('error', () => [
+        `[utils] _handlePermission: Invalid permission key: ${key}, value: ${permission[key as keyof T]}`,
+        runtime?.agentsName && `, agentsName: ${runtime.agentsName}`,
+      ], {
+        force: true,
+      });
+    }
+  });
 
   return permission;
 }

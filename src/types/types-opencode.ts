@@ -181,10 +181,6 @@ export const enum EnumShadowAgentPermissionKey
 
 	/** 代碼搜尋 (matches query) / Code search */
 	Codesearch = 'codesearch',
-
-	
-
-	
 }
 
 /**
@@ -200,7 +196,7 @@ export const enum EnumShadowAgentPermissionKey2
 /**
  * 會導致 設定崩潰 的權限設定
  */
-export const enum EnumShadowAgentPermissionKeyINvalid
+export const enum EnumShadowAgentPermissionKeyInvalid
 {
 	/** 啟動子代理 (matches subagent type) / Launch subagents */
 	Task = 'task',
@@ -211,6 +207,12 @@ export const enum EnumShadowAgentPermissionKeyINvalid
 	/** 相同工具呼叫重複 3 次 / Same tool call repeats 3 times with identical input */
 	DoomLoop = 'doom_loop',
 }
+
+export const SHADOW_AGENT_PERMISSION_KEY_INVALID = [
+	EnumShadowAgentPermissionKeyInvalid.Task,
+	EnumShadowAgentPermissionKeyInvalid.ExternalDirectory,
+	EnumShadowAgentPermissionKeyInvalid.DoomLoop,
+] as ITSTypeAndStringLiteral<EnumShadowAgentPermissionKeyInvalid>[];
 
 export type IShadowAgentPermissionCore<P extends string> = Record<P, EnumOpencodeAgentPermission>;
 
@@ -235,5 +237,5 @@ export type IShadowAgentPermission = ITSPartialRecord<ITSTypeAndStringLiteral<En
 	/**
 	 * 會導致 設定崩潰 的權限設定
 	 */
-	& ITSPartialRecord<EnumShadowAgentPermissionKeyINvalid, never>
+	& ITSPartialRecord<EnumShadowAgentPermissionKeyInvalid, never>
 	;
