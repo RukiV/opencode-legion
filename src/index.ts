@@ -49,6 +49,8 @@ function isHookEnabled(config: IAriseConfig, hookName: EnumHookName): boolean {
  * 3. Register custom tools
  * 4. Configure Shadow Agents
  * 5. Handle various events
+ * 
+ * @see https://opencode.ai/docs/zh-tw/plugins/
  */
 const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
   logArise2WithLevel('info', () => [`${PLUGIN_NAME}@${PLUGIN_VERSION_STRING} initializing...`]);

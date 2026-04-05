@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.35](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.34...@bluelovers/opencode-arise@0.1.35) (2026-04-05)
+
+
+
+### 📚　Documentation
+
+* **opencode:** 新增 OpenCode 設定參考文件及執行期設定分析 ([3797395](https://github.com/bluelovers/opencode-arise/commit/3797395067d817270a0ae1d4308e5cafbe09af9c))
+* **permission:** 新增權限鍵值安全說明文件 ([e5ab68b](https://github.com/bluelovers/opencode-arise/commit/e5ab68b707f69abdcf46629fe2f09793c50c587f))
+
+
+
 ## [0.1.34](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.33...@bluelovers/opencode-arise@0.1.34) (2026-04-05)
 
 **Note:** Version bump only for package @bluelovers/opencode-arise
