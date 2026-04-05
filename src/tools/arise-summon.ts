@@ -1,6 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { IAriseConfig } from "../config/schema";
-import { EnumAriseTools } from '../types/enums';
+import type { ISessionRecord } from "../types/session";
+import { EnumAriseTools, BackgroundTaskStatus } from '../types/enums';
 import { EnumLogLevel } from "../types/enum-opencode";
 import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
@@ -53,6 +54,9 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
       /** 任務描述（用於顯示）/ Task description (for display) */
       const taskDesc = description ?? `${shadow} task`;
 
+      /** Session ID（可能在 catch 块中使用）/ Session ID (may be used in catch block) */
+      let sessionId: string | undefined;
+
       try {
         /**
          * 狀態日誌：開始召喚
@@ -74,7 +78,7 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
           body: { title: formatAriseMsgTitle(taskDesc) },
         });
 
-        const sessionId = session.data?.id;
+        sessionId = session.data?.id;
         if (!sessionId) {
           /**
            * 狀態日誌：建立 session 失敗
@@ -106,6 +110,26 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
           `[arise-summon]`,
           `Model resolved: ${formatModelBodyDescription(modelBody)}, sessionId=${sessionId}`,
         ], { force: true });
+
+        /**
+         * 更新 session 记录（添加 shadow 和 parentSessionId）
+         * Update session record (add shadow and parentSessionId)
+         *
+         * 从 chat.params hook 已经记录了基础资讯，这里补充 Arise 追加的资讯
+         */
+        const existingRecord = runtimeCache.getSessionRecord(sessionId);
+        if (existingRecord) {
+          const updatedRecord: ISessionRecord = {
+            ...existingRecord,
+            _arise: {
+              ...existingRecord._arise,
+              shadow: shadow,
+              parentSessionId: context.sessionID,
+              resolvedModel: formatModelBodyDescription(modelBody),
+            },
+          };
+          runtimeCache.cacheSessionRecord(updatedRecord);
+        }
 
         /**
          * 輸出召喚日誌
@@ -236,6 +260,9 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
             ?.filter((m) => m.info.role === "assistant")
             .pop();
 
+          /** 更新 session 记录状态为已完成 / Update session record status to completed */
+          runtimeCache.updateSessionStatus(sessionId, BackgroundTaskStatus.Completed);
+
           if (lastAssistant) {
             /**
              * 從訊息 parts 中提取文字內容
@@ -263,6 +290,12 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
          * Safely extract error message
          */
         const message = getErrorMessage(error);
+
+        /** 更新 session 记录状态为错误（如果 sessionId 存在）/ Update session record status to error (if sessionId exists) */
+        if (sessionId) {
+          runtimeCache.updateSessionStatus(sessionId, BackgroundTaskStatus.Error, message);
+        }
+
         return formatAriseMsgError(`Failed to summon ${shadow}: ${message}`);
       }
     },

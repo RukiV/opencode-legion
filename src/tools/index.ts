@@ -35,7 +35,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		/** 取得背景任務輸出工具 / Get background task output tool */
 		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT]: createAgentToolAriseBackgroundOutput(backgroundManager),
 		/** 列出背景任務狀態工具 / List background task status tool */
-		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: createAgentToolAriseBackgroundStatus(backgroundManager),
+		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: createAgentToolAriseBackgroundStatus(backgroundManager, ctx),
 		/** 取消背景任務工具 / Cancel background task tool */
 		[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: createAgentToolAriseBackgroundCancel(backgroundManager),
 		/** 列出可用模型工具 / List available models tool @see docs/tools/list-models.md */

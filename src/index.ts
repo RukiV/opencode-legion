@@ -1,6 +1,7 @@
 import type { Plugin, PluginInput, Hooks } from "@opencode-ai/plugin";
+import type { ISessionRecord } from "./types/session";
 import { type IAriseConfig } from "./config/schema";
-import { EnumHookName } from "./types/enums";
+import { EnumHookName, BackgroundTaskStatus } from "./types/enums";
 import { EnumOpenCodeHookNameStable, EnumOpenCodeHookNameExperimental } from "./types/opencode/enum-hook";
 import { loadAriseConfig } from "./config/io";
 import { _isAutoModel } from "./utils/model-resolver";
@@ -161,9 +162,24 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
        * Record the model used by current session for AUTO model
       */
     async [EnumOpenCodeHookNameStable.ChatParams](input) {
+      // 原有逻辑：缓存模型（保持不变）
+      // Original logic: cache model (keep unchanged)
       if (input.model) {
         runtimeCache.cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
       }
+
+      // 新增：记录完整 session 资讯
+      // New: Record complete session information
+      const record: ISessionRecord = {
+        sessionID: input.sessionID,
+        agent: input.agent,
+        model: input.model ? `${input.model.providerID}/${input.model.id}` : undefined,
+        _arise: {
+          createdAt: Date.now(),
+          status: BackgroundTaskStatus.Running,
+        },
+      };
+      runtimeCache.cacheSessionRecord(record);
     },
 
     /**

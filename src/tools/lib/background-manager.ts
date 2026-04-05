@@ -1,5 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
+import type { ISessionRecord } from "../../types/session";
 import {
     getPollInterval,
     getRetryDelayIncrement,
@@ -809,6 +810,23 @@ export class BackgroundManager
     }
 
     /**
+     * 记录 session 资讯
+     * Record session information
+     *
+     * 在 Shadow 任务创建时，记录 shadow、parentSessionId 等资讯
+     */
+    const sessionRecord: ISessionRecord = {
+      sessionID: sessionId,
+      _arise: {
+        shadow: opts.shadow as IAllShadowAgentsName,
+        parentSessionId: opts.parentSessionId,
+        createdAt: Date.now(),
+        status: BackgroundTaskStatus.Running,
+      },
+    };
+    runtimeCache.cacheSessionRecord(sessionRecord);
+
+    /**
      * 建立任務物件
      * Create task object
      */
@@ -1072,6 +1090,12 @@ export class BackgroundManager
           ]);
 
           await this.notifyParent(task);
+
+          /**
+           * 更新 session 状态为 completed
+           * Update session status to completed
+           */
+          runtimeCache.updateSessionStatus(task.sessionId, BackgroundTaskStatus.Completed);
         }
         /**
          * Session busy/retry = 任務仍在執行，增加重試次數並繼續輪詢
@@ -1106,12 +1130,24 @@ export class BackgroundManager
         task.status = BackgroundTaskStatus.Completed;
         task.completedAt = Date.now();
         await this.notifyParent(task);
+
+        /**
+         * 更新 session 状态为 completed（容错路径）
+         * Update session status to completed (fault tolerance path)
+         */
+        runtimeCache.updateSessionStatus(task.sessionId, BackgroundTaskStatus.Completed);
       }
     } catch (err)
     {
       task.status = BackgroundTaskStatus.Error;
       task.error = getErrorMessage(err);
       task.completedAt = Date.now();
+
+      /**
+       * 更新 session 状态为 error
+       * Update session status to error
+       */
+      runtimeCache.updateSessionStatus(task.sessionId, BackgroundTaskStatus.Error, task.error);
 
       const resumeCheck = this.checkAutoResume(task);
 

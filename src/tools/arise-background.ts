@@ -1,4 +1,4 @@
-import type { ToolContext } from "@opencode-ai/plugin";
+import type { PluginInput, ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./lib/background-manager";
 import { BackgroundTaskStatus } from "../types/enums";
 import { EnumAriseTools } from "../types/enums";
@@ -14,7 +14,8 @@ import {
   formatAriseMsgInfo,
   formatAriseMsgMulti,
 } from "../utils/string/arise-message";
-import { createAgentToolListModels } from './arise-list-models';
+import { runtimeCache } from "../utils/session/session-cache";
+import type { ISessionRecord } from "../types/session";
 
 /**
  * 建立背景任務工具
@@ -192,8 +193,9 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
  * Used to list all background tasks and their status
  *
  * @param manager - BackgroundManager 實例
+ * @param ctx - Plugin 上下文（用於 SDK 查詢）
  */
-export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager) {
+export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager, ctx?: PluginInput) {
 
   const {
     description,
@@ -205,6 +207,125 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager)
     args,
 
     async execute(args, context: ToolContext) {
+      // 1. 如果提供了 session_id，查询特定 session 记录
+      if (args.session_id) {
+        /**
+         * 狀態日誌：查詢特定 session
+         * Status log: querying specific session
+         */
+        logArise2WithLevel("debug", () => [
+          `[arise-background-status]`,
+          `Querying session: session_id=${args.session_id}, include_full_info=${args.include_full_info ?? false}`,
+        ], { force: true });
+
+        let record = runtimeCache.getSessionRecord(args.session_id);
+
+        /**
+         * 如果本地没有记录，尝试使用 SDK 查询
+         * If local record not found, try SDK query
+         */
+        if (!record) {
+          /**
+           * 狀態日誌：本地記錄不存在，嘗試 SDK 查詢
+           * Status log: local record not found, trying SDK query
+           */
+          logArise2WithLevel("debug", () => [
+            `[arise-background-status]`,
+            `Local record not found, attempting SDK query: session_id=${args.session_id}`,
+          ], { force: true });
+
+          // 检查是否有 context 可用
+          if (ctx?.client?.session?.messages) {
+            try {
+              const messages = await ctx.client.session.messages({
+                path: { id: args.session_id },
+              });
+
+              // 从第一条消息获取资讯
+              const firstMessage = messages.data?.[0];
+              if (firstMessage?.info) {
+                /**
+                 * 狀態日誌：SDK 查詢成功，構建記錄
+                 * Status log: SDK query successful, building record
+                 */
+                logArise2WithLevel("debug", () => [
+                  `[arise-background-status]`,
+                  `SDK query successful for session: ${args.session_id}`,
+                ], { force: true });
+
+                // 类型断言：SDK 返回的消息包含 info 字段
+                const messageInfo = firstMessage.info as {
+                  agent?: string;
+                  model?: string;
+                } | undefined;
+
+                // 构建从 SDK 获取的记录
+                const sdkRecord: ISessionRecord = {
+                  sessionID: args.session_id,
+                  agent: messageInfo?.agent,
+                  model: messageInfo?.model,
+                  _arise: {
+                    // SDK 查询无法确定状态，保持 undefined
+                    status: undefined,
+                  },
+                };
+
+                record = sdkRecord;
+              } else {
+                /**
+                 * 狀態日誌：SDK 查詢返回空結果
+                 * Status log: SDK query returned empty result
+                 */
+                logArise2WithLevel("debug", () => [
+                  `[arise-background-status]`,
+                  `SDK query returned no messages: session_id=${args.session_id}`,
+                ], { force: true });
+              }
+            } catch (e) {
+              /**
+               * 狀態日誌：SDK 查詢失敗
+               * Status log: SDK query failed
+               */
+              logArise2WithLevel("debug", () => [
+                `[arise-background-status]`,
+                `SDK query failed: session_id=${args.session_id}, error=${getErrorMessage(e)}`,
+              ], { force: true });
+
+              return formatAriseMsgError(`Session not found: ${args.session_id}. Also SDK query failed: ${getErrorMessage(e)}`);
+            }
+          }
+
+          // 如果仍然没有记录，返回错误
+          if (!record) {
+            return formatAriseMsgError(`Session not found: ${args.session_id}`);
+          }
+        }
+
+        // 如果需要完整资讯
+        if (args.include_full_info) {
+          const details = [
+            `Agent: ${record.agent ?? "(none)"}`,
+            `Model: ${record.model ?? "(none)"}`,
+            `Shadow: ${record._arise?.shadow ?? "(none)"}`,
+            `Resolved Model: ${record._arise?.resolvedModel ?? "(none)"}`,
+            `Status: ${record._arise?.status ?? "unknown"}`,
+            `Parent Session: ${record._arise?.parentSessionId ?? "(none)"}`,
+            `Created: ${record._arise?.createdAt ? new Date(record._arise.createdAt).toISOString() : "(none)"}`,
+            `Completed: ${record._arise?.completedAt ? new Date(record._arise.completedAt).toISOString() : "(none)"}`,
+            record._arise?.error ? `Error: ${record._arise.error}` : "",
+          ].filter(Boolean).join("\n");
+
+          return formatAriseMsgSuccessMultiLine(`Session: ${record.sessionID}`, details);
+        }
+
+        // 简化输出
+        return formatAriseMsgSuccessMultiLine(
+          `Session: ${record.sessionID}`,
+          `Shadow: ${record._arise?.shadow ?? "(none)"}\nStatus: ${record._arise?.status ?? "unknown"}`
+        );
+      }
+
+      // 2. 原有的任务列表查询逻辑（保持不变）
       /**
        * 狀態日誌：查詢任務列表
        * Status log: querying task list

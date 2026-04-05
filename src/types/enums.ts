@@ -217,6 +217,8 @@ export const ALLOWED_AUTO_RESUME_TARGET = [
  */
 export enum BackgroundTaskStatus
 {
+	/** 等待中 / Pending */
+	Pending = "pending",
 	/** 執行中 / Running */
 	Running = "running",
 	/** 已完成 / Completed */

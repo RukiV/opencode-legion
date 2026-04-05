@@ -280,6 +280,14 @@ Use this to check which tasks are still running before calling arise_background_
 				.boolean()
 				.meta({ description: "Only show tasks from current session", title: "Current Session Only" })
 				.optional(),
+			session_id: z
+				.string()
+				.meta({ description: "Query specific session ID to get its record", title: "Session ID" })
+				.optional(),
+			include_full_info: z
+				.boolean()
+				.meta({ description: "Include full session information (model, agent, etc.)", title: "Include Full Info" })
+				.optional(),
 		},
 	},
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: {
