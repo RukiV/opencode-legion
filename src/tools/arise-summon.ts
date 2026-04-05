@@ -1,6 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import type { IAriseConfig } from "../config/schema";
 import type { ISessionRecord } from "../types/session";
+import type { BackgroundManager } from "./lib/background-manager";
 import { EnumAriseTools, BackgroundTaskStatus } from '../types/enums';
 import { EnumLogLevel } from "../types/enum-opencode";
 import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
@@ -26,9 +27,14 @@ import { runtimeCache } from '../utils/session/session-cache';
  *
  * @param ctx - Plugin 上下文
  * @param config - Arise 配置物件
+ * @param manager - BackgroundManager 實例（用於 run_in_background=true 時建立任務追蹤）
  * @returns Arise Agent 工具定義
  */
-export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseConfig)
+export function createAgentToolAriseSyncSummon(
+	ctx: PluginInput,
+	config: IAriseConfig,
+	manager: BackgroundManager
+)
 {
 	const {
 		description,
@@ -163,68 +169,60 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
 				 * run_in_background: 非同步執行，立即返回
 				 * run_in_background: Execute async, return immediately
 				 */
-				if (run_in_background)
-				{
-					/**
-					 * 狀態日誌：開始非同步執行
-					 * Status log: starting async execution
-					 */
-					logArise2WithLevel("debug", () => [
-						`[arise-summon]`,
-						`Starting async execution: sessionId=${sessionId}, shadow=${shadow}`,
-					], { force: true });
+			if (run_in_background)
+			{
+				/**
+				 * 狀態日誌：開始非同步執行
+				 * Status log: starting async execution
+				 */
+				logArise2WithLevel("debug", () => [
+					`[arise-summon]`,
+					`Starting async execution with BackgroundManager: sessionId=${sessionId}, shadow=${shadow}`,
+				], { force: true });
 
-					/**
-					 * 非同步模式（Fire and forget）
-					 * Async mode (Fire and forget)
-					 *
-					 * 立即返回，Shadow 在背景執行
-					 * Return immediately, Shadow executes in background
-					 */
-					ctx.client.session.promptAsync({
-							path: { id: sessionId },
-							body: {
-								agent: shadow,
-								model: modelBody,
-								parts: [{ type: "text", text: prompt }],
-							},
-						})
-						.then(() =>
-						{
-							/**
-							 * 狀態日誌：非同步執行完成（Promise resolved）
-							 * Status log: async execution completed (Promise resolved)
-							 */
-							logArise2WithLevel("debug", () => [
-								`[arise-summon]`,
-								`Async execution resolved: sessionId=${sessionId}, shadow=${shadow}`,
-							], { force: true });
-						})
-						.catch((error) =>
-						{
-							/**
-							 * 狀態日誌：非同步執行錯誤
-							 * Status log: async execution error
-							 */
-							logArise2WithLevel("error", () => [
-								`[arise-summon]`,
-								`Async execution failed: sessionId=${sessionId}, shadow=${shadow}, error=${getErrorMessage(error)}`,
-							], { force: true });
+			/**
+			 * 使用 BackgroundManager 建立完整追蹤的任務
+			 * Use BackgroundManager to create fully tracked task
+			 *
+			 * 表面維持 fire-and-forget 外觀，但實際上建立完整追蹤
+			 * Maintains fire-and-forget appearance on surface, but creates full tracking internally
+			 *
+			 * 傳入現有的 sessionId，避免重複建立 session
+			 * Pass existing sessionId to avoid duplicate session creation
+			 */
+			const task = await manager.launch({
+				shadow,
+				prompt,
+				description: taskDesc,
+				parentSessionId: context.sessionID,
+				model,
+				existingSessionId: sessionId,
+			});
 
-							ctx.client.app.log?.({
-								body: formatAriseMsgLogBody({
-									label: "Summon failed",
-									message: `Background summon failed for ${shadow}: ${getErrorMessage(error)}`,
-									level: EnumLogLevel.Error,
-								}),
-							});
-						});
+				/**
+				 * 狀態日誌：非同步任務已建立
+				 * Status log: async task created
+				 */
+				logArise2WithLevel("debug", () => [
+					`[arise-summon]`,
+					`Async task created: taskId=${task.id}, sessionId=${sessionId}, shadow=${shadow}`,
+				], { force: true });
 
-					return formatAriseMsgSuccessMultiLine(
-						`Summoned ${shadow} in background.`,
-						`Task: ${taskDesc}\nSession ID: ${sessionId}\n\nThe shadow is working. Continue with your work.`,
-					);
-				}
+				/**
+				 * 返回時顯示 Task ID + Session ID（選項 B）
+				 * Return with Task ID + Session ID displayed (Option B)
+				 */
+				return formatAriseMsgSuccessMultiLine(
+					`Summoned ${shadow} in background.`,
+					`Task ID: ${task.id}
+Session ID: ${task.sessionId}
+Task: ${taskDesc}
+
+The shadow is working. Continue with your work.
+
+Use arise_background_output("${task.id}") or arise_background_output("${task.sessionId}") to retrieve result.`,
+				);
+			}
 				else
 				{
 					/**

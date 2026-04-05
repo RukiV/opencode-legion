@@ -36,7 +36,7 @@ import {
 import { TOOL_SHORT_DESCRIPTIONS } from './lib/arise-tools-descriptions';
 import { getAriseToolsSection } from './lib/arise-tools-utils';
 import { SHADOW_MONARCH_PROMPT } from './lib/shadow-prompt-monarch';
-import { createSummoningStrategy } from './lib/tool-guides';
+import { createSummoningStrategy, TASK_ID_SESSION_ID_FORMAT } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
 
 /**
@@ -197,9 +197,9 @@ ${ALLOWED_SHADOWS.map((name) =>
 
 				`IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
-- run_in_background=true: Returns immediately with a Session ID, BUT there is NO tool to retrieve the result later. Only use for fire-and-forget tasks where you DON'T need the result.
+- run_in_background=true: ⚠️ NOT RECOMMENDED - Returns immediately with Task ID and Session ID, but prefer arise_background for tasks that don't require file editing.
 
-⚠️ For parallel execution WITH retrievable results, use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+⚠️ For tasks that don't need file editing and require retrievable results, use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
 			],
 			footer: [
 				createSummoningStrategy(EnumAriseTools.ARISE_SYNC_SUMMON),
@@ -213,11 +213,11 @@ ${ALLOWED_SHADOWS.map((name) =>
 				.enum(ALLOWED_SHADOWS)
 				.meta({ description: "Which shadow agent to summon" }),
 			...SHARED_SUMMON_ARGS,
-			run_in_background: z
-				.boolean()
-				.meta({ description: "false (DEFAULT) = blocks and returns result directly. true = returns Session ID but NO tool exists to retrieve result later - only use for fire-and-forget. For parallel WITH retrievable results, use arise_background instead." })
-				.optional()
-				.default(false),
+		run_in_background: z
+			.boolean()
+			.meta({ description: "NOT RECOMMENDED: For tasks that don't need file editing and require retrievable results, use arise_background instead. true = fire-and-forget, returns Task ID + Session ID." })
+			.optional()
+			.default(false),
 		},
 	},
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: {
@@ -256,15 +256,15 @@ The 'description' arg will be shown in arise_background_status output for task i
 		description: `Retrieve the completed output from a background shadow agent task.
 
 Returns the shadow agent's final response after task completion. 
-Use arise_background_status first to check if the task is done before calling this tool.
+Use arise_background_status first to check if the task is done.
 
-The task_id must come from a previous arise_background call (format: arise_xxx).` as const,
+${TASK_ID_SESSION_ID_FORMAT}` as const,
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT],
 
 		args: {
 			task_id: z
 				.string()
-				.meta({ description: "The task ID from arise_background (format: arise_xxx)", title: "Task ID" }),
+				.meta({ description: "The task ID to retrieve (format: arise_xxx or ses_xxx)", title: "Task ID" }),
 		},
 	},
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: {
@@ -293,7 +293,9 @@ Use this to check which tasks are still running before calling arise_background_
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: {
 		description: `Cancel a currently running background shadow agent task.
 
-The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.` as const,
+${TASK_ID_SESSION_ID_FORMAT}
+
+Only running tasks can be cancelled; already completed tasks cannot be cancelled.` as const,
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL],
 
 		args: {
@@ -324,6 +326,10 @@ Returns a formatted list of all available models in the format provider/modelID.
 	[EnumAriseTools.ARISE_CONTINUE]: {
 		description: `Actively continue/resume a failed background task.
 
+The task_id can be either:
+- Task ID from arise_background (format: arise_xxx)
+- Session ID from arise_summon with run_in_background=true (format: ses_xxx)
+
 This tool allows agents to manually trigger a retry for a failed task, instead of waiting for passive auto-resume.
 
 Use this when:
@@ -341,7 +347,7 @@ Returns the status of the resume attempt.` as const,
 		args: {
 			task_id: z
 				.string()
-				.meta({ description: "The task ID to resume/continue", title: "Task ID" }),
+				.meta({ description: "The task ID to resume/continue (format: arise_xxx or ses_xxx)", title: "Task ID" }),
 			force: z
 				.boolean()
 				.meta({ description: "Force retry even if task is not in error state", title: "Force Retry" })

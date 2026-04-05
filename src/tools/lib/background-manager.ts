@@ -779,6 +779,7 @@ export class BackgroundManager
 	 * Creates new session and executes prompt asynchronously
 	 *
 	 * @param opts - 任務選項
+	 * @param opts.existingSessionId - 可選的現有 session ID（如果傳入則跳過建立新 session）
 	 * @returns 建立的任務物件
 	 */
 	async launch(opts: {
@@ -787,30 +788,35 @@ export class BackgroundManager
 		description: string;
 		parentSessionId: string;
 		model?: string;
+		existingSessionId?: string;
 	}): Promise<BackgroundTask>
 	{
 		const taskId = this.generateTaskId();
 
 		logArise2WithLevel("debug", () => [
 			`[background-manager]`,
-			`launch: generated taskId=${taskId}, shadow=${opts.shadow}, parentSessionId=${opts.parentSessionId}`,
+			`launch: generated taskId=${taskId}, shadow=${opts.shadow}, parentSessionId=${opts.parentSessionId}, existingSessionId=${opts.existingSessionId ?? "none"}`,
 		]);
 
 		/**
-		 * 為背景任務建立新 session
-		 * Create new session for background task
+		 * 如果傳入了 existingSessionId，則重用該 session；否則建立新 session
+		 * If existingSessionId is provided, reuse it; otherwise create new session
 		 *
 		 * Session title 包含 taskId 以便識別
 		 * Session title includes taskId for identification
 		 */
-		const session = await this.ctx.client.session.create({
-			body: { title: formatAriseMsgSessionTitle(taskId, opts.description) },
-		});
-
-		const sessionId = session.data?.id;
+		let sessionId = opts.existingSessionId;
 		if (!sessionId)
 		{
-			throw new Error("Failed to create background session");
+			const session = await this.ctx.client.session.create({
+				body: { title: formatAriseMsgSessionTitle(taskId, opts.description) },
+			});
+
+			sessionId = session.data?.id;
+			if (!sessionId)
+			{
+				throw new Error("Failed to create background session");
+			}
 		}
 
 		/**
@@ -1314,6 +1320,21 @@ export class BackgroundManager
 	getTask(taskId: string): BackgroundTask | undefined
 	{
 		return this.tasks.get(taskId);
+	}
+
+	/**
+	 * 透過 sessionId 取得任務
+	 * Get task by session ID
+	 *
+	 * 用於支援 arise_summon(true) 建立的 session（ID 格式為 ses_xxx）
+	 * Used to support sessions created by arise_summon(true) (ID format: ses_xxx)
+	 *
+	 * @param sessionId - Session ID (ses_xxx)
+	 * @returns 任務或 undefined
+	 */
+	getTaskBySessionId(sessionId: string): BackgroundTask | undefined
+	{
+		return Array.from(this.tasks.values()).find((t) => t.sessionId === sessionId);
 	}
 
 	/** 取得所有任務 / Get all tasks */

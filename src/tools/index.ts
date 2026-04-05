@@ -29,7 +29,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 {
 	return {
 		/** 同步/非同步召喚 Shadow 工具 / Sync/async summon Shadow tool */
-		[EnumAriseTools.ARISE_SYNC_SUMMON]: createAgentToolAriseSyncSummon(ctx, config),
+		[EnumAriseTools.ARISE_SYNC_SUMMON]: createAgentToolAriseSyncSummon(ctx, config, backgroundManager),
 		/** 啟動背景任務工具 / Launch background task tool */
 		[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: createAgentToolAriseBackgroundTask(backgroundManager),
 		/** 取得背景任務輸出工具 / Get background task output tool */

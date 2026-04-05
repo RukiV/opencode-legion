@@ -118,7 +118,7 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 
 		async execute(args)
 		{
-			const task = manager.getTask(args.task_id);
+			const { task_id } = args;
 
 			/**
 			 * 狀態日誌：查詢任務輸出
@@ -126,8 +126,22 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 			 */
 			logArise2WithLevel("debug", () => [
 				`[arise-background-output]`,
-				`Querying task: taskId=${args.task_id}`,
+				`Querying task: taskId=${task_id}`,
 			], { force: true });
+
+			/** 優先嘗試用 taskId 查詢 / Try taskId first */
+			let task = manager.getTask(task_id);
+
+			/** 如果是 sessionId 格式（ses_xxx）且上面找不到，嘗試用 sessionId 查詢 */
+			if (!task && task_id.startsWith("ses_"))
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-background-output]`,
+					`Task not found by taskId, trying sessionId: taskId=${task_id}`,
+				], { force: true });
+
+				task = manager.getTaskBySessionId(task_id);
+			}
 
 			/** 任務不存在 / Task not found */
 			if (!task)
@@ -513,7 +527,25 @@ export function createAgentToolAriseBackgroundCancel(manager: BackgroundManager)
 				`Cancelling task: taskId=${args.task_id}`,
 			], { force: true });
 
-			const success = await manager.cancelTask(args.task_id);
+			const { task_id } = args;
+
+			/** 優先嘗試用 taskId 取消 / Try cancel by taskId first */
+			let success = await manager.cancelTask(task_id);
+
+			/** 如果是 sessionId 格式且上面失敗，嘗試用 sessionId 查詢後再取消 */
+			if (!success && task_id.startsWith("ses_"))
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-background-cancel]`,
+					`cancelTask failed, trying sessionId: taskId=${task_id}`,
+				], { force: true });
+
+				const task = manager.getTaskBySessionId(task_id);
+				if (task)
+				{
+					success = await manager.cancelTask(task.id);
+				}
+			}
 
 			if (success)
 			{

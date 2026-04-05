@@ -322,3 +322,14 @@ export const TODO_LIST_GUIDE = `## TODO List Management
   - Plan only the current phase (3-5 items max)
   - After completing phase, plan the next phase
   - This avoids over-planning and keeps the list short and flexible` as const;
+
+/**
+ * Task ID / Session ID 格式說明（共用）
+ * Task ID / Session ID format description (shared)
+ *
+ * 用於 arise_background_output, arise_background_cancel, arise_continue 等工具
+ * Used in arise_background_output, arise_background_cancel, arise_continue, etc.
+ */
+export const TASK_ID_SESSION_ID_FORMAT = `The task_id can be either:
+- Task ID from arise_background (format: arise_xxx)
+- Session ID from arise_summon with run_in_background=true (format: ses_xxx)` as const;
