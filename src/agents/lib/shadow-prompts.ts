@@ -24,6 +24,8 @@ import {
 	RESEARCH_TOOLS,
 	NO_EDIT_CONSTRAINTS,
 	SHARED_CONSTRAINTS,
+	TODO_LIST_GUIDE,
+	createSummoningStrategy,
 } from './tool-guides';
 import { RULES_SKILLS_INDEX } from './rules-skills-ref';
 
@@ -189,6 +191,8 @@ When reviewing code changes, check:
 - Naming: Follow project conventions
 - Comments: Follow project conventions
 - Code style: Matches file conventions
+- **Duplicate definitions**: Check for potential duplicates (same name exported multiple times, similar logic repeated)
+- **Circular dependencies**: Check for circular imports between modules
 
 Report any convention violations found.`,
 
@@ -249,6 +253,7 @@ Ask yourself:
 4. Confidence level: [HIGH/MEDIUM/LOW based on verification depth]`,
 	],
 	footer: [
+		TODO_LIST_GUIDE,
 		SEARCH_TOOLS,
 		RESEARCH_TOOLS,
 		`Your wisdom guides the Shadow Army Agents through the most challenging battles.
