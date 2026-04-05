@@ -857,13 +857,20 @@ export class BackgroundManager
     /**
      * 解析模型上下文
      * Resolve model context
-     *
-     * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > AUTO 使用父模型
-     * Priority: User specified > Config model > Shadow default > AUTO use parent model
+      *
+      * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > AUTO 使用父模型
+      * Priority: User specified > Config model > Shadow default > AUTO use parent model
+      */
+    const parentModelIModel = runtimeCache.getSessionModel(opts.parentSessionId);
+    /**
+     * 將 IModelBody 轉換為 string 格式
+     * Convert IModelBody to string format
      */
-    const parentModel = runtimeCache.getSessionModel(opts.parentSessionId);
+    const parentModelStr = parentModelIModel
+      ? `${parentModelIModel.providerID}/${parentModelIModel.modelID}`
+      : undefined;
     const modelBody = resolveModelContext(
-      parentModel,
+      parentModelStr,
       opts.shadow as IAllShadowAgentsName,
       this.config,
       opts.model
@@ -871,7 +878,7 @@ export class BackgroundManager
 
     logArise2WithLevel("debug", () => [
       `[background-manager]`,
-      `launch: resolved model, parentModel=${parentModel ?? "none"}, finalModelBody=${JSON.stringify(modelBody)}`,
+      `launch: resolved model, parentModel=${parentModelStr ?? "none"}, finalModelBody=${JSON.stringify(modelBody)}`,
     ]);
 
     /**
@@ -886,7 +893,7 @@ export class BackgroundManager
       * - resolvedModel: 解析後的模型（providerID/modelID 格式）
       */
     logArise2WithLevel("info", () => [
-      `[Arise] Background launch: ${opts.shadow} with model: ${formatModelBodyDescription(modelBody)} (parent: ${parentModel ?? "none"}), description: ${opts.description}`
+      `[Arise] Background launch: ${opts.shadow} with model: ${formatModelBodyDescription(modelBody)} (parent: ${parentModelStr ?? "none"}), description: ${opts.description}`
     ], {
       force: true
     });

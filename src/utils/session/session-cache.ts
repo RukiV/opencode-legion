@@ -1,4 +1,5 @@
 import type { ISessionRecord } from "../../types/session";
+import type { IModelBody } from "../../types/types-opencode";
 import { BackgroundTaskStatus } from "../../types/enums";
 
 /**
@@ -38,12 +39,6 @@ class RuntimeCache
 	 * Recorded during config initialization, restored to AUTO during call phase to get parent model
 	 */
 	protected _userConfigModelIsAuto = new Set<string>();
-
-	/**
-	 * session 模型缓存（protected）
-	 * Session model cache
-	 */
-	protected _sessionModels = new Map<string, string>();
 
 	/**
 	 * session 记录缓存（protected）
@@ -86,7 +81,7 @@ class RuntimeCache
 	}
 
 	// ============================================================
-	// Session Model API
+	// Session Model API (delegates to Session Records)
 	// ============================================================
 
 	/**
@@ -99,7 +94,24 @@ class RuntimeCache
 	 */
 	cacheSessionModel(sessionId: string, providerId: string, modelId: string): void
 	{
-		this._sessionModels.set(sessionId, `${providerId}/${modelId}`);
+		const modelBody: IModelBody = {
+			providerID: providerId,
+			modelID: modelId,
+		};
+
+		const existing = this._sessionRecords.get(sessionId);
+		if (existing)
+		{
+			existing.model = modelBody;
+		}
+		else
+		{
+			const record: ISessionRecord = {
+				sessionID: sessionId,
+				model: modelBody,
+			};
+			this._sessionRecords.set(sessionId, record);
+		}
 	}
 
 	/**
@@ -107,11 +119,12 @@ class RuntimeCache
 	 * Get session model
 	 *
 	 * @param sessionId - session ID
-	 * @returns 模型名称（provider/model 格式），若无则返回 undefined
+	 * @returns IModelBody，若无则返回 undefined
 	 */
-	getSessionModel(sessionId: string): string | undefined
+	getSessionModel(sessionId: string): IModelBody | undefined
 	{
-		return this._sessionModels.get(sessionId);
+		const record = this._sessionRecords.get(sessionId);
+		return record?.model;
 	}
 
 	// ============================================================
@@ -238,7 +251,6 @@ class RuntimeCache
 	clear(): void
 	{
 		this._userConfigModelIsAuto.clear();
-		this._sessionModels.clear();
 		this._sessionRecords.clear();
 	}
 
@@ -250,7 +262,6 @@ class RuntimeCache
 	 */
 	clearSessionModel(sessionId: string): void
 	{
-		this._sessionModels.delete(sessionId);
 		this._sessionRecords.delete(sessionId);
 	}
 
@@ -260,7 +271,7 @@ class RuntimeCache
 	 */
 	clearAllSessionModels(): void
 	{
-		this._sessionModels.clear();
+		this._sessionRecords.clear();
 	}
 
 	// ============================================================
@@ -277,7 +288,6 @@ class RuntimeCache
 	{
 		return {
 			userConfigModelIsAuto: Array.from(this._userConfigModelIsAuto),
-			sessionModels: Object.fromEntries(this._sessionModels),
 			sessionRecords: Object.fromEntries(this._sessionRecords),
 		};
 	}

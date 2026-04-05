@@ -3,7 +3,7 @@ import type { BackgroundManager } from "./lib/background-manager";
 import { BackgroundTaskStatus } from "../types/enums";
 import { EnumAriseTools } from "../types/enums";
 import { getAriseToolsConfigEntry } from "../agents/lib/arise-tools-utils";
-import { tool2 } from '../types/types-opencode';
+import { tool2, type IModelBody } from '../types/types-opencode';
 import { formatDuration } from "../utils/string/message";
 import { getErrorMessage } from "../utils/error";
 import { logArise2WithLevel } from "../utils/debug-control";
@@ -241,7 +241,7 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
                 path: { id: args.session_id },
               });
 
-              // 从第一条消息获取资讯
+              /** 从第一条消息获取资讯 / Get info from first message */
               const firstMessage = messages.data?.[0];
               if (firstMessage?.info) {
                 /**
@@ -250,25 +250,99 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
                  */
                 logArise2WithLevel("debug", () => [
                   `[arise-background-status]`,
-                  `SDK query successful for session: ${args.session_id}`,
+                  `SDK query successful: session_id=${args.session_id}, hasInfo=${!!firstMessage?.info}, messageCount=${messages.data?.length ?? 0}`,
                 ], { force: true });
 
-                // 类型断言：SDK 返回的消息包含 info 字段
+                /** 
+                 * 类型断言：SDK 返回的消息包含 info 字段
+                 * SDK 类型：UserMessage.model = { providerID, modelID }, AssistantMessage 有 providerID/modelID 分開
+                 * SDK role: UserMessage.role = "user" | AssistantMessage.role = "assistant"
+                 */
                 const messageInfo = firstMessage.info as {
                   agent?: string;
-                  model?: string;
+                  role?: "user" | "assistant";
+                  model?: IModelBody;
+                  providerID?: string;
+                  modelID?: string;
                 } | undefined;
 
-                // 构建从 SDK 获取的记录
+                /**
+                 * 狀態日誌：擷取的訊息內容
+                 * Status log: Extracted message content
+                 */
+                const modelDesc = messageInfo?.model
+                  ? `${messageInfo.model.providerID}/${messageInfo.model.modelID}`
+                  : messageInfo?.providerID && messageInfo?.modelID
+                    ? `${messageInfo.providerID}/${messageInfo.modelID}`
+                    : "none";
+                logArise2WithLevel("debug", () => [
+                  `[arise-background-status]`,
+                  `Message details: agent=${messageInfo?.agent ?? "none"}, role=${messageInfo?.role ?? "none"}, model=${modelDesc}`,
+                ], { force: true });
+
+                /** 从 messageInfo 提取模型资讯（支援两种格式）/ Extract model info from messageInfo (supports two formats) */
+                const extractModel = (): IModelBody | undefined => {
+                  /** 格式 1: UserMessage (model 物件) / Format 1: UserMessage (model object) */
+                  if (messageInfo?.model)
+                  {
+                    const modelObj = messageInfo.model;
+                    /**
+                     * 狀態日誌：使用 UserMessage 格式
+                     * Status log: Using UserMessage format
+                     */
+                    logArise2WithLevel("debug", () => [
+                      `[arise-background-status]`,
+                      `Model format: UserMessage (model object), providerID=${modelObj.providerID}, modelID=${modelObj.modelID}`,
+                    ], { force: true });
+                    return modelObj;
+                  }
+                  /** 格式 2: AssistantMessage (分開的 providerID/modelID) / Format 2: AssistantMessage (separate providerID/modelID) */
+                  if (messageInfo?.providerID && messageInfo?.modelID)
+                  {
+                    /**
+                     * 狀態日誌：使用 AssistantMessage 格式
+                     * Status log: Using AssistantMessage format
+                     */
+                    logArise2WithLevel("debug", () => [
+                      `[arise-background-status]`,
+                      `Model format: AssistantMessage (separate fields), providerID=${messageInfo.providerID}, modelID=${messageInfo.modelID}`,
+                    ], { force: true });
+                    return {
+                      providerID: messageInfo.providerID,
+                      modelID: messageInfo.modelID,
+                    };
+                  }
+                  /**
+                   * 狀態日誌：無法擷取模型資訊
+                   * Status log: Cannot extract model info
+                   */
+                  logArise2WithLevel("debug", () => [
+                    `[arise-background-status]`,
+                    `Model format: None (no valid model info found), available fields: model=${!!messageInfo?.model}, providerID=${!!messageInfo?.providerID}, modelID=${!!messageInfo?.modelID}`,
+                  ], { force: true });
+                  return undefined;
+                };
+
+                /** 构建从 SDK 获取的记录 / Build record from SDK */
                 const sdkRecord: ISessionRecord = {
                   sessionID: args.session_id,
                   agent: messageInfo?.agent,
-                  model: messageInfo?.model,
+                  role: messageInfo?.role,
+                  model: extractModel(),
                   _arise: {
-                    // SDK 查询无法确定状态，保持 undefined
+                    /** SDK 查询无法确定状态，保持 undefined / SDK query cannot determine status, keep undefined */
                     status: undefined,
                   },
                 };
+
+                /**
+                 * 狀態日誌：記錄構建完成
+                 * Status log: Record built
+                 */
+                logArise2WithLevel("debug", () => [
+                  `[arise-background-status]`,
+                  `Record built: sessionID=${sdkRecord.sessionID}, agent=${sdkRecord.agent ?? "none"}, role=${sdkRecord.role ?? "none"}, model=${sdkRecord.model ? `${sdkRecord.model.providerID}/${sdkRecord.model.modelID}` : "none"}`,
+                ], { force: true });
 
                 record = sdkRecord;
               } else {
@@ -295,17 +369,18 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
             }
           }
 
-          // 如果仍然没有记录，返回错误
+          /** 如果仍然没有记录，返回错误 / If still no record, return error */
           if (!record) {
             return formatAriseMsgError(`Session not found: ${args.session_id}`);
           }
         }
 
-        // 如果需要完整资讯
+        /** 如果需要完整资讯 / If full info is requested */
         if (args.include_full_info) {
           const details = [
             `Agent: ${record.agent ?? "(none)"}`,
-            `Model: ${record.model ?? "(none)"}`,
+            `Role: ${record.role ?? "(none)"}`,
+            `Model: ${record.model ? `${record.model.providerID}/${record.model.modelID}` : "(none)"}`,
             `Shadow: ${record._arise?.shadow ?? "(none)"}`,
             `Resolved Model: ${record._arise?.resolvedModel ?? "(none)"}`,
             `Status: ${record._arise?.status ?? "unknown"}`,

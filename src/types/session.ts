@@ -1,4 +1,5 @@
 import type { IAllShadowAgentsName } from "./enums";
+import type { IModelBody } from "./types-opencode";
 import { BackgroundTaskStatus } from "./enums";
 
 /**
@@ -8,6 +9,7 @@ import { BackgroundTaskStatus } from "./enums";
  * 混合了 SDK 原生资讯（从 chat.params hook 取得）+ Arise 追加的资讯
  *
  * @see chat.params hook input: { sessionID, agent, model: { providerID, modelID } }
+ * @see SDK Message types: UserMessage (role: "user") | AssistantMessage (role: "assistant")
  */
 export interface ISessionRecord {
 	// ========== SDK 原生栏位（从 chat.params input 取得）==========
@@ -16,8 +18,10 @@ export interface ISessionRecord {
 	sessionID: string;
 	/** 使用的代理 / Agent used */
 	agent?: string;
-	/** 使用的模型（provider/model 格式）/ Model used */
-	model?: string;
+	/** 使用的模型 / Model used */
+	model?: IModelBody;
+	/** 消息角色 / Message role (SDK: UserMessage.role = "user" | AssistantMessage.role = "assistant") */
+	role?: "user" | "assistant";
 
 	// ========== Arise 追加栏位 ==========
 

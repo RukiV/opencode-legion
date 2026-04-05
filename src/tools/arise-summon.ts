@@ -99,8 +99,15 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
          * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > AUTO 使用父模型 > 父模型 > DEFAULT_MODEL
          * Priority: User specified > Config model > Shadow default > AUTO use parent > parentModel > DEFAULT_MODEL
          */
-        const parentModel = runtimeCache.getSessionModel(context.sessionID);
-        const modelBody = resolveModelContext(parentModel, shadow, config, model);
+        const parentModelIModel = runtimeCache.getSessionModel(context.sessionID);
+        /**
+         * 將 IModelBody 轉換為 string 格式
+         * Convert IModelBody to string format
+         */
+        const parentModelStr = parentModelIModel
+          ? `${parentModelIModel.providerID}/${parentModelIModel.modelID}`
+          : undefined;
+        const modelBody = resolveModelContext(parentModelStr, shadow, config, model);
 
         /**
          * 狀態日誌：解析模型完成

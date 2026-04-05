@@ -173,7 +173,10 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
       const record: ISessionRecord = {
         sessionID: input.sessionID,
         agent: input.agent,
-        model: input.model ? `${input.model.providerID}/${input.model.id}` : undefined,
+        model: input.model ? {
+          providerID: input.model.providerID,
+          modelID: input.model.id,
+        } : undefined,
         _arise: {
           createdAt: Date.now(),
           status: BackgroundTaskStatus.Running,

@@ -62,12 +62,15 @@ function createMockProviders(providers: Array<{ id: string; models: Record<strin
  */
 describe("runtimeCache.cacheSessionModel", () => {
 	test("caches model for session", () => {
-		/** 快取並驗證格式為 provider/modelID / Cache and verify format is provider/modelID */
+		/** 快取並驗證格式為 IModelBody / Cache and verify format is IModelBody */
 		const sessionId = "session-123";
 		runtimeCache.cacheSessionModel(sessionId, "anthropic", "claude-sonnet-4");
 
 		const result = runtimeCache.getSessionModel(sessionId);
-		expect(result).toBe("anthropic/claude-sonnet-4");
+		expect(result).toEqual({
+			providerID: "anthropic",
+			modelID: "claude-sonnet-4",
+		});
 	});
 
 	test("overwrites existing cache", () => {
@@ -77,7 +80,10 @@ describe("runtimeCache.cacheSessionModel", () => {
 		runtimeCache.cacheSessionModel(sessionId, "openai", "gpt-4");
 
 		const result = runtimeCache.getSessionModel(sessionId);
-		expect(result).toBe("openai/gpt-4");
+		expect(result).toEqual({
+			providerID: "openai",
+			modelID: "gpt-4",
+		});
 	});
 
 	test("handles model ID with slashes", () => {
@@ -86,7 +92,10 @@ describe("runtimeCache.cacheSessionModel", () => {
 		runtimeCache.cacheSessionModel(sessionId, "azure", "gpt-4/deployment");
 
 		const result = runtimeCache.getSessionModel(sessionId);
-		expect(result).toBe("azure/gpt-4/deployment");
+		expect(result).toEqual({
+			providerID: "azure",
+			modelID: "gpt-4/deployment",
+		});
 	});
 });
 
@@ -101,13 +110,16 @@ describe("runtimeCache.getSessionModel", () => {
 		expect(result).toBeUndefined();
 	});
 
-	test("returns model string format", () => {
-		/** 返回格式為 provider/modelID / Returns format provider/modelID */
+	test("returns model object format", () => {
+		/** 返回格式為 IModelBody / Returns format IModelBody */
 		const sessionId = "session-test";
 		runtimeCache.cacheSessionModel(sessionId, "provider", "model-id");
 
 		const result = runtimeCache.getSessionModel(sessionId);
-		expect(result).toMatch(/^[^\/]+\/[^\/]+/);
+		expect(result).toEqual({
+			providerID: "provider",
+			modelID: "model-id",
+		});
 	});
 });
 
@@ -136,7 +148,10 @@ describe("runtimeCache.clearSessionModel", () => {
 		runtimeCache.clearSessionModel(session1);
 
 		expect(runtimeCache.getSessionModel(session1)).toBeUndefined();
-		expect(runtimeCache.getSessionModel(session2)).toBe("provider2/model2");
+		expect(runtimeCache.getSessionModel(session2)).toEqual({
+			providerID: "provider2",
+			modelID: "model2",
+		});
 	});
 
 	test("does not throw for non-existent session", () => {
@@ -194,9 +209,18 @@ describe("cache operations", () => {
 		runtimeCache.cacheSessionModel("s2", "openai", "gpt-4");
 		runtimeCache.cacheSessionModel("s3", "google", "gemini-pro");
 
-		expect(runtimeCache.getSessionModel("s1")).toBe("anthropic/claude-3-5");
-		expect(runtimeCache.getSessionModel("s2")).toBe("openai/gpt-4");
-		expect(runtimeCache.getSessionModel("s3")).toBe("google/gemini-pro");
+		expect(runtimeCache.getSessionModel("s1")).toEqual({
+			providerID: "anthropic",
+			modelID: "claude-3-5",
+		});
+		expect(runtimeCache.getSessionModel("s2")).toEqual({
+			providerID: "openai",
+			modelID: "gpt-4",
+		});
+		expect(runtimeCache.getSessionModel("s3")).toEqual({
+			providerID: "google",
+			modelID: "gemini-pro",
+		});
 	});
 
 	test("clear one preserves others", () => {
@@ -206,7 +230,10 @@ describe("cache operations", () => {
 		runtimeCache.clearSessionModel("s1");
 
 		expect(runtimeCache.getSessionModel("s1")).toBeUndefined();
-		expect(runtimeCache.getSessionModel("s2")).toBe("p2/m2");
+		expect(runtimeCache.getSessionModel("s2")).toEqual({
+			providerID: "p2",
+			modelID: "m2",
+		});
 	});
 });
 

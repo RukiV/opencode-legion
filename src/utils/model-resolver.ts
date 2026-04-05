@@ -371,21 +371,33 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 export function combineModelID(
 	providerID: string,
 	modelID: string,
+	opts?: {
+		noThrowError?: boolean;
+	},
 ): string
 export function combineModelID(
 	modelBody: IModelBody,
 	modelID?: undefined,
+	opts?: {
+		noThrowError?: boolean;
+	},
 ): string
 export function combineModelID(
 	providerID: string | IModelBody,
 	modelID?: string,
+	opts?: {
+		noThrowError?: boolean;
+	},
 ): string
 {
 	if (typeof providerID === "object")
 	{
 		if (!providerID.providerID || !providerID.modelID)
 		{
-			throw new RangeError(`Invalid model body: ${JSON.stringify(providerID)}`);
+			if (!opts?.noThrowError)
+			{
+				throw new RangeError(`Invalid model body: ${JSON.stringify(providerID)}`);
+			}
 		}
 		return `${providerID.providerID}/${providerID.modelID}`;
 	}
