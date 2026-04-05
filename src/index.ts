@@ -18,7 +18,7 @@ import { PLUGIN_VERSION_STRING } from "./types/version";
 import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/index';
 import { PLUGIN_NAME } from "./types/const-default";
-import { runtimeCache } from './config/lib/session-cache';
+import { runtimeCache } from './utils/session/session-cache';
 
 
 /**
@@ -50,7 +50,7 @@ function isHookEnabled(config: IAriseConfig, hookName: EnumHookName): boolean {
  * 3. Register custom tools
  * 4. Configure Shadow Agents
  * 5. Handle various events
- * 
+ *
  * @see https://opencode.ai/docs/zh-tw/plugins/
  */
 const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {

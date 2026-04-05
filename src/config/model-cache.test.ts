@@ -37,7 +37,7 @@ import {
 	EnumProviderHistoryStatus,
 } from "./model-cache";
 import { IOpenCodeProvider, IOpenCodeProviderCore } from "../types/opencode/types-provider";
-import { runtimeCache } from './lib/session-cache';
+import { runtimeCache } from '../utils/session/session-cache';
 
 /** 固定時間戳用於測試 */
 const FIXED_TIMESTAMP = 1775233205504;

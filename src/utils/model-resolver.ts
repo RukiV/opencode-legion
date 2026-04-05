@@ -19,7 +19,7 @@ import { SHADOW_AGENTS } from "../agents/shadows";
 import { EnumDetectAutoModelBody, type IAllShadowAgentsName } from "../types/enums";
 import { _isEmpty, _isNotEmpty, _trimLazy, normalizeModelString } from "./string/string-utils";
 import { IModelBody } from "../types/types-opencode";
-import { runtimeCache } from "../config/lib/session-cache";
+import { runtimeCache } from "./session/session-cache";
 
 /**
  * 預設模型

@@ -14,7 +14,7 @@ import {
   formatAriseMsgSuccessMultiLine,
   formatAriseMsgLogBody,
 } from '../utils/string/arise-message';
-import { runtimeCache } from '../config/lib/session-cache';
+import { runtimeCache } from '../utils/session/session-cache';
 
 /**
  * 建立呼叫 Arise Agent 的工具

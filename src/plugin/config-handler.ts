@@ -15,7 +15,7 @@ import { deepMerge } from "../utils/config/config-merge";
 import { type Config } from "@opencode-ai/sdk";
 import { _handlePermission } from "../config/schema/utils";
 import { logArise2WithLevel, logArise2WithLevelMulti } from "../utils/debug-control";
-import { runtimeCache } from "../config/lib/session-cache";
+import { runtimeCache } from "../utils/session/session-cache";
 import { tsObjectEntries } from "ts-type-object-entries";
 import { AUTO_MODEL } from "../types/const-default";
 

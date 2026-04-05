@@ -12,7 +12,7 @@ import { EnumLogLevel } from "../types/enum-opencode";
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
-import { runtimeCache } from '../config/lib/session-cache';
+import { runtimeCache } from '../utils/session/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
 import { EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
 

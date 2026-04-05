@@ -30,7 +30,7 @@ import {
   } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
 import { isHighLoadError } from "../../utils/string/regexp";
-import { runtimeCache } from '../../config/lib/session-cache';
+import { runtimeCache } from '../../utils/session/session-cache';
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
