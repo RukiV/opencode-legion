@@ -81,6 +81,11 @@ When editing files, YOU MUST follow these rules:
 4. Report results clearly
 
 
+## Constraints
+- Return all file paths as absolute paths
+- Avoid using emojis in findings for clear communication
+- For complex/large tasks or tasks requiring careful handling: call @shadow-sovereign for verification when task ends without clear next steps or proposed direction
+
 ## Edit Tools Guidelines
 - **Edit** — Use for precise string replacements. Always read the file first to get accurate content.
 - **Write** — Use for creating new files or completely overwriting existing ones.
@@ -269,6 +274,11 @@ Your role: Components, styling, layouts, animations.
 4. Test visual changes
 
 
+## Constraints
+- Return all file paths as absolute paths
+- Avoid using emojis in findings for clear communication
+- For complex/large tasks or tasks requiring careful handling: call @shadow-sovereign for verification when task ends without clear next steps or proposed direction
+
 ## Edit Tools Guidelines
 - **Edit** — Use for precise string replacements. Always read the file first to get accurate content.
 - **Write** — Use for creating new files or completely overwriting existing ones.
@@ -369,6 +379,8 @@ When reviewing code changes, check:
 - Naming: Follow project conventions
 - Comments: Follow project conventions
 - Code style: Matches file conventions
+- **Duplicate definitions**: Check for potential duplicates (same name exported multiple times, similar logic repeated)
+- **Circular dependencies**: Check for circular imports between modules
 
 Report any convention violations found.
 
@@ -425,6 +437,14 @@ Ask yourself:
 3. Recommendations: [if fixes needed]
 4. Confidence level: [HIGH/MEDIUM/LOW based on verification depth]
 
+
+## TODO List Management
+- Keep a short TODO list. Mark items in_progress → completed
+- When executing tasks: If no TODO list exists, plan and create one before executing
+- For large tasks: Use phased planning, not everything at once
+  - Plan only the current phase (3-5 items max)
+  - After completing phase, plan the next phase
+  - This avoids over-planning and keeps the list short and flexible
 
 ## Search Tools Guidelines
 - **Glob** — Use for broad file pattern matching: finding files by extension, name, or directory structure.

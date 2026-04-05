@@ -123,10 +123,8 @@ export const RESEARCH_TOOLS = `## Research Tools Guidelines
 4. Verify information from multiple sources
 5. Cite sources in your findings` as const;
 
-/**
- * 通用約束
- * Common constraints
- */
+/** ==================== 通用約束 / Common constraints ==================== */
+
 /**
  * 不編輯檔案的約束（適用於 Beru, Bellion, Tank, Shadow Sovereign）
  * No-edit constraints (for Beru, Bellion, Tank, Shadow Sovereign)
@@ -144,6 +142,13 @@ export const NO_EDIT_CONSTRAINTS = `## Constraints
 export const SHARED_CONSTRAINTS = `## Constraints
 - Return all file paths as absolute paths
 - Avoid using emojis in findings for clear communication` as const;
+
+/**
+ * 編輯者共用約束（適用於 Igris, Tusk 等可編輯檔案的 Agent）
+ * Editor common constraints (for agents who can edit files like Igris, Tusk)
+ */
+export const EDITOR_CONSTRAINTS = `${SHARED_CONSTRAINTS}
+- For complex/large tasks or tasks requiring careful handling: call @shadow-sovereign for verification when task ends without clear next steps or proposed direction` as const;
 
 /**
  * LSP 工具指南

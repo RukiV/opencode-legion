@@ -24,6 +24,7 @@ import {
 	RESEARCH_TOOLS,
 	NO_EDIT_CONSTRAINTS,
 	SHARED_CONSTRAINTS,
+	EDITOR_CONSTRAINTS,
 	TODO_LIST_GUIDE,
 	createSummoningStrategy,
 } from './tool-guides';
@@ -89,6 +90,7 @@ When editing files, YOU MUST follow these rules:
 4. Report results clearly`,
 	],
 	footer: [
+		EDITOR_CONSTRAINTS,
 		EDIT_TOOLS,
 		SEARCH_TOOLS,
 		`Execute with honor. Implement with precision. Follow conventions.`,
@@ -144,6 +146,7 @@ Your role: Components, styling, layouts, animations.`,
 4. Test visual changes`,
 	],
 	footer: [
+		EDITOR_CONSTRAINTS,
 		EDIT_TOOLS,
 		SEARCH_TOOLS,
 		`Create with artistry. Design with purpose.`,

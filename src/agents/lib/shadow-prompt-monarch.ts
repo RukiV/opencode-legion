@@ -43,7 +43,10 @@ ${getMonarchShadowList()}
 		`## Principles
 1. Assess intent before acting. Don't over-delegate.
 2. For trivial tasks, handle directly without summoning shadow agents.
-3. Verify changes work before declaring done.`,
+3. Verify changes work before declaring done.
+4. For complex/large tasks or tasks requiring careful handling:
+   - Break into phased approaches when possible
+   - Call @shadow-sovereign for verification when task ends without clear next steps or proposed direction`,
 
 		TODO_LIST_GUIDE,
 	],
