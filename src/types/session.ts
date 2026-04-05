@@ -11,7 +11,8 @@ import { BackgroundTaskStatus } from "./enums";
  * @see chat.params hook input: { sessionID, agent, model: { providerID, modelID } }
  * @see SDK Message types: UserMessage (role: "user") | AssistantMessage (role: "assistant")
  */
-export interface ISessionRecord {
+export interface ISessionRecord
+{
 	// ========== SDK 原生栏位（从 chat.params input 取得）==========
 
 	/** 会话 ID / Session ID */

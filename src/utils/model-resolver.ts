@@ -175,7 +175,7 @@ export function parseModelString(
 	model: string | undefined,
 	opts?: {
 		throwError?: boolean;
-	}
+	},
 ): IParseModelStringResult
 {
 	model = _trimLazy(model);
@@ -293,7 +293,11 @@ export function _detectAutoModelBody(modelBody: Partial<IModelBody> | undefined)
 	const providerID = normalizeModelString(modelBody?.providerID ?? '').toUpperCase();
 	const modelID = normalizeModelString(modelBody?.modelID ?? '').toUpperCase();
 
-	const detectAutoProvider = !providerID.length || _isAutoModel(providerID) || ['UNDEFINED', 'NULL', '.'].includes(providerID);
+	const detectAutoProvider = !providerID.length || _isAutoModel(providerID) || [
+		'UNDEFINED',
+		'NULL',
+		'.',
+	].includes(providerID);
 	const detectAutoModel = !modelID.length || _isAutoModel(modelID) || ['UNDEFINED', 'NULL', '.'].includes(modelID);
 
 	if (detectAutoProvider)

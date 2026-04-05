@@ -204,7 +204,7 @@ class RuntimeCache
 		sessionId: string,
 		status: BackgroundTaskStatus,
 		error?: string,
-		completedAt?: number
+		completedAt?: number,
 	): void
 	{
 		const record = this._sessionRecords.get(sessionId);
