@@ -162,8 +162,7 @@ export const enum EnumShadowAgentPermissionKey
 	/** 列出目錄 (matches directory path) / List files in a directory */
 	List = 'list',
 
-	/** 啟動子代理 (matches subagent type) / Launch subagents */
-	Task = 'task',
+	
 
 	/** 載入 skill (matches skill name) / Load a skill */
 	Skill = 'skill',
@@ -183,23 +182,34 @@ export const enum EnumShadowAgentPermissionKey
 	/** 代碼搜尋 (matches query) / Code search */
 	Codesearch = 'codesearch',
 
-	/** 存取工作目錄外的路徑 / Touch paths outside the working directory */
-	ExternalDirectory = 'external_directory',
+	
 
-	/** 相同工具呼叫重複 3 次 / Same tool call repeats 3 times with identical input */
-	DoomLoop = 'doom_loop',
+	
 }
 
 /**
- * Shadow Agent Bash 權限鍵值
- * Shadow Agent Bash permission key
- *
- * Bash 使用 pattern matching (如 "git *"、"npm *")
+ * Shadow Agent 權限鍵值 可使用 pattern matching (如 "git *"、"npm *")
+ * Shadow Agent permission key that supports pattern matching
  */
 export const enum EnumShadowAgentPermissionKey2
 {
 	/** 執行指令 (matches parsed commands) / Run shell commands */
 	Bash = 'bash',
+}
+
+/**
+ * 會導致 設定崩潰 的權限設定
+ */
+export const enum EnumShadowAgentPermissionKeyINvalid
+{
+	/** 啟動子代理 (matches subagent type) / Launch subagents */
+	Task = 'task',
+
+	/** 存取工作目錄外的路徑 / Touch paths outside the working directory */
+	ExternalDirectory = 'external_directory',
+
+	/** 相同工具呼叫重複 3 次 / Same tool call repeats 3 times with identical input */
+	DoomLoop = 'doom_loop',
 }
 
 export type IShadowAgentPermissionCore<P extends string> = Record<P, EnumOpencodeAgentPermission>;
@@ -216,4 +226,14 @@ export type IShadowAgentPermissionCore<P extends string> = Record<P, EnumOpencod
  * }
  */
 export type IShadowAgentPermission = ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey>, EnumOpencodeAgentPermission> 
-	& ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey2>, EnumOpencodeAgentPermission | ITSPartialRecord<string, EnumOpencodeAgentPermission>>;
+
+	/**
+	 * Shadow Agent 權限鍵值 可使用 pattern matching (如 "git *"、"npm *")
+	 * Shadow Agent permission key that supports pattern matching
+	 */
+	& ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey2>, EnumOpencodeAgentPermission | ITSPartialRecord<string | "*",  EnumOpencodeAgentPermission>>
+	/**
+	 * 會導致 設定崩潰 的權限設定
+	 */
+	& ITSPartialRecord<EnumShadowAgentPermissionKeyINvalid, never>
+	;

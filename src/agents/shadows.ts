@@ -439,10 +439,6 @@ export const SHADOW_AGENTS: IShadowAgents = {
 		model: "anthropic/claude-opus-4-5",
 		steps: 16,
 		prompt: SHADOW_MONARCH_PROMPT,
-		permission: {
-			doom_loop: EnumOpencodeAgentPermission.ALLOW,
-			task: EnumOpencodeAgentPermission.ALLOW,
-		},
 	},
 
 	/**
@@ -590,7 +586,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 			edit: EnumOpencodeAgentPermission.DENY,
 			write: EnumOpencodeAgentPermission.DENY,
 			webfetch: EnumOpencodeAgentPermission.ALLOW,
-			external_directory: EnumOpencodeAgentPermission.ASK,
+			// external_directory: EnumOpencodeAgentPermission.ASK,
 		},
 		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.EsilRadiru],
 	},

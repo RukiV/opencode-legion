@@ -14,6 +14,7 @@ import { _isAutoModel } from "../utils/model-resolver";
 import { deepMerge } from "../utils/config/config-merge";
 import { type Config } from "@opencode-ai/sdk";
 import { _handlePermission } from "../config/schema/utils";
+import { logArise2WithLevel, logArise2WithLevelMulti } from "../utils/debug-control";
 
 /**
  * OpenCode 配置介面
@@ -47,6 +48,13 @@ export function setShadowAgentsConfig(params: {
 {
 	const { ariseConfig, opencodeConfig } = params;
 
+	logArise2WithLevel('debug', () => [
+		'[config-handler] setShadowAgentsConfig called',
+		`  disabled_shadows: ${JSON.stringify(ariseConfig.disabled_shadows ?? [])}`,
+		`  opencodeConfig.model: ${JSON.stringify(opencodeConfig.model)}`,
+		`  agents count before: ${Object.keys(opencodeConfig.agent ?? {}).length}`,
+	]);
+
 	/** 初始化 agent 設定 / Initialize agent config */
 	opencodeConfig.agent = opencodeConfig.agent ?? {};
 	const agents = opencodeConfig.agent!;
@@ -59,15 +67,26 @@ export function setShadowAgentsConfig(params: {
 	 * Iterate through all Shadow agents, decide whether to register based on config
 	 */
 	const disabledShadows = new Set(ariseConfig.disabled_shadows ?? []);
+	const registeredAgents: string[] = [];
+	const skippedAgents: string[] = [];
+
 	for (const [name, shadow] of Object.entries(SHADOW_AGENTS))
 	{
 		const shadowName = name as IAllShadowAgentsName;
 		/** 跳過已停用的 Shadow / Skip disabled shadows */
-		if (disabledShadows.has(shadowName)) continue;
+		if (disabledShadows.has(shadowName))
+		{
+			skippedAgents.push(`${name} (disabled_shadows)`);
+			continue;
+		}
 
 		const userOverride = ariseConfig.agents?.[shadowName];
 		/** 跳過使用者已停用的 Shadow / Skip shadows disabled by user */
-		if (userOverride?.disabled) continue;
+		if (userOverride?.disabled)
+		{
+			skippedAgents.push(`${name} (user disabled)`);
+			continue;
+		}
 
 		/**
 		 * 解析模型
@@ -78,7 +97,16 @@ export function setShadowAgentsConfig(params: {
 		 * If Shadow is set to AUTO, use parent task's model
 		 * Otherwise use user override or Shadow's default model
 		 */
-		const resolvedModel = _isAutoModel(shadow.model) ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
+		const isShadowAuto = _isAutoModel(shadow.model);
+		const resolvedModel = isShadowAuto ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
+
+		logArise2WithLevel('debug', () => [
+			`  [register] ${name}`,
+			`    default model: ${shadow.model}`,
+			`    user override model: ${userOverride?.model ?? '(none)'}`,
+			`    resolved model: ${JSON.stringify(resolvedModel)}`,
+			`    is auto (shadow default): ${isShadowAuto}`,
+		]);
 
 		/** 註冊 Shadow Agent / Register Shadow agent */
 		agents[name] = {
@@ -90,7 +118,16 @@ export function setShadowAgentsConfig(params: {
 			...(shadow.permission && { permission: _handlePermission(shadow.permission) } as any),
 			...(shadow.options && { options: shadow.options }),
 		};
+
+		registeredAgents.push(name);
 	}
+
+	logArise2WithLevelMulti('debug', () => [
+		`[config-handler] Shadow agents summary:`,
+		`  registered (${registeredAgents.length}): ${registeredAgents.join(', ')}`,
+		`  skipped (${skippedAgents.length}): ${skippedAgents.join(', ')}`,
+		`  agents count after: ${Object.keys(agents).length}`,
+	]);
 }
 
 /**
@@ -101,6 +138,12 @@ export function setShadowAgentsConfig(params: {
  */
 export function applyOpencodeAgentOverrides(agents: Record<string, unknown>): void
 {
+	logArise2WithLevel('debug', () => [
+		'[config-handler] applyOpencodeAgentOverrides called',
+		`  existing agent keys: ${Object.keys(agents).join(', ')}`,
+		`  override keys: ${Object.keys(OPENCODE_OVERRIDES).join(', ')}`,
+	]);
+
 	/**
 	 * 套用 OpenCode 代理覆寫
 	 * Apply OpenCode agent overrides
@@ -114,6 +157,11 @@ export function applyOpencodeAgentOverrides(agents: Record<string, unknown>): vo
 	{
 		agents[name] = deepMerge((agents[name] as Record<string, unknown>) ?? {}, override as Record<string, unknown>);
 	}
+
+	logArise2WithLevel('debug', () => [
+		'[config-handler] applyOpencodeAgentOverrides done',
+		`  final agent keys: ${Object.keys(agents).join(', ')}`,
+	]);
 }
 
 /**
@@ -127,19 +175,45 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 {
 	return async function configHook(opencodeConfig: IOpencodeConfig): Promise<void>
 	{
-		/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
-		opencodeConfig.default_agent = EnumShadowAgentsName.ShadowMonarch;
+		logArise2WithLevel('debug', () => [
+			'[config-handler] configHook called',
+			`  opencodeConfig.model: ${JSON.stringify(opencodeConfig.model)}`,
+			`  opencodeConfig.default_agent (before): ${JSON.stringify(opencodeConfig.default_agent)}`,
+			`  opencodeConfig.agent keys (before): ${Object.keys(opencodeConfig.agent ?? {}).join(', ') || '(empty)'}`,
+		]);
 
-		/** 設定 Shadow Agent 配置 / Set Shadow agents config */
-		setShadowAgentsConfig({
-			ariseConfig,
-			opencodeConfig
-		});
-
-		/** 套用 OpenCode 代理覆寫 / Apply OpenCode agent overrides */
-		if (opencodeConfig.agent)
+		try
 		{
-			applyOpencodeAgentOverrides(opencodeConfig.agent as Record<string, unknown>);
+			/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
+			opencodeConfig.default_agent = EnumShadowAgentsName.ShadowMonarch;
+
+			/** 設定 Shadow Agent 配置 / Set Shadow agents config */
+			setShadowAgentsConfig({
+				ariseConfig,
+				opencodeConfig
+			});
+
+			/** 套用 OpenCode 代理覆寫 / Apply OpenCode agent overrides */
+			if (opencodeConfig.agent)
+			{
+				applyOpencodeAgentOverrides(opencodeConfig.agent as Record<string, unknown>);
+			}
+
+			logArise2WithLevel('debug', () => [
+				'[config-handler] configHook completed successfully',
+				`  default_agent (after): ${JSON.stringify(opencodeConfig.default_agent)}`,
+				`  agent keys (after): ${Object.keys(opencodeConfig.agent ?? {}).join(', ') || '(empty)'}`,
+				`  total agents: ${Object.keys(opencodeConfig.agent ?? {}).length}`,
+			]);
+		}
+		catch (error)
+		{
+			logArise2WithLevel('error', () => [
+				'[config-handler] configHook FAILED',
+				`  error: ${error instanceof Error ? error.message : String(error)}`,
+				`  stack: ${error instanceof Error ? error.stack : '(no stack)'}`,
+			]);
+			throw error;
 		}
 	};
 }

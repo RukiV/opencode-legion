@@ -51,8 +51,20 @@ function isHookEnabled(config: IAriseConfig, hookName: EnumHookName): boolean {
  * 5. Handle various events
  */
 const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
+  logArise2WithLevel('info', () => [`${PLUGIN_NAME}@${PLUGIN_VERSION_STRING} initializing...`]);
+
   /** 載入 Arise 配置 / Load Arise config */
   const config = await loadAriseConfig(ctx);
+
+  logArise2WithLevel('debug', () => [
+    '[index] Plugin initialized with config:',
+    `  disabled_shadows: ${JSON.stringify(config.disabled_shadows ?? [])}`,
+    `  disabled_hooks: ${JSON.stringify(config.disabled_hooks ?? [])}`,
+    `  show_banner: ${config.show_banner}`,
+    `  debug.enabled: ${config.debug?.enabled ?? false}`,
+    `  debug.level: ${config.debug?.level ?? '(default)'}`,
+    `  agents overrides: ${Object.keys(config.agents ?? {}).join(', ') || '(none)'}`,
+  ]);
 
   /**
    * 初始化除錯控制
