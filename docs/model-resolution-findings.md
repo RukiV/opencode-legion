@@ -42,13 +42,10 @@ export function _isAutoModel(model?: string): model is typeof AUTO_MODEL {
 
 ### 問題
 
-`cacheSessionModel` 直接將 `providerID` 和 `modelId` 組合成字串寫入快取，沒有任何驗證：
+`runtimeCache.cacheSessionModel` 直接將 `providerID` 和 `modelId` 組合成字串寫入快取，沒有任何驗證：
 
 ```typescript
-export function cacheSessionModel(sessionId: string, providerId: string, modelId: string): void {
-  const modelString = `${providerId}/${modelId}`;
-  sessionModelCache.set(sessionId, modelString);
-}
+runtimeCache.cacheSessionModel(sessionId, providerId, modelId);
 ```
 
 ### 分析
@@ -259,7 +256,7 @@ const modelBody = resolveModelContext(
 | 1 | 用戶指定的 `model` 參數 |
 | 2 | `opencode-arise.json` 中 `agents.<agent>.model` |
 | 3 | `SHADOW_AGENTS[shadow].model`（Shadow 預設） |
-| 4 | 父會話模型（從 session cache 取得） |
+| 4 | 父會話模型（從 runtimeCache 取得） |
 | 5 | `DEFAULT_MODEL`（全域預設） |
 
 ### 教訓

@@ -10,11 +10,14 @@ import type { IAriseConfig } from "../config/schema";
 import { EnumShadowAgentsName, type IAllShadowAgentsName } from "../types/enums";
 import type { IShadowAgent } from "../agents/shadows";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents/shadows";
-import { _isAutoModel } from "../utils/model-resolver";
+import { _isAutoModel, DEFAULT_MODEL, getEffectiveModelWithFallback, parseModelString } from "../utils/model-resolver";
 import { deepMerge } from "../utils/config/config-merge";
 import { type Config } from "@opencode-ai/sdk";
 import { _handlePermission } from "../config/schema/utils";
 import { logArise2WithLevel, logArise2WithLevelMulti } from "../utils/debug-control";
+import { runtimeCache } from "../config/lib/session-cache";
+import { tsObjectEntries } from "ts-type-object-entries";
+import { AUTO_MODEL } from "../types/const-default";
 
 /**
  * OpenCode 配置介面
@@ -70,9 +73,11 @@ export function setShadowAgentsConfig(params: {
 	const registeredAgents: string[] = [];
 	const skippedAgents: string[] = [];
 
-	for (const [name, shadow] of Object.entries(SHADOW_AGENTS))
+	const opencodeModel = parseModelString(opencodeConfig.model).detectAutoModelBody ? DEFAULT_MODEL : opencodeConfig.model!;
+
+	for (const [name, shadow] of tsObjectEntries(SHADOW_AGENTS))
 	{
-		const shadowName = name as IAllShadowAgentsName;
+		const shadowName = name;
 		/** 跳過已停用的 Shadow / Skip disabled shadows */
 		if (disabledShadows.has(shadowName))
 		{
@@ -88,24 +93,28 @@ export function setShadowAgentsConfig(params: {
 			continue;
 		}
 
-		/**
-		 * 解析模型
-		 * Resolve model
-		 *
-		 * 如果 Shadow 設定為 AUTO，則使用主任務的模型
-		 * 否則使用使用者覆寫或 Shadow 預設模型
-		 * If Shadow is set to AUTO, use parent task's model
-		 * Otherwise use user override or Shadow's default model
-		 */
-		const isShadowAuto = _isAutoModel(shadow.model);
-		const resolvedModel = isShadowAuto ? opencodeConfig.model : (userOverride?.model ?? shadow.model);
+		let resolvedModel = getEffectiveModelWithFallback(
+			AUTO_MODEL,
+			opencodeModel,
+			shadow.model,
+			userOverride?.model,
+		);
+
+		const parsed = parseModelString(resolvedModel);
+
+		/** 記錄 agent 的 user config 模型為 AUTO / Record agent's user config model is AUTO */
+		if (parsed.detectAutoModelBody)
+		{
+			runtimeCache.addUserConfigModelIsAuto(name);
+			resolvedModel = opencodeModel;
+		}
 
 		logArise2WithLevel('debug', () => [
 			`  [register] ${name}`,
 			`    default model: ${shadow.model}`,
 			`    user override model: ${userOverride?.model ?? '(none)'}`,
 			`    resolved model: ${JSON.stringify(resolvedModel)}`,
-			`    is auto (shadow default): ${isShadowAuto}`,
+			`    is auto: ${parsed.detectAutoModelBody}`,
 		]);
 
 		/** 註冊 Shadow Agent / Register Shadow agent */
@@ -115,7 +124,7 @@ export function setShadowAgentsConfig(params: {
 			model: resolvedModel,
 			steps: shadow.steps,
 			...(shadow.prompt && { prompt: shadow.prompt }),
-			...(shadow.permission && { permission: _handlePermission(shadow.permission) } as any),
+			...(shadow.permission && { permission: _handlePermission(shadow.permission, { agentsName: name }) } as any),
 			...(shadow.options && { options: shadow.options }),
 		};
 

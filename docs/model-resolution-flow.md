@@ -21,44 +21,44 @@
 
 ```
 用戶在 OpenCode UI 選擇模型
-         │
-         ▼
-  ┌──────────────────────┐
-  │ chat.params Hook     │  ← 寫入快取入口（唯一寫入點）
-  │ index.ts:148-151     │
-  │ cacheSessionModel()  │
-  └────────┬─────────────┘
-           │
-           ▼
-  ┌──────────────────────┐
-  │ sessionModelCache    │  ← Map<string, string>
-  │ (記憶體快取)          │     key: sessionId
-  └────────┬─────────────┘     value: "provider/modelID"
-           │
-    ┌──────┴──────┐
-    │             │
-    ▼             ▼
- ┌─────┐      ┌────────────────────┐
- │路徑A│      │路徑B               │
- │同步 │      │背景任務            │
- └──┬──┘      └─────────┬──────────┘
-    │                   │
-    ▼                   ▼
- arise-summon.ts    arise-background.ts
- :98-99             :52-58
-    │                   │
-    │                   ▼
-    │              background-manager.ts
-    │              :846-852
-    │                   │
-    │              getSessionModel(parentSessionId)
-    │                   │
-    │              resolveModelContext()
-    │                   │
-    ▼                   ▼
- ┌─────────────────────────────┐
- │ getSessionModel(sessionID)  │  ← 讀取快取
- │ resolveModelContext()       │  ← 解析模型
+          │
+          ▼
+   ┌──────────────────────┐
+   │ chat.params Hook     │  ← 寫入快取入口（唯一寫入點）
+   │ index.ts:148-151     │
+   │ runtimeCache.cacheSessionModel()  │
+   └────────┬─────────────┘
+            │
+            ▼
+   ┌──────────────────────┐
+   │ runtimeCache         │  ← RuntimeCache 類別
+   │ _sessionModels Map    │     key: sessionId
+   └────────┬─────────────┘     value: "provider/modelID"
+            │
+     ┌──────┴──────┐
+     │             │
+     ▼             ▼
+  ┌─────┐      ┌────────────────────┐
+  │路徑A│      │路徑B               │
+  │同步 │      │背景任務            │
+  └──┬──┘      └─────────┬──────────┘
+     │                   │
+     ▼                   ▼
+  arise-summon.ts    arise-background.ts
+  :98-99             :52-58
+     │                   │
+     │                   ▼
+     │              background-manager.ts
+     │              :846-852
+     │                   │
+     │              runtimeCache.getSessionModel(parentSessionId)
+     │                   │
+     │              resolveModelContext()
+     │                   │
+     ▼                   ▼
+  ┌─────────────────────────────┐
+  │ runtimeCache.getSessionModel()  │  ← 讀取快取
+  │ resolveModelContext()       │  ← 解析模型
  │                             │
  │ 1. getModelFromConfig()     │
  │ 2. SHADOW_AGENTS[].model    │
@@ -89,7 +89,7 @@
 ```typescript
 async "chat.params"(input) {
   if (input.model) {
-    cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
+    runtimeCache.cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
   }
 }
 ```
@@ -98,7 +98,7 @@ async "chat.params"(input) {
 |------|------|
 | 觸發時機 | 用戶發送訊息時（每次對話） |
 | 輸入 | `input.model.providerID`、`input.model.id` |
-| 輸出 | 寫入 `sessionModelCache` Map |
+| 輸出 | 寫入 `runtimeCache._sessionModels` Map |
 | 快取格式 | `sessionId → "providerID/modelID"` |
 
 ---
@@ -111,14 +111,14 @@ async "chat.params"(input) {
 用於 Monarch 召喚 Shadow Agent 時的模型解析。支援同步（等待完成）和非同步（fire-and-forget）兩種模式。
 
 ```typescript
-const parentModel = getSessionModel(context.sessionID);
+const parentModel = runtimeCache.getSessionModel(context.sessionID);
 const modelBody = resolveModelContext(parentModel, shadow, config, model);
 ```
 
 | 屬性 | 說明 |
 |------|------|
 | 工具名稱 | `arise_summon` |
-| `parentModel` 來源 | `getSessionModel(context.sessionID)` — 當前會話的快取模型 |
+| `parentModel` 來源 | `runtimeCache.getSessionModel(context.sessionID)` — 當前會話的快取模型 |
 | `config` 來源 | 插件初始化時載入的 `IAriseConfig` |
 | `userModel` 來源 | 工具呼叫時的 `model` 參數 |
 | SDK 呼叫 | `session.prompt()`（同步）或 `session.promptAsync()`（非同步） |
@@ -159,7 +159,7 @@ const task = await manager.launch({
 背景任務的模型解析核心。與 `arise-summon` 不同的是，此處不傳入 `config`（傳入 `undefined`），因此不會讀取 `opencode-arise.json` 中的 agent 模型設定。
 
 ```typescript
-const parentModel = getSessionModel(opts.parentSessionId);
+const parentModel = runtimeCache.getSessionModel(opts.parentSessionId);
 const modelBody = resolveModelContext(
   parentModel,
   opts.shadow as IAllShadowAgentsName,
@@ -170,7 +170,7 @@ const modelBody = resolveModelContext(
 
 | 屬性 | 說明 |
 |------|------|
-| `parentModel` 來源 | `getSessionModel(opts.parentSessionId)` — 父會話的快取模型 |
+| `parentModel` 來源 | `runtimeCache.getSessionModel(opts.parentSessionId)` — 父會話的快取模型 |
 | `config` | `undefined`（不讀取配置檔案） |
 | `userModel` 來源 | `opts.model` — 工具呼叫時傳入的模型 |
 | SDK 呼叫 | `session.promptAsync()` |
@@ -187,7 +187,7 @@ const modelBody = resolveModelContext(
 僅用於事件處理時的日誌記錄，不參與模型解析。
 
 ```typescript
-const model = sessionId ? getSessionModel(sessionId) : undefined;
+const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 ```
 
 | 屬性 | 說明 |
@@ -251,7 +251,7 @@ const model = sessionId ? getSessionModel(sessionId) : undefined;
 | 1 | `userModel` | 用戶呼叫工具時指定的模型（最高優先級） |
 | 2 | `configModel` | `opencode-arise.json` 中 `agents.<agent>.model` |
 | 3 | `defaultModel` | `shadows.ts` 中 Shadow Agent 的預設模型 |
-| 4 | `parentModel` | 父會話使用的模型（從 session cache 取得） |
+| 4 | `parentModel` | 父會話使用的模型（從 runtimeCache 取得） |
 | 5 | `DEFAULT_MODEL` | 全域預設：`opencode/big-pickle` |
 
 ### AUTO 模型處理
@@ -305,5 +305,5 @@ parentModel = AUTO → DEFAULT_MODEL
 
 | 函數 | 檔案 | 用途 |
 |------|------|------|
-| `clearSessionModel(sessionId)` | `src/config/lib/session-cache.ts:55` | 清除單一會話 |
-| `clearAllSessionModels()` | `src/config/lib/session-cache.ts:67` | 清除全部（測試用） |
+| `runtimeCache.clearSessionModel(sessionId)` | `src/config/lib/session-cache.ts:94` | 清除單一會話 |
+| `runtimeCache.clearAllSessionModels()` | `src/config/lib/session-cache.ts:99` | 清除全部（測試用） |

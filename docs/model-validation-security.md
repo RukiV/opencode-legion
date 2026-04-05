@@ -23,7 +23,7 @@
 | L2 | `_isAutoModel` | 嚴格匹配 + 寬鬆匹配（trim + toUpperCase） |
 | L3 | `_detectAutoModelBody` | 檢測 AUTO/空白/undefined/null 字串 |
 | L4 | `resolveModelContext` | fallback 到 DEFAULT_MODEL |
-| L5 | `cacheSessionModel` | 無驗證，直接寫入 |
+| L5 | `runtimeCache.cacheSessionModel` | 無驗證，直接寫入 |
 
 ---
 
@@ -37,19 +37,18 @@
 ```typescript
 async "chat.params"(input) {
   if (input.model) {
-    cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
+    runtimeCache.cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
   }
 }
 ```
 
 ### 分析
 
-`cacheSessionModel` 直接將 `providerID` 和 `modelId` 組合成字串寫入快取，**沒有任何驗證**：
+`runtimeCache.cacheSessionModel` 直接將 `providerID` 和 `modelId` 組合成字串寫入快取，**沒有任何驗證**：
 
 ```typescript
-export function cacheSessionModel(sessionId: string, providerId: string, modelId: string): void {
-  const modelString = `${providerId}/${modelId}`;
-  sessionModelCache.set(sessionId, modelString);
+runtimeCache.cacheSessionModel(sessionId: string, providerId: string, modelId: string): void {
+  this._sessionModels.set(sessionId, `${providerId}/${modelId}`);
 }
 ```
 
@@ -64,7 +63,7 @@ export function cacheSessionModel(sessionId: string, providerId: string, modelId
 結果：快取值 = "AUTO/gpt-4o"
 ```
 
-**影響：** 當後續呼叫 `getSessionModel()` 取得此快取值時，字串 `"AUTO/gpt-4o"` 會進入 `parseModelString`：
+**影響：** 當後續呼叫 `runtimeCache.getSessionModel()` 取得此快取值時，字串 `"AUTO/gpt-4o"` 會進入 `parseModelString`：
 
 ```
 parseModelString("AUTO/gpt-4o")
@@ -125,7 +124,7 @@ parseModelString("openai/gpt-4/./.AUTO")
 | 惡意 modelId 含 AUTO 變體 | ❌ 否 | `normalizeModelString` + `_isAutoModel` |
 | 特殊字元注入 | ❌ 否 | 空段檢測 → RangeError → fallback |
 
-**風險評估：** 雖然 `cacheSessionModel` 本身無驗證，但 **所有讀取快取後的路徑都會經過 `parseModelString` 的完整檢測鏈**，因此無法繞過。
+**風險評估：** 雖然 `runtimeCache.cacheSessionModel` 本身無驗證，但 **所有讀取快取後的路徑都會經過 `parseModelString` 的完整檢測鏈**，因此無法繞過。
 
 ---
 
@@ -137,7 +136,7 @@ parseModelString("openai/gpt-4/./.AUTO")
 ### 程式碼
 
 ```typescript
-const parentModel = getSessionModel(context.sessionID);
+const parentModel = runtimeCache.getSessionModel(context.sessionID);
 const modelBody = resolveModelContext(parentModel, shadow, config, model);
 ```
 
@@ -205,7 +204,7 @@ const task = await manager.launch({
 });
 
 // background-manager.ts
-const parentModel = getSessionModel(opts.parentSessionId);
+const parentModel = runtimeCache.getSessionModel(opts.parentSessionId);
 const modelBody = resolveModelContext(
   parentModel,
   opts.shadow as IAllShadowAgentsName,
@@ -257,7 +256,7 @@ const modelBody = resolveModelContext(
 ### 程式碼
 
 ```typescript
-const model = sessionId ? getSessionModel(sessionId) : undefined;
+const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 ```
 
 ### 分析
@@ -383,7 +382,7 @@ if (parsed.detectAutoModelBody || !parsed.modelBody) {
 
 | # | 弱點 | 嚴重度 | 建議 |
 |---|------|--------|------|
-| 1 | `cacheSessionModel` 無輸入驗證 | 低 | 添加 `parseModelString` 驗證，拒絕 AUTO 變體寫入快取 |
+| 1 | `runtimeCache.cacheSessionModel` 無輸入驗證 | 低 | 添加 `parseModelString` 驗證，拒絕 AUTO 變體寫入快取 |
 | 2 | `background-manager` 不讀取 config | 低 | 考慮是否應傳入 config 以保持一致性 |
 | 3 | `_isAutoModel` 不檢測 `"AUTO_MODEL"` 等變體 | 極低 | 這些變體不會被誤認為 AUTO，但可考慮添加白名單機制 |
 

@@ -1,5 +1,5 @@
 
-import { EnumShadowAgentsName } from "../../types/enums";
+import { EnumShadowAgentsName, IAllShadowAgentsName } from "../../types/enums";
 import { IShadowAgentPermission, SHADOW_AGENT_PERMISSION_KEY_INVALID } from "../../types/types-opencode";
 import { logArise2WithLevel } from "../../utils/debug-control";
 
@@ -21,7 +21,7 @@ import { logArise2WithLevel } from "../../utils/debug-control";
  * @returns 處理後的權限物件 / Processed permission object
  */
 export function _handlePermission<T extends IShadowAgentPermission>(permission: T, runtime?: {
-  agentsName?: EnumShadowAgentsName;
+  agentsName?: IAllShadowAgentsName;
 }) 
 {
   permission.edit = permission.edit ?? permission.write;

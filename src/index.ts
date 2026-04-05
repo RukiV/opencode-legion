@@ -17,7 +17,7 @@ import { PLUGIN_VERSION_STRING } from "./types/version";
 import { IHooks, IPlugin } from './types/types-opencode';
 import { createPluginTools } from './tools/index';
 import { PLUGIN_NAME } from "./types/const-default";
-import { cacheSessionModel, clearSessionModel } from './config/lib/session-cache';
+import { runtimeCache } from './config/lib/session-cache';
 
 
 /**
@@ -159,7 +159,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> => {
      */
     async "chat.params"(input) {
       if (input.model) {
-        cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
+        runtimeCache.cacheSessionModel(input.sessionID, input.model.providerID, input.model.id);
       }
     },
 

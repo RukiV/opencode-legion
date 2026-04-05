@@ -12,7 +12,7 @@ import { EnumLogLevel } from "../types/enum-opencode";
 import { getErrorMessage } from "../utils/error";
 import { ITSPickExtra } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
-import { clearSessionModel, getSessionModel } from '../config/lib/session-cache';
+import { runtimeCache } from '../config/lib/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
 import { EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
 
@@ -43,7 +43,7 @@ export function handleSessionDeleted(event: EventSessionDeleted, params?: ICreat
 	const sessionId = extractSessionId(event);
 	if (sessionId)
 	{
-		clearSessionModel(sessionId);
+		runtimeCache.clearSessionModel(sessionId);
 	}
 }
 
@@ -184,7 +184,7 @@ export function createFullEventHandler(
 		const event = input.event;
 		const eventType = event.type;
 		const sessionId = extractSessionId(event);
-		const model = sessionId ? getSessionModel(sessionId) : undefined;
+		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
 		params.ctx.client.app?.log?.({

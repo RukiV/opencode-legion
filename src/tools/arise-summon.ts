@@ -14,7 +14,7 @@ import {
   formatAriseMsgSuccessMultiLine,
   formatAriseMsgLogBody,
 } from '../utils/string/arise-message';
-import { getSessionModel } from '../config/lib/session-cache';
+import { runtimeCache } from '../config/lib/session-cache';
 
 /**
  * 建立呼叫 Arise Agent 的工具
@@ -95,7 +95,7 @@ export function createAgentToolAriseSyncSummon(ctx: PluginInput, config: IAriseC
          * 優先順序：用戶指定 > Config 模型 > Shadow 預設 > AUTO 使用父模型 > 父模型 > DEFAULT_MODEL
          * Priority: User specified > Config model > Shadow default > AUTO use parent > parentModel > DEFAULT_MODEL
          */
-        const parentModel = getSessionModel(context.sessionID);
+        const parentModel = runtimeCache.getSessionModel(context.sessionID);
         const modelBody = resolveModelContext(parentModel, shadow, config, model);
 
         /**

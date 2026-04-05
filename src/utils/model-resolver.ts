@@ -19,6 +19,7 @@ import { SHADOW_AGENTS } from "../agents/shadows";
 import { EnumDetectAutoModelBody, type IAllShadowAgentsName } from "../types/enums";
 import { _isEmpty, _isNotEmpty, _trimLazy, normalizeModelString } from "./string/string-utils";
 import { IModelBody } from "../types/types-opencode";
+import { runtimeCache } from "../config/lib/session-cache";
 
 /**
  * 預設模型
@@ -575,7 +576,7 @@ export function resolveModelContext(
 ): IModelBody
 {
 	/** 1. 從 config 取得模型設定 / 1. Get model config from config */
-	const configModel = getModelFromConfig(config, shadow);
+	const configModel = runtimeCache.hasUserConfigModelIsAuto(shadow) ? AUTO_MODEL : getModelFromConfig(config, shadow);
 
 	/** 2. 從 SHADOW_AGENTS 取得預設模型 / 2. Get default model from SHADOW_AGENTS */
 	const defaultModel = SHADOW_AGENTS[shadow]?.model;
