@@ -2,7 +2,7 @@ import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./lib/background-manager";
 import { BackgroundTaskStatus } from "../types/enums";
 import { EnumAriseTools } from "../types/enums";
-import { getAriseToolsConfigEntry } from "../agents/shadows";
+import { getAriseToolsConfigEntry } from "../agents/lib/arise-tools-utils";
 import { tool2 } from '../types/types-opencode';
 import { formatDuration } from "../utils/string/message";
 import { getErrorMessage } from "../utils/error";

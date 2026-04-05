@@ -4,6 +4,8 @@
  *
  * 包含所有 Shadow Agent 的靜態設定（不含 prompt）
  * Contains all Shadow Agent static config (prompts excluded)
+ *
+ * @module shadow-descriptions
  */
 
 import { EnumShadowSubAgentsName, ALLOWED_SHADOWS } from '../../types/enums';
@@ -202,13 +204,7 @@ export function getMonarchShadowList(): string {
     .join("\n");
 }
 
-/**
- * 工具函式：檢查是否支援背景執行
- * Tool function: Check if background execution is supported
- */
-export function supportsBackgroundExecution(name: EnumShadowSubAgentsName): boolean {
-  return SHADOW_DESCRIPTIONS[name]?.supportsBackground ?? false;
-}
+
 
 /**
  * 工具函式：根據任務類型建議合适的 Shadow Agent
@@ -257,62 +253,12 @@ export function getShadowAgentsMarkdownTable(): string {
   return [formatRow(headers), formatRow(separator), ...rows.map(formatRow)].join("\n");
 }
 
-/**
- * 工具函式：取得 Shadow Agent 描述物件
- * Tool function: Get Shadow Agent description object
- */
-export function getShadowDescription(name: EnumShadowSubAgentsName): IShadowDescription | undefined {
-  return SHADOW_DESCRIPTIONS[name];
-}
+
 
 /**
  * 工具函式：取得所有 Shadow Agents 的名稱陣列
  * Tool function: Get all Shadow Agent names
  */
 export function getAllShadowNames(): readonly EnumShadowSubAgentsName[] {
-  return ALLOWED_SHADOWS;
-}
-
-/**
- * 取得工具列表的格式化字串 (用於 ShadowMonarch prompt)
- * Format tools list for ShadowMonarch prompt
- */
-function getAriseToolsMarkdown(): string {
-  // Use lowercase to match ALL_ARISE_TOOLS values
-  const tools = [
-    "arise_summon",
-    "arise_background", 
-    "arise_background_output",
-    "arise_background_status",
-    "arise_background_cancel",
-    "arise_list_models",
-    "arise_continue",
-    "arise_debug",
-    "arise_git_summary",
-  ];
-  
-  const toolDescriptions: Record<string, string> = {
-    arise_summon: "Summon a shadow agent - sync or background",
-    arise_background: "Launch background shadow agent - trackable",
-    arise_background_output: "Retrieve completed output from background task",
-    arise_background_status: "List background tasks and current status",
-    arise_background_cancel: "Cancel a running background task",
-    arise_list_models: "List available models from providers",
-    arise_continue: "Manually continue/resume failed task",
-    arise_debug: "Control debug mode (enable/disable/set level)",
-    arise_git_summary: "Get Git status summary",
-  };
-  
-  return tools.map(t => `- ${t}: ${toolDescriptions[t] || t}`).join("\n");
-}
-
-/**
- * 取得工具列表的格式化字串 (含 OpenCode 內建 task 工具)
- * Format tools list including OpenCode built-in task tool
- */
-export function getAriseToolsSection(): string {
-  const ariseTools = getAriseToolsMarkdown();
-  return `## Available Tools
-${ariseTools}
-- task: OpenCode's built-in for complex multi-step delegation`;
+	return ALLOWED_SHADOWS;
 }

@@ -12,10 +12,8 @@ import {
 	getShortDescription,
 	getFullDescription,
 	getMonarchShadowList,
-	supportsBackgroundExecution,
 	suggestShadowAgent,
 	getShadowAgentsMarkdownTable,
-	getShadowDescription,
 	getAllShadowNames,
 } from "./lib/shadow-descriptions";
 import {
@@ -218,36 +216,6 @@ describe("getMonarchShadowList", () => {
 });
 
 /**
- * supportsBackgroundExecution 函數測試
- * supportsBackgroundExecution function tests
- */
-describe("supportsBackgroundExecution", () => {
-	/**
-	 * 驗證背景執行支援正確
-	 * Verify background execution support is correct
-	 */
-	it("returns correct value for background shadows", () => {
-		for (const name of BACKGROUND_SHADOWS) {
-			expect(supportsBackgroundExecution(name)).toBe(true);
-		}
-	});
-
-	/**
-	 * 驗證非背景執行 Shadow 返回 false
-	 * Verify non-background shadows return false
-	 */
-	it("returns false for non-background shadows", () => {
-		const nonBackgroundNames = ALLOWED_SHADOWS.filter(
-			(name) => (BACKGROUND_SHADOWS as readonly string[]).indexOf(name) === -1
-		);
-
-		for (const name of nonBackgroundNames) {
-			expect(supportsBackgroundExecution(name)).toBe(false);
-		}
-	});
-});
-
-/**
  * suggestShadowAgent 函數測試
  * suggestShadowAgent function tests
  */
@@ -365,31 +333,6 @@ describe("getShadowAgentsMarkdownTable", () => {
 		expect(result).toContain("| Shadow Agent |");
 		expect(result).toContain("| Role |");
 		expect(result).toContain("| --- |");
-	});
-});
-
-/**
- * getShadowDescription 函數測試
- * getShadowDescription function tests
- */
-describe("getShadowDescription", () => {
-	/**
-	 * 驗證取得描述物件
-	 * Verify getting description object
-	 */
-	it("returns description for valid name", () => {
-		const result = getShadowDescription(EnumShadowSubAgentsName.Beru);
-		expect(result).toBeDefined();
-		expect(result?.name).toBe(EnumShadowSubAgentsName.Beru);
-	});
-
-	/**
-	 * 驗證無效名稱返回 undefined
-	 * Verify invalid name returns undefined
-	 */
-	it("returns undefined for invalid name", () => {
-		const result = getShadowDescription("invalid" as EnumShadowSubAgentsName);
-		expect(result).toBeUndefined();
 	});
 });
 

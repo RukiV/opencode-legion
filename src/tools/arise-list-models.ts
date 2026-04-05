@@ -1,6 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { EnumAriseTools } from '../types/enums';
-import { getAriseToolsConfigEntry } from '../agents/shadows';
+import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
 import { getErrorMessage } from '../utils/error';
 import { logArise2WithLevel } from '../utils/debug-control';

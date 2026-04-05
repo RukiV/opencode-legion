@@ -28,14 +28,13 @@ import {
 	IShadowDescription,
 	getShortDescription,
 	getMonarchShadowList,
-	supportsBackgroundExecution,
 	getFullDescription,
 	getShadowAgentsMarkdownTable,
-	getShadowDescription,
 	suggestShadowAgent,
 	getAllShadowNames,
-	getAriseToolsSection,
 } from './lib/shadow-descriptions';
+import { TOOL_SHORT_DESCRIPTIONS } from './lib/tool-descriptions';
+import { getAriseToolsSection } from './lib/arise-tools-utils';
 import { SHADOW_MONARCH_PROMPT } from './lib/shadow-monarch-prompt';
 import { createSummoningStrategy } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
@@ -207,7 +206,7 @@ ${ALLOWED_SHADOWS.map((name) =>
 			],
 		}),
 
-		shortDescription: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_SYNC_SUMMON],
 
 		args: {
 			shadow: z
@@ -241,7 +240,7 @@ The 'description' arg will be shown in arise_background_status output for task i
 			],
 		}),
 
-		shortDescription: "Launch background shadow agent - trackable, retrievable results" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND],
 
 		args: {
 			shadow: z
@@ -260,7 +259,7 @@ Returns the shadow agent's final response after task completion.
 Use arise_background_status first to check if the task is done before calling this tool.
 
 The task_id must come from a previous arise_background call (format: arise_xxx).` as const,
-		shortDescription: "Retrieve the completed output from a background shadow agent task" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT],
 
 		args: {
 			task_id: z
@@ -274,7 +273,7 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 Shows task_id, shadow name, status (running/completed/error/cancelled), description, and duration for each task.
 
 Use this to check which tasks are still running before calling arise_background_output. Supports filtering to current session only.` as const,
-		shortDescription: "List all background shadow agent tasks and their current status" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS],
 
 		args: {
 			current_session_only: z
@@ -287,7 +286,7 @@ Use this to check which tasks are still running before calling arise_background_
 		description: `Cancel a currently running background shadow agent task.
 
 The task_id must come from a previous arise_background call (format: arise_xxx). Only running tasks can be cancelled; already completed tasks cannot be cancelled.` as const,
-		shortDescription: "Cancel a currently running background shadow agent task." as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL],
 
 		args: {
 			task_id: z
@@ -301,7 +300,7 @@ The task_id must come from a previous arise_background call (format: arise_xxx).
 Use this tool to find the exact model name when you need to specify a model for a shadow.
 
 Returns a formatted list of all available models in the format provider/modelID.` as const,
-		shortDescription: "List all available models from configured providers." as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_LIST_MODELS],
 
 		args: {
 			provider: z
@@ -329,7 +328,7 @@ Runtime controls:
 - background_auto_resume: Enable/disable auto-resume specifically for background tasks
 
 Returns the status of the resume attempt.` as const,
-		shortDescription: "Actively continue/resume a failed task manually" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_CONTINUE],
 
 		args: {
 			task_id: z
@@ -366,7 +365,7 @@ The log levels are ordered from least to most verbose:
 - warn: Errors and warnings
 - info: Errors, warnings, and informational messages
 - debug: All messages including debug information` as const,
-		shortDescription: "Control debug mode (enable/disable/set level)" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_DEBUG],
 
 		args: {
 			enabled: z
@@ -393,32 +392,11 @@ Optional parameters:
 - cwd: target directory to run git commands in (relative to project root or absolute path)
 
 Returns a formatted summary suitable for quick repository state assessment.` as const,
-		shortDescription: "Get Git status summary (status + diff stat + recent log)" as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_GIT_SUMMARY],
 
 		args: GIT_SUMMARY_ARGS,
 	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;
-
-/**
- * 取得工具設定項目
- * Get tool configuration entry
- */
-export function getAriseToolsConfigEntry<A extends EnumAriseTools>(ariseToolName: A)
-{
-	const ariseToolsConfigEntry = ARISE_TOOLS[ariseToolName];
-
-	if (!ariseToolsConfigEntry)
-	{
-		throw new TypeError(`Tool ${ariseToolName} not found`);
-	}
-
-	// @ts-ignore
-	ariseToolsConfigEntry.description ??= ariseToolsConfigEntry.shortDescription;
-
-	return ariseToolsConfigEntry as any as ITSRequiredWith<typeof ARISE_TOOLS[A] & {
-		description: string;
-	}, 'description'>;
-}
 
 /**
  * Shadow Agents 定義集合

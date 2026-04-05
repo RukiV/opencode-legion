@@ -13,7 +13,8 @@
 
 import { EnumShadowAgentsName } from '../../types/enums';
 import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
-import { getMonarchShadowList, getAriseToolsSection } from './shadow-descriptions';
+import { getMonarchShadowList } from './shadow-descriptions';
+import { getAriseToolsSection } from './arise-tools-utils';
 import { composePrompt } from '../../utils/string/prompt-utils';
 import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy } from './tool-guides';
 

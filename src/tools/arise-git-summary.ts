@@ -6,7 +6,7 @@
  * Core logic is in src/utils/git-summary.ts; this file only integrates with OpenCode tool framework
  */
 import { EnumAriseTools } from '../types/enums';
-import { getAriseToolsConfigEntry } from '../agents/shadows';
+import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
 import { formatAriseMsgError, formatAriseMsgSuccess } from '../utils/string/arise-message';
 import { getGitSummary, formatGitSummary } from '../utils/git-summary';

@@ -21,8 +21,8 @@ import {
 	getMonarchShadowList,
 	getShortDescription,
 	getAllShadowNames,
-	getAriseToolsSection,
 } from "../src/agents/lib/shadow-descriptions";
+import { getAriseToolsSection } from "../src/agents/lib/arise-tools-utils";
 
 /**
  * 測試群組：Shadow Agents 配置完整性

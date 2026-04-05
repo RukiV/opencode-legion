@@ -2,7 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import type { IAriseConfig } from "../config/schema";
 import { EnumAriseTools } from '../types/enums';
 import { EnumLogLevel } from "../types/enum-opencode";
-import { getAriseToolsConfigEntry } from '../agents/shadows';
+import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
 import { resolveModelContext, formatModelBodyDescription } from '../utils/model-resolver';
 import { extractTextFromMessageParts } from '../utils/string/message';

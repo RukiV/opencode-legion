@@ -1,7 +1,7 @@
 import type { ToolContext } from "@opencode-ai/plugin";
 import type { BackgroundManager } from "./lib/background-manager";
 import { EnumAriseTools } from "../types/enums";
-import { getAriseToolsConfigEntry } from "../agents/shadows";
+import { getAriseToolsConfigEntry } from "../agents/lib/arise-tools-utils";
 import { tool2 } from '../types/types-opencode';
 import { consoleLoggerWithLevel, logArise2WithLevel } from "../utils/debug-control";
 import { createAgentToolListModels } from './arise-list-models';
