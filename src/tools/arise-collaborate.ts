@@ -30,6 +30,7 @@ import {
 	getRoundTimeoutMs,
 	getTotalRounds,
 } from "./lib/arise-collaborate-validator";
+import { checkTermination } from "./lib/arise-collaborate-termination";
 
 // ==================== 共用常數 / Shared Constants ====================
 
@@ -568,6 +569,41 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 		}
 
 		/**
+		 * 檢查終止標記
+		 * Check termination markers
+		 */
+		for (const response of roundResponses)
+		{
+			const termination = checkTermination(response);
+			if (termination.shouldStop)
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-collaborate:planning]`,
+					`Termination marker detected: ${termination.terminationType} at round ${round}`,
+				], { force: true });
+
+				/**
+				 * 組合終止結果
+				 * Compose termination result
+				 */
+				const details = [
+					`Rounds: ${round}`,
+					`Agents: ${config.shadows.join(", ")}`,
+					`Mode: planning`,
+					`Termination: ${termination.terminationType}`,
+					"",
+					"Final response:",
+					termination.finalResponse,
+				].join("\n");
+
+				return formatAriseMsgSuccessMultiLine(
+					`Planning collaboration terminated: ${termination.terminationType}`,
+					details,
+				);
+			}
+		}
+
+		/**
 		 * 檢查是否達成共識（所有回應相同或相似）
 		 * Check if consensus reached (all responses same or similar)
 		 */
@@ -670,6 +706,41 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 		);
 
 		tasks.push(...batchResults);
+	}
+
+	/**
+	 * 檢查終止標記
+	 * Check termination markers
+	 */
+	for (const task of tasks)
+	{
+		const termination = checkTermination(task.response);
+		if (termination.shouldStop)
+		{
+			logArise2WithLevel("debug", () => [
+				`[arise-collaborate:parallel]`,
+				`Termination marker detected: ${termination.terminationType}`,
+			], { force: true });
+
+			const resultsText = tasks.map(t =>
+				`${t.shadow}: ${t.response}`,
+			).join('\n\n');
+
+			const details = [
+				`Total agents: ${config.shadows.length}`,
+				`Max concurrent: ${config.max_concurrent}`,
+				`Mode: parallel`,
+				`Termination: ${termination.terminationType}`,
+				"",
+				"Results:",
+				resultsText,
+			].join('\n');
+
+			return formatAriseMsgSuccessMultiLine(
+				`Parallel collaboration terminated: ${termination.terminationType}`,
+				details,
+			);
+		}
 	}
 
 	/**
@@ -798,6 +869,38 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 			{
 				previousResult = result.result;
 				chainResults.push(result);
+
+				/**
+				 * 檢查終止標記
+				 * Check termination markers
+				 */
+				const termination = checkTermination(result.result);
+				if (termination.shouldStop)
+				{
+					logArise2WithLevel("debug", () => [
+						`[arise-collaborate:chain]`,
+						`Termination marker detected: ${termination.terminationType}`,
+					], { force: true });
+
+					const resultsText = chainResults.map(r =>
+						`${r.shadow}:\n${r.result}`,
+					).join('\n\n---\n\n');
+
+					const details = [
+						`Total agents: ${config.shadows.length}`,
+						`Max concurrent: ${config.max_concurrent}`,
+						`Mode: chain`,
+						`Termination: ${termination.terminationType}`,
+						"",
+						"Chain execution results:",
+						resultsText,
+					].join('\n');
+
+					return formatAriseMsgSuccessMultiLine(
+						`Chain collaboration terminated: ${termination.terminationType}`,
+						details,
+					);
+				}
 			}
 		}
 		// End of if (useBatchedExecution) for loop
@@ -838,6 +941,38 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 
 			previousResult = responseText;
 			chainResults.push({ shadow, result: responseText });
+
+			/**
+			 * 檢查終止標記
+			 * Check termination markers
+			 */
+			const termination = checkTermination(responseText);
+			if (termination.shouldStop)
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-collaborate:chain]`,
+					`Termination marker detected: ${termination.terminationType}`,
+				], { force: true });
+
+				const resultsText = chainResults.map(r =>
+					`${r.shadow}:\n${r.result}`,
+				).join('\n\n---\n\n');
+
+				const details = [
+					`Total agents: ${config.shadows.length}`,
+					`Max concurrent: ${config.max_concurrent}`,
+					`Mode: chain`,
+					`Termination: ${termination.terminationType}`,
+					"",
+					"Chain execution results:",
+					resultsText,
+				].join('\n');
+
+				return formatAriseMsgSuccessMultiLine(
+					`Chain collaboration terminated: ${termination.terminationType}`,
+					details,
+				);
+			}
 		}
 	}
 

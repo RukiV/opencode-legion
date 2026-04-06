@@ -254,6 +254,29 @@ export const ALLOWED_COLLABORATE_MODES = [
 ] as const satisfies EnumCollaborateMode[];
 
 /**
+ * Collaboration termination marker enumeration
+ * 協作終止標記列舉
+ */
+export enum EnumCollaborateTermination
+{
+	/** 已達成共識，停止討論 / Consensus reached, stop discussion */
+	STOP = "STOP",
+	/** 無法達成共識，停止討論 / Cannot reach consensus, stop discussion */
+	DEADLOCK = "DEADLOCK",
+	/** 資訊已足夠，停止討論 / Information is sufficient, stop discussion */
+	ENOUGH = "ENOUGH",
+}
+
+/**
+ * 允許的終止標記列表 / Allowed termination markers
+ */
+export const ALLOWED_COLLABORATE_TERMINATIONS = [
+	EnumCollaborateTermination.STOP,
+	EnumCollaborateTermination.DEADLOCK,
+	EnumCollaborateTermination.ENOUGH,
+] as const satisfies EnumCollaborateTermination[];
+
+/**
  * Enum of all Arise tool names
  */
 export enum EnumAriseTools

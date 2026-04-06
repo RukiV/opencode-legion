@@ -62,6 +62,9 @@ importers:
       regexp-cjk-with-plugin-enabled:
         specifier: ^1.0.23
         version: 1.0.23(@lazy-cjk/jp-table-voice@1.0.40(ts-toolbelt@9.6.0))(cjk-conv@1.2.150(ts-toolbelt@9.6.0))(regexp-parser-event@1.1.47(ts-toolbelt@9.6.0))(ts-toolbelt@9.6.0)
+      regexp-helper-core:
+        specifier: ^2.0.10
+        version: 2.0.10
       sort-object-keys2:
         specifier: ^3.0.8
         version: 3.0.8
