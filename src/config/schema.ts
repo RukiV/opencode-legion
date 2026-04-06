@@ -346,17 +346,17 @@ export const AriseConfigSchema = z
 						title: "Denied Modes",
 					})
 					.optional(),
-				/** 預設總回合數（預設 8，最大 15）/ Default total rounds (default 8, max 15) */
-				total_rounds: z.number().int().min(1).max(MAX_COLLABORATE_TOTAL_ROUNDS)
+				/** 預設總回合數（預設 8）/ Default total rounds (default 8) */
+				total_rounds: z.number().int().min(1)
 					.meta({
-						description: `預設總回合數（最大 ${MAX_COLLABORATE_TOTAL_ROUNDS}）/ Default total rounds (max ${MAX_COLLABORATE_TOTAL_ROUNDS})`,
+						description: "預設總回合數（預設 8）/ Default total rounds (default 8)",
 						title: "Total Rounds",
 					})
 					.optional(),
 				/** 總回合數最大上限（預設 15）/ Total rounds maximum limit (default 15) */
-				total_rounds_max: z.number().int().min(1).max(50)
+				total_rounds_max: z.number().int().min(1)
 					.meta({
-						description: "總回合數最大上限 / Total rounds maximum limit",
+						description: "總回合數最大上限（預設 15）/ Total rounds maximum limit (default 15)",
 						title: "Total Rounds Max",
 					})
 					.optional(),
@@ -368,7 +368,7 @@ export const AriseConfigSchema = z
 					})
 					.optional(),
 				/** 預設最大並行數（預設 2，最大 5）/ Default max concurrent (default 2, max 5) */
-				max_concurrent: z.number().int().min(1).max(MAX_COLLABORATE_MAX_CONCURRENT)
+				max_concurrent: z.number().int().min(1)
 					.meta({
 						description: `預設最大並行數（最大 ${MAX_COLLABORATE_MAX_CONCURRENT}）/ Default max concurrent (max ${MAX_COLLABORATE_MAX_CONCURRENT})`,
 						title: "Max Concurrent",
