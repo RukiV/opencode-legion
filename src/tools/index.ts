@@ -9,6 +9,7 @@ import { createAgentToolListModels } from './arise-list-models';
 import { createAgentToolContinue } from './arise-continue';
 import { createAgentToolDebug } from './arise-debug';
 import { createAgentToolGitSummary } from './arise-git-summary';
+import { createAgentToolAriseCollaborate } from './arise-collaborate';
 import { EnumAriseTools } from '../types/enums';
 import { IAriseTools } from '../types/types';
 import { BackgroundManager } from './lib/background-manager';
@@ -25,7 +26,10 @@ import { loadAriseConfig } from '../config/io';
  * @param backgroundManager - 背景任務管理器
  * @returns 所有 Arise 工具的物件
  */
-export function createPluginTools(ctx: PluginInput, backgroundManager: BackgroundManager, config: IAriseConfig): IAriseTools
+export function createPluginTools(ctx: PluginInput,
+	backgroundManager: BackgroundManager,
+	config: IAriseConfig,
+): IAriseTools
 {
 	return {
 		/** 同步/非同步召喚 Shadow 工具 / Sync/async summon Shadow tool */
@@ -46,5 +50,7 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 		[EnumAriseTools.ARISE_DEBUG]: createAgentToolDebug(),
 		/** Git 狀態摘要工具 / Git status summary tool */
 		[EnumAriseTools.ARISE_GIT_SUMMARY]: createAgentToolGitSummary(),
+		/** 多代理協作工具 / Multi-agent collaboration tool */
+		[EnumAriseTools.ARISE_COLLABORATE]: createAgentToolAriseCollaborate(ctx, config, backgroundManager),
 	} satisfies IAriseTools
 }

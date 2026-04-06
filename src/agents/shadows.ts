@@ -15,6 +15,8 @@ import {
 	type IAllShadowAgentsName,
 	EnumAriseTools,
 	ALL_ARISE_TOOLS,
+	ALLOWED_COLLABORATE_MODES,
+	EnumCollaborateMode,
 } from '../types/enums';
 import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
@@ -213,11 +215,14 @@ ${ALLOWED_SHADOWS.map((name) =>
 				.enum(ALLOWED_SHADOWS)
 				.meta({ description: "Which shadow agent to summon" }),
 			...SHARED_SUMMON_ARGS,
-		run_in_background: z
-			.boolean()
-			.meta({ description: "NOT RECOMMENDED: For tasks that don't need file editing and require retrievable results, use arise_background instead. true = fire-and-forget, returns Task ID + Session ID." })
-			.optional()
-			.default(false),
+			run_in_background: z
+				.boolean()
+				.meta({
+					description: "NOT RECOMMENDED: For tasks that don't need file editing and require retrievable results, use arise_background instead. true = fire-and-forget, returns Task ID + Session ID.",
+					title: "Run in Background",
+				})
+				.optional()
+				.default(false),
 		},
 	},
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: {
@@ -409,6 +414,104 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_GIT_SUMMARY],
 
 		args: GIT_SUMMARY_ARGS,
+	},
+	[EnumAriseTools.ARISE_COLLABORATE]: {
+		description: `Enable multiple Shadow Agents to collaborate on a task using different execution modes.
+
+**Collaboration Modes:**
+- **planning**: Multiple agents discuss and reach consensus on a solution
+- **parallel**: Multiple agents execute different tasks simultaneously
+- **chain**: Multiple agents execute in sequence, passing results to the next agent
+
+**Key Parameters:**
+- mode: Collaboration mode (planning, parallel, chain)
+- shadows: List of participating Shadow agents (at least 1 required)
+- prompt: The task prompt for agents to work on
+- total_rounds: Maximum total rounds (default: 8, max: 15)
+- max_concurrent: Max concurrent agents (default: 2, max: 5)
+- round_timeout_ms: Timeout per round in milliseconds (default: 60000)
+- per_agent_rounds: Maximum rounds per individual agent (optional)
+
+**Usage Guidelines:**
+- Use planning mode for complex problem-solving requiring multiple perspectives
+- Use parallel mode for independent tasks that can run simultaneously
+- Use chain mode for sequential workflows where each agent builds on previous results
+- Values exceeding configured limits will be automatically truncated with warnings` as const,
+		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_COLLABORATE],
+
+		args: {
+			mode: z
+				.enum(ALLOWED_COLLABORATE_MODES)
+				.meta({
+					description: "Collaboration mode: planning (discussion), parallel (simultaneous), or chain (sequential)",
+					title: "Mode",
+				}),
+			shadows: z
+				.array(z.enum(ALLOWED_SHADOWS))
+				.min(1)
+				.meta({
+					description: "List of participating Shadow agents (at least 1 required)",
+					title: "Shadow Agents",
+				}),
+			prompt: z
+				.string()
+				.meta({
+					description: "Task prompt for agents to work on",
+					title: "Prompt",
+				}),
+			description: z
+				.string()
+				.meta({
+					description: "Task description (for identification in status output)",
+					title: "Description",
+				})
+				.optional(),
+			model: z
+				.string()
+				.meta({
+					description: "Specified model to use for all agents",
+					title: "Model",
+				})
+				.optional(),
+			total_rounds: z
+				.number()
+				.int()
+				.min(1)
+				.max(15)
+				.meta({
+					description: "Total maximum rounds (default: 8, max: 15)",
+					title: "Total Rounds",
+				})
+				.optional(),
+			max_concurrent: z
+				.number()
+				.int()
+				.min(1)
+				.max(5)
+				.meta({
+					description: "Maximum concurrent agents (default: 2, max: 5)",
+					title: "Max Concurrent",
+				})
+				.optional(),
+			round_timeout_ms: z
+				.number()
+				.int()
+				.min(1000)
+				.meta({
+					description: "Timeout per round in milliseconds (default: 60000)",
+					title: "Round Timeout (ms)",
+				})
+				.optional(),
+			per_agent_rounds: z
+				.number()
+				.int()
+				.min(1)
+				.meta({
+					description: "Maximum rounds per individual agent (optional)",
+					title: "Per-Agent Rounds",
+				})
+				.optional(),
+		},
 	},
 } satisfies Record<EnumAriseTools, I_AriseToolsConfigEntry>;
 

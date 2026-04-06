@@ -1,9 +1,22 @@
 import { z } from "zod";
-import { ALL_SHADOW_AGENTS_NAME } from "../types/enums";
+import { ALL_SHADOW_AGENTS_NAME, ALLOWED_COLLABORATE_MODES } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
-import { ALLOWED_AUTO_RESUME_ON_ERROR, ALLOWED_AUTO_RESUME_TARGET, EnumAutoResumeOnError, EnumAutoResumeTarget } from "../types/enums";
-import { AUTO_MODEL, DEFAULT_SAFETY_PROMPT, DEFAULT_POLL_INTERVAL, DEFAULT_RETRY_DELAY_INCREMENT, DEFAULT_RETRY_DELAY_MAX } from "../types/const-default";
+import {
+	ALLOWED_AUTO_RESUME_ON_ERROR,
+	ALLOWED_AUTO_RESUME_TARGET,
+	EnumAutoResumeOnError,
+	EnumAutoResumeTarget,
+} from "../types/enums";
+import {
+	AUTO_MODEL,
+	DEFAULT_SAFETY_PROMPT,
+	DEFAULT_POLL_INTERVAL,
+	DEFAULT_RETRY_DELAY_INCREMENT,
+	DEFAULT_RETRY_DELAY_MAX,
+	MAX_COLLABORATE_TOTAL_ROUNDS,
+	MAX_COLLABORATE_MAX_CONCURRENT,
+} from "../types/const-default";
 import { extractDefaultsFromJSONSchema } from "../utils/type/zod-defaults";
 import { unwrapZodAll, unwrapZodAllShape } from "../utils/type/zod-schema-helpers";
 
@@ -221,7 +234,7 @@ export const AgentOverride = z
 		description: "代理覆寫設定 / Agent override settings",
 		title: "Agent Override",
 	});
-	;
+;
 /**
  * Arise 主配置結構
  * Arise main configuration schema
@@ -308,12 +321,63 @@ export const AriseConfigSchema = z
 			.optional(),
 		/** 背景任務設定（可選）/ Background task settings (optional) */
 		background: BackgroundTiming.extend({
-			/** 自動繼續任務設定（可選）/ Auto resume task settings (optional) */
-			auto_resume: AutoResumeConfig.optional(),
-		})
+				/** 自動繼續任務設定（可選）/ Auto resume task settings (optional) */
+				auto_resume: AutoResumeConfig.optional(),
+			})
 			.meta({
 				description: "背景任務設定 / Background task settings",
 				title: "Background",
+			})
+			.optional(),
+		/** 協作任務設定（可選）/ Collaboration task settings (optional) */
+		collaborate: z
+			.object({
+				/** 允許的模式列表（白名單）/ Allowed modes (whitelist) */
+				allowed_modes: z.array(z.enum(ALLOWED_COLLABORATE_MODES))
+					.meta({
+						description: "允許的模式列表，若設定則只允許這些模式 / Allowed modes, if set only these modes are allowed",
+						title: "Allowed Modes",
+					})
+					.optional(),
+				/** 禁止的模式列表（黑名單）/ Denied modes (blacklist) */
+				denied_modes: z.array(z.enum(ALLOWED_COLLABORATE_MODES))
+					.meta({
+						description: "禁止的模式列表，優先於 allowed_modes / Denied modes, takes precedence over allowed_modes",
+						title: "Denied Modes",
+					})
+					.optional(),
+				/** 預設總回合數（預設 8，最大 15）/ Default total rounds (default 8, max 15) */
+				total_rounds: z.number().int().min(1).max(MAX_COLLABORATE_TOTAL_ROUNDS)
+					.meta({
+						description: `預設總回合數（最大 ${MAX_COLLABORATE_TOTAL_ROUNDS}）/ Default total rounds (max ${MAX_COLLABORATE_TOTAL_ROUNDS})`,
+						title: "Total Rounds",
+					})
+					.optional(),
+				/** 預設每個 agent 回合數（可選）/ Default per-agent rounds (optional) */
+				per_agent_rounds: z.number().int().positive()
+					.meta({
+						description: "預設每個 agent 回合數 / Default per-agent rounds",
+						title: "Per Agent Rounds",
+					})
+					.optional(),
+				/** 預設最大並行數（預設 2，最大 5）/ Default max concurrent (default 2, max 5) */
+				max_concurrent: z.number().int().min(1).max(MAX_COLLABORATE_MAX_CONCURRENT)
+					.meta({
+						description: `預設最大並行數（最大 ${MAX_COLLABORATE_MAX_CONCURRENT}）/ Default max concurrent (max ${MAX_COLLABORATE_MAX_CONCURRENT})`,
+						title: "Max Concurrent",
+					})
+					.optional(),
+				/** 預設回合超時（毫秒）/ Default round timeout (ms) */
+				round_timeout_ms: z.number().int().positive()
+					.meta({
+						description: "預設回合超時（毫秒）/ Default round timeout (ms)",
+						title: "Round Timeout",
+					})
+					.optional(),
+			})
+			.meta({
+				description: "協作任務設定 / Collaboration task settings",
+				title: "Collaborate",
 			})
 			.optional(),
 		/** 除錯設定（可選）/ Debug settings (optional) */

@@ -15,7 +15,8 @@ import { createAgentToolListModels } from './arise-list-models';
  *
  * @param manager - BackgroundManager 實例
  */
-export function createAgentToolContinue(manager: BackgroundManager) {
+export function createAgentToolContinue(manager: BackgroundManager)
+{
 	const {
 		description,
 		args,
@@ -25,7 +26,8 @@ export function createAgentToolContinue(manager: BackgroundManager) {
 		description,
 		args,
 
-		async execute(args) {
+		async execute(args)
+		{
 			const { task_id, force, auto_resume, background_auto_resume } = args;
 
 			/**
@@ -33,8 +35,8 @@ export function createAgentToolContinue(manager: BackgroundManager) {
 			 * Debug log: Start manual retry execution
 			 */
 			logArise2WithLevel("debug", () => [
-			  `[arise-continue]`,
-			  `Starting manual retry for task: ${task_id}, force: ${force ?? false}`,
+				`[arise-continue]`,
+				`Starting manual retry for task: ${task_id}, force: ${force ?? false}`,
 			]);
 
 			/** 優先嘗試用 taskId / Try taskId first */
@@ -64,7 +66,7 @@ export function createAgentToolContinue(manager: BackgroundManager) {
 				targetTaskId,
 				force ?? false,
 				auto_resume,
-				background_auto_resume
+				background_auto_resume,
 			);
 
 			/**
@@ -72,8 +74,8 @@ export function createAgentToolContinue(manager: BackgroundManager) {
 			 * Debug log: Manual retry result
 			 */
 			logArise2WithLevel("debug", () => [
-			  `[arise-continue]`,
-			  `Manual retry result for ${args.task_id}: ${result}`,
+				`[arise-continue]`,
+				`Manual retry result for ${args.task_id}: ${result}`,
 			]);
 
 			return result;

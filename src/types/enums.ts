@@ -131,7 +131,8 @@ export type IAllowedShadowName = ITSTypeAndStringLiteral<EnumShadowSubAgentsName
  * 定義所有可用的生命週期 Hook 名稱
  * Defines all available lifecycle hook names
  */
-export const enum EnumHookName {
+export const enum EnumHookName
+{
 	/** 橫幅顯示 Hook / Arise Banner Hook */
 	AriseBanner = "arise-banner",
 	/** 輸出整形 Hook / Output Shaper Hook */
@@ -163,7 +164,8 @@ export const ALLOWED_HOOKS = [
  * 定義 auto_resume 任務失敗時的行為
  * Defines behavior when auto_resume task fails
  */
-export enum EnumAutoResumeOnError {
+export enum EnumAutoResumeOnError
+{
 	/** 忽略錯誤，繼續執行 / Ignore error, continue execution */
 	Ignore = "ignore",
 	/** 重試任務 / Retry the task */
@@ -179,7 +181,8 @@ export enum EnumAutoResumeOnError {
  * 定義哪些任務類型啟用 auto-resume
  * Defines which task types enable auto-resume
  */
-export enum EnumAutoResumeTarget {
+export enum EnumAutoResumeTarget
+{
 	/** 僅背景任務 / Background tasks only */
 	Background = "background",
 	/** 所有任務 / All tasks */
@@ -228,13 +231,33 @@ export enum BackgroundTaskStatus
 }
 
 /**
- * Arise 工具名稱列舉
- * Arise tool name enum
- *
- * 定義所有 OpencodeArise 插件提供的工具 key
+ * 協作模式列舉
+ * Collaboration mode enumeration
+ */
+export enum EnumCollaborateMode
+{
+	/** 規劃討論模式 - 多個 agent 討論並達成共識 / Planning discussion mode - multiple agents discuss and reach consensus */
+	PLANNING = "planning",
+	/** 平行執行模式 - 多個 agent 同時執行不同任務 / Parallel execution mode - multiple agents execute different tasks simultaneously */
+	PARALLEL = "parallel",
+	/** 鏈式執行模式 - 多個 agent 依序執行，結果傳遞 / Chain execution mode - multiple agents execute in sequence, passing results */
+	CHAIN = "chain",
+}
+
+/**
+ * 允許的協作模式列表 / Allowed collaboration modes
+ */
+export const ALLOWED_COLLABORATE_MODES = [
+	EnumCollaborateMode.PLANNING,
+	EnumCollaborateMode.PARALLEL,
+	EnumCollaborateMode.CHAIN,
+] as const satisfies EnumCollaborateMode[];
+
+/**
  * Enum of all Arise tool names
  */
-export enum EnumAriseTools {
+export enum EnumAriseTools
+{
 	/** 同步或非同步召喚 shadow agent 執行任務 / Invoke a shadow agent synchronously or in background */
 	ARISE_SYNC_SUMMON = "arise_summon",
 	/** 以背景任務方式啟動 shadow agent (平行執行) / Launch shadow agent as background task (parallel) */
@@ -253,6 +276,8 @@ export enum EnumAriseTools {
 	ARISE_DEBUG = "arise_debug",
 	/** 一次性取得 Git 狀態摘要（status、diff stat、log）/ Get Git status summary in one shot */
 	ARISE_GIT_SUMMARY = "arise_git_summary",
+	/** 多個 shadow agent 協作執行任務 / Multiple shadow agents collaborate on tasks */
+	ARISE_COLLABORATE = "arise_collaborate",
 }
 
 /**
@@ -269,6 +294,7 @@ export const ALL_ARISE_TOOLS = [
 	EnumAriseTools.ARISE_CONTINUE,
 	EnumAriseTools.ARISE_DEBUG,
 	EnumAriseTools.ARISE_GIT_SUMMARY,
+	EnumAriseTools.ARISE_COLLABORATE,
 ] as const satisfies EnumAriseTools[];
 
 export enum EnumDetectAutoModelBody

@@ -27,13 +27,15 @@ export const TOOL_SHORT_DESCRIPTIONS: Record<EnumAriseTools, string> = {
 	[EnumAriseTools.ARISE_CONTINUE]: "Actively continue/resume a failed task manually",
 	[EnumAriseTools.ARISE_DEBUG]: "Control debug mode (enable/disable/set level)",
 	[EnumAriseTools.ARISE_GIT_SUMMARY]: "Get Git status summary (status + diff stat + recent log)",
+	[EnumAriseTools.ARISE_COLLABORATE]: "Multi-agent collaboration - planning, parallel, or chain execution",
 };
 
 /**
  * 取得工具列表的格式化字串 (用於 ShadowMonarch prompt)
  * Format tools list for ShadowMonarch prompt
  */
-export function getAriseToolsMarkdown(): string {
+export function getAriseToolsMarkdown(): string
+{
 	return ALL_ARISE_TOOLS
 		.map((tool) => `- ${tool}: ${TOOL_SHORT_DESCRIPTIONS[tool]}`)
 		.join("\n");

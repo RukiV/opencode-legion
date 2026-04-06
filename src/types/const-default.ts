@@ -27,8 +27,8 @@ export const AUTO_MODEL = 'AUTO' as const;
  * Zod schema for AUTO_MODEL constant validation
  */
 export const AutoModelSchema = z.literal(AUTO_MODEL).meta({
-  description: "自動模型標記，表示自動沿用主任務的模型 / Auto model marker, inherits parent task's model",
-  title: "Auto Model",
+	description: "自動模型標記，表示自動沿用主任務的模型 / Auto model marker, inherits parent task's model",
+	title: "Auto Model",
 });
 
 /**
@@ -81,6 +81,36 @@ export const DEFAULT_RETRY_DELAY_INCREMENT = 5000 as const;
  * Default maximum retry delay in milliseconds
  */
 export const DEFAULT_RETRY_DELAY_MAX = 60000 as const;
+
+/**
+ * Collaborate 工具預設總回合數
+ * Default total rounds for collaborate tool
+ */
+export const DEFAULT_COLLABORATE_TOTAL_ROUNDS = 8 as const;
+
+/**
+ * Collaborate 工具最大總回合數
+ * Maximum total rounds for collaborate tool
+ */
+export const MAX_COLLABORATE_TOTAL_ROUNDS = 15 as const;
+
+/**
+ * Collaborate 工具預設最大並行數
+ * Default max concurrent agents for collaborate tool
+ */
+export const DEFAULT_COLLABORATE_MAX_CONCURRENT = 2 as const;
+
+/**
+ * Collaborate 工具最大並行數
+ * Maximum max concurrent agents for collaborate tool
+ */
+export const MAX_COLLABORATE_MAX_CONCURRENT = 5 as const;
+
+/**
+ * Collaborate 工具預設回合超時（毫秒）
+ * Default round timeout for collaborate tool
+ */
+export const DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS = 60000 as const;
 
 /**
  * @see {@link https://github.com/anomalyco/opencode/blob/2cc738fb1794470d28b6795f2267b9b756d4be88/packages/opencode/src/session/compaction.ts#L320}
