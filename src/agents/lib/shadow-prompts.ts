@@ -276,6 +276,8 @@ Ask yourself:
    - ⚠️ Potential risks: [what could go wrong]
 3. Recommendations: [if fixes needed]
 4. Confidence level: [HIGH/MEDIUM/LOW based on verification depth]`,
+
+		DRY_DETECTION_AND_SHARING,
 	],
 	footer: [
 		TODO_LIST_GUIDE,
