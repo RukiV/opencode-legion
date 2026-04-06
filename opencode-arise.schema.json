@@ -374,6 +374,82 @@
         }
       }
     },
+    "collaborate": {
+      "type": "object",
+      "title": "Collaborate",
+      "description": "協作任務設定 / Collaboration task settings",
+      "additionalProperties": false,
+      "properties": {
+        "allowed_modes": {
+          "type": "array",
+          "title": "Allowed Modes",
+          "description": "允許的模式列表，若設定則只允許這些模式 / Allowed modes, if set only these modes are allowed",
+          "items": {
+            "type": "string",
+            "enum": [
+              "planning",
+              "parallel",
+              "chain"
+            ]
+          }
+        },
+        "denied_modes": {
+          "type": "array",
+          "title": "Denied Modes",
+          "description": "禁止的模式列表，優先於 allowed_modes / Denied modes, takes precedence over allowed_modes",
+          "items": {
+            "type": "string",
+            "enum": [
+              "planning",
+              "parallel",
+              "chain"
+            ]
+          }
+        },
+        "total_rounds": {
+          "type": "integer",
+          "title": "Total Rounds",
+          "description": "預設總回合數（預設 8）/ Default total rounds (default 8)",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "total_rounds_max": {
+          "type": "integer",
+          "title": "Total Rounds Max",
+          "description": "總回合數最大上限（預設 15）/ Total rounds maximum limit (default 15)",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "per_agent_rounds": {
+          "type": "integer",
+          "title": "Per Agent Rounds",
+          "description": "預設每個 agent 回合數 / Default per-agent rounds",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "max_concurrent": {
+          "type": "integer",
+          "title": "Max Concurrent",
+          "description": "預設最大並行數（最大 5）/ Default max concurrent (max 5)",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "round_timeout_ms": {
+          "type": "integer",
+          "title": "Round Timeout",
+          "description": "預設回合超時（毫秒）/ Default round timeout (ms)",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "round_timeout_ms_max": {
+          "type": "integer",
+          "title": "Round Timeout Max",
+          "description": "回合超時最大上限（毫秒）/ Round timeout maximum limit (ms)",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        }
+      }
+    },
     "debug": {
       "type": "object",
       "title": "Debug",

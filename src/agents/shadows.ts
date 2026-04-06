@@ -448,7 +448,7 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				}),
 			shadows: z
 				.array(z.enum(ALLOWED_SHADOWS))
-				.min(1)
+				.min(2)
 				.meta({
 					description: "List of participating Shadow agents (at least 1 required)",
 					title: "Shadow Agents",
@@ -477,9 +477,8 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				.number()
 				.int()
 				.min(1)
-				.max(15)
 				.meta({
-					description: "Total maximum rounds (default: 8, max: 15)",
+					description: "Total maximum rounds (default: 8, configurable via total_rounds_max)",
 					title: "Total Rounds",
 				})
 				.optional(),
@@ -487,7 +486,6 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				.number()
 				.int()
 				.min(1)
-				.max(5)
 				.meta({
 					description: "Maximum concurrent agents (default: 2, max: 5)",
 					title: "Max Concurrent",
