@@ -30,6 +30,7 @@ import {
 	PREFER_TOOLS_OVER_BASH,
 	CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 	GIT_COMMIT_PUSH_CAUTIONS,
+	DRY_DETECTION_AND_SHARING,
 } from './tool-guides';
 import { RULES_SKILLS_INDEX } from './rules-skills-ref';
 
@@ -90,6 +91,8 @@ When editing files, YOU MUST follow these rules:
 		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 
 		GIT_COMMIT_PUSH_CAUTIONS,
+
+		DRY_DETECTION_AND_SHARING,
 
 		`## Core Principles
 1. Make minimal, focused changes
@@ -152,6 +155,8 @@ Your role: Components, styling, layouts, animations.`,
 		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 
 		GIT_COMMIT_PUSH_CAUTIONS,
+
+		DRY_DETECTION_AND_SHARING,
 
 		`## Core Principles
 1. Follow existing design patterns

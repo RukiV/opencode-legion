@@ -16,7 +16,7 @@ import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
 import { getMonarchShadowList } from './shadow-descriptions';
 import { getAriseToolsSection } from './arise-tools-utils';
 import { composePrompt } from '../../utils/string/prompt-utils';
-import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy, CAUTION_WITH_DESTRUCTIVE_OPERATIONS, GIT_COMMIT_PUSH_CAUTIONS } from './tool-guides';
+import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy, CAUTION_WITH_DESTRUCTIVE_OPERATIONS, GIT_COMMIT_PUSH_CAUTIONS, DRY_DETECTION_AND_SHARING } from './tool-guides';
 
 /**
  * Shadow Monarch Prompt
@@ -53,6 +53,8 @@ ${getMonarchShadowList()}
 		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 
 		GIT_COMMIT_PUSH_CAUTIONS,
+
+		DRY_DETECTION_AND_SHARING,
 	],
 	footer: [
 		SUMMONING_METHOD_RULES,

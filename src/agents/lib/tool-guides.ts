@@ -226,6 +226,46 @@ export const PREFER_TOOLS_OVER_BASH = `## Prefer Tools Over Bash Commands
 **Rule:** Check available tools first, use bash only when no suitable tool exists.` as const;
 
 /**
+ * 重複檢測與共享邏輯
+ * DRY (Don't Repeat Yourself) detection and logic sharing
+ *
+ * 💡 提示：對於類似的邏輯，應該抽離建立共享邏輯來復用，避免重複程式碼
+ * 💡 Tip: For similar logic, extract and create shared logic for reuse — avoid duplicating code
+ */
+export const DRY_DETECTION_AND_SHARING = `## 🔄 DRY — Don't Repeat Yourself
+
+**When you find similar logic patterns:**
+
+1. **Detect duplication:**
+   - Same or very similar code appears in multiple places
+   - Similar validation logic, data transformation, helper functions
+   - Repeated patterns in different files
+
+2. **Extract to shared location:**
+   - Create a shared utility function in a common location
+   - Use appropriate naming (e.g., \`utils/xxx-utils.ts\`, \`lib/xxx.ts\`)
+   - Export for use across modules
+
+3. **When to refactor:**
+   - If the logic needs to be updated, you only need to change one place
+   - When duplication makes maintenance difficult
+   - When the shared logic is general enough to be reused
+
+4. **Before extracting, consider:**
+   - Is this logic truly reusable?
+   - Does it belong to a specific module or is it truly generic?
+   - Will the refactoring break existing functionality?
+
+5. **Don't over-engineer:**
+   - Small, simple duplication may be acceptable
+   - Don't create abstraction just for the sake of it
+   - Balance between reusability and complexity
+
+**Example:**
+- ❌ Bad: Copy-paste same validation logic in multiple services
+- ✅ Good: Create \`validateXXX()\` in shared utils, import where needed` as const;
+
+/**
  * 不編輯檔案的約束（適用於 Beru, Bellion, Tank, Shadow Sovereign）
  * No-edit constraints (for Beru, Bellion, Tank, Shadow Sovereign)
  */
