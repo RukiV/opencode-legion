@@ -276,7 +276,11 @@ export enum EnumAriseTools
 	ARISE_DEBUG = "arise_debug",
 	/** 一次性取得 Git 狀態摘要（status、diff stat、log）/ Get Git status summary in one shot */
 	ARISE_GIT_SUMMARY = "arise_git_summary",
-	/** 多個 shadow agent 協作執行任務 / Multiple shadow agents collaborate on tasks */
+	/**
+	 * 多個 shadow agent 協作執行任務 / Multiple shadow agents collaborate on tasks 
+	 * 
+	 * @see docs/features/arise-collaborate.md
+	 */
 	ARISE_COLLABORATE = "arise_collaborate",
 }
 

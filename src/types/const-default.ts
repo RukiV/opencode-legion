@@ -109,8 +109,20 @@ export const MAX_COLLABORATE_MAX_CONCURRENT = 5 as const;
 /**
  * Collaborate 工具預設回合超時（毫秒）
  * Default round timeout for collaborate tool
+ *
+ * 預設 3 分鐘，考慮免費 AI 能力較慢
+ * Default 3 minutes, considering free AI capabilities are slower
  */
-export const DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS = 60000 as const;
+export const DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS = 180000 as const;
+
+/**
+ * Collaborate 工具回合超時最大上限（毫秒）
+ * Maximum round timeout for collaborate tool
+ *
+ * 預設 10 分鐘
+ * Default 10 minutes
+ */
+export const COLLABORATE_ROUND_TIMEOUT_MS_MAX = 600000 as const;
 
 /**
  * @see {@link https://github.com/anomalyco/opencode/blob/2cc738fb1794470d28b6795f2267b9b756d4be88/packages/opencode/src/session/compaction.ts#L320}

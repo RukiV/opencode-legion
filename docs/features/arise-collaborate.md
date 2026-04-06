@@ -287,14 +287,37 @@
 
 ### 可選參數
 
-| 參數                 | 類型       | 預設值   | 說明             |
-|--------------------|----------|-------|----------------|
-| `description`      | `string` | -     | 任務描述（用於狀態輸出識別） |
-| `model`            | `string` | -     | 指定使用的模型        |
-| `total_rounds`     | `number` | 8     | 總回合數（上限 15）    |
-| `max_concurrent`   | `number` | 2     | 最大並行數（上限 5）    |
-| `round_timeout_ms` | `number` | 60000 | 回合超時（毫秒）       |
-| `per_agent_rounds` | `number` | -     | 每個 agent 的回合數  |
+| 參數                 | 類型       | 說明             |
+|--------------------|----------|----------------|
+| `description`      | `string` | 任務描述（用於狀態輸出識別） |
+| `model`            | `string` | 指定使用的模型        |
+| `total_rounds`     | `number` | 總回合數（預設 8，最大由 `total_rounds_max` 決定） |
+| `total_rounds_max` | `number` | 總回合數最大上限（預設 15） |
+| `max_concurrent`   | `number` | 最大並行數；計算方式：min(呼叫值, min(config值, 2)) |
+| `round_timeout_ms` | `number` | 回合超時（毫秒，預設 3 分鐘） |
+| `round_timeout_ms_max` | `number` | 回合超時最大上限（預設 10 分鐘） |
+| `per_agent_rounds` | `number` | 每個 agent 的回合數  |
+
+### 參數驗證策略
+
+#### max_concurrent
+- 安全預設值 = min(config值, 系統預設值 2)
+- 最終呼叫值 = min(呼叫值, 安全預設值)
+- 呼叫值不合法時使用安全預設值
+
+#### round_timeout_ms
+- 最終預設值 = config值 ?? 180000 (3 分鐘)
+- 最終最大上限 = config_max值 ?? 600000 (10 分鐘)
+- 呼叫值不合法 → 最終預設值
+- 呼叫值 > 最終最大上限 → 最終最大上限
+- 否則 → 呼叫值
+
+#### total_rounds
+- 最終預設值 = config值 ?? 8
+- 最終最大上限 = config_max值 ?? 15
+- 呼叫值不合法 → 最終預設值
+- 呼叫值 > 最終最大上限 → 最終最大上限
+- 否則 → 呼叫值
 
 ---
 
@@ -351,29 +374,33 @@
     "allowed_modes": ["planning", "parallel", "chain"],
     "denied_modes": [],
     "total_rounds": 8,
+    "total_rounds_max": 15,
     "per_agent_rounds": null,
     "max_concurrent": 2,
-    "round_timeout_ms": 60000
+    "round_timeout_ms": 180000,
+    "round_timeout_ms_max": 600000,
   }
 }
 ```
 
 ### 配置欄位說明
 
-| 欄位                 | 類型         | 說明            |
-|--------------------|------------|---------------|
-| `allowed_modes`    | `string[]` | 允許的協作模式       |
-| `denied_modes`     | `string[]` | 拒絕的協作模式       |
-| `total_rounds`     | `number`   | 預設總回合數        |
-| `per_agent_rounds` | `number`   | 預設每 agent 回合數 |
-| `max_concurrent`   | `number`   | 預設最大並行數       |
-| `round_timeout_ms` | `number`   | 預設回合超時        |
+| 欄位                   | 類型         | 說明                  |
+|----------------------|------------|---------------------|
+| `allowed_modes`      | `string[]` | 允許的協作模式            |
+| `denied_modes`       | `string[]` | 拒絕的協作模式            |
+| `total_rounds`       | `number`   | 預設總回合數              |
+| `total_rounds_max`   | `number`   | 總回合數最大上限（預設 15）    |
+| `per_agent_rounds`   | `number`   | 預設每 agent 回合數        |
+| `max_concurrent`     | `number`   | 預設最大並行數（系統上限 2）    |
+| `round_timeout_ms`   | `number`   | 預設回合超時（毫秒，預設 3 分鐘） |
+| `round_timeout_ms_max` | `number`   | 回合超時最大上限（預設 10 分鐘） |
 
 ---
 
 ## 限制說明
 
-- `total_rounds` 上限：15（預設 8）
+- `total_rounds` 上限：由 `total_rounds_max` 決定（預設 15）
 - `max_concurrent` 上限：5（預設 2）
 - 當值超過上限時會自動截斷並記錄警告
 

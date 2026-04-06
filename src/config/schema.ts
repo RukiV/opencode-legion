@@ -353,6 +353,13 @@ export const AriseConfigSchema = z
 						title: "Total Rounds",
 					})
 					.optional(),
+				/** 總回合數最大上限（預設 15）/ Total rounds maximum limit (default 15) */
+				total_rounds_max: z.number().int().min(1).max(50)
+					.meta({
+						description: "總回合數最大上限 / Total rounds maximum limit",
+						title: "Total Rounds Max",
+					})
+					.optional(),
 				/** 預設每個 agent 回合數（可選）/ Default per-agent rounds (optional) */
 				per_agent_rounds: z.number().int().positive()
 					.meta({
@@ -372,6 +379,13 @@ export const AriseConfigSchema = z
 					.meta({
 						description: "預設回合超時（毫秒）/ Default round timeout (ms)",
 						title: "Round Timeout",
+					})
+					.optional(),
+				/** 回合超時最大上限（毫秒）/ Round timeout maximum limit (ms) */
+				round_timeout_ms_max: z.number().int().positive()
+					.meta({
+						description: "回合超時最大上限（毫秒）/ Round timeout maximum limit (ms)",
+						title: "Round Timeout Max",
 					})
 					.optional(),
 			})

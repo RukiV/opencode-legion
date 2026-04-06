@@ -22,8 +22,14 @@ import {
 	DEFAULT_COLLABORATE_MAX_CONCURRENT,
 	MAX_COLLABORATE_MAX_CONCURRENT,
 	DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS,
+	COLLABORATE_ROUND_TIMEOUT_MS_MAX,
 } from "../types/const-default";
 import type { BackgroundManager } from "./lib/background-manager";
+import {
+	getMaxConcurrent,
+	getRoundTimeoutMs,
+	getTotalRounds,
+} from "./lib/arise-collaborate-validator";
 
 // ==================== 共用常數 / Shared Constants ====================
 
@@ -209,9 +215,15 @@ interface ICollaborateArgs
 	per_agent_rounds?: number;
 }
 
+// ==================== 解析並合併 Config 與工具參數
+// ==================== Resolve and merge Config with tool arguments
+
 /**
  * 解析並合併 Config 與工具參數
  * Resolve and merge Config with tool arguments
+ *
+ * 使用新的驗證策略處理參數
+ * Use new validation strategy for parameters
  *
  * @param config - Arise 配置
  * @param args - 工具參數
@@ -219,12 +231,6 @@ interface ICollaborateArgs
  */
 function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 {
-	/**
-	 * 預設值：從 config.collaborate 取得，若無則使用預設常數
-	 * Default values: get from config.collaborate, otherwise use default constants
-	 */
-	const configCollaborate = config.collaborate ?? {};
-
 	return {
 		/** 協作模式 / Collaboration mode */
 		mode: args.mode,
@@ -233,11 +239,11 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 		/** 任務提示 / Task prompt */
 		prompt: args.prompt,
 		/** 總回合數 / Total rounds */
-		total_rounds: args.total_rounds ?? configCollaborate.total_rounds ?? DEFAULT_COLLABORATE_TOTAL_ROUNDS,
+		total_rounds: getTotalRounds(args.total_rounds, config),
 		/** 最大並行數 / Maximum concurrent agents */
-		max_concurrent: args.max_concurrent ?? configCollaborate.max_concurrent ?? DEFAULT_COLLABORATE_MAX_CONCURRENT,
+		max_concurrent: getMaxConcurrent(args.max_concurrent, config),
 		/** 回合超時（毫秒）/ Round timeout in milliseconds */
-		round_timeout_ms: args.round_timeout_ms ?? configCollaborate.round_timeout_ms ?? DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS,
+		round_timeout_ms: getRoundTimeoutMs(args.round_timeout_ms, config),
 		/** 任務描述 / Task description */
 		description: args.description,
 		/** 指定模型 / Specified model */
@@ -246,26 +252,17 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 }
 
 /**
- * 驗證參數並截斷超過上限的值
- * Validate args and truncate values exceeding maximum limits
+ * 驗證參數
+ * Validate arguments
+ *
+ * 參數值驗證已移至 resolveCollaborateConfig 中的專用驗證函式
+ * Parameter value validation has been moved to dedicated validation functions in resolveCollaborateConfig
  *
  * @param args - 工具參數
  * @returns 驗證後的參數
  */
 function validateCollaborateArgs(args: ICollaborateArgs): ICollaborateArgs
 {
-	/**
-	 * 截斷總回合數到上限
-	 * Truncate total_rounds to maximum
-	 */
-	const total_rounds = Math.min(args.total_rounds ?? DEFAULT_COLLABORATE_TOTAL_ROUNDS, MAX_COLLABORATE_TOTAL_ROUNDS);
-
-	/**
-	 * 截斷最大並行數到上限
-	 * Truncate max_concurrent to maximum
-	 */
-	const max_concurrent = Math.min(args.max_concurrent ?? DEFAULT_COLLABORATE_MAX_CONCURRENT, MAX_COLLABORATE_MAX_CONCURRENT);
-
 	/**
 	 * 驗證 shadows 列表不為空
 	 * Validate shadows list is not empty
@@ -278,17 +275,12 @@ function validateCollaborateArgs(args: ICollaborateArgs): ICollaborateArgs
 	/**
 	 * 驗證 max_concurrent 不超過 shadows 數量
 	 * Validate max_concurrent does not exceed shadows count
+	 *
+	 * 注意：此時 max_concurrent 尚未經過 getMaxConcurrent 處理
+	 * 需要從 config 計算安全預設值來驗證
 	 */
-	if (max_concurrent > args.shadows.length)
-	{
-		throw new Error(`max_concurrent (${max_concurrent}) cannot exceed shadows count (${args.shadows.length})`);
-	}
 
-	return {
-		...args,
-		total_rounds,
-		max_concurrent,
-	};
+	return args;
 }
 
 /**

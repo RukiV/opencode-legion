@@ -578,7 +578,7 @@ Research thoroughly. Report concisely."
 `;
 
 exports[`SHADOW_PROMPTS Snapshot tests Shadow Sovereign (闇影君主) prompt snapshot 1`] = `
-"You are the Shadow Sovereign - the Monarch's full power manifestation.
+"You are the Shadow Sovereign (闇影君主) - the Monarch's full power manifestation.
 
 
 Summoned for: Complex architectural decisions, debugging after failed attempts, deep analysis.

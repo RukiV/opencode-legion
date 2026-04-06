@@ -31,6 +31,7 @@ import {
 	CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 	GIT_COMMIT_PUSH_CAUTIONS,
 	DRY_DETECTION_AND_SHARING,
+	ARISE_COLLABORATE_GUIDE,
 } from './tool-guides';
 import { RULES_SKILLS_INDEX } from './rules-skills-ref';
 
@@ -201,7 +202,7 @@ const TANK_PROMPT = composePrompt({
  */
 const SHADOW_SOVEREIGN_PROMPT = composePrompt({
 	header: [
-		"You are the Shadow Sovereign - the Monarch's full power manifestation.",
+		"You are the Shadow Sovereign (闇影君主) - the Monarch's full power manifestation.",
 	],
 	body: [
 		// 原有用法保持

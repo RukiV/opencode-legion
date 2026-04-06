@@ -326,6 +326,7 @@ export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
 - Need result LATER (parallel) → arise_background (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
 - DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
 - ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
+- When multiple agents need to collaborate → use \`arise_collaborate\`
 - When summoning shadow agents: **If no TODO list exists, use available tools (e.g., todowrite) to write task goals first**` as const;
 
 /**
@@ -333,6 +334,8 @@ export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
  * When to summon which agent (for Monarch only)
  */
 export const WHEN_TO_SUMMON = `## When to Summon Which Agent
+
+- Use \`arise_collaborate\` when multiple agents need to collaborate
 - Use background tasks for parallel exploration (beru, tank, bellion)
 - Summon @shadow-sovereign when stuck or for complex architecture` as const;
 
@@ -499,3 +502,50 @@ export const TODO_LIST_GUIDE = `## TODO List Management
 export const TASK_ID_SESSION_ID_FORMAT = `The task_id can be either:
 - Task ID from arise_background (format: arise_xxx)
 - Session ID from arise_summon with run_in_background=true (format: ses_xxx)` as const;
+
+/**
+ * arise_collaborate 工具使用指南（僅補充系統無法告知的部分）
+ * arise_collaborate tool usage guide (supplementing what the system can't tell)
+ *
+ * 💡 基礎參數資訊由工具定義提供，此處僅補充使用注意事項
+ * 💡 Basic parameter info from tool definition, here we supplement usage notes
+ */
+export const ARISE_COLLABORATE_GUIDE = `## arise_collaborate Usage Notes
+
+### When to Use Each Mode
+
+| Mode | Use Case |
+|------|----------|
+| \`planning\` | Multiple agents discuss and iterate to reach consensus (e.g., complex decisions, architecture design) |
+| \`parallel\` | Multiple independent subtasks can run simultaneously (e.g., searching different scopes) |
+| \`chain\` | Tasks have dependencies, next step needs previous step's result (e.g., multi-phase implementation) |
+
+### max_concurrent Notes
+
+- **When max_concurrent = 1**: Sequential execution (one agent at a time, traditional turn-based)
+- **When max_concurrent > 1**: Batch parallel execution, each batch up to this value
+- ⚠️ If agents need to modify the same file, set to 1 or avoid summoning simultaneously
+
+### Combined Modes
+
+Common combinations:
+- \`planning\` + \`max_concurrent: 2\`: 2 agents discuss in parallel per round
+- \`parallel\` + \`max_concurrent: 3\`: Up to 3 agents execute different tasks simultaneously
+- \`chain\` + \`max_concurrent: 1\`: Ensures strict sequential execution
+
+### Timeout Details
+
+- \`round_timeout_ms\`: Timeout per agent task (default 180000ms = 3 minutes)
+  - Each agent tracks their own timing, not total time
+  - Example: planning 3 agents × 3 rounds, each execution has its own timer
+- Simple search: 60000 (1 minute)
+- General tasks: 120000 (2 minutes)
+- Complex discussion or implementation: 180000 (3 minutes, default)
+
+### Comparison with Other Tools
+
+| Tool | Use Case |
+|------|----------|
+| \`arise_summon\` | Summon single agent, wait for result then continue |
+| \`arise_background\` | Summon agent for long-running task, can track progress |
+| \`arise_collaborate\` | Multiple agents collaborate to discuss or complete tasks together |` as const;
