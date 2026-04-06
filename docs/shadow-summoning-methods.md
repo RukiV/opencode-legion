@@ -293,6 +293,33 @@ Agent 行為的真正控制來源是 `shadows.ts` 中的工具描述（`ARISE_TO
 
 ---
 
+## 程式碼參考 / Code Reference
+
+更多召喚策略詳細內容，請參考 `src/agents/lib/tool-guides.ts` 中的 `createSummoningStrategy` 函式。
+
+For more detailed summoning strategy, see `createSummoningStrategy` function in `src/agents/lib/tool-guides.ts`.
+
+### 核心函式 / Core Functions
+
+| 函式 | 說明 |
+|------|------|
+| `getInitialTestDescription()` | 產生 Initial Test 召喚描述 |
+| `getThenDecideDescription()` | 產生 Then decide 描述 |
+| `createSummoningStrategy()` | 產生完整的召喚策略指南 |
+
+### 相關檔案 / Related Files
+
+```
+src/agents/lib/
+├── tool-guides.ts              # 工具使用指南（含召喚策略）
+├── shadow-prompts.ts           # Shadow Agent prompts
+├── arise-tools-utils.ts        # 工具相關 utility
+├── rules-skills-ref.ts         # Rules & Skills 索引
+└── shadow-descriptions.ts      # Shadow Agent 描述
+```
+
+---
+
 ## 測試記錄
 
 - **測試日期：** 2026-04-01
