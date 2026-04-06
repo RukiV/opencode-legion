@@ -51,39 +51,39 @@ const POLL_INTERVAL_MS = 500;
  * @returns 任務結果或超時錯誤訊息
  */
 async function waitForTaskCompletion(
-    backgroundManager: BackgroundManager,
-    taskId: string,
-    timeoutMs: number,
+	backgroundManager: BackgroundManager,
+	taskId: string,
+	timeoutMs: number,
 ): Promise<string>
 {
-    let completed = false;
-    let responseText = "";
-    let startTime = Date.now();
+	let completed = false;
+	let responseText = "";
+	let startTime = Date.now();
 
-    while (!completed && (Date.now() - startTime) < timeoutMs)
-    {
-        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+	while (!completed && (Date.now() - startTime) < timeoutMs)
+	{
+		await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
 
-        const currentTask = backgroundManager.getTask(taskId);
-        if (currentTask?.status === BackgroundTaskStatus.Completed)
-        {
-            responseText = currentTask.result ?? "No response";
-            completed = true;
-        }
-        else if (currentTask?.status === BackgroundTaskStatus.Error)
-        {
-            responseText = `Error: ${currentTask.error ?? "Unknown error"}`;
-            completed = true;
-        }
-    }
+		const currentTask = backgroundManager.getTask(taskId);
+		if (currentTask?.status === BackgroundTaskStatus.Completed)
+		{
+			responseText = currentTask.result ?? "No response";
+			completed = true;
+		}
+		else if (currentTask?.status === BackgroundTaskStatus.Error)
+		{
+			responseText = `Error: ${currentTask.error ?? "Unknown error"}`;
+			completed = true;
+		}
+	}
 
-    if (!completed)
-    {
-        backgroundManager.cancelTask(taskId);
-        responseText = "Timeout waiting for agent response";
-    }
+	if (!completed)
+	{
+		backgroundManager.cancelTask(taskId);
+		responseText = "Timeout waiting for agent response";
+	}
 
-    return responseText;
+	return responseText;
 }
 
 /**
@@ -99,21 +99,21 @@ async function waitForTaskCompletion(
  * @returns 啟動的任務
  */
 async function launchShadowTask(
-    backgroundManager: BackgroundManager,
-    shadow: string,
-    prompt: string,
-    description: string,
-    context: ToolContext,
-    model?: string,
+	backgroundManager: BackgroundManager,
+	shadow: string,
+	prompt: string,
+	description: string,
+	context: ToolContext,
+	model?: string,
 )
 {
-    return backgroundManager.launch({
-        shadow,
-        prompt,
-        description,
-        parentSessionId: context.sessionID,
-        model,
-    });
+	return backgroundManager.launch({
+		shadow,
+		prompt,
+		description,
+		parentSessionId: context.sessionID,
+		model,
+	});
 }
 
 /**
@@ -126,16 +126,16 @@ async function launchShadowTask(
  * @returns 包含討論歷史的提示
  */
 function buildPromptWithDiscussionHistory(
-    basePrompt: string,
-    previousResponses: string[],
-    shadowNames: string[],
+	basePrompt: string,
+	previousResponses: string[],
+	shadowNames: string[],
 ): string
 {
-    if (previousResponses.length === 0) return basePrompt;
+	if (previousResponses.length === 0) return basePrompt;
 
-    return `${basePrompt}\n\nPrevious discussions from all agents:\n${previousResponses.map((r,
-        idx,
-    ) => `${shadowNames[idx % shadowNames.length]}: ${r}`).join('\n\n')}`;
+	return `${basePrompt}\n\nPrevious discussions from all agents:\n${previousResponses.map((r,
+		idx,
+	) => `${shadowNames[idx % shadowNames.length]}: ${r}`).join('\n\n')}`;
 }
 
 /**
@@ -147,13 +147,13 @@ function buildPromptWithDiscussionHistory(
  * @returns 包含前一次結果的提示
  */
 function buildPromptWithPreviousResult(
-    basePrompt: string,
-    previousResult: string,
+	basePrompt: string,
+	previousResult: string,
 ): string
 {
-    if (!previousResult) return basePrompt;
+	if (!previousResult) return basePrompt;
 
-    return `${basePrompt}\n\nPrevious agent result:\n${previousResult}\n\nPlease build upon this result and continue the task.`;
+	return `${basePrompt}\n\nPrevious agent result:\n${previousResult}\n\nPlease build upon this result and continue the task.`;
 }
 
 /**
@@ -166,25 +166,25 @@ function buildPromptWithPreviousResult(
  * @returns 所有批次的結果陣列
  */
 async function executeInBatches<TInput, TOutput>(
-    items: TInput[],
-    maxConcurrent: number,
-    processor: (item: TInput) => Promise<TOutput>,
+	items: TInput[],
+	maxConcurrent: number,
+	processor: (item: TInput) => Promise<TOutput>,
 ): Promise<TOutput[]>
 {
-    // TODO: [refactor] 可使用此函式簡化分批執行邏輯
-    // 此函式目前未使用，因為現有邏輯需要更多自定義處理
-    // This function is not currently used because existing logic requires more custom handling
-    const results: TOutput[] = [];
+	// TODO: [refactor] 可使用此函式簡化分批執行邏輯
+	// 此函式目前未使用，因為現有邏輯需要更多自定義處理
+	// This function is not currently used because existing logic requires more custom handling
+	const results: TOutput[] = [];
 
-    for (let i = 0; i < items.length; i += maxConcurrent)
-    {
-        const batch = items.slice(i, i + maxConcurrent);
-        const batchPromises = batch.map(processor);
-        const batchResults = await Promise.all(batchPromises);
-        results.push(...batchResults);
-    }
+	for (let i = 0; i < items.length; i += maxConcurrent)
+	{
+		const batch = items.slice(i, i + maxConcurrent);
+		const batchPromises = batch.map(processor);
+		const batchResults = await Promise.all(batchPromises);
+		results.push(...batchResults);
+	}
 
-    return results;
+	return results;
 }
 
 // ==================== 類型定義 / Type Definitions ====================
@@ -432,7 +432,9 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:planning]`,
-		`Starting planning mode with ${config.shadows.length} agents, max_concurrent: ${config.max_concurrent}, mode: ${useBatchedExecution ? 'batched' : 'sequential'}`,
+		`Starting planning mode with ${config.shadows.length} agents, max_concurrent: ${config.max_concurrent}, mode: ${useBatchedExecution
+			? 'batched'
+			: 'sequential'}`,
 	], { force: true });
 
 	/**
@@ -463,64 +465,64 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 			 * Execute in batches, each batch no more than max_concurrent
 			 */
 			for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
-		{
-			const batch = config.shadows.slice(i, i + config.max_concurrent);
-
-			/**
-			 * 並行啟動這批任務
-			 * Launch this batch of tasks in parallel
-			 */
-			const batchPromises = batch.map(async (shadow) =>
 			{
-				/**
-				 * 構建包含所有前次回應的提示
-				 * Build prompt with all previous responses
-				 */
-				const promptWithContext = buildPromptWithDiscussionHistory(
-					config.prompt,
-					allResponses,
-					config.shadows,
-				);
-
-				const task = await launchShadowTask(
-					backgroundManager,
-					shadow,
-					promptWithContext,
-					config.description ?? `planning round ${round}`,
-					context,
-					config.model,
-				);
+				const batch = config.shadows.slice(i, i + config.max_concurrent);
 
 				/**
-				 * 等待結果
-				 * Wait for result
+				 * 並行啟動這批任務
+				 * Launch this batch of tasks in parallel
 				 */
-				const responseText = await waitForTaskCompletion(
-					backgroundManager,
-					task.id,
-					config.round_timeout_ms,
-				);
+				const batchPromises = batch.map(async (shadow) =>
+				{
+					/**
+					 * 構建包含所有前次回應的提示
+					 * Build prompt with all previous responses
+					 */
+					const promptWithContext = buildPromptWithDiscussionHistory(
+						config.prompt,
+						allResponses,
+						config.shadows,
+					);
 
-				return { shadow, response: responseText };
-			});
+					const task = await launchShadowTask(
+						backgroundManager,
+						shadow,
+						promptWithContext,
+						config.description ?? `planning round ${round}`,
+						context,
+						config.model,
+					);
 
-			/**
-			 * 等待這批任務完成
-			 * Wait for this batch to complete
-			 */
-			const batchResults = await Promise.all(batchPromises);
+					/**
+					 * 等待結果
+					 * Wait for result
+					 */
+					const responseText = await waitForTaskCompletion(
+						backgroundManager,
+						task.id,
+						config.round_timeout_ms,
+					);
 
-			/**
-			 * 收集結果
-			 * Collect results
-			 */
-			for (const result of batchResults)
-			{
-				roundResponses.push(result.response);
-				allResponses.push(result.response);
+					return { shadow, response: responseText };
+				});
+
+				/**
+				 * 等待這批任務完成
+				 * Wait for this batch to complete
+				 */
+				const batchResults = await Promise.all(batchPromises);
+
+				/**
+				 * 收集結果
+				 * Collect results
+				 */
+				for (const result of batchResults)
+				{
+					roundResponses.push(result.response);
+					allResponses.push(result.response);
+				}
 			}
-		}
-		// Close the if block
+			// Close the if block
 		}
 
 		else
@@ -723,7 +725,9 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:chain]`,
-		`Starting chain mode with ${config.shadows.length} agents, max_concurrent: ${config.max_concurrent}, mode: ${useBatchedExecution ? 'batched' : 'sequential'}`,
+		`Starting chain mode with ${config.shadows.length} agents, max_concurrent: ${config.max_concurrent}, mode: ${useBatchedExecution
+			? 'batched'
+			: 'sequential'}`,
 	], { force: true });
 
 	/**
