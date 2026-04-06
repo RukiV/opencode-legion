@@ -6,11 +6,11 @@
 
 `arise_collaborate` 工具提供多個 Shadow Agent 協作完成任務的功能，支援三種執行模式：
 
-| 模式           | 說明                 |
-|--------------|--------------------|
-| **planning** | 多個 agent 討論並達成共識   |
-| **parallel** | 多個 agent 同時執行不同任務  |
-| **chain**    | 多個 agent 依序執行，結果傳遞 |
+| 模式           | max_concurrent | 說明                 |
+|--------------|----------------|--------------------|
+| **planning** | ✅ 使用        | 多個 agent 討論並達成共識   |
+| **parallel** | ✅ 使用        | 多個 agent 同時執行不同任務  |
+| **chain**    | ✅ 使用        | 多個 agent 依序執行，結果傳遞 |
 
 ---
 
@@ -63,26 +63,27 @@
                     │  for round = 1 to     │
                     │  total_rounds         │
                     └───────────────────────┘
-                                │
-                                ▼
-         ┌──────────────────────────────────────────────┐
-         │  for each shadow in shadows                 │
-         │  (依序召喚每個 agent)                        │
-         └──────────────────────────────────────────────┘
-                                │
-                                ▼
-         ┌──────────────────────────────────────────────┐
-         │  1. 構建包含前次回應的提示                   │
-         │  2. launch() 啟動背景任務                    │
-         │  3. 輪詢等待完成或超時                       │
-         │  4. 收集回應                                 │
-         └──────────────────────────────────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────────┐
-                    │  檢查是否達成共識      │
-                    │  (所有回應相同)       │
-                    └───────────────────────┘
+                                 │
+                                 ▼
+          ┌──────────────────────────────────────────────┐
+          │  for i = 0 to shadows.length step max_concurrent │
+          │  (分批執行，每批最多 max_concurrent 個)      │
+          └──────────────────────────────────────────────┘
+                                 │
+                                 ▼
+          ┌──────────────────────────────────────────────┐
+          │  1. 批次內所有 agent 同時啟動                │
+          │  2. 收集所有前次回應作為上下文               │
+          │  3. launch() 啟動背景任務                    │
+          │  4. 輪詢等待完成或超時                       │
+          │  5. 收集回應                                 │
+          └──────────────────────────────────────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │  檢查是否達成共識      │
+                     │  (所有回應相同)       │
+                     └───────────────────────┘
                                 │
                     ┌───────────┴───────────┐
                     │                       │
@@ -144,33 +145,38 @@
                     │  for each shadow in  │
                     │  shadows (依序)      │
                     └───────────────────────┘
-                                │
-                                ▼
-         ┌──────────────────────────────────────────────┐
-         │  1. 構建包含上一次結果的提示                │
-         │     "Previous agent result: {previous}"     │
-         │  2. launch() 啟動背景任務                   │
-         │  3. 輪詢等待完成                             │
-         │  4. 將結果傳遞給下一個 agent                 │
-         └──────────────────────────────────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────────┐
-                    │  previousResult =     │
-                    │  currentResult        │
-                    └───────────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────────┐
-                    │  依序執行所有 agent   │
-                    │  直到完成             │
-                    └───────────────────────┘
-                                │
-                                ▼
-                    ┌───────────────────────┐
-                    │  返回鏈式執行的       │
-                    │  所有結果             │
-                    └───────────────────────┘
+                                 │
+                                 ▼
+          ┌──────────────────────────────────────────────┐
+          │  for i = 0 to shadows.length step max_concurrent │
+          │  (分批執行，每批最多 max_concurrent 個)      │
+          └───────────────────────────────────────────────┘
+                                 │
+                                 ▼
+          ┌──────────────────────────────────────────────┐
+          │  1. 這批所有 agent 同時啟動                 │
+          │  2. 收集上一次結果作為上下文                │
+          │     "Previous agent result: {previous}"     │
+          │  3. launch() 啟動背景任務                   │
+          │  4. 輪詢等待完成                             │
+          │  5. 收集結果傳遞給下一批                    │
+          └──────────────────────────────────────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │  收集這批結果          │
+                     │  更新 previousResult  │
+                     └───────────────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │  執行下一批 (如果有)   │
+                     └───────────────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │  返回所有批次結果      │
+                     └───────────────────────┘
 ```
 
 ---
@@ -197,23 +203,26 @@
 ### Planning 模式執行流程
 
 ```
-1. currentPrompt = 原始 prompt
-2. allResponses = []
+1. allResponses = []
 
-3. for round = 1 to total_rounds:
+2. for round = 1 to total_rounds:
    a. roundResponses = []
    
-   b. for each shadow in shadows:
-      - promptWithContext = currentPrompt + 所有前次回應
-      - task = backgroundManager.launch(shadow, promptWithContext)
-      - 輪詢 getTask(task.id) 等待完成
-      - roundResponses.push(response)
-      - allResponses.push(response)
+   b. for i = 0 to shadows.length step max_concurrent:
+      - batch = shadows[i : i + max_concurrent]
+      - promptWithContext = config.prompt + 所有前次回應
+      - batchPromises = Promise.all(
+          batch.map(shadow =>
+            backgroundManager.launch(shadow, promptWithContext)
+          )
+        )
+      - 等待這批完成
+      - 收集回應到 roundResponses 和 allResponses
    
    c. 如果所有回應相同 (共識):
       - break 提早結束
    
-4. 返回最終共識結果
+3. 返回最終共識結果
 ```
 
 ### Parallel 模式執行流程
@@ -244,17 +253,22 @@
 1. previousResult = ""
 2. chainResults = []
 
-3. for each shadow in shadows:
-   a. promptWithResult = 
-      previousResult 
-        ? "prompt + Previous agent result: {previousResult}"
-        : prompt
+3. for i = 0 to shadows.length step max_concurrent:
+   a. batch = shadows[i : i + max_concurrent]
    
-   b. task = backgroundManager.launch(shadow, promptWithResult)
-   c. 輪詢 getTask(task.id) 等待完成
+   b. batchPromises = Promise.all(
+      batch.map(shadow =>
+        promptWithResult = previousResult 
+          ? "prompt + Previous agent result: {previousResult}"
+          : prompt
+        backgroundManager.launch(shadow, promptWithResult)
+      )
+   )
    
-   d. previousResult = currentResult
-   e. chainResults.push({shadow, result: currentResult})
+   c. 等待這批完成
+   
+   d. 收集結果，更新 previousResult
+   e. chainResults.push(...batchResults)
 
 4. 返回所有鏈式結果
 ```

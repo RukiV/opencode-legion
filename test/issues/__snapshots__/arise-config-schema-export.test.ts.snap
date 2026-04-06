@@ -81,6 +81,7 @@ Check in order:
     "retry_delay_max": 60000,
   },
   "banner_every_session": false,
+  "collaborate": {},
   "compaction": {
     "preserve_todos": true,
     "threshold_percent": 80,
