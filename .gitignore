@@ -10,3 +10,5 @@ nul
 test/temp*.ts
 test/temp*/
 tsconfig.tsbuildinfo
+providers-keys.json
+providers-cache.json

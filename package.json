@@ -55,6 +55,7 @@
     "build:bun": "bun build src/index.ts --outdir dist --target bun && bun build src/cli/index.ts --outdir dist/cli --target bun && tsc --emitDeclarationOnly",
     "build:config-defaults": "bun test/scripts/generate-config-defaults.ts",
     "build:json-schema": "bun test/scripts/generate-json-schema.ts",
+    "build:extract-api-keys": "bun test/scripts/extract-api-keys.ts",
     "build:tsc": "tsc",
     "postbuild": "node --run build:json-schema",
     "npm:publish:bump": "node --run version:bump && npm publish",
