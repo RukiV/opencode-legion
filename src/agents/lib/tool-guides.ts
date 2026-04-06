@@ -170,13 +170,23 @@ export const LSP_TOOLS = `## LSP Tools Guidelines
 /**
  * 召喚方法規則（ Monarch 專用）
  * Summoning method rules (for Monarch only)
+ *
+ * ⚠️ 重要：召喚 Shadow Agents 前，若尚無 TODO 清單，應先建立任務目標
+ * ⚠️ Important: Before summoning Shadow Agents, if no TODO list exists, write the task goals to TODO first
+ *
+ * 💡 提示：使用系統工具（如有）來建立 TODO 清單，例如 todowrite, task tool 等
+ * 💡 Tip: Use system tools (if available) to create TODO lists, e.g., todowrite, task tool, etc.
  */
 export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
+
+⚠️ REMINDER: Before summoning — if no TODO list exists, **use available tools to create one first**!
+
+**Tool usage:**
 - Need result NOW → arise_summon (sync, blocks and returns result)
 - Need result LATER (parallel) → arise_background (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
 - DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
 - ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
-- When summoning shadow agents: If no TODO list exists, write the task goals to TODO first` as const;
+- When summoning shadow agents: **If no TODO list exists, use available tools (e.g., todowrite) to write task goals first**` as const;
 
 /**
  * 召喚時機指南（ Monarch 專用）
@@ -314,14 +324,30 @@ export function createSummoningStrategy<T extends EnumAriseTools.ARISE_SYNC_SUMM
 /**
  * TODO List 管理指南（ Monarch 專用）
  * TODO List management guide (for Monarch only)
+ *
+ * ⚠️ 重要提醒：養成建立 TODO 的習慣，避免任務執行過程中忘記要做什麼
+ * ⚠️ Important: Develop the habit of creating TODOs to avoid forgetting what needs to be done during task execution
+ *
+ * 💡 提示：使用系統工具（如有）來建立和管理 TODO 清單，而非僅依賴口頭描述
+ * 💡 Tip: Use system tools (if available) to create and manage TODO lists, rather than just describing them verbally
+ *    - 例如：todowrite, task tool, 或其他可用的任務管理工具
+ *    - e.g., todowrite, task tool, or other available task management tools
  */
 export const TODO_LIST_GUIDE = `## TODO List Management
-- Keep a short TODO list. Mark items in_progress → completed
-- When executing tasks: If no TODO list exists, plan and create one before executing
-- For large tasks: Use phased planning, not everything at once
-  - Plan only the current phase (3-5 items max)
-  - After completing phase, plan the next phase
-  - This avoids over-planning and keeps the list short and flexible` as const;
+
+⚠️ IMPORTANT: ALWAYS create a TODO list when starting a task — this prevents losing track of goals mid-execution!
+
+**Use available system tools to create and manage your TODO list:**
+- Check what tools are available in your environment (e.g., todowrite, task tool, etc.)
+- Use the appropriate tool to create and track your TODO items
+- Mark items as \`in_progress\` → \`completed\` as you work
+- Keep the list short and focused (3-5 items max per phase)
+
+**Workflow:**
+1. **First**: Create TODO list with available tools — don't skip this step!
+2. **During**: Update status (in_progress/completed) as you progress
+3. **Between phases**: Plan the next phase when current phase completes
+4. **Avoid**: Over-planning everything at once — stay flexible` as const;
 
 /**
  * Task ID / Session ID 格式說明（共用）

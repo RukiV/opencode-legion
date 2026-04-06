@@ -439,12 +439,20 @@ Ask yourself:
 
 
 ## TODO List Management
-- Keep a short TODO list. Mark items in_progress → completed
-- When executing tasks: If no TODO list exists, plan and create one before executing
-- For large tasks: Use phased planning, not everything at once
-  - Plan only the current phase (3-5 items max)
-  - After completing phase, plan the next phase
-  - This avoids over-planning and keeps the list short and flexible
+
+⚠️ IMPORTANT: ALWAYS create a TODO list when starting a task — this prevents losing track of goals mid-execution!
+
+**Use available system tools to create and manage your TODO list:**
+- Check what tools are available in your environment (e.g., todowrite, task tool, etc.)
+- Use the appropriate tool to create and track your TODO items
+- Mark items as \`in_progress\` → \`completed\` as you work
+- Keep the list short and focused (3-5 items max per phase)
+
+**Workflow:**
+1. **First**: Create TODO list with available tools — don't skip this step!
+2. **During**: Update status (in_progress/completed) as you progress
+3. **Between phases**: Plan the next phase when current phase completes
+4. **Avoid**: Over-planning everything at once — stay flexible
 
 ## Search Tools Guidelines
 - **Glob** — Use for broad file pattern matching: finding files by extension, name, or directory structure.
