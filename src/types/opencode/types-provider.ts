@@ -1,3 +1,26 @@
+import { Model, Provider } from "@opencode-ai/sdk";
+import { ITSTypeAndStringLiteral, ITSDeepPartial } from 'ts-type';
+
+export enum EnumOpenCodeProviderSource
+{
+	/** 環境變數 */
+	ENV = 'env',
+	/** 設定檔 */
+	CONFIG = 'config',
+	/** 自訂 */
+	CUSTOM = 'custom',
+	/** API */
+	API = 'api',
+}
+
+export enum EnnumOpenCodeProviderModelStatus
+{
+	Alpha = "alpha",
+	Beta = "beta",
+	Deprecated = "deprecated",
+	Active = "active",
+}
+
 /**
  * 提供者資料結構
  * Provider data structure
@@ -15,12 +38,12 @@
  *   "models": { "openai/gpt-5.2-codex": { ... } }
  * }
  */
-export interface IOpenCodeProviderCore
+export interface IOpenCodeProviderCore extends Omit<Partial<Provider>, 'models' | 'options'>
 {
 	/** 提供者 ID（如 "openrouter"、"anthropic"） */
 	id: string;
 	/** 來源類型（如 "api"） */
-	source?: string;
+	source?: ITSTypeAndStringLiteral<EnumOpenCodeProviderSource>;
 	/** 提供者名稱（如 "OpenRouter"） */
 	name?: string;
 	/** 環境變數名稱列表 */
@@ -29,6 +52,12 @@ export interface IOpenCodeProviderCore
 	options?: IOpenCodeProviderProviderOptions;
 	/** 是否為預設提供者 */
 	default?: boolean;
+	/**
+	 * API 密鑰 (此處是真實密鑰 API KEY，用於存取提供商服務，絕對要避免洩漏或意外提交至GIT)
+	 *
+	 * @deprecated 此欄位不應洩漏或輸出日誌
+	 */
+	key?: string;
 }
 
 /**
@@ -152,7 +181,7 @@ export interface IOpenCodeProviderModelVariants
  * 從 OpenCode SDK config.providers() 取得的模型資料
  * Model data obtained from OpenCode SDK config.providers()
  */
-export interface IOpenCodeProviderCachedModel
+export interface IOpenCodeProviderCachedModel extends ITSDeepPartial<Model>
 {
 	/** 模型 ID（如 "openai/gpt-5.2-codex"） */
 	id: string;
@@ -165,7 +194,7 @@ export interface IOpenCodeProviderCachedModel
 	/** API 設定 */
 	api?: IOpenCodeProviderModelApi;
 	/** 模型狀態 */
-	status?: string;
+	status?: ITSTypeAndStringLiteral<EnnumOpenCodeProviderModelStatus>;
 	/** 自訂請求頭 */
 	headers?: Record<string, string>;
 	/** 額外選項 */

@@ -446,11 +446,38 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 					description: "Collaboration mode: planning (discussion), parallel (simultaneous), or chain (sequential)",
 					title: "Mode",
 				}),
-			shadows: z
-				.array(z.enum(ALLOWED_SHADOWS))
+			/**
+			 * Shadow 項目 schema
+			 * Shadows entry schema
+			 */
+				shadows: z
+				.array(
+					z.object({
+						/** Shadow agent 名稱 / Shadow agent name */
+						agent: z.enum(ALLOWED_SHADOWS)
+							.meta({
+								description: "Shadow agent name",
+								title: "Agent",
+							}),
+						/** 模型名稱，可選，由 summon 系統自動處理 / Model name, optional, handled by summon system */
+						model: z.string()
+							.meta({
+								description: "Model to use (optional, auto-handled by summon system)",
+								title: "Model",
+							})
+							.optional(),
+						/** 自訂標籤，選填 / Custom label, optional */
+						label: z.string()
+							.meta({
+								description: "Custom label for identification",
+								title: "Label",
+							})
+							.optional(),
+					}),
+				)
 				.min(2)
 				.meta({
-					description: "List of participating Shadow agents (at least 1 required)",
+					description: "List of participating Shadow agents with optional model and label (at least 2 required)",
 					title: "Shadow Agents",
 				}),
 			prompt: z

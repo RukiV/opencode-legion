@@ -31,6 +31,11 @@ import {
 	getTotalRounds,
 } from "./lib/arise-collaborate-validator";
 import { checkTermination } from "./lib/arise-collaborate-termination";
+import {
+	normalizeShadowsEntries,
+	getShadowDisplayName,
+	type INormalizedCollaborateShadowEntry,
+} from "./lib/arise-collaborate-normalizer";
 
 // ==================== 共用常數 / Shared Constants ====================
 
@@ -129,10 +134,12 @@ async function launchShadowTask(
 function buildPromptWithDiscussionHistory(
 	basePrompt: string,
 	previousResponses: string[],
-	shadowNames: string[],
+	shadowEntries: INormalizedCollaborateShadowEntry[],
 ): string
 {
 	if (previousResponses.length === 0) return basePrompt;
+
+	const shadowNames = shadowEntries.map(e => getShadowDisplayName(e));
 
 	return `${basePrompt}\n\nPrevious discussions from all agents:\n${previousResponses.map((r,
 		idx,
@@ -199,13 +206,18 @@ interface ICollaborateArgs
 	/** 協作模式 / Collaboration mode */
 	mode: EnumCollaborateMode;
 	/** 參與的 Shadow Agent 列表 / List of participating Shadow agents */
-	shadows: typeof ALLOWED_SHADOWS[number][];
+	shadows: {
+		/** Shadow agent 名稱 / Shadow agent name */
+		agent: typeof ALLOWED_SHADOWS[number];
+		/** 模型名稱，預設 "AUTO" / Model name, default "AUTO" */
+		model?: string;
+		/** 自訂標籤，選填 / Custom label, optional */
+		label?: string;
+	}[];
 	/** 任務提示 / Task prompt */
 	prompt: string;
 	/** 任務描述（可選）/ Task description (optional) */
 	description?: string;
-	/** 指定模型（可選）/ Specified model (optional) */
-	model?: string;
 	/** 總回合數（可選）/ Total rounds (optional) */
 	total_rounds?: number;
 	/** 最大並行數（可選）/ Max concurrent (optional) */
@@ -235,8 +247,8 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 	return {
 		/** 協作模式 / Collaboration mode */
 		mode: args.mode,
-		/** 參與的 Shadow Agent 列表 / List of participating Shadow agents */
-		shadows: args.shadows,
+		/** 已正規化的 Shadows 列表 / Normalized shadows list */
+		shadows: normalizeShadowsEntries(args.shadows),
 		/** 任務提示 / Task prompt */
 		prompt: args.prompt,
 		/** 總回合數 / Total rounds */
@@ -247,8 +259,6 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 		round_timeout_ms: getRoundTimeoutMs(args.round_timeout_ms, config),
 		/** 任務描述 / Task description */
 		description: args.description,
-		/** 指定模型 / Specified model */
-		model: args.model,
 	};
 }
 
@@ -407,13 +417,12 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
  */
 async function executePlanningMode(backgroundManager: BackgroundManager, config: {
 	mode: EnumCollaborateMode;
-	shadows: typeof ALLOWED_SHADOWS[number][];
+	shadows: INormalizedCollaborateShadowEntry[];
 	prompt: string;
 	total_rounds: number;
 	max_concurrent: number;
 	round_timeout_ms: number;
 	description?: string;
-	model?: string;
 }, context: ToolContext): Promise<string>
 {
 	/**
@@ -473,7 +482,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				 * 並行啟動這批任務
 				 * Launch this batch of tasks in parallel
 				 */
-				const batchPromises = batch.map(async (shadow) =>
+				const batchPromises = batch.map(async (entry) =>
 				{
 					/**
 					 * 構建包含所有前次回應的提示
@@ -487,11 +496,11 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 
 					const task = await launchShadowTask(
 						backgroundManager,
-						shadow,
+						entry.agent,
 						promptWithContext,
 						config.description ?? `planning round ${round}`,
 						context,
-						config.model,
+						entry.model,
 					);
 
 					/**
@@ -504,7 +513,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 						config.round_timeout_ms,
 					);
 
-					return { shadow, response: responseText };
+					return { shadow: getShadowDisplayName(entry), response: responseText };
 				});
 
 				/**
@@ -532,7 +541,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 			 * 傳統回合制執行 - 依序執行每個 agent
 			 * Traditional round-based execution - execute each agent sequentially
 			 */
-			for (const shadow of config.shadows)
+			for (const entry of config.shadows)
 			{
 				/**
 				 * 構建包含所有前次回應的提示
@@ -546,11 +555,11 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 
 				const task = await launchShadowTask(
 					backgroundManager,
-					shadow,
+					entry.agent,
 					promptWithContext,
 					config.description ?? `planning round ${round}`,
 					context,
-					config.model,
+					entry.model,
 				);
 
 				/**
@@ -588,7 +597,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				 */
 				const details = [
 					`Rounds: ${round}`,
-					`Agents: ${config.shadows.join(", ")}`,
+					`Agents: ${config.shadows.map(s => getShadowDisplayName(s)).join(", ")}`,
 					`Mode: planning`,
 					`Termination: ${termination.terminationType}`,
 					"",
@@ -624,7 +633,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 */
 	const details = [
 		`Rounds: ${Math.min(config.total_rounds, allResponses.length / config.shadows.length)}`,
-		`Agents: ${config.shadows.join(', ')}`,
+		`Agents: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		`Mode: planning`,
 		"",
 		"Final consensus:",
@@ -632,7 +641,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	].join('\n');
 
 	return formatAriseMsgSuccessMultiLine(
-		`Planning collaboration completed: ${config.shadows.join(', ')}`,
+		`Planning collaboration completed: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		details,
 	);
 }
@@ -648,12 +657,11 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
  */
 async function executeParallelMode(backgroundManager: BackgroundManager, config: {
 	mode: EnumCollaborateMode;
-	shadows: typeof ALLOWED_SHADOWS[number][];
+	shadows: INormalizedCollaborateShadowEntry[];
 	prompt: string;
 	max_concurrent: number;
 	round_timeout_ms: number;
 	description?: string;
-	model?: string;
 }, context: ToolContext): Promise<string>
 {
 	logArise2WithLevel("debug", () => [
@@ -665,8 +673,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 	 * 批次啟動任務
 	 * Batch launch tasks
 	 */
-	const tasks: Array<{
-		shadow: typeof config.shadows[number];
+	const tasks: Array<INormalizedCollaborateShadowEntry & {
 		task: { id: string };
 		response: string;
 	}> = [];
@@ -684,15 +691,15 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 		 * Launch this batch of tasks in parallel and wait for results
 		 */
 		const batchResults = await Promise.all(
-			batch.map(async (shadow) =>
+			batch.map(async (entry) =>
 			{
 				const task = await launchShadowTask(
 					backgroundManager,
-					shadow,
+					entry.agent,
 					config.prompt,
 					config.description ?? `parallel task ${i}`,
 					context,
-					config.model,
+					entry.model,
 				);
 
 				const response = await waitForTaskCompletion(
@@ -701,7 +708,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 					config.round_timeout_ms,
 				);
 
-				return { shadow, task, response };
+			return { ...entry, task, response };
 			}),
 		);
 
@@ -723,7 +730,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 			], { force: true });
 
 			const resultsText = tasks.map(t =>
-				`${t.shadow}: ${t.response}`,
+				`${getShadowDisplayName(t)}: ${t.response}`,
 			).join('\n\n');
 
 			const details = [
@@ -748,7 +755,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 	 * Compose final result
 	 */
 	const resultsText = tasks.map(t =>
-		`${t.shadow}: ${t.response}`,
+		`${getShadowDisplayName(t)}: ${t.response}`,
 	).join('\n\n');
 
 	const details = [
@@ -761,7 +768,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 	].join('\n');
 
 	return formatAriseMsgSuccessMultiLine(
-		`Parallel collaboration completed: ${config.shadows.join(', ')}`,
+		`Parallel collaboration completed: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		details,
 	);
 }
@@ -777,12 +784,11 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
  */
 async function executeChainMode(backgroundManager: BackgroundManager, config: {
 	mode: EnumCollaborateMode;
-	shadows: typeof ALLOWED_SHADOWS[number][];
+	shadows: INormalizedCollaborateShadowEntry[];
 	prompt: string;
 	max_concurrent: number;
 	round_timeout_ms: number;
 	description?: string;
-	model?: string;
 }, context: ToolContext): Promise<string>
 {
 	/**
@@ -806,7 +812,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 	 * Accumulated results
 	 */
 	let previousResult = "";
-	const chainResults: Array<{ shadow: typeof config.shadows[number]; result: string }> = [];
+	const chainResults: Array<INormalizedCollaborateShadowEntry & { result: string }> = [];
 
 	/**
 	 * 根據 max_concurrent 選擇執行方式
@@ -818,34 +824,34 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 		 * 分批執行，每批不超過 max_concurrent
 		 * Execute in batches, each batch no more than max_concurrent
 		 */
-		for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
-		{
-			const batch = config.shadows.slice(i, i + config.max_concurrent);
+	for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
+	{
+		const batch = config.shadows.slice(i, i + config.max_concurrent);
 
-			/**
-			 * 這批 agents 同時執行
-			 * This batch of agents executes simultaneously
-			 */
-			const batchResults = await Promise.all(
-				batch.map(async (shadow) =>
-				{
-					/**
-					 * 構建包含上一次結果的提示
-					 * Build prompt with previous result
-					 */
-					const promptWithResult = buildPromptWithPreviousResult(
-						config.prompt,
-						previousResult,
-					);
+		/**
+		 * 這批 agents 同時執行
+		 * This batch of agents executes simultaneously
+		 */
+		const batchResults = await Promise.all(
+			batch.map(async (entry) =>
+			{
+				/**
+				 * 構建包含上一次結果的提示
+				 * Build prompt with previous result
+				 */
+				const promptWithResult = buildPromptWithPreviousResult(
+					config.prompt,
+					previousResult,
+				);
 
-					const task = await launchShadowTask(
-						backgroundManager,
-						shadow,
-						promptWithResult,
-						config.description ?? `chain ${shadow}`,
-						context,
-						config.model,
-					);
+				const task = await launchShadowTask(
+					backgroundManager,
+					entry.agent,
+					promptWithResult,
+					config.description ?? `chain ${getShadowDisplayName(entry)}`,
+					context,
+					entry.model,
+				);
 
 					/**
 					 * 等待結果
@@ -857,7 +863,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 						config.round_timeout_ms,
 					);
 
-					return { shadow, result };
+					return { ...entry, result };
 				}),
 			);
 
@@ -883,7 +889,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 					], { force: true });
 
 					const resultsText = chainResults.map(r =>
-						`${r.shadow}:\n${r.result}`,
+						`${getShadowDisplayName(r)}:\n${r.result}`,
 					).join('\n\n---\n\n');
 
 					const details = [
@@ -909,7 +915,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 
 	else
 	{
-		for (const shadow of config.shadows)
+		for (const entry of config.shadows)
 		{
 			/**
 			 * 構建包含上一次結果的提示
@@ -922,11 +928,11 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 
 			const task = await launchShadowTask(
 				backgroundManager,
-				shadow,
+				entry.agent,
 				promptWithResult,
-				config.description ?? `chain ${shadow}`,
+				config.description ?? getShadowDisplayName(entry),
 				context,
-				config.model,
+				entry.model,
 			);
 
 			/**
@@ -940,7 +946,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 			);
 
 			previousResult = responseText;
-			chainResults.push({ shadow, result: responseText });
+			chainResults.push({ ...entry, result: responseText });
 
 			/**
 			 * 檢查終止標記
@@ -955,7 +961,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 				], { force: true });
 
 				const resultsText = chainResults.map(r =>
-					`${r.shadow}:\n${r.result}`,
+					`${getShadowDisplayName(r)}:\n${r.result}`,
 				).join('\n\n---\n\n');
 
 				const details = [
@@ -981,7 +987,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 	 * Compose final result
 	 */
 	const resultsText = chainResults.map(r =>
-		`${r.shadow}:\n${r.result}`,
+		`${getShadowDisplayName(r)}:\n${r.result}`,
 	).join('\n\n---\n\n');
 
 	const details = [
@@ -994,7 +1000,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 	].join('\n');
 
 	return formatAriseMsgSuccessMultiLine(
-		`Chain collaboration completed: ${config.shadows.join(', ')}`,
+		`Chain collaboration completed: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		details,
 	);
 }

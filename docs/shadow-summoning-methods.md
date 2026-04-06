@@ -17,6 +17,41 @@ Tested and verified through actual invocation, documenting behavioral difference
 
 ---
 
+## Shadows 物件格式（v0.1.35+）
+
+自 v0.1.35 起，`arise_collaborate` 的 `shadows` 參數支援新格式：
+
+### 舊格式（已棄用）
+```json
+["beru", "bellion"]
+```
+
+### 新格式
+```json
+[
+  { "agent": "beru" },
+  { "agent": "bellion", "model": "claude-opus", "label": "先鋒" }
+]
+```
+
+### 欄位說明
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| `agent` | string (必填) | Shadow agent 名稱 |
+| `model` | string (選填) | 指定模型，未指定時由 summon 系統自動處理 |
+| `label` | string (選填) | 自訂識別標籤，未指定時自動產生遞增編號（如 beru#001） |
+
+### Label 衝突處理
+- 自訂 label 與現有 label 衝突 → 改為自動產生 label
+- 自訂 label 符合 `#XXX` 格式 → 改為自動產生 label
+- 自動 label 編號被佔用 → 跳到下一個可用編號
+- 不同 agent 可使用相同 label
+
+### 顯示名稱
+使用 `getShadowDisplayName()` 統一顯示格式：`label(agent - model)` 或 `label(agent)`
+
+---
+
 ## 各方式詳細說明
 
 ### 1. `arise_summon(run_in_background=false)` — 同步阻塞
