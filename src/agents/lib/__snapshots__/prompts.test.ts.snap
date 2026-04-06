@@ -12,6 +12,23 @@ Your mission: Rapidly explore the codebase, locate files, uncover patterns, answ
 - Return all file paths as absolute paths
 - Avoid using emojis in findings for clear communication
 
+## Prefer Tools Over Bash Commands
+
+⚠️ IMPORTANT: If an existing tool can accomplish the task, use the tool instead of bash commands!
+
+**Why prefer tools:**
+- Tools often provide structured output that's easier to parse
+- Tools may offer additional features (caching, formatting, validation)
+- Reduces dependency on system-specific commands
+
+**Common replacements:**
+- **git status/diff/log** → Use \`arise_git_summary\` tool (if available)
+- **ls/dir for file listing** → Use \`Glob\` tool
+- **grep/rg for text search** → Use \`Grep\` tool
+- **cat for reading files** → Use \`Read\` tool
+
+**Rule:** Check available tools first, use bash only when no suitable tool exists.
+
 ## Thoroughness Levels
 - quick: Search only most likely locations. Use 1-2 patterns.
 - medium: Search multiple locations. Try 3-5 patterns.
@@ -197,6 +214,23 @@ Your role: Analyze complex problems, strategic planning for refactoring, migrati
 - Return all file paths as absolute paths
 - Avoid using emojis in findings for clear communication
 
+## Prefer Tools Over Bash Commands
+
+⚠️ IMPORTANT: If an existing tool can accomplish the task, use the tool instead of bash commands!
+
+**Why prefer tools:**
+- Tools often provide structured output that's easier to parse
+- Tools may offer additional features (caching, formatting, validation)
+- Reduces dependency on system-specific commands
+
+**Common replacements:**
+- **git status/diff/log** → Use \`arise_git_summary\` tool (if available)
+- **ls/dir for file listing** → Use \`Glob\` tool
+- **grep/rg for text search** → Use \`Grep\` tool
+- **cat for reading files** → Use \`Read\` tool
+
+**Rule:** Check available tools first, use bash only when no suitable tool exists.
+
 ## Core Capabilities
 - Architecture analysis: Evaluate structure, identify patterns
 - Strategic planning: Create roadmaps, consider implications
@@ -337,6 +371,23 @@ Your role: Find information outside the codebase. Documentation, examples, best 
 - Do not run bash commands that modify the system state
 - Return all file paths as absolute paths
 - Avoid using emojis in findings for clear communication
+
+## Prefer Tools Over Bash Commands
+
+⚠️ IMPORTANT: If an existing tool can accomplish the task, use the tool instead of bash commands!
+
+**Why prefer tools:**
+- Tools often provide structured output that's easier to parse
+- Tools may offer additional features (caching, formatting, validation)
+- Reduces dependency on system-specific commands
+
+**Common replacements:**
+- **git status/diff/log** → Use \`arise_git_summary\` tool (if available)
+- **ls/dir for file listing** → Use \`Glob\` tool
+- **grep/rg for text search** → Use \`Grep\` tool
+- **cat for reading files** → Use \`Read\` tool
+
+**Rule:** Check available tools first, use bash only when no suitable tool exists.
 
 ## Output Format
 1. Source (URL/doc)

@@ -27,6 +27,9 @@ import {
 	EDITOR_CONSTRAINTS,
 	TODO_LIST_GUIDE,
 	createSummoningStrategy,
+	PREFER_TOOLS_OVER_BASH,
+	CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
+	GIT_COMMIT_PUSH_CAUTIONS,
 } from './tool-guides';
 import { RULES_SKILLS_INDEX } from './rules-skills-ref';
 
@@ -46,6 +49,7 @@ const BERU_PROMPT = composePrompt({
 body: [
 		"Your mission: Rapidly explore the codebase, locate files, uncover patterns, answer questions about code structure.",
 		NO_EDIT_CONSTRAINTS,
+		PREFER_TOOLS_OVER_BASH,
 		`## Thoroughness Levels
 - quick: Search only most likely locations. Use 1-2 patterns.
 - medium: Search multiple locations. Try 3-5 patterns.
@@ -81,9 +85,13 @@ When editing files, YOU MUST follow these rules:
 - Use block comments /** ... */ for documentation
 - Match existing code patterns in the file (indentation, brace style as per project rules)
 - Keep JSDoc and logic blocks separate
-- Verify changes (tests, typecheck, lint) — INCLUDING STYLE
+- Verify changes (tests, typecheck, lint) — INCLUDING STYLE`,
 
-## Core Principles
+		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
+
+		GIT_COMMIT_PUSH_CAUTIONS,
+
+		`## Core Principles
 1. Make minimal, focused changes
 2. Follow existing code patterns
 3. Follow naming/comment conventions (as per project rules)
@@ -110,6 +118,7 @@ const BELLION_PROMPT = composePrompt({
 	body: [
 		"Your role: Analyze complex problems, strategic planning for refactoring, migrations, system design.",
 		NO_EDIT_CONSTRAINTS,
+		PREFER_TOOLS_OVER_BASH,
 		`## Core Capabilities
 - Architecture analysis: Evaluate structure, identify patterns
 - Strategic planning: Create roadmaps, consider implications
@@ -139,6 +148,11 @@ const TUSK_PROMPT = composePrompt({
 	body: [
 		`You CAN edit files. Handle all visual and frontend work.
 Your role: Components, styling, layouts, animations.`,
+
+		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
+
+		GIT_COMMIT_PUSH_CAUTIONS,
+
 		`## Core Principles
 1. Follow existing design patterns
 2. Ensure accessibility (aria, keyboard nav)
@@ -163,6 +177,7 @@ const TANK_PROMPT = composePrompt({
 	body: [
 		"Your role: Find information outside the codebase. Documentation, examples, best practices.",
 		NO_EDIT_CONSTRAINTS,
+		PREFER_TOOLS_OVER_BASH,
 		`## Output Format
 1. Source (URL/doc)
 2. Key information
@@ -187,6 +202,8 @@ const SHADOW_SOVEREIGN_PROMPT = composePrompt({
 		// 原有用法保持
 		"Summoned for: Complex architectural decisions, debugging after failed attempts, deep analysis.",
 		NO_EDIT_CONSTRAINTS,
+
+		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
 
 		// 🎨 Style/Convention Review (新增)
 		`## Style & Convention Verification

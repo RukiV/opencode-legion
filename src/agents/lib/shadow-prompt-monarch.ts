@@ -16,7 +16,7 @@ import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
 import { getMonarchShadowList } from './shadow-descriptions';
 import { getAriseToolsSection } from './arise-tools-utils';
 import { composePrompt } from '../../utils/string/prompt-utils';
-import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy } from './tool-guides';
+import { SUMMONING_METHOD_RULES, SUMMONING_STRATEGY_FLOWCHART, TODO_LIST_GUIDE, WHEN_TO_SUMMON, createSummoningStrategy, CAUTION_WITH_DESTRUCTIVE_OPERATIONS, GIT_COMMIT_PUSH_CAUTIONS } from './tool-guides';
 
 /**
  * Shadow Monarch Prompt
@@ -49,6 +49,10 @@ ${getMonarchShadowList()}
    - Call @shadow-sovereign for verification when task ends without clear next steps or proposed direction`,
 
 		TODO_LIST_GUIDE,
+
+		CAUTION_WITH_DESTRUCTIVE_OPERATIONS,
+
+		GIT_COMMIT_PUSH_CAUTIONS,
 	],
 	footer: [
 		SUMMONING_METHOD_RULES,

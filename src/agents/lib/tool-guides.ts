@@ -56,6 +56,9 @@ export function getThenDecideDescription<T extends EnumAriseTools.ARISE_SYNC_SUM
 /**
  * 搜尋工具指南
  * Search tools guide
+ *
+ * 💡 提示：如已有現成工具可完成任務，應優先使用工具而非 bash 命令
+ * 💡 Tip: If there's an existing tool that can accomplish the task, prefer it over bash commands
  */
 export const SEARCH_TOOLS = `## Search Tools Guidelines
 - **Glob** — Use for broad file pattern matching: finding files by extension, name, or directory structure.
@@ -124,6 +127,103 @@ export const RESEARCH_TOOLS = `## Research Tools Guidelines
 5. Cite sources in your findings` as const;
 
 /** ==================== 通用約束 / Common constraints ==================== */
+
+/**
+ * 謹慎處理破壞性操作
+ * Caution with destructive operations
+ *
+ * 💡 提示：刪除、撤銷、重置等操作需格外謹慎，應明確指定目標而非大範圍
+ * 💡 Tip: Deletion, rollback, reset operations require extra caution — specify targets explicitly, not broadly
+ */
+export const CAUTION_WITH_DESTRUCTIVE_OPERATIONS = `## ⚠️ Caution with Destructive Operations
+
+**When performing delete/rollback/reset operations:**
+
+1. **Specify targets explicitly** — Don't use broad patterns that could match unintended files
+   - ❌ Bad: Delete all .tmp files in entire project
+   - ✅ Good: Delete only specific files in test/temp/ directory
+
+2. **Always confirm before executing** — If uncertain, ask for permission first
+
+3. **Ask yourself first:**
+   - "Do I really need to do this?"
+   - "What are the consequences if this goes wrong?"
+   - "Can this be undone?"
+
+4. **If not sure:** Explain your concerns and ask for clarification:
+   - "I'm not certain about this because... Is it okay if I...?"
+
+5. **Prefer reversible actions** when possible:
+   - Instead of deleting, consider marking as deprecated
+   - Instead of overwriting, consider creating backup first` as const;
+
+/**
+ * Git 提交推送謹慎原則
+ * Git commit push caution principles
+ *
+ * 💡 提示：除非有明確指示，否則不應擅自替使用者提交推送，也應避免修改提交或強制提交
+ * 💡 Tip: Unless explicitly instructed, don't commit/push on behalf of user; avoid amending commits or force push
+ */
+export const GIT_COMMIT_PUSH_CAUTIONS = `## ⚠️ Git Commit & Push Caution
+
+**Unless explicitly instructed by the user:**
+- ❌ DON'T commit changes automatically
+- ❌ DON'T push to remote
+- ❌ DON'T amend commits (unless user explicitly requests it)
+- ❌ DON'T force push (e.g., git push --force)
+
+**Instead:**
+- Report what changes were made
+- Show the diff for review
+- Ask: "Would you like me to commit these changes?"
+
+**Only commit when explicitly requested:**
+- User says "commit this" or "提交"
+- User explicitly asks to create a commit
+
+**For commit messages:**
+- Follow the project's commit message conventions
+- Summarize the "why", not just the "what"
+- Ask for clarification if unsure about message content
+
+**Safety rules:**
+- NEVER update git config
+- NEVER skip hooks (--no-verify, --no-gpg-sign, etc.)
+- NEVER force push to main/master unless explicitly requested` as const;
+
+/**
+ * 優先使用現有工具而非 Bash 命令
+ * Prefer existing tools over Bash commands
+ *
+ * 💡 提示：如果已有現成的工具可以完成任務，應盡量使用工具而非呼叫 bash 命令
+ * 💡 Tip: If there's an existing tool that can accomplish the task, use the tool instead of calling bash commands
+ *
+ * 例如 / Examples:
+ * - git status → 使用 arise_git_summary 工具（如有）
+ * - file listing → 使用 Glob 而非 ls bash 命令
+ * - text search → 使用 Grep 而非 grep bash 命令
+ *
+ * 這樣的好處：
+ * - 工具通常更結構化，輸出更易於解析
+ * - 工具可能提供額外功能（如快取、格式化）
+ * - 減少對系統命令的依賴
+ */
+export const PREFER_TOOLS_OVER_BASH = `## Prefer Tools Over Bash Commands
+
+⚠️ IMPORTANT: If an existing tool can accomplish the task, use the tool instead of bash commands!
+
+**Why prefer tools:**
+- Tools often provide structured output that's easier to parse
+- Tools may offer additional features (caching, formatting, validation)
+- Reduces dependency on system-specific commands
+
+**Common replacements:**
+- **git status/diff/log** → Use \`arise_git_summary\` tool (if available)
+- **ls/dir for file listing** → Use \`Glob\` tool
+- **grep/rg for text search** → Use \`Grep\` tool
+- **cat for reading files** → Use \`Read\` tool
+
+**Rule:** Check available tools first, use bash only when no suitable tool exists.` as const;
 
 /**
  * 不編輯檔案的約束（適用於 Beru, Bellion, Tank, Shadow Sovereign）
