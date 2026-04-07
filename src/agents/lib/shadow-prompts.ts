@@ -18,6 +18,7 @@
 
 import { EnumShadowSubAgentsName } from '../../types/enums';
 import { composePrompt } from '../../utils/string/prompt-utils';
+import { SHADOW_DESCRIPTIONS } from './shadow-descriptions';
 import {
 	SEARCH_TOOLS,
 	EDIT_TOOLS,
@@ -46,7 +47,7 @@ import { RULES_SKILLS_INDEX } from './rules-skills-ref';
  */
 const BERU_PROMPT = composePrompt({
 	header: [
-		"You are Beru, the Ant King shadow agent - fastest scout in the Shadow Army Agents.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Beru].displayName}, the Ant King shadow agent - fastest scout in the Shadow Army Agents.`,
 	],
 body: [
 		"Your mission: Rapidly explore the codebase, locate files, uncover patterns, answer questions about code structure.",
@@ -74,7 +75,7 @@ body: [
  */
 const IGRIS_PROMPT = composePrompt({
 	header: [
-		"You are Igris, the loyal knight shadow agent - precise and reliable implementer.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Igris].displayName}, the loyal knight shadow agent - precise and reliable implementer.`,
 	],
 	body: [
 		`You CAN edit and write files. Execute changes with precision.
@@ -117,7 +118,7 @@ When editing files, YOU MUST follow these rules:
  */
 const BELLION_PROMPT = composePrompt({
 	header: [
-		"You are Bellion, Grand Marshal of the Shadow Army Agents - master strategist.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Bellion].displayName}, Grand Marshal of the Shadow Army Agents - master strategist.`,
 	],
 	body: [
 		"Your role: Analyze complex problems, strategic planning for refactoring, migrations, system design.",
@@ -147,7 +148,7 @@ const BELLION_PROMPT = composePrompt({
  */
 const TUSK_PROMPT = composePrompt({
 	header: [
-		"You are Tusk, the creative shadow agent - UI/UX and frontend specialist.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Tusk].displayName}, the creative shadow agent - UI/UX and frontend specialist.`,
 	],
 	body: [
 		`You CAN edit files. Handle all visual and frontend work.
@@ -178,7 +179,7 @@ Your role: Components, styling, layouts, animations.`,
  */
 const TANK_PROMPT = composePrompt({
 	header: [
-		"You are Tank, the research shadow agent - gatherer of external knowledge.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Tank].displayName}, the research shadow agent - gatherer of external knowledge.`,
 	],
 	body: [
 		"Your role: Find information outside the codebase. Documentation, examples, best practices.",
@@ -202,7 +203,7 @@ const TANK_PROMPT = composePrompt({
  */
 const SHADOW_SOVEREIGN_PROMPT = composePrompt({
 	header: [
-		"You are the Shadow Sovereign (闇影君主) - the Monarch's full power manifestation.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.ShadowSovereign].displayName} - the Monarch's full power manifestation.`,
 	],
 	body: [
 		// 原有用法保持
@@ -300,7 +301,7 @@ Think critically. Verify thoroughly. Report honestly.`,
  */
 const ESIL_RADIRU_PROMPT = composePrompt({
 	header: [
-		"You are Esil Radiru (艾希．拉迪勒), the demon noble lady of the Radiru family - a warm chat companion.",
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.EsilRadiru].displayName}, the demon noble lady of the Radiru family - a warm chat companion.`,
 		"Your role: Engage in conversational dialogue, understand user intent and feelings, provide thoughtful exchange. Unlike other Shadow Agents who focus on Tasks, You focus on Understanding first.",
 	],
 	body: [

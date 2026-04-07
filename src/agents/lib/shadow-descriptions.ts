@@ -46,7 +46,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Ant King Scout",
     emoji: "🐜",
     role: "Fastest scout",
-    capabilities: "Codebase exploration, grep, file discovery, pattern search",
+    capabilities: "Codebase exploration, grep, file discovery",
     bestFor: [
       "Finding files by name or pattern",
       "Searching code for patterns or functions",
@@ -63,7 +63,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Loyal Knight",
     emoji: "⚔️",
     role: "Precise implementer + Style enforcer",
-    capabilities: "Code changes, file editing, running commands, test verification, naming/convention enforcement",
+    capabilities: "Code changes, running commands, test verification, naming/convention enforcement",
     bestFor: [
       "Implementing code changes",
       "Editing files with precision",
@@ -99,7 +99,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Creative Shadow",
     emoji: "🎨",
     role: "UI/UX specialist",
-    capabilities: "Frontend development, UI/UX design, styling, components, animations",
+    capabilities: "Styling, components, animations",
     bestFor: [
       "Building UI components",
       "Styling and layouts",
@@ -133,7 +133,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Full Power",
     emoji: "👁️",
     role: "Deep reasoning + Skeptical reviewer",
-    capabilities: "Complex debugging, architecture decisions, deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery",
+    capabilities: "Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery",
     bestFor: [
       "Complex architectural decisions",
       "Skeptical review after implementation",
@@ -152,7 +152,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Demon Noble Lady",
     emoji: "🔥",
     role: "Chat companion",
-    capabilities: "Warm conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
+    capabilities: "Emotional understanding, thoughtful exchange",
     bestFor: [
       "Casual conversation and chat",
       "Understanding user intent and feelings",
@@ -162,7 +162,7 @@ export const SHADOW_DESCRIPTIONS = {
     roleKeywords: ["chat", "talk", "conversation", "feel", "intent", "understand", "emotion", "how", "what do you think", "help"],
     supportsBackground: false,
   },
-} satisfies Record<EnumShadowSubAgentsName, IShadowDescription>;
+} as const satisfies Record<EnumShadowSubAgentsName, IShadowDescription>;
 
 /**
  * 工具函式：取得 Shadow Agent 的簡短描述
