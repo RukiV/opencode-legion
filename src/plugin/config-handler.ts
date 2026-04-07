@@ -7,7 +7,7 @@
  */
 
 import type { IAriseConfig } from "../config/schema";
-import { EnumShadowAgentsName, type IAllShadowAgentsName } from "../types/enums";
+import { EnumAriseTools, EnumShadowAgentsName, type IAllShadowAgentsName } from "../types/enums";
 import type { IShadowAgent } from "../agents/shadows";
 import { SHADOW_AGENTS, OPENCODE_OVERRIDES } from "../agents/shadows";
 import { _isAutoModel, DEFAULT_MODEL, getEffectiveModelWithFallback, parseModelString } from "../utils/model-resolver";
@@ -18,6 +18,8 @@ import { logArise2WithLevel, logArise2WithLevelMulti } from "../utils/debug-cont
 import { runtimeCache } from "../utils/session/session-cache";
 import { tsObjectEntries } from "ts-type-object-entries";
 import { AUTO_MODEL } from "../types/const-default";
+import { EnumOpencodeAgentPermission } from "../types/enum-opencode";
+import { IShadowAgentPermission } from "../types/types-opencode";
 
 /**
  * OpenCode 配置介面
@@ -194,7 +196,7 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 		try
 		{
 			/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
-			opencodeConfig.default_agent = EnumShadowAgentsName.ShadowMonarch;
+			opencodeConfig.default_agent ??= EnumShadowAgentsName.ShadowMonarch;
 
 			/** 設定 Shadow Agent 配置 / Set Shadow agents config */
 			setShadowAgentsConfig({

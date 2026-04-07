@@ -542,7 +542,6 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 			per_agent_rounds: z
 				.number()
 				.int()
-				.min(1)
 				.meta({
 					description: "Maximum rounds per individual agent (optional)",
 					title: "Per-Agent Rounds",
@@ -555,7 +554,9 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 					description: "Create a persistent collaboration session that can be continued across multiple tool calls",
 					title: "Persistent",
 				})
-				.optional(),
+				.optional()
+				.default(true)
+				,
 			/** 現有 session ID（繼續協作）/ Existing session ID (continue collaboration) */
 			session_id: z
 				.string()

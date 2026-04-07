@@ -326,8 +326,9 @@ export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
 - Need result LATER (parallel) → arise_background (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
 - DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
 - ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
-- When multiple agents need to collaborate → use \`arise_collaborate\`
 - When summoning shadow agents: **If no TODO list exists, use available tools (e.g., todowrite) to write task goals first**` as const;
+
+export const SUMMONING_METHOD_RULES_COLLABORATE = `- When multiple agents need to collaborate → use \`arise_collaborate\`` as const;
 
 /**
  * 召喚時機指南（ Monarch 專用）
@@ -335,9 +336,10 @@ export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
  */
 export const WHEN_TO_SUMMON = `## When to Summon Which Agent
 
-- Use \`arise_collaborate\` when multiple agents need to collaborate
 - Use background tasks for parallel exploration (beru, tank, bellion)
 - Summon @shadow-sovereign when stuck or for complex architecture` as const;
+
+export const WHEN_TO_SUMMON_COLLABORATE = `- Use \`arise_collaborate\` when multiple agents need to collaborate` as const;
 
 /**
  * 召喚策略流程圖（ Monarch 專用）

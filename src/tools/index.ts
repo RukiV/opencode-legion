@@ -50,7 +50,11 @@ export function createPluginTools(ctx: PluginInput,
 		[EnumAriseTools.ARISE_DEBUG]: createAgentToolDebug(),
 		/** Git 狀態摘要工具 / Git status summary tool */
 		[EnumAriseTools.ARISE_GIT_SUMMARY]: createAgentToolGitSummary(),
-		/** 多代理協作工具 / Multi-agent collaboration tool */
-		[EnumAriseTools.ARISE_COLLABORATE]: createAgentToolAriseCollaborate(ctx, config, backgroundManager),
-	} satisfies IAriseTools
+		/**
+		 * 多代理協作工具 / Multi-agent collaboration tool
+		 * 
+		 * @deprecated 實作上有問題，暫時不使用
+		 */
+		// [EnumAriseTools.ARISE_COLLABORATE]: createAgentToolAriseCollaborate(ctx, config, backgroundManager),
+	} satisfies Omit<IAriseTools, EnumAriseTools.ARISE_COLLABORATE> as any
 }

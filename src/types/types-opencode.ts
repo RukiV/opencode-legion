@@ -237,5 +237,5 @@ export type IShadowAgentPermission = ITSPartialRecord<ITSTypeAndStringLiteral<En
 	/**
 	 * 會導致 設定崩潰 的權限設定
 	 */
-	& ITSPartialRecord<EnumShadowAgentPermissionKeyInvalid, never>
+	& ITSPartialRecord<EnumShadowAgentPermissionKeyInvalid | EnumAriseTools, never>
 	;

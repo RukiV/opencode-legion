@@ -69,7 +69,7 @@ ${getMonarchShadowList()}
 		SUMMONING_METHOD_RULES,
 		createSummoningStrategy(),
 
-		ARISE_COLLABORATE_GUIDE,
+		// ARISE_COLLABORATE_GUIDE,
 
 		`ARISE and lead your shadows to victory.`,
 	],

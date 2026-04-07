@@ -446,7 +446,7 @@ export class BackgroundManager
 	{
 		const message = `Auto-resume skipped for task ${task.id} (${task.shadow}): ${reason}`;
 
-		logArise2WithLevel("info", () => [
+		logArise2WithLevel("debug", () => [
 			`[background-manager]`,
 			`notifyAutoResumeSkipped: ${message}`,
 		]);
@@ -565,7 +565,7 @@ export class BackgroundManager
 		{
 			totalRetryDelay += HIGH_LOAD_BONUS_DELAY_MS;
 
-			logArise2WithLevel("info", () => [
+			logArise2WithLevel("debug", () => [
 				`[background-manager]`,
 				`performAutoResume: high load detected in error, adding ${HIGH_LOAD_BONUS_DELAY_MS}ms bonus delay (total: ${totalRetryDelay}ms)`,
 			]);
@@ -673,7 +673,7 @@ export class BackgroundManager
 				})
 				.then(() =>
 				{
-					logArise2WithLevel("info", () => [
+					logArise2WithLevel("debug", () => [
 						`[background-manager]`,
 						`performAutoResume: promptAsync succeeded for taskId=${task.id}, will be polled`,
 					]);
@@ -926,7 +926,7 @@ export class BackgroundManager
 			})
 			.then(() =>
 			{
-				logArise2WithLevel("info", () => [
+				logArise2WithLevel("debug", () => [
 					`[background-manager]`,
 					`launch: promptAsync succeeded, taskId=${taskId}, scheduling polling`,
 				]);
@@ -1020,18 +1020,7 @@ export class BackgroundManager
 		if (task.retryCount > 0)
 		{
 			const increment = this.getRetryDelayIncrement(agentName);
-
-			logArise2WithLevel("debug", () => [
-				`[background-manager]`,
-				`schedulePolling: increment=${increment}ms`,
-			]);
-
 			const maxDelay = this.getRetryDelayMax(agentName);
-
-			logArise2WithLevel("debug", () => [
-				`[background-manager]`,
-				`schedulePolling: maxDelay=${maxDelay}ms`,
-			]);
 
 			/**
 			 * 計算額外延遲
@@ -1045,14 +1034,16 @@ export class BackgroundManager
 
 			logArise2WithLevel("debug", () => [
 				`[background-manager]`,
-				`schedulePolling: retryCount=${task.retryCount}, additionalDelay=${additionalDelay}ms, finalInterval=${interval}ms`,
+				`schedulePolling: retryCount=${task.retryCount}, delay=${additionalDelay}ms, interval=${interval}ms`,
 			]);
 		}
-
-		logArise2WithLevel("debug", () => [
-			`[background-manager]`,
-			`schedulePolling: scheduling poll for taskId=${taskId} in ${interval}ms`,
-		]);
+		else
+		{
+			logArise2WithLevel("debug", () => [
+				`[background-manager]`,
+				`schedulePolling: taskId=${taskId}, interval=${interval}ms`,
+			]);
+		}
 
 		setTimeout(() => this.pollTaskCompletion(taskId), interval);
 	}
@@ -1089,11 +1080,6 @@ export class BackgroundManager
 			{
 				const status = statuses[task.sessionId];
 
-				logArise2WithLevel("debug", () => [
-					`[background-manager]`,
-					`pollTaskCompletion: sessionId=${task.sessionId}, status.type=${status.type}`,
-				]);
-
 				/**
 				 * Session idle = 任務完成
 				 * Session idle = task completed
@@ -1104,7 +1090,7 @@ export class BackgroundManager
 					task.status = BackgroundTaskStatus.Completed;
 					task.completedAt = Date.now();
 
-					logArise2WithLevel("info", () => [
+					logArise2WithLevel("debug", () => [
 						`[background-manager]`,
 						`pollTaskCompletion: taskId=${taskId} completed, result length: ${task.result?.length ?? 0}`,
 					]);
@@ -1124,12 +1110,6 @@ export class BackgroundManager
 				else if (status.type === EnumSessionStatusType.Busy || status.type === EnumSessionStatusType.Retry)
 				{
 					task.retryCount++;
-
-					logArise2WithLevel("debug", () => [
-						`[background-manager]`,
-						`pollTaskCompletion: session busy/retry, taskId=${taskId}, retryCount=${task.retryCount}`,
-					]);
-
 					this.schedulePolling(taskId, task.shadow as IAllShadowAgentsName);
 				}
 			}
@@ -1142,11 +1122,6 @@ export class BackgroundManager
 				 * 這是一種容錯機制，避免因狀態查詢失敗而無法完成任務
 				 * This is a fault tolerance mechanism to avoid tasks never completing due to status query failures
 				 */
-				logArise2WithLevel("debug", () => [
-					`[background-manager]`,
-					`pollTaskCompletion: sessionId=${task.sessionId} not in status map, assuming completed`,
-				]);
-
 				await this.extractResult(task);
 				task.status = BackgroundTaskStatus.Completed;
 				task.completedAt = Date.now();
@@ -1289,7 +1264,7 @@ export class BackgroundManager
 
 		try
 		{
-			logArise2WithLevel("info", () => [
+			logArise2WithLevel("debug", () => [
 				`[background-manager]`,
 				`notifyParent: showing toast, task=${task.shadow} finished: ${task.description} (${duration}s)`,
 			]);

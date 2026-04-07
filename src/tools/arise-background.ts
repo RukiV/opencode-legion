@@ -46,14 +46,7 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 
 			try
 			{
-				/**
-				 * 狀態日誌：開始啟動背景任務
-				 * Status log: starting background task launch
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background]`,
-					`Launching background task: shadow=${shadow}, description=${description}`,
-				], { force: true });
+				
 
 				/** 啟動背景任務 / Launch background task */
 				const task = await manager.launch({
@@ -123,14 +116,7 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 		{
 			const { task_id } = args;
 
-			/**
-			 * 狀態日誌：查詢任務輸出
-			 * Status log: querying task output
-			 */
-			logArise2WithLevel("debug", () => [
-				`[arise-background-output]`,
-				`Querying task: taskId=${task_id}`,
-			], { force: true });
+			
 
 			/** 優先嘗試用 taskId 查詢 / Try taskId first */
 			let task = manager.getTask(task_id);
@@ -138,11 +124,6 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 			/** 如果是 sessionId 格式（ses_xxx）且上面找不到，嘗試用 sessionId 查詢 */
 			if (!task && task_id.startsWith("ses_"))
 			{
-				logArise2WithLevel("debug", () => [
-					`[arise-background-output]`,
-					`Task not found by taskId, trying sessionId: taskId=${task_id}`,
-				], { force: true });
-
 				task = manager.getTaskBySessionId(task_id);
 			}
 
@@ -194,15 +175,6 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 				return formatAriseMsgError(`Task failed: ${task.error ?? "Unknown error"}`);
 			}
 
-			/**
-			 * 狀態日誌：任務成功完成
-			 * Status log: task completed successfully
-			 */
-			logArise2WithLevel("debug", () => [
-				`[arise-background-output]`,
-				`Task completed: taskId=${args.task_id}, shadow=${task.shadow}, duration=${duration}`,
-			], { force: true });
-
 			/** 任務成功完成 / Task completed successfully */
 			return formatAriseMsgSuccessMultiLine(
 				`${task.shadow} completed (${duration}):`,
@@ -239,15 +211,6 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 			// 1. 如果提供了 session_id，查询特定 session 记录
 			if (args.session_id)
 			{
-				/**
-				 * 狀態日誌：查詢特定 session
-				 * Status log: querying specific session
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background-status]`,
-					`Querying session: session_id=${args.session_id}, include_full_info=${args.include_full_info ?? false}`,
-				], { force: true });
-
 				let record = runtimeCache.getSessionRecord(args.session_id);
 
 				/**
@@ -278,14 +241,7 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 							const firstMessage = messages.data?.[0];
 							if (firstMessage?.info)
 							{
-								/**
-								 * 狀態日誌：SDK 查詢成功，構建記錄
-								 * Status log: SDK query successful, building record
-								 */
-								logArise2WithLevel("debug", () => [
-									`[arise-background-status]`,
-									`SDK query successful: session_id=${args.session_id}, hasInfo=${!!firstMessage.info}, messageCount=${messages.data!.length}`,
-								], { force: true });
+								
 
 								/**
 								 * 类型断言：SDK 返回的消息包含 info 字段
