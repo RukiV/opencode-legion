@@ -88,20 +88,11 @@ export function createAgentToolListModels(ctx: PluginInput)
 					fromCache = true;
 					/** 計算緩存剩餘時間 / Calculate remaining cache time */
 					const now = Date.now();
-					const age = now - cached.timestamp;
-					const remaining = cached.expiresIn - age;
+					const remaining = cached.expiresIn - (now - cached.timestamp);
 					const expiresAt = tzDayjs(cached.timestamp + cached.expiresIn);
-					const expiresAtStr = expiresAt.format(DEFAULT_DATE_TIME_FORMAT);
-					const remainingStr = fromNow(cached.timestamp + cached.expiresIn); // 人類可讀的剩餘時間 / Human-readable remaining time
+					const remainingStr = fromNow(cached.timestamp + cached.expiresIn);
 					logArise2WithLevel("info", () => [
-						"Using cached providers",
-						{
-							count: providers.length,
-							expiresIn: cached.expiresIn,
-							remainingMs: remaining,
-							expiresAt: expiresAtStr,
-							remaining: remainingStr,
-						},
+						`Cache: ${providers.length} providers, expires in ${remainingStr}`,
 					]);
 				}
 				else
@@ -114,27 +105,17 @@ export function createAgentToolListModels(ctx: PluginInput)
 						return formatAriseMsgError("Failed to fetch providers: No data returned");
 					}
 
-					/** 輸出預設提供者日誌 / Log default provider */
-					logArise2WithLevel("info", () => ["Default provider:", providersResult.data.default]);
-
 					providers = providersResult.data.providers as unknown as IOpenCodeProvider[];
 
-					/** 緩存結果 / Cache the result (傳入舊緩存用於比較差異與歷史記錄) */
+					/** 緩存結果 / Cache the result */
 					if (providers && providers.length > 0)
 					{
-						const oldCache = getProvidersCache(true); // 強制獲取舊緩存（即使過期）
+						const oldCache = getProvidersCache(true);
 						setProvidersCache(providers, DEFAULT_PROVIDERS_CACHE_TTL, oldCache);
 						const expiresAt = tzDayjs(Date.now() + DEFAULT_PROVIDERS_CACHE_TTL);
-						const expiresAtStr = expiresAt.format(DEFAULT_DATE_TIME_FORMAT);
-						const remainingStr = fromNow(Date.now() + DEFAULT_PROVIDERS_CACHE_TTL); // 人類可讀的剩餘時間 / Human-readable remaining time
+						const remainingStr = fromNow(Date.now() + DEFAULT_PROVIDERS_CACHE_TTL);
 						logArise2WithLevel("info", () => [
-							"Cached providers",
-							{
-								count: providers.length,
-								ttl: DEFAULT_PROVIDERS_CACHE_TTL,
-								expiresAt: expiresAtStr,
-								remaining: remainingStr,
-							},
+							`Cached: ${providers.length} providers, TTL: ${remainingStr}`,
 						]);
 					}
 				}

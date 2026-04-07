@@ -30,34 +30,16 @@ export function createAgentToolContinue(manager: BackgroundManager)
 		{
 			const { task_id, force, auto_resume, background_auto_resume } = args;
 
-			/**
-			 * 除錯日誌：開始執行手動重試
-			 * Debug log: Start manual retry execution
-			 */
-			logArise2WithLevel("debug", () => [
-				`[arise-continue]`,
-				`Starting manual retry for task: ${task_id}, force: ${force ?? false}`,
-			]);
-
 			/** 優先嘗試用 taskId / Try taskId first */
 			let targetTaskId = task_id;
 
 			/** 如果是 sessionId 格式，嘗試用 sessionId 查詢 */
 			if (task_id.startsWith("ses_"))
 			{
-				logArise2WithLevel("debug", () => [
-					`[arise-continue]`,
-					`Input is sessionId, trying to find task: taskId=${task_id}`,
-				], { force: true });
-
 				const task = manager.getTaskBySessionId(task_id);
 				if (task)
 				{
 					targetTaskId = task.id;
-					logArise2WithLevel("debug", () => [
-						`[arise-continue]`,
-						`Found task by sessionId: taskId=${task_id} -> ${targetTaskId}`,
-					], { force: true });
 				}
 			}
 
@@ -68,15 +50,6 @@ export function createAgentToolContinue(manager: BackgroundManager)
 				auto_resume,
 				background_auto_resume,
 			);
-
-			/**
-			 * 除錯日誌：手動重試結果
-			 * Debug log: Manual retry result
-			 */
-			logArise2WithLevel("debug", () => [
-				`[arise-continue]`,
-				`Manual retry result for ${args.task_id}: ${result}`,
-			]);
 
 			return result;
 		},

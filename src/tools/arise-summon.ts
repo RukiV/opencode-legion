@@ -68,15 +68,6 @@ export function createAgentToolAriseSyncSummon(
 			try
 			{
 				/**
-				 * 狀態日誌：開始召喚
-				 * Status log: starting summon
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-summon]`,
-					`Starting summon: shadow=${shadow}, description=${taskDesc}, run_in_background=${run_in_background}`,
-				], { force: true });
-
-				/**
 				 * 建立新的 Session
 				 * Create new session
 				 *
@@ -91,8 +82,8 @@ export function createAgentToolAriseSyncSummon(
 				if (!sessionId)
 				{
 					/**
-					 * 狀態日誌：建立 session 失敗
-					 * Status log: session creation failed
+					 * 錯誤日誌：建立 session 失敗
+					 * Error log: session creation failed
 					 */
 					logArise2WithLevel("error", () => [
 						`[arise-summon]`,
@@ -118,15 +109,6 @@ export function createAgentToolAriseSyncSummon(
 					? `${parentModelIModel.providerID}/${parentModelIModel.modelID}`
 					: undefined;
 				const modelBody = resolveModelContext(parentModelStr, shadow, config, model);
-
-				/**
-				 * 狀態日誌：解析模型完成
-				 * Status log: model resolved
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-summon]`,
-					`Model resolved: ${formatModelBodyDescription(modelBody)}, sessionId=${sessionId}`,
-				], { force: true });
 
 				/**
 				 * 更新 session 记录（添加 shadow 和 parentSessionId）
@@ -172,15 +154,6 @@ export function createAgentToolAriseSyncSummon(
 				if (run_in_background)
 				{
 					/**
-					 * 狀態日誌：開始非同步執行
-					 * Status log: starting async execution
-					 */
-					logArise2WithLevel("debug", () => [
-						`[arise-summon]`,
-						`Starting async execution with BackgroundManager: sessionId=${sessionId}, shadow=${shadow}`,
-					], { force: true });
-
-					/**
 					 * 使用 BackgroundManager 建立完整追蹤的任務
 					 * Use BackgroundManager to create fully tracked task
 					 *
@@ -200,15 +173,6 @@ export function createAgentToolAriseSyncSummon(
 					});
 
 					/**
-					 * 狀態日誌：非同步任務已建立
-					 * Status log: async task created
-					 */
-					logArise2WithLevel("debug", () => [
-						`[arise-summon]`,
-						`Async task created: taskId=${task.id}, sessionId=${sessionId}, shadow=${shadow}`,
-					], { force: true });
-
-					/**
 					 * 返回時顯示 Task ID + Session ID（選項 B）
 					 * Return with Task ID + Session ID displayed (Option B)
 					 */
@@ -226,15 +190,6 @@ Use arise_background_output("${task.id}") or arise_background_output("${task.ses
 				else
 				{
 					/**
-					 * 狀態日誌：開始同步執行
-					 * Status log: starting sync execution
-					 */
-					logArise2WithLevel("debug", () => [
-						`[arise-summon]`,
-						`Starting sync execution: sessionId=${sessionId}, shadow=${shadow}`,
-					], { force: true });
-
-					/**
 					 * 同步模式（等待完成）
 					 * Sync mode (wait for completion)
 					 *
@@ -249,15 +204,6 @@ Use arise_background_output("${task.id}") or arise_background_output("${task.ses
 							parts: [{ type: "text", text: prompt }],
 						},
 					});
-
-					/**
-					 * 狀態日誌：同步執行完成
-					 * Status log: sync execution completed
-					 */
-					logArise2WithLevel("debug", () => [
-						`[arise-summon]`,
-						`Sync execution completed: sessionId=${sessionId}, shadow=${shadow}`,
-					], { force: true });
 
 					/** 取得 session 的訊息歷史 / Get session message history */
 					const messages = await ctx.client.session.messages({

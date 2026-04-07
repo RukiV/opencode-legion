@@ -57,15 +57,6 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 					model,
 				});
 
-				/**
-				 * 狀態日誌：背景任務啟動成功
-				 * Status log: background task launched successfully
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background]`,
-					`Background task launched: taskId=${task.id}, shadow=${shadow}`,
-				], { force: true });
-
 				return formatAriseMsgSuccessMultiLine(
 					`Shadow ${shadow} launched in background.`,
 					`Task ID: ${task.id}
@@ -130,15 +121,6 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 			/** 任務不存在 / Task not found */
 			if (!task)
 			{
-				/**
-				 * 狀態日誌：任務不存在
-				 * Status log: task not found
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background-output]`,
-					`Task not found: taskId=${args.task_id}`,
-				], { force: true });
-
 				return formatAriseMsgError(`Task not found: ${args.task_id}`);
 			}
 
@@ -148,30 +130,12 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 			/** 任務仍在執行中 / Task still running */
 			if (task.status === BackgroundTaskStatus.Running)
 			{
-				/**
-				 * 狀態日誌：任務仍在執行中
-				 * Status log: task still running
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background-output]`,
-					`Task still running: taskId=${args.task_id}, duration=${duration}`,
-				], { force: true });
-
 				return formatAriseMsgInfo(`Task still running (${duration}). Check again later.`);
 			}
 
 			/** 任務執行失敗 / Task execution failed */
 			if (task.status === BackgroundTaskStatus.Error)
 			{
-				/**
-				 * 狀態日誌：任務執行失敗
-				 * Status log: task execution failed
-				 */
-				logArise2WithLevel("debug", () => [
-					`[arise-background-output]`,
-					`Task failed: taskId=${args.task_id}, error=${task.error ?? "Unknown error"}, duration=${duration}`,
-				], { force: true });
-
 				return formatAriseMsgError(`Task failed: ${task.error ?? "Unknown error"}`);
 			}
 

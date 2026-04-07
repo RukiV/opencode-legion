@@ -1257,11 +1257,6 @@ export class BackgroundManager
 			? Math.round((task.completedAt - task.startedAt) / 1000)
 			: 0;
 
-		logArise2WithLevel("debug", () => [
-			`[background-manager]`,
-			`notifyParent: taskId=${task.id}, duration=${duration}s`,
-		]);
-
 		try
 		{
 			logArise2WithLevel("debug", () => [
@@ -1280,14 +1275,6 @@ export class BackgroundManager
 		}
 		catch
 		{
-			/**
-			 * TUI 可能不可用（無圖形介面）
-			 * TUI might not be available (non-graphical environment)
-			 */
-			logArise2WithLevel("debug", () => [
-				`[background-manager]`,
-				`notifyParent: TUI not available, skipping notification`,
-			]);
 		}
 	}
 
