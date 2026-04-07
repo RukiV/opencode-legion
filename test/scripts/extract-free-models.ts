@@ -22,47 +22,13 @@ import { IOpenCodeProvider } from '../../src/types/opencode/types-provider';
 import { __TEST_FIXTURES } from '../../__root';
 import { console } from 'debug-color2';
 import { sortObject } from "sort-object-keys2";
+import { findFreeModelsRecord } from '../../src/config/model-cache';
+import { tsObjectEntries } from 'ts-type-object-entries';
 
 const _dir = join(__TEST_FIXTURES, "api");
 
 const INPUT_FILE = join(_dir, "providers-cache.json");
 const OUTPUT_FILE = join(_dir, "free-models.json");
-
-/**
- * 免費模型資訊介面 (單一模型結構)
- * Free model info interface (single model structure)
- */
-interface IFreeModelEntry
-{
-	/** 提供者 ID */
-	providerId: string;
-	/** 模型 ID */
-	modelId: string;
-	/** 模型名稱 */
-	name?: string;
-	/** 模型費用資訊 */
-	cost: {
-		input: number;
-		output: number;
-		cache?: {
-			read: number;
-			write: number;
-		};
-	};
-}
-
-/**
- * 提供商免費模型資料結構 (與 providers-history.json 相同格式)
- * Provider free models data structure (same format as providers-history.json)
- */
-interface IProviderFreeModels
-{
-	[providerId: string]: {
-		models: {
-			[modelId: string]: IFreeModelEntry;
-		};
-	};
-}
 
 /**
  * 輸出檔案資料結構
@@ -74,67 +40,7 @@ interface IFreeModelsOutput
 	extractedAt?: string;
 	totalCount?: number;
 	providerCount?: number;
-	[providerId: string]: unknown;
-}
-
-/**
- * 檢查模型是否為免費模型
- * Check if a model is free
- *
- * @param cost - 模型費用資訊
- * @returns 是否為免費模型
- */
-function isFreeModel(cost: IFreeModelEntry['cost'] | undefined): boolean
-{
-	if (!cost)
-	{
-		return false;
-	}
-
-	return cost.input === 0 && cost.output === 0;
-}
-
-/**
- * 從 providers 中找出所有免費模型，並依照提供商分類
- * Find all free models from providers, grouped by provider
- *
- * @param providers - 提供者列表
- * @returns 依照提供商分類的免費模型
- */
-function findFreeModelsGrouped(providers: IOpenCodeProvider[]): IProviderFreeModels
-{
-	const result: IProviderFreeModels = {};
-
-	for (const provider of providers)
-	{
-		if (provider.models)
-		{
-			for (const [modelKey, model] of Object.entries(provider.models))
-			{
-				if (isFreeModel(model.cost))
-				{
-					const modelId = model?.id ?? model?.name ?? modelKey;
-
-					// 初始化提供商結構 / Initialize provider structure
-					if (!result[provider.id])
-					{
-						result[provider.id] = {
-							models: {},
-						};
-					}
-
-					result[provider.id].models[modelId] = {
-						providerId: provider.id,
-						modelId,
-						name: model.name,
-						cost: model.cost!,
-					};
-				}
-			}
-		}
-	}
-
-	return result;
+	data: ReturnType<typeof findFreeModelsRecord>;
 }
 
 /**
@@ -162,7 +68,7 @@ async function extractFreeModels(): Promise<void>
 	const oldJson = JSON.stringify(oldOutput);
 
 	// 找出所有免費模型並依照提供商分類 / Find all free models grouped by provider
-	const freeModelsGrouped = findFreeModelsGrouped(cache.data);
+	const freeModelsGrouped = findFreeModelsRecord(cache.data);
 
 	sortObject(freeModelsGrouped, {
 		useSource: true,
@@ -187,7 +93,7 @@ async function extractFreeModels(): Promise<void>
 
 	// 計算總數 / Calculate total count
 	const totalCount = Object.values(freeModelsGrouped).reduce((acc, provider) =>
-		acc + Object.keys(provider.models).length, 0);
+		acc + Object.keys(provider).length, 0);
 
 	// 建立輸出資料 (providers-history.json 格式) / Create output data (providers-history.json format)
 	const newOutput: IFreeModelsOutput = {
@@ -202,16 +108,16 @@ async function extractFreeModels(): Promise<void>
 	console.log("");
 
 	// 輸出各提供商的模型數量 / Output model count per provider
-	for (const [providerId, providerData] of Object.entries(freeModelsGrouped))
+	for (const [providerId, providerData] of tsObjectEntries(freeModelsGrouped))
 	{
-		const modelCount = Object.keys(providerData.models).length;
+		const modelCount = Object.keys(providerData).length;
 		console.info(`  [${providerId}] ${modelCount} models`);
 
 		// 顯示前幾個模型 / Show first few models
-		const modelIds = Object.keys(providerData.models).slice(0, 3);
+		const modelIds = Object.keys(providerData).slice(0, 3);
 		for (const modelId of modelIds)
 		{
-			const model = providerData.models[modelId];
+			const model = providerData[modelId];
 			console.gray.info(`         - ${model.name || modelId}`);
 		}
 

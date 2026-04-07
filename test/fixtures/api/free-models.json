@@ -1,1390 +1,1380 @@
 {
   "note": "免費模型列表 (依照提供商分類) / Free models list (grouped by provider)",
-  "extractedAt": "2026-04-07T07:05:08.550Z",
+  "extractedAt": "2026-04-07T07:22:52.817Z",
   "providerCount": 5,
   "totalCount": 105,
   "data": {
     "google": {
-      "models": {
-        "gemma-3n-e2b-it": {
-          "providerId": "google",
-          "modelId": "gemma-3n-e2b-it",
-          "name": "Gemma 3n 2B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+      "gemma-3n-e2b-it": {
+        "providerId": "google",
+        "modelId": "gemma-3n-e2b-it",
+        "name": "Gemma 3n 2B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-3-27b-it": {
-          "providerId": "google",
-          "modelId": "gemma-3-27b-it",
-          "name": "Gemma 3 27B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-3-27b-it": {
+        "providerId": "google",
+        "modelId": "gemma-3-27b-it",
+        "name": "Gemma 3 27B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-3-4b-it": {
-          "providerId": "google",
-          "modelId": "gemma-3-4b-it",
-          "name": "Gemma 3 4B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-3-4b-it": {
+        "providerId": "google",
+        "modelId": "gemma-3-4b-it",
+        "name": "Gemma 3 4B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-3n-e4b-it": {
-          "providerId": "google",
-          "modelId": "gemma-3n-e4b-it",
-          "name": "Gemma 3n 4B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-3n-e4b-it": {
+        "providerId": "google",
+        "modelId": "gemma-3n-e4b-it",
+        "name": "Gemma 3n 4B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-4-26b": {
-          "providerId": "google",
-          "modelId": "gemma-4-26b",
-          "name": "Gemma 4 26B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-4-26b": {
+        "providerId": "google",
+        "modelId": "gemma-4-26b",
+        "name": "Gemma 4 26B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-3-12b-it": {
-          "providerId": "google",
-          "modelId": "gemma-3-12b-it",
-          "name": "Gemma 3 12B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-3-12b-it": {
+        "providerId": "google",
+        "modelId": "gemma-3-12b-it",
+        "name": "Gemma 3 12B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma-4-31b": {
-          "providerId": "google",
-          "modelId": "gemma-4-31b",
-          "name": "Gemma 4 31B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma-4-31b": {
+        "providerId": "google",
+        "modelId": "gemma-4-31b",
+        "name": "Gemma 4 31B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
         }
       }
     },
     "kilo": {
-      "models": {
-        "giga-potato": {
-          "providerId": "kilo",
-          "modelId": "giga-potato",
-          "name": "Giga Potato (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+      "giga-potato": {
+        "providerId": "kilo",
+        "modelId": "giga-potato",
+        "name": "Giga Potato (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "corethink:free": {
-          "providerId": "kilo",
-          "modelId": "corethink:free",
-          "name": "CoreThink (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "corethink:free": {
+        "providerId": "kilo",
+        "modelId": "corethink:free",
+        "name": "CoreThink (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "giga-potato-thinking": {
-          "providerId": "kilo",
-          "modelId": "giga-potato-thinking",
-          "name": "Giga Potato Thinking (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "giga-potato-thinking": {
+        "providerId": "kilo",
+        "modelId": "giga-potato-thinking",
+        "name": "Giga Potato Thinking (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "morph-warp-grep-v2": {
-          "providerId": "kilo",
-          "modelId": "morph-warp-grep-v2",
-          "name": "Morph: WarpGrep V2",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "morph-warp-grep-v2": {
+        "providerId": "kilo",
+        "modelId": "morph-warp-grep-v2",
+        "name": "Morph: WarpGrep V2",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "x-ai/grok-code-fast-1:optimized:free": {
-          "providerId": "kilo",
-          "modelId": "x-ai/grok-code-fast-1:optimized:free",
-          "name": "xAI: Grok Code Fast 1 Optimized (experimental, free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "x-ai/grok-code-fast-1:optimized:free": {
+        "providerId": "kilo",
+        "modelId": "x-ai/grok-code-fast-1:optimized:free",
+        "name": "xAI: Grok Code Fast 1 Optimized (experimental, free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nvidia/nemotron-3-super-120b-a12b:free": {
-          "providerId": "kilo",
-          "modelId": "nvidia/nemotron-3-super-120b-a12b:free",
-          "name": "NVIDIA: Nemotron 3 Super (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nvidia/nemotron-3-super-120b-a12b:free": {
+        "providerId": "kilo",
+        "modelId": "nvidia/nemotron-3-super-120b-a12b:free",
+        "name": "NVIDIA: Nemotron 3 Super (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "kilo/auto-free": {
-          "providerId": "kilo",
-          "modelId": "kilo/auto-free",
-          "name": "Deprecated Kilo Auto Free",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "kilo/auto-free": {
+        "providerId": "kilo",
+        "modelId": "kilo/auto-free",
+        "name": "Deprecated Kilo Auto Free",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/hunter-alpha": {
-          "providerId": "kilo",
-          "modelId": "openrouter/hunter-alpha",
-          "name": "Hunter Alpha",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/hunter-alpha": {
+        "providerId": "kilo",
+        "modelId": "openrouter/hunter-alpha",
+        "name": "Hunter Alpha",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/free": {
-          "providerId": "kilo",
-          "modelId": "openrouter/free",
-          "name": "Free Models Router",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/free": {
+        "providerId": "kilo",
+        "modelId": "openrouter/free",
+        "name": "Free Models Router",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/bodybuilder": {
-          "providerId": "kilo",
-          "modelId": "openrouter/bodybuilder",
-          "name": "Body Builder (beta)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/bodybuilder": {
+        "providerId": "kilo",
+        "modelId": "openrouter/bodybuilder",
+        "name": "Body Builder (beta)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/auto": {
-          "providerId": "kilo",
-          "modelId": "openrouter/auto",
-          "name": "Auto Router",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/auto": {
+        "providerId": "kilo",
+        "modelId": "openrouter/auto",
+        "name": "Auto Router",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/healer-alpha": {
-          "providerId": "kilo",
-          "modelId": "openrouter/healer-alpha",
-          "name": "Healer Alpha",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/healer-alpha": {
+        "providerId": "kilo",
+        "modelId": "openrouter/healer-alpha",
+        "name": "Healer Alpha",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "arcee-ai/trinity-large-preview:free": {
-          "providerId": "kilo",
-          "modelId": "arcee-ai/trinity-large-preview:free",
-          "name": "Arcee AI: Trinity Large Preview (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "arcee-ai/trinity-large-preview:free": {
+        "providerId": "kilo",
+        "modelId": "arcee-ai/trinity-large-preview:free",
+        "name": "Arcee AI: Trinity Large Preview (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "kilo-auto/free": {
-          "providerId": "kilo",
-          "modelId": "kilo-auto/free",
-          "name": "Kilo Auto Free",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "kilo-auto/free": {
+        "providerId": "kilo",
+        "modelId": "kilo-auto/free",
+        "name": "Kilo Auto Free",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax/minimax-m2.5:free": {
-          "providerId": "kilo",
-          "modelId": "minimax/minimax-m2.5:free",
-          "name": "MiniMax: MiniMax M2.5 (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax/minimax-m2.5:free": {
+        "providerId": "kilo",
+        "modelId": "minimax/minimax-m2.5:free",
+        "name": "MiniMax: MiniMax M2.5 (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "stepfun/step-3.5-flash:free": {
-          "providerId": "kilo",
-          "modelId": "stepfun/step-3.5-flash:free",
-          "name": "StepFun: Step 3.5 Flash (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "stepfun/step-3.5-flash:free": {
+        "providerId": "kilo",
+        "modelId": "stepfun/step-3.5-flash:free",
+        "name": "StepFun: Step 3.5 Flash (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
         }
       }
     },
     "ollama-cloud": {
-      "models": {
-        "mistral-large-3:675b": {
-          "providerId": "ollama-cloud",
-          "modelId": "mistral-large-3:675b",
-          "name": "mistral-large-3:675b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+      "mistral-large-3:675b": {
+        "providerId": "ollama-cloud",
+        "modelId": "mistral-large-3:675b",
+        "name": "mistral-large-3:675b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "kimi-k2-thinking": {
-          "providerId": "ollama-cloud",
-          "modelId": "kimi-k2-thinking",
-          "name": "kimi-k2-thinking",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "kimi-k2-thinking": {
+        "providerId": "ollama-cloud",
+        "modelId": "kimi-k2-thinking",
+        "name": "kimi-k2-thinking",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3-coder-next": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3-coder-next",
-          "name": "qwen3-coder-next",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3-coder-next": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3-coder-next",
+        "name": "qwen3-coder-next",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3-vl:235b-instruct": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3-vl:235b-instruct",
-          "name": "qwen3-vl:235b-instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3-vl:235b-instruct": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3-vl:235b-instruct",
+        "name": "qwen3-vl:235b-instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gpt-oss:120b": {
-          "providerId": "ollama-cloud",
-          "modelId": "gpt-oss:120b",
-          "name": "gpt-oss:120b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gpt-oss:120b": {
+        "providerId": "ollama-cloud",
+        "modelId": "gpt-oss:120b",
+        "name": "gpt-oss:120b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "kimi-k2.5": {
-          "providerId": "ollama-cloud",
-          "modelId": "kimi-k2.5",
-          "name": "kimi-k2.5",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "kimi-k2.5": {
+        "providerId": "ollama-cloud",
+        "modelId": "kimi-k2.5",
+        "name": "kimi-k2.5",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "cogito-2.1:671b": {
-          "providerId": "ollama-cloud",
-          "modelId": "cogito-2.1:671b",
-          "name": "cogito-2.1:671b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "cogito-2.1:671b": {
+        "providerId": "ollama-cloud",
+        "modelId": "cogito-2.1:671b",
+        "name": "cogito-2.1:671b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nemotron-3-nano:30b": {
-          "providerId": "ollama-cloud",
-          "modelId": "nemotron-3-nano:30b",
-          "name": "nemotron-3-nano:30b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nemotron-3-nano:30b": {
+        "providerId": "ollama-cloud",
+        "modelId": "nemotron-3-nano:30b",
+        "name": "nemotron-3-nano:30b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "ministral-3:14b": {
-          "providerId": "ollama-cloud",
-          "modelId": "ministral-3:14b",
-          "name": "ministral-3:14b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "ministral-3:14b": {
+        "providerId": "ollama-cloud",
+        "modelId": "ministral-3:14b",
+        "name": "ministral-3:14b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "devstral-small-2:24b": {
-          "providerId": "ollama-cloud",
-          "modelId": "devstral-small-2:24b",
-          "name": "devstral-small-2:24b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "devstral-small-2:24b": {
+        "providerId": "ollama-cloud",
+        "modelId": "devstral-small-2:24b",
+        "name": "devstral-small-2:24b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax-m2": {
-          "providerId": "ollama-cloud",
-          "modelId": "minimax-m2",
-          "name": "minimax-m2",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax-m2": {
+        "providerId": "ollama-cloud",
+        "modelId": "minimax-m2",
+        "name": "minimax-m2",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3-next:80b": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3-next:80b",
-          "name": "qwen3-next:80b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3-next:80b": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3-next:80b",
+        "name": "qwen3-next:80b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3-vl:235b": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3-vl:235b",
-          "name": "qwen3-vl:235b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3-vl:235b": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3-vl:235b",
+        "name": "qwen3-vl:235b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax-m2.1": {
-          "providerId": "ollama-cloud",
-          "modelId": "minimax-m2.1",
-          "name": "minimax-m2.1",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax-m2.1": {
+        "providerId": "ollama-cloud",
+        "modelId": "minimax-m2.1",
+        "name": "minimax-m2.1",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma3:12b": {
-          "providerId": "ollama-cloud",
-          "modelId": "gemma3:12b",
-          "name": "gemma3:12b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma3:12b": {
+        "providerId": "ollama-cloud",
+        "modelId": "gemma3:12b",
+        "name": "gemma3:12b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma3:27b": {
-          "providerId": "ollama-cloud",
-          "modelId": "gemma3:27b",
-          "name": "gemma3:27b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma3:27b": {
+        "providerId": "ollama-cloud",
+        "modelId": "gemma3:27b",
+        "name": "gemma3:27b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3-coder:480b": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3-coder:480b",
-          "name": "qwen3-coder:480b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3-coder:480b": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3-coder:480b",
+        "name": "qwen3-coder:480b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "glm-4.6": {
-          "providerId": "ollama-cloud",
-          "modelId": "glm-4.6",
-          "name": "glm-4.6",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "glm-4.6": {
+        "providerId": "ollama-cloud",
+        "modelId": "glm-4.6",
+        "name": "glm-4.6",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemini-3-flash-preview": {
-          "providerId": "ollama-cloud",
-          "modelId": "gemini-3-flash-preview",
-          "name": "gemini-3-flash-preview",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemini-3-flash-preview": {
+        "providerId": "ollama-cloud",
+        "modelId": "gemini-3-flash-preview",
+        "name": "gemini-3-flash-preview",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax-m2.7": {
-          "providerId": "ollama-cloud",
-          "modelId": "minimax-m2.7",
-          "name": "minimax-m2.7",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax-m2.7": {
+        "providerId": "ollama-cloud",
+        "modelId": "minimax-m2.7",
+        "name": "minimax-m2.7",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gpt-oss:20b": {
-          "providerId": "ollama-cloud",
-          "modelId": "gpt-oss:20b",
-          "name": "gpt-oss:20b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gpt-oss:20b": {
+        "providerId": "ollama-cloud",
+        "modelId": "gpt-oss:20b",
+        "name": "gpt-oss:20b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "ministral-3:8b": {
-          "providerId": "ollama-cloud",
-          "modelId": "ministral-3:8b",
-          "name": "ministral-3:8b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "ministral-3:8b": {
+        "providerId": "ollama-cloud",
+        "modelId": "ministral-3:8b",
+        "name": "ministral-3:8b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gemma3:4b": {
-          "providerId": "ollama-cloud",
-          "modelId": "gemma3:4b",
-          "name": "gemma3:4b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gemma3:4b": {
+        "providerId": "ollama-cloud",
+        "modelId": "gemma3:4b",
+        "name": "gemma3:4b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3.5:397b": {
-          "providerId": "ollama-cloud",
-          "modelId": "qwen3.5:397b",
-          "name": "qwen3.5:397b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3.5:397b": {
+        "providerId": "ollama-cloud",
+        "modelId": "qwen3.5:397b",
+        "name": "qwen3.5:397b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nemotron-3-super": {
-          "providerId": "ollama-cloud",
-          "modelId": "nemotron-3-super",
-          "name": "nemotron-3-super",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nemotron-3-super": {
+        "providerId": "ollama-cloud",
+        "modelId": "nemotron-3-super",
+        "name": "nemotron-3-super",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "glm-5": {
-          "providerId": "ollama-cloud",
-          "modelId": "glm-5",
-          "name": "glm-5",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "glm-5": {
+        "providerId": "ollama-cloud",
+        "modelId": "glm-5",
+        "name": "glm-5",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "devstral-2:123b": {
-          "providerId": "ollama-cloud",
-          "modelId": "devstral-2:123b",
-          "name": "devstral-2:123b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "devstral-2:123b": {
+        "providerId": "ollama-cloud",
+        "modelId": "devstral-2:123b",
+        "name": "devstral-2:123b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "glm-4.7": {
-          "providerId": "ollama-cloud",
-          "modelId": "glm-4.7",
-          "name": "glm-4.7",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "glm-4.7": {
+        "providerId": "ollama-cloud",
+        "modelId": "glm-4.7",
+        "name": "glm-4.7",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "rnj-1:8b": {
-          "providerId": "ollama-cloud",
-          "modelId": "rnj-1:8b",
-          "name": "rnj-1:8b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "rnj-1:8b": {
+        "providerId": "ollama-cloud",
+        "modelId": "rnj-1:8b",
+        "name": "rnj-1:8b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "deepseek-v3.2": {
-          "providerId": "ollama-cloud",
-          "modelId": "deepseek-v3.2",
-          "name": "deepseek-v3.2",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "deepseek-v3.2": {
+        "providerId": "ollama-cloud",
+        "modelId": "deepseek-v3.2",
+        "name": "deepseek-v3.2",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "deepseek-v3.1:671b": {
-          "providerId": "ollama-cloud",
-          "modelId": "deepseek-v3.1:671b",
-          "name": "deepseek-v3.1:671b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "deepseek-v3.1:671b": {
+        "providerId": "ollama-cloud",
+        "modelId": "deepseek-v3.1:671b",
+        "name": "deepseek-v3.1:671b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "ministral-3:3b": {
-          "providerId": "ollama-cloud",
-          "modelId": "ministral-3:3b",
-          "name": "ministral-3:3b",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "ministral-3:3b": {
+        "providerId": "ollama-cloud",
+        "modelId": "ministral-3:3b",
+        "name": "ministral-3:3b",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "kimi-k2:1t": {
-          "providerId": "ollama-cloud",
-          "modelId": "kimi-k2:1t",
-          "name": "kimi-k2:1t",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "kimi-k2:1t": {
+        "providerId": "ollama-cloud",
+        "modelId": "kimi-k2:1t",
+        "name": "kimi-k2:1t",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax-m2.5": {
-          "providerId": "ollama-cloud",
-          "modelId": "minimax-m2.5",
-          "name": "minimax-m2.5",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax-m2.5": {
+        "providerId": "ollama-cloud",
+        "modelId": "minimax-m2.5",
+        "name": "minimax-m2.5",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
         }
       }
     },
     "opencode": {
-      "models": {
-        "big-pickle": {
-          "providerId": "opencode",
-          "modelId": "big-pickle",
-          "name": "Big Pickle",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+      "big-pickle": {
+        "providerId": "opencode",
+        "modelId": "big-pickle",
+        "name": "Big Pickle",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen3.6-plus-free": {
-          "providerId": "opencode",
-          "modelId": "qwen3.6-plus-free",
-          "name": "Qwen3.6 Plus Free",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen3.6-plus-free": {
+        "providerId": "opencode",
+        "modelId": "qwen3.6-plus-free",
+        "name": "Qwen3.6 Plus Free",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "gpt-5-nano": {
-          "providerId": "opencode",
-          "modelId": "gpt-5-nano",
-          "name": "GPT-5 Nano",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "gpt-5-nano": {
+        "providerId": "opencode",
+        "modelId": "gpt-5-nano",
+        "name": "GPT-5 Nano",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nemotron-3-super-free": {
-          "providerId": "opencode",
-          "modelId": "nemotron-3-super-free",
-          "name": "Nemotron 3 Super Free",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nemotron-3-super-free": {
+        "providerId": "opencode",
+        "modelId": "nemotron-3-super-free",
+        "name": "Nemotron 3 Super Free",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "minimax-m2.5-free": {
-          "providerId": "opencode",
-          "modelId": "minimax-m2.5-free",
-          "name": "MiniMax M2.5 Free",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "minimax-m2.5-free": {
+        "providerId": "opencode",
+        "modelId": "minimax-m2.5-free",
+        "name": "MiniMax M2.5 Free",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
         }
       }
     },
     "openrouter": {
-      "models": {
-        "openai/gpt-oss-120b:free": {
-          "providerId": "openrouter",
-          "modelId": "openai/gpt-oss-120b:free",
-          "name": "gpt-oss-120b (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+      "openai/gpt-oss-120b:free": {
+        "providerId": "openrouter",
+        "modelId": "openai/gpt-oss-120b:free",
+        "name": "gpt-oss-120b (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openai/gpt-oss-20b:free": {
-          "providerId": "openrouter",
-          "modelId": "openai/gpt-oss-20b:free",
-          "name": "gpt-oss-20b (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openai/gpt-oss-20b:free": {
+        "providerId": "openrouter",
+        "modelId": "openai/gpt-oss-20b:free",
+        "name": "gpt-oss-20b (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "deepseek/deepseek-r1-distill-llama-70b": {
-          "providerId": "openrouter",
-          "modelId": "deepseek/deepseek-r1-distill-llama-70b",
-          "name": "DeepSeek R1 Distill Llama 70B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "deepseek/deepseek-r1-distill-llama-70b": {
+        "providerId": "openrouter",
+        "modelId": "deepseek/deepseek-r1-distill-llama-70b",
+        "name": "DeepSeek R1 Distill Llama 70B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "deepseek/deepseek-chat-v3-0324": {
-          "providerId": "openrouter",
-          "modelId": "deepseek/deepseek-chat-v3-0324",
-          "name": "DeepSeek V3 0324",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "deepseek/deepseek-chat-v3-0324": {
+        "providerId": "openrouter",
+        "modelId": "deepseek/deepseek-chat-v3-0324",
+        "name": "DeepSeek V3 0324",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nvidia/nemotron-nano-9b-v2:free": {
-          "providerId": "openrouter",
-          "modelId": "nvidia/nemotron-nano-9b-v2:free",
-          "name": "Nemotron Nano 9B V2 (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nvidia/nemotron-nano-9b-v2:free": {
+        "providerId": "openrouter",
+        "modelId": "nvidia/nemotron-nano-9b-v2:free",
+        "name": "Nemotron Nano 9B V2 (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nvidia/nemotron-nano-12b-v2-vl:free": {
-          "providerId": "openrouter",
-          "modelId": "nvidia/nemotron-nano-12b-v2-vl:free",
-          "name": "Nemotron Nano 12B 2 VL (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nvidia/nemotron-nano-12b-v2-vl:free": {
+        "providerId": "openrouter",
+        "modelId": "nvidia/nemotron-nano-12b-v2-vl:free",
+        "name": "Nemotron Nano 12B 2 VL (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nvidia/nemotron-3-super-120b-a12b:free": {
-          "providerId": "openrouter",
-          "modelId": "nvidia/nemotron-3-super-120b-a12b:free",
-          "name": "Nemotron 3 Super (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nvidia/nemotron-3-super-120b-a12b:free": {
+        "providerId": "openrouter",
+        "modelId": "nvidia/nemotron-3-super-120b-a12b:free",
+        "name": "Nemotron 3 Super (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nvidia/nemotron-3-nano-30b-a3b:free": {
-          "providerId": "openrouter",
-          "modelId": "nvidia/nemotron-3-nano-30b-a3b:free",
-          "name": "Nemotron 3 Nano 30B A3B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nvidia/nemotron-3-nano-30b-a3b:free": {
+        "providerId": "openrouter",
+        "modelId": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "name": "Nemotron 3 Nano 30B A3B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "z-ai/glm-4.5-air:free": {
-          "providerId": "openrouter",
-          "modelId": "z-ai/glm-4.5-air:free",
-          "name": "GLM 4.5 Air (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "z-ai/glm-4.5-air:free": {
+        "providerId": "openrouter",
+        "modelId": "z-ai/glm-4.5-air:free",
+        "name": "GLM 4.5 Air (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "sourceful/riverflow-v2-standard-preview": {
-          "providerId": "openrouter",
-          "modelId": "sourceful/riverflow-v2-standard-preview",
-          "name": "Riverflow V2 Standard Preview",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "sourceful/riverflow-v2-standard-preview": {
+        "providerId": "openrouter",
+        "modelId": "sourceful/riverflow-v2-standard-preview",
+        "name": "Riverflow V2 Standard Preview",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "sourceful/riverflow-v2-fast-preview": {
-          "providerId": "openrouter",
-          "modelId": "sourceful/riverflow-v2-fast-preview",
-          "name": "Riverflow V2 Fast Preview",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "sourceful/riverflow-v2-fast-preview": {
+        "providerId": "openrouter",
+        "modelId": "sourceful/riverflow-v2-fast-preview",
+        "name": "Riverflow V2 Fast Preview",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "sourceful/riverflow-v2-max-preview": {
-          "providerId": "openrouter",
-          "modelId": "sourceful/riverflow-v2-max-preview",
-          "name": "Riverflow V2 Max Preview",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "sourceful/riverflow-v2-max-preview": {
+        "providerId": "openrouter",
+        "modelId": "sourceful/riverflow-v2-max-preview",
+        "name": "Riverflow V2 Max Preview",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "cognitivecomputations/dolphin-mistral-24b-venice-edition:free": {
-          "providerId": "openrouter",
-          "modelId": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
-          "name": "Uncensored (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "cognitivecomputations/dolphin-mistral-24b-venice-edition:free": {
+        "providerId": "openrouter",
+        "modelId": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+        "name": "Uncensored (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "google/gemma-3-12b-it:free": {
-          "providerId": "openrouter",
-          "modelId": "google/gemma-3-12b-it:free",
-          "name": "Gemma 3 12B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "google/gemma-3-12b-it:free": {
+        "providerId": "openrouter",
+        "modelId": "google/gemma-3-12b-it:free",
+        "name": "Gemma 3 12B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "google/gemma-3-4b-it:free": {
-          "providerId": "openrouter",
-          "modelId": "google/gemma-3-4b-it:free",
-          "name": "Gemma 3 4B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "google/gemma-3-4b-it:free": {
+        "providerId": "openrouter",
+        "modelId": "google/gemma-3-4b-it:free",
+        "name": "Gemma 3 4B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "google/gemma-3-27b-it:free": {
-          "providerId": "openrouter",
-          "modelId": "google/gemma-3-27b-it:free",
-          "name": "Gemma 3 27B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "google/gemma-3-27b-it:free": {
+        "providerId": "openrouter",
+        "modelId": "google/gemma-3-27b-it:free",
+        "name": "Gemma 3 27B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "google/gemma-3n-e2b-it:free": {
-          "providerId": "openrouter",
-          "modelId": "google/gemma-3n-e2b-it:free",
-          "name": "Gemma 3n 2B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "google/gemma-3n-e2b-it:free": {
+        "providerId": "openrouter",
+        "modelId": "google/gemma-3n-e2b-it:free",
+        "name": "Gemma 3n 2B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "google/gemma-3n-e4b-it:free": {
-          "providerId": "openrouter",
-          "modelId": "google/gemma-3n-e4b-it:free",
-          "name": "Gemma 3n 4B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "google/gemma-3n-e4b-it:free": {
+        "providerId": "openrouter",
+        "modelId": "google/gemma-3n-e4b-it:free",
+        "name": "Gemma 3n 4B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "meta-llama/llama-3.2-11b-vision-instruct": {
-          "providerId": "openrouter",
-          "modelId": "meta-llama/llama-3.2-11b-vision-instruct",
-          "name": "Llama 3.2 11B Vision Instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "meta-llama/llama-3.2-11b-vision-instruct": {
+        "providerId": "openrouter",
+        "modelId": "meta-llama/llama-3.2-11b-vision-instruct",
+        "name": "Llama 3.2 11B Vision Instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "meta-llama/llama-3.2-3b-instruct:free": {
-          "providerId": "openrouter",
-          "modelId": "meta-llama/llama-3.2-3b-instruct:free",
-          "name": "Llama 3.2 3B Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "meta-llama/llama-3.2-3b-instruct:free": {
+        "providerId": "openrouter",
+        "modelId": "meta-llama/llama-3.2-3b-instruct:free",
+        "name": "Llama 3.2 3B Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "meta-llama/llama-3.3-70b-instruct:free": {
-          "providerId": "openrouter",
-          "modelId": "meta-llama/llama-3.3-70b-instruct:free",
-          "name": "Llama 3.3 70B Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "meta-llama/llama-3.3-70b-instruct:free": {
+        "providerId": "openrouter",
+        "modelId": "meta-llama/llama-3.3-70b-instruct:free",
+        "name": "Llama 3.3 70B Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "openrouter/free": {
-          "providerId": "openrouter",
-          "modelId": "openrouter/free",
-          "name": "Free Models Router",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "openrouter/free": {
+        "providerId": "openrouter",
+        "modelId": "openrouter/free",
+        "name": "Free Models Router",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "arcee-ai/trinity-mini:free": {
-          "providerId": "openrouter",
-          "modelId": "arcee-ai/trinity-mini:free",
-          "name": "Trinity Mini",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "arcee-ai/trinity-mini:free": {
+        "providerId": "openrouter",
+        "modelId": "arcee-ai/trinity-mini:free",
+        "name": "Trinity Mini",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "arcee-ai/trinity-large-preview:free": {
-          "providerId": "openrouter",
-          "modelId": "arcee-ai/trinity-large-preview:free",
-          "name": "Trinity Large Preview",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "arcee-ai/trinity-large-preview:free": {
+        "providerId": "openrouter",
+        "modelId": "arcee-ai/trinity-large-preview:free",
+        "name": "Trinity Large Preview",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "nousresearch/hermes-3-llama-3.1-405b:free": {
-          "providerId": "openrouter",
-          "modelId": "nousresearch/hermes-3-llama-3.1-405b:free",
-          "name": "Hermes 3 405B Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "nousresearch/hermes-3-llama-3.1-405b:free": {
+        "providerId": "openrouter",
+        "modelId": "nousresearch/hermes-3-llama-3.1-405b:free",
+        "name": "Hermes 3 405B Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen3-4b:free": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen3-4b:free",
-          "name": "Qwen3 4B (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen3-4b:free": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen3-4b:free",
+        "name": "Qwen3 4B (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen3-coder:free": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen3-coder:free",
-          "name": "Qwen3 Coder 480B A35B Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen3-coder:free": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen3-coder:free",
+        "name": "Qwen3 Coder 480B A35B Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen2.5-vl-72b-instruct": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen2.5-vl-72b-instruct",
-          "name": "Qwen2.5 VL 72B Instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen2.5-vl-72b-instruct": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen2.5-vl-72b-instruct",
+        "name": "Qwen2.5 VL 72B Instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen3-next-80b-a3b-instruct:free": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen3-next-80b-a3b-instruct:free",
-          "name": "Qwen3 Next 80B A3B Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen3-next-80b-a3b-instruct:free": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen3-next-80b-a3b-instruct:free",
+        "name": "Qwen3 Next 80B A3B Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen3.6-plus-preview:free": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen3.6-plus-preview:free",
-          "name": "Qwen3.6 Plus Preview (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen3.6-plus-preview:free": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen3.6-plus-preview:free",
+        "name": "Qwen3.6 Plus Preview (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen3.6-plus:free": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen3.6-plus:free",
-          "name": "Qwen3.6 Plus (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen3.6-plus:free": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen3.6-plus:free",
+        "name": "Qwen3.6 Plus (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "qwen/qwen-2.5-coder-32b-instruct": {
-          "providerId": "openrouter",
-          "modelId": "qwen/qwen-2.5-coder-32b-instruct",
-          "name": "Qwen2.5 Coder 32B Instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "qwen/qwen-2.5-coder-32b-instruct": {
+        "providerId": "openrouter",
+        "modelId": "qwen/qwen-2.5-coder-32b-instruct",
+        "name": "Qwen2.5 Coder 32B Instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "black-forest-labs/flux.2-pro": {
-          "providerId": "openrouter",
-          "modelId": "black-forest-labs/flux.2-pro",
-          "name": "FLUX.2 Pro",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "black-forest-labs/flux.2-pro": {
+        "providerId": "openrouter",
+        "modelId": "black-forest-labs/flux.2-pro",
+        "name": "FLUX.2 Pro",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "black-forest-labs/flux.2-max": {
-          "providerId": "openrouter",
-          "modelId": "black-forest-labs/flux.2-max",
-          "name": "FLUX.2 Max",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "black-forest-labs/flux.2-max": {
+        "providerId": "openrouter",
+        "modelId": "black-forest-labs/flux.2-max",
+        "name": "FLUX.2 Max",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "black-forest-labs/flux.2-klein-4b": {
-          "providerId": "openrouter",
-          "modelId": "black-forest-labs/flux.2-klein-4b",
-          "name": "FLUX.2 Klein 4B",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "black-forest-labs/flux.2-klein-4b": {
+        "providerId": "openrouter",
+        "modelId": "black-forest-labs/flux.2-klein-4b",
+        "name": "FLUX.2 Klein 4B",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "black-forest-labs/flux.2-flex": {
-          "providerId": "openrouter",
-          "modelId": "black-forest-labs/flux.2-flex",
-          "name": "FLUX.2 Flex",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "black-forest-labs/flux.2-flex": {
+        "providerId": "openrouter",
+        "modelId": "black-forest-labs/flux.2-flex",
+        "name": "FLUX.2 Flex",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "stepfun/step-3.5-flash:free": {
-          "providerId": "openrouter",
-          "modelId": "stepfun/step-3.5-flash:free",
-          "name": "Step 3.5 Flash (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "stepfun/step-3.5-flash:free": {
+        "providerId": "openrouter",
+        "modelId": "stepfun/step-3.5-flash:free",
+        "name": "Step 3.5 Flash (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "liquid/lfm-2.5-1.2b-instruct:free": {
-          "providerId": "openrouter",
-          "modelId": "liquid/lfm-2.5-1.2b-instruct:free",
-          "name": "LFM2.5-1.2B-Instruct (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "liquid/lfm-2.5-1.2b-instruct:free": {
+        "providerId": "openrouter",
+        "modelId": "liquid/lfm-2.5-1.2b-instruct:free",
+        "name": "LFM2.5-1.2B-Instruct (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "liquid/lfm-2.5-1.2b-thinking:free": {
-          "providerId": "openrouter",
-          "modelId": "liquid/lfm-2.5-1.2b-thinking:free",
-          "name": "LFM2.5-1.2B-Thinking (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "liquid/lfm-2.5-1.2b-thinking:free": {
+        "providerId": "openrouter",
+        "modelId": "liquid/lfm-2.5-1.2b-thinking:free",
+        "name": "LFM2.5-1.2B-Thinking (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "moonshotai/kimi-k2:free": {
-          "providerId": "openrouter",
-          "modelId": "moonshotai/kimi-k2:free",
-          "name": "Kimi K2 (free)",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "moonshotai/kimi-k2:free": {
+        "providerId": "openrouter",
+        "modelId": "moonshotai/kimi-k2:free",
+        "name": "Kimi K2 (free)",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "bytedance-seed/seedream-4.5": {
-          "providerId": "openrouter",
-          "modelId": "bytedance-seed/seedream-4.5",
-          "name": "Seedream 4.5",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "bytedance-seed/seedream-4.5": {
+        "providerId": "openrouter",
+        "modelId": "bytedance-seed/seedream-4.5",
+        "name": "Seedream 4.5",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "mistralai/mistral-small-3.2-24b-instruct": {
-          "providerId": "openrouter",
-          "modelId": "mistralai/mistral-small-3.2-24b-instruct",
-          "name": "Mistral Small 3.2 24B Instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "mistralai/mistral-small-3.2-24b-instruct": {
+        "providerId": "openrouter",
+        "modelId": "mistralai/mistral-small-3.2-24b-instruct",
+        "name": "Mistral Small 3.2 24B Instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
-        },
-        "mistralai/mistral-small-3.1-24b-instruct": {
-          "providerId": "openrouter",
-          "modelId": "mistralai/mistral-small-3.1-24b-instruct",
-          "name": "Mistral Small 3.1 24B Instruct",
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cache": {
-              "read": 0,
-              "write": 0
-            }
+        }
+      },
+      "mistralai/mistral-small-3.1-24b-instruct": {
+        "providerId": "openrouter",
+        "modelId": "mistralai/mistral-small-3.1-24b-instruct",
+        "name": "Mistral Small 3.1 24B Instruct",
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
           }
         }
       }

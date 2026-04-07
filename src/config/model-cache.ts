@@ -1039,3 +1039,12 @@ export function findFreeModels(providers: IOpenCodeProvider[]): IFreeModelInfo[]
 
 	return freeModels;
 }
+
+export function findFreeModelsRecord(providers: IOpenCodeProvider[])
+{
+	return findFreeModels(providers).reduce((record, entry) => {
+		record[entry.providerId] ??= {} as any;
+		record[entry.providerId][entry.modelId] = entry;
+		return record;
+	}, {} as Record<IFreeModelInfo["providerId"], Record<IFreeModelInfo["modelId"], IFreeModelInfo>>);
+}
