@@ -8,7 +8,14 @@
 
 import type { PluginInput, ToolContext } from "@opencode-ai/plugin";
 import type { IAriseConfig } from "../config/schema";
-import { EnumAriseTools, EnumCollaborateMode, ALLOWED_SHADOWS, BackgroundTaskStatus } from "../types/enums";
+import {
+	EnumAriseTools,
+	EnumCollaborateMode,
+	ALLOWED_SHADOWS,
+	BackgroundTaskStatus,
+	EnumCollaborationSessionStatus,
+	EnumCollaborateTermination,
+} from "../types/enums";
 import { getAriseToolsConfigEntry } from "../agents/lib/arise-tools-utils";
 import { tool2 } from '../types/types-opencode';
 import { logArise2WithLevel } from "../utils/debug-control";
@@ -36,6 +43,10 @@ import {
 	getShadowDisplayName,
 	type INormalizedCollaborateShadowEntry,
 } from "./lib/arise-collaborate-normalizer";
+import {
+	collaborationSessionManager,
+	type ICollaborationSession,
+} from "./lib/collaboration-session";
 
 // ==================== 共用常數 / Shared Constants ====================
 
@@ -102,6 +113,7 @@ async function waitForTaskCompletion(
  * @param description - 任務描述
  * @param context - 工具上下文
  * @param model - 指定模型（可選）
+ * @param existingSessionId - 現有 session ID（可選，用於重用 session）
  * @returns 啟動的任務
  */
 async function launchShadowTask(
@@ -111,6 +123,7 @@ async function launchShadowTask(
 	description: string,
 	context: ToolContext,
 	model?: string,
+	existingSessionId?: string,
 )
 {
 	return backgroundManager.launch({
@@ -119,6 +132,7 @@ async function launchShadowTask(
 		description,
 		parentSessionId: context.sessionID,
 		model,
+		existingSessionId,
 	});
 }
 
@@ -226,6 +240,14 @@ interface ICollaborateArgs
 	round_timeout_ms?: number;
 	/** 每個 agent 回合數（可選）/ Per-agent rounds (optional) */
 	per_agent_rounds?: number;
+	/** 是否創建持久化 session / Whether to create persistent session */
+	persistent?: boolean;
+	/** 現有 session ID（繼續協作）/ Existing session ID (continue collaboration) */
+	session_id?: string;
+	/** 結束 session / End session */
+	end_session?: boolean;
+	/** 暫停 session / Pause session */
+	pause_session?: boolean;
 }
 
 // ==================== 解析並合併 Config 與工具參數
@@ -333,6 +355,56 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
 		async execute(args, context: ToolContext)
 		{
 			/**
+			 * Session 操作優先路由
+			 * Session operations take priority over new collaboration creation
+			 */
+
+			// 結束 session
+			if (args.end_session && args.session_id)
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-collaborate]`,
+					`Ending session: ${args.session_id}`,
+				], { force: true });
+
+				return executeEndSession(args.session_id);
+			}
+
+			// 暫停 session
+			if (args.pause_session && args.session_id)
+			{
+				logArise2WithLevel("debug", () => [
+					`[arise-collaborate]`,
+					`Pausing session: ${args.session_id}`,
+				], { force: true });
+
+				return executePauseSession(args.session_id);
+			}
+
+			// 繼續現有 session
+			if (args.session_id)
+			{
+				const session = collaborationSessionManager.get(args.session_id);
+				if (!session)
+				{
+					return formatAriseMsgError(`Session not found: ${args.session_id}`);
+				}
+
+				logArise2WithLevel("debug", () => [
+					`[arise-collaborate]`,
+					`Continuing session: ${args.session_id}, currentRound=${session.currentRound}`,
+				], { force: true });
+
+				return await executeContinueSession(session, backgroundManager, context);
+			}
+
+			// 列出所有 session（無 mode 也無 session_id 時）
+			if (!args.mode)
+			{
+				return executeListSessions();
+			}
+
+			/**
 			 * 狀態日誌：開始協作
 			 * Status log: starting collaboration
 			 */
@@ -363,6 +435,19 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
 					`[arise-collaborate]`,
 					`Config resolved: total_rounds=${collaborateConfig.total_rounds}, max_concurrent=${collaborateConfig.max_concurrent}`,
 				], { force: true });
+
+				/**
+				 * 持久化模式：創建 session 並執行第一回合
+				 * Persistent mode: create session and execute first round
+				 */
+				if (args.persistent)
+				{
+					return await executePersistentCollaboration(
+						backgroundManager,
+						collaborateConfig,
+						context,
+					);
+				}
 
 				/**
 				 * 根據模式執行協作
@@ -708,7 +793,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 					config.round_timeout_ms,
 				);
 
-			return { ...entry, task, response };
+				return { ...entry, task, response };
 			}),
 		);
 
@@ -824,34 +909,34 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 		 * 分批執行，每批不超過 max_concurrent
 		 * Execute in batches, each batch no more than max_concurrent
 		 */
-	for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
-	{
-		const batch = config.shadows.slice(i, i + config.max_concurrent);
+		for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
+		{
+			const batch = config.shadows.slice(i, i + config.max_concurrent);
 
-		/**
-		 * 這批 agents 同時執行
-		 * This batch of agents executes simultaneously
-		 */
-		const batchResults = await Promise.all(
-			batch.map(async (entry) =>
-			{
-				/**
-				 * 構建包含上一次結果的提示
-				 * Build prompt with previous result
-				 */
-				const promptWithResult = buildPromptWithPreviousResult(
-					config.prompt,
-					previousResult,
-				);
+			/**
+			 * 這批 agents 同時執行
+			 * This batch of agents executes simultaneously
+			 */
+			const batchResults = await Promise.all(
+				batch.map(async (entry) =>
+				{
+					/**
+					 * 構建包含上一次結果的提示
+					 * Build prompt with previous result
+					 */
+					const promptWithResult = buildPromptWithPreviousResult(
+						config.prompt,
+						previousResult,
+					);
 
-				const task = await launchShadowTask(
-					backgroundManager,
-					entry.agent,
-					promptWithResult,
-					config.description ?? `chain ${getShadowDisplayName(entry)}`,
-					context,
-					entry.model,
-				);
+					const task = await launchShadowTask(
+						backgroundManager,
+						entry.agent,
+						promptWithResult,
+						config.description ?? `chain ${getShadowDisplayName(entry)}`,
+						context,
+						entry.model,
+					);
 
 					/**
 					 * 等待結果
@@ -1003,4 +1088,316 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 		`Chain collaboration completed: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		details,
 	);
+}
+
+// ==================== 持久化 Session 操作
+// ==================== Persistent Session Operations
+
+/**
+ * 構建下一回合提示（用於持久化 session 的後續回合）
+ * Build next turn prompt (for subsequent rounds in persistent session)
+ */
+function buildNextTurnPrompt(agentLabel: string, round: number, session: ICollaborationSession): string
+{
+	const otherAgents = session.shadows.filter(e => e.label !== agentLabel).map(e => e.label);
+	return `Round ${round}. Continue the discussion. Other participants: ${otherAgents.join(", ")}.`;
+}
+
+/**
+ * 構建 session 狀態詳情
+ */
+function buildSessionStatusDetails(session: ICollaborationSession): string
+{
+	const agentStatus = session.shadows.map(e =>
+	{
+		const roundCount = session.perAgentRoundCount.get(e.label) ?? 0;
+		const hasSession = session.agentSessionIds.has(e.label);
+		return `  - ${getShadowDisplayName(e)}: ${roundCount} rounds, session: ${hasSession
+			? "active"
+			: "not yet created"}`;
+	}).join("\n");
+
+	return [
+		`Session ID: ${session.id}`,
+		`Mode: ${session.mode}`,
+		`Status: ${session.status}`,
+		`Round: ${session.currentRound}/${session.totalRounds}`,
+		`Agents: ${session.shadows.length}`,
+		`Terminated: ${session.terminated ? "Yes" : "No"}`,
+		"",
+		"Agent status:",
+		agentStatus,
+		"",
+		`Use session_id: "${session.id}" to continue, or end_session: true to finish.`,
+	].join("\n");
+}
+
+/**
+ * 構建最終摘要
+ */
+function buildFinalSummary(session: ICollaborationSession): string
+{
+	const allResponses = session.allResponses;
+	if (allResponses.length === 0) return "No responses collected.";
+	return `Total rounds: ${session.currentRound}\nTotal responses: ${allResponses.length}\nTermination: ${session.terminatedBy ?? "manual"}\n\nFinal response:\n${allResponses[allResponses.length - 1]}`;
+}
+
+/**
+ * 構建 session 結束詳情
+ */
+function buildSessionEndDetails(session: ICollaborationSession): string
+{
+	return [
+		`Session ID: ${session.id}`,
+		`Mode: ${session.mode}`,
+		`Total rounds executed: ${session.currentRound}`,
+		`Termination: ${session.terminatedBy ?? "manual"}`,
+		`Reason: ${session.terminationReason ?? "N/A"}`,
+		"",
+		"Final summary:",
+		session.finalSummary ?? "No summary available.",
+	].join("\n");
+}
+
+/**
+ * 執行持久化協作（創建 session 並執行第一回合）
+ */
+async function executePersistentCollaboration(
+	backgroundManager: BackgroundManager,
+	config: {
+		mode: EnumCollaborateMode;
+		shadows: INormalizedCollaborateShadowEntry[];
+		prompt: string;
+		total_rounds: number;
+		max_concurrent: number;
+		round_timeout_ms: number;
+		description?: string
+	},
+	context: ToolContext,
+): Promise<string>
+{
+	logArise2WithLevel("debug", () => [
+		`[arise-collaborate:persistent]`,
+		`Creating persistent session: mode=${config.mode}, agents=${config.shadows.length}`,
+	], { force: true });
+
+	const session = collaborationSessionManager.create({
+		mode: config.mode,
+		shadows: config.shadows,
+		prompt: config.prompt,
+		description: config.description,
+		totalRounds: config.total_rounds,
+		maxConcurrent: config.max_concurrent,
+		roundTimeoutMs: config.round_timeout_ms,
+		parentSessionId: context.sessionID,
+		context,
+		config: context as unknown as IAriseConfig,
+	});
+
+	const result = await executeNextRound(session, backgroundManager);
+	session.lastActivityAt = Date.now();
+
+	return formatAriseMsgSuccessMultiLine(`Persistent collaboration created: ${session.id}`, buildSessionStatusDetails(session));
+}
+
+/**
+ * 執行 session 的下一回合
+ */
+async function executeNextRound(session: ICollaborationSession, backgroundManager: BackgroundManager): Promise<string>
+{
+	if (session.terminated)
+	{
+		return formatAriseMsgError(`Session ${session.id} is already terminated: ${session.terminatedBy}`);
+	}
+
+	if (session.currentRound >= session.totalRounds)
+	{
+		session.status = EnumCollaborationSessionStatus.Completed;
+		session.terminated = true;
+		session.terminatedBy = EnumCollaborateTermination.STOP;
+		session.terminatedAt = Date.now();
+		session.terminationReason = "Max rounds reached";
+		session.finalSummary = buildFinalSummary(session);
+		return formatAriseMsgSuccessMultiLine(`Session completed: max rounds reached`, buildSessionEndDetails(session));
+	}
+
+	session.currentRound++;
+	const round = session.currentRound;
+	session.status = EnumCollaborationSessionStatus.Executing;
+
+	logArise2WithLevel("debug", () => [
+		`[arise-collaborate:persistent]`,
+		`Executing round ${round}/${session.totalRounds} for session ${session.id}`,
+	], { force: true });
+
+	const roundResponses: string[] = [];
+	const useBatchedExecution = session.maxConcurrent > 1;
+
+	if (useBatchedExecution)
+	{
+		for (let i = 0; i < session.shadows.length; i += session.maxConcurrent)
+		{
+			const batch = session.shadows.slice(i, i + session.maxConcurrent);
+			const batchResults = await Promise.all(batch.map(async (entry) =>
+			{
+				let sessionId = session.agentSessionIds.get(entry.label);
+				let prompt = sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt;
+
+				const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
+				if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);
+
+				const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.roundTimeoutMs);
+				const currentCount = session.perAgentRoundCount.get(entry.label) ?? 0;
+				session.perAgentRoundCount.set(entry.label, currentCount + 1);
+
+				return { label: entry.label, response: responseText };
+			}));
+
+			for (const result of batchResults)
+			{
+				roundResponses.push(result.response);
+				session.allResponses.push(result.response);
+				if (!session.roundResponses.has(round)) session.roundResponses.set(round, new Map());
+				session.roundResponses.get(round)!.set(result.label, result.response);
+			}
+		}
+	}
+	else
+	{
+		for (const entry of session.shadows)
+		{
+			let sessionId = session.agentSessionIds.get(entry.label);
+			let prompt = sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt;
+
+			const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
+			if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);
+
+			const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.roundTimeoutMs);
+			const currentCount = session.perAgentRoundCount.get(entry.label) ?? 0;
+			session.perAgentRoundCount.set(entry.label, currentCount + 1);
+
+			roundResponses.push(responseText);
+			session.allResponses.push(responseText);
+			if (!session.roundResponses.has(round)) session.roundResponses.set(round, new Map());
+			session.roundResponses.get(round)!.set(entry.label, responseText);
+
+			const termination = checkTermination(responseText);
+			if (termination.shouldStop)
+			{
+				session.terminated = true;
+				session.terminatedBy = termination.terminationType ?? undefined;
+				session.terminatedAt = Date.now();
+				session.terminationReason = `Auto-detected: ${termination.terminationType}`;
+				session.terminationMarkers.push(termination.terminationType!);
+				session.finalSummary = buildFinalSummary(session);
+				session.status = EnumCollaborationSessionStatus.Completed;
+				return formatAriseMsgSuccessMultiLine(`Session terminated: ${termination.terminationType}`, buildSessionEndDetails(session));
+			}
+		}
+	}
+
+	if (roundResponses.every(r => r === roundResponses[0]) && roundResponses.length > 0)
+	{
+		session.terminated = true;
+		session.terminatedBy = EnumCollaborateTermination.STOP;
+		session.terminatedAt = Date.now();
+		session.terminationReason = "Consensus reached";
+		session.finalSummary = buildFinalSummary(session);
+		session.status = EnumCollaborationSessionStatus.Completed;
+	}
+
+	session.status = session.terminated ? EnumCollaborationSessionStatus.Completed : EnumCollaborationSessionStatus.Idle;
+	return formatAriseMsgSuccessMultiLine(`Round ${round} completed`, buildSessionStatusDetails(session));
+}
+
+/**
+ * 繼續現有 session
+ */
+async function executeContinueSession(session: ICollaborationSession,
+	backgroundManager: BackgroundManager,
+	context: ToolContext,
+): Promise<string>
+{
+	if (session.status === EnumCollaborationSessionStatus.Completed)
+	{
+		return formatAriseMsgError(`Session ${session.id} is already completed. Create a new session to start fresh.`);
+	}
+
+	if (session.status === EnumCollaborationSessionStatus.Paused)
+	{
+		session.status = EnumCollaborationSessionStatus.Idle;
+	}
+
+	if (session.terminated)
+	{
+		return formatAriseMsgSuccessMultiLine(`Session already terminated: ${session.terminatedBy}`, `Reason: ${session.terminationReason ?? "No reason provided"}`);
+	}
+
+	session.context = context;
+	const result = await executeNextRound(session, backgroundManager);
+	session.lastActivityAt = Date.now();
+	return result;
+}
+
+/**
+ * 結束 session
+ */
+function executeEndSession(sessionId: string): string
+{
+	const session = collaborationSessionManager.get(sessionId);
+	if (!session) return formatAriseMsgError(`Session not found: ${sessionId}`);
+
+	session.status = EnumCollaborationSessionStatus.Completed;
+	session.terminated = true;
+	session.terminatedBy = EnumCollaborateTermination.STOP;
+	session.terminatedAt = Date.now();
+	session.terminationReason = "Manually ended by user";
+	session.finalSummary = buildFinalSummary(session);
+
+	return formatAriseMsgSuccessMultiLine(`Collaboration session ended: ${session.id}`, buildSessionEndDetails(session));
+}
+
+/**
+ * 暫停 session
+ */
+function executePauseSession(sessionId: string): string
+{
+	const session = collaborationSessionManager.get(sessionId);
+	if (!session) return formatAriseMsgError(`Session not found: ${sessionId}`);
+
+	if (session.status === EnumCollaborationSessionStatus.Completed || session.status === EnumCollaborationSessionStatus.Cancelled)
+	{
+		return formatAriseMsgError(`Cannot pause session in ${session.status} state.`);
+	}
+
+	session.status = EnumCollaborationSessionStatus.Paused;
+	session.lastActivityAt = Date.now();
+
+	return formatAriseMsgSuccessMultiLine(`Session paused: ${session.id}`, `Round: ${session.currentRound}/${session.totalRounds}\nUse session_id: "${session.id}" to resume.`);
+}
+
+/**
+ * 列出所有協作 session
+ */
+function executeListSessions(): string
+{
+	const sessions = collaborationSessionManager.list();
+	const stats = collaborationSessionManager.getStats();
+
+	if (sessions.length === 0)
+	{
+		return formatAriseMsgSuccessMultiLine("No active collaboration sessions", "Use persistent: true to create one.");
+	}
+
+	const sessionList = sessions.map(s =>
+	{
+		const statusIcon = s.status === EnumCollaborationSessionStatus.Idle ? "⏸" :
+			s.status === EnumCollaborationSessionStatus.Executing ? "▶" :
+				s.status === EnumCollaborationSessionStatus.Paused ? "⏸" :
+					s.status === EnumCollaborationSessionStatus.Completed ? "✅" : "❌";
+		return `${statusIcon} ${s.id} | ${s.mode} | Round ${s.currentRound}/${s.totalRounds} | ${s.status} | ${s.shadows.map(e => e.label)
+			.join(", ")}`;
+	}).join("\n");
+
+	return formatAriseMsgSuccessMultiLine(`Collaboration sessions (total: ${stats.total}, active: ${stats.active}, completed: ${stats.completed})`, sessionList);
 }

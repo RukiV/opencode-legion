@@ -423,6 +423,13 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 - **parallel**: Multiple agents execute different tasks simultaneously
 - **chain**: Multiple agents execute in sequence, passing results to the next agent
 
+**Persistent Sessions (Token-Efficient):**
+- Set "persistent: true" to create a reusable session
+- Use "session_id" to continue an existing session across tool calls
+- Use "end_session: true" to finish a session
+- Use "pause_session: true" to pause a session
+- Persistent sessions reuse the same LLM context, saving up to 90% tokens on multi-round discussions
+
 **Key Parameters:**
 - mode: Collaboration mode (planning, parallel, chain)
 - shadows: List of participating Shadow agents (at least 1 required)
@@ -431,11 +438,16 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 - max_concurrent: Max concurrent agents (default: 2, max: 5)
 - round_timeout_ms: Timeout per round in milliseconds (default: 60000)
 - per_agent_rounds: Maximum rounds per individual agent (optional)
+- persistent: Create a persistent session (boolean, optional)
+- session_id: Continue an existing session (string, optional)
+- end_session: End a persistent session (boolean, optional)
+- pause_session: Pause a persistent session (boolean, optional)
 
 **Usage Guidelines:**
 - Use planning mode for complex problem-solving requiring multiple perspectives
 - Use parallel mode for independent tasks that can run simultaneously
 - Use chain mode for sequential workflows where each agent builds on previous results
+- Use persistent sessions for long discussions to save tokens
 - Values exceeding configured limits will be automatically truncated with warnings` as const,
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_COLLABORATE],
 
@@ -450,7 +462,7 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 			 * Shadow 項目 schema
 			 * Shadows entry schema
 			 */
-				shadows: z
+			shadows: z
 				.array(
 					z.object({
 						/** Shadow agent 名稱 / Shadow agent name */
@@ -534,6 +546,38 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				.meta({
 					description: "Maximum rounds per individual agent (optional)",
 					title: "Per-Agent Rounds",
+				})
+				.optional(),
+			/** 是否創建持久化 session / Whether to create persistent session */
+			persistent: z
+				.boolean()
+				.meta({
+					description: "Create a persistent collaboration session that can be continued across multiple tool calls",
+					title: "Persistent",
+				})
+				.optional(),
+			/** 現有 session ID（繼續協作）/ Existing session ID (continue collaboration) */
+			session_id: z
+				.string()
+				.meta({
+					description: "Existing session ID to continue collaboration (overrides other params)",
+					title: "Session ID",
+				})
+				.optional(),
+			/** 結束 session / End session */
+			end_session: z
+				.boolean()
+				.meta({
+					description: "End a persistent collaboration session",
+					title: "End Session",
+				})
+				.optional(),
+			/** 暫停 session / Pause session */
+			pause_session: z
+				.boolean()
+				.meta({
+					description: "Pause a persistent collaboration session",
+					title: "Pause Session",
 				})
 				.optional(),
 		},

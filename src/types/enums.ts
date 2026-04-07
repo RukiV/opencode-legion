@@ -277,6 +277,24 @@ export const ALLOWED_COLLABORATE_TERMINATIONS = [
 ] as const satisfies EnumCollaborateTermination[];
 
 /**
+ * 協作 Session 狀態列舉
+ * Collaboration session status enumeration
+ */
+export enum EnumCollaborationSessionStatus
+{
+	/** 閒置，等待繼續 / Idle, waiting to continue */
+	Idle = "idle",
+	/** 執行中 / Executing */
+	Executing = "executing",
+	/** 已暫停 / Paused */
+	Paused = "paused",
+	/** 已完成 / Completed */
+	Completed = "completed",
+	/** 已取消 / Cancelled */
+	Cancelled = "cancelled",
+}
+
+/**
  * Enum of all Arise tool names
  */
 export enum EnumAriseTools
@@ -300,8 +318,8 @@ export enum EnumAriseTools
 	/** 一次性取得 Git 狀態摘要（status、diff stat、log）/ Get Git status summary in one shot */
 	ARISE_GIT_SUMMARY = "arise_git_summary",
 	/**
-	 * 多個 shadow agent 協作執行任務 / Multiple shadow agents collaborate on tasks 
-	 * 
+	 * 多個 shadow agent 協作執行任務 / Multiple shadow agents collaborate on tasks
+	 *
 	 * @see docs/features/arise-collaborate.md
 	 */
 	ARISE_COLLABORATE = "arise_collaborate",
