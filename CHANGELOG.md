@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.36](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.35...@bluelovers/opencode-arise@0.1.36) (2026-04-07)
+
+
+### BREAKING CHANGES
+
+* **session:** ISessionRecord.model 類型從 string 改為 IModelBody，需更新存取方式從 `record.model` 改為 `record.model.providerID` / `record.model.modelID
+
+
+
+### 🐛　Bug Fixes
+
+* **arise-collaborate:** 修正參數預設值處理邏輯，新增驗證模組 ([b2652a3](https://github.com/bluelovers/opencode-arise/commit/b2652a351bf7b5b98c93a6ca0319fd3c4bc6d94d))
+* **git-summary:** 修復 code block 跳脫字元問題 ([d4ba563](https://github.com/bluelovers/opencode-arise/commit/d4ba5631e6eaa48e0b753eef6b284fc4ca39be73))
+* **schema:** 移除 collaborate 參數的 .max() 限制 ([6a572b3](https://github.com/bluelovers/opencode-arise/commit/6a572b30570e959a73542107e839e7d3b0e6b768))
+* **schema:** 移除 collaborate 參數的 .max() 限制 ([4aaa8e8](https://github.com/bluelovers/opencode-arise/commit/4aaa8e84a111429da9813f4b6f14973cdf808d04))
+
+
+### ✨　Features
+
+* **arise-collaborate:** 新增持久化 session 功能 - 節省高達 84% token ([cd5a8a0](https://github.com/bluelovers/opencode-arise/commit/cd5a8a086238a29c1639b7e097a00a2b2b52e4c3))
+* **arise-collaborate:** 支援新 Shadows 物件格式與模型控制 ([16c9c12](https://github.com/bluelovers/opencode-arise/commit/16c9c125e9e9f00d565aa4f47517a0ab35b0fb78)), closes [beru#001](https://github.com/beru/issues/001)
+* **arise-collaborate:** 新增終止標記功能 ([b829f01](https://github.com/bluelovers/opencode-arise/commit/b829f01eab9d9425ed5c4c7738fbd80267a628f7))
+* **arise-collaborate:** 新增多 Shadow Agent 協作工具 ([0595c4b](https://github.com/bluelovers/opencode-arise/commit/0595c4bb7b2b569613a9c3326ce914a87540317c))
+* **arise-summon:** 將 run_in_background=true 改為可追蹤形式 ([146de22](https://github.com/bluelovers/opencode-arise/commit/146de22b6ed2ff91e167c311478bde4ba7b97770))
+* **session:** 新增 OpenCode Session 類型定義與模型資訊擷取工具 ([2101b00](https://github.com/bluelovers/opencode-arise/commit/2101b00df88767616f7335e5e0e87a13abe9bbb8))
+* **session:** 新增 session 记录缓存与查询功能 ([9b607e7](https://github.com/bluelovers/opencode-arise/commit/9b607e7c3c134edd6ebc30fc4a6413f1522b6fd7))
+* **shadow-prompts:** Shadow Sovereign 加入 DRY 指南 ([738acc0](https://github.com/bluelovers/opencode-arise/commit/738acc06ab40fe2140635d60852fc7956c062a73))
+* **test:** 新增免費模型提取腳本與資料檔 ([c24592a](https://github.com/bluelovers/opencode-arise/commit/c24592ad1c41edae6d6226344d112d7dc29eec23))
+* **tool-guides:** 新增 DRY 偵測與共享邏輯指南 ([de59af8](https://github.com/bluelovers/opencode-arise/commit/de59af873607b6c74b77d47118c7fd3378912786))
+* **tool-guides:** 新增多項操作謹慎指南 ([6970c6b](https://github.com/bluelovers/opencode-arise/commit/6970c6bb3a640cb94ca7d2d78b1f837beac70824))
+* **tool-guides:** 強化 TODO 建立提醒，使用系統工具而非口頭描述 ([b7ebf2c](https://github.com/bluelovers/opencode-arise/commit/b7ebf2c3384e88100b1aba2e94666c5bf0ac44a6))
+* **tools:** 新增 disabled_tools 配置項並重構工具為延遲載入 ([97b1f60](https://github.com/bluelovers/opencode-arise/commit/97b1f60426c26f46399beaf63d62095f629f3e8c))
+
+
+### 📦　Code Refactoring
+
+* **agents:** 添加编辑器约束并在 Igris 等 Agent 中应用 ([89411f6](https://github.com/bluelovers/opencode-arise/commit/89411f6a47942b29c52ec0bfe031179ebb6dfe99))
+* **agents:** 增强代码审查检查项 - 添加重复定义与循环依赖检查 ([25a4bbe](https://github.com/bluelovers/opencode-arise/commit/25a4bbeb8c1a04278297d56c605276d0fab31da7))
+* **arise-collaborate:** 抽取共用工具函式，減少 15% 重複代碼 ([c24ea03](https://github.com/bluelovers/opencode-arise/commit/c24ea03a6ed6efc9015e4298816e6b06872d9539))
+* **arise-tools:** 重構工具描述與函式分離 ([edb2c86](https://github.com/bluelovers/opencode-arise/commit/edb2c863777ffbb19e3d32f1d1b7042436ad6bc1))
+* **background:** 使用工具函式簡化模型資訊提取邏輯 ([234fc9c](https://github.com/bluelovers/opencode-arise/commit/234fc9c50983591a1bf090dc654781fb0c37ae6a))
+* **collaborate:** 停用 arise_collaborate 工具並簡化日誌輸出 ([801545a](https://github.com/bluelovers/opencode-arise/commit/801545ab779c6775b6ceb2ece20a9be8362ad9df))
+* **docs:** 將技術文檔重新組織至 architecture 與 references 目錄 ([4109f20](https://github.com/bluelovers/opencode-arise/commit/4109f208d30708cfaf631c5ecdbf7edf698b24db))
+* **opencode:** 重構 Hook 名稱列舉與模組命名 ([687e8cb](https://github.com/bluelovers/opencode-arise/commit/687e8cbfbce8413c1aa398a3c3d54dbbac7126e5))
+* **session:** 將 session model 快取從字串改為 IModelBody 物件格式 ([395ef41](https://github.com/bluelovers/opencode-arise/commit/395ef41f2b651b73fae2df5b716ffc563e8a7792))
+* **session-cache:** 將 session-cache 模組從 config/lib 遷移至 utils/session ([821796c](https://github.com/bluelovers/opencode-arise/commit/821796c5321b78d3b78ed95c6bf68d7473189518))
+* **shadow-prompt-monarch:** 簡化原則條文移除瑣碎任務處理指引 ([34e0ca8](https://github.com/bluelovers/opencode-arise/commit/34e0ca88510045d2385617969d69263e8b010c0b))
+* **shadows:** 精簡 Shadow Agent 描述中的 capabilities 項目 ([4ef330a](https://github.com/bluelovers/opencode-arise/commit/4ef330a4082ae95208c367426465b8fce7f585b8))
+* **shadows:** 使用工具函式動態生成 Shadow Agent 描述 ([17cfe08](https://github.com/bluelovers/opencode-arise/commit/17cfe084374136e35ccb15f49fed9b6cb034f877))
+* **tools:** 移除多個工具中的除錯日誌輸出 ([0694c57](https://github.com/bluelovers/opencode-arise/commit/0694c57cf65fb296cda9c90ff3789a6cb8b39cb9))
+
+
+### 📚　Documentation
+
+* **shadow-summoning-methods:** 新增程式碼參考區塊，連結至 src/agents/lib/ 目錄 ([bd42959](https://github.com/bluelovers/opencode-arise/commit/bd42959bd5756ce88554bc7080dabc42dd4a7c91))
+
+
+### 💎　Styles
+
+* 修復程式碼縮排一致性 ([f08add4](https://github.com/bluelovers/opencode-arise/commit/f08add49486ea8ab65c56d9f5cefab34b20b5710))
+* apply consistent multi-line arrow function format across codebase ([e89bd4b](https://github.com/bluelovers/opencode-arise/commit/e89bd4b29622b4bbdf58fa127773339af220c370))
+
+
+### 🚨　Tests
+
+* 重構免費模型提取腳本使用共用函式 ([1888e19](https://github.com/bluelovers/opencode-arise/commit/1888e19e10778681aa3b6746056eef524cbebcaa))
+* 新增 API 金鑰擷取腳本 ([2bd7d40](https://github.com/bluelovers/opencode-arise/commit/2bd7d403a781ed2a4c2992845ff73b86c03eecbf))
+
+
+
 ## [0.1.35](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.34...@bluelovers/opencode-arise@0.1.35) (2026-04-05)
 
 

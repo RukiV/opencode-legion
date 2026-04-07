@@ -30,6 +30,26 @@
         ]
       }
     },
+    "disabled_tools": {
+      "type": "array",
+      "title": "Disabled Tools",
+      "description": "要停用的工具列表 / List of tools to disable",
+      "items": {
+        "type": "string",
+        "enum": [
+          "arise_summon",
+          "arise_background",
+          "arise_background_output",
+          "arise_background_status",
+          "arise_background_cancel",
+          "arise_list_models",
+          "arise_continue",
+          "arise_debug",
+          "arise_git_summary",
+          "arise_collaborate"
+        ]
+      }
+    },
     "disabled_hooks": {
       "type": "array",
       "title": "Disabled Hooks",
