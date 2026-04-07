@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ALL_SHADOW_AGENTS_NAME, ALLOWED_COLLABORATE_MODES } from "../types/enums";
+import { ALL_ARISE_TOOLS, ALL_SHADOW_AGENTS_NAME, ALLOWED_COLLABORATE_MODES } from "../types/enums";
 import { ALLOWED_HOOKS, EnumHookName } from "../types/enums";
 import { ALLOWED_LOG_LEVELS, EnumLogLevel } from "../types/enum-opencode";
 import {
@@ -252,6 +252,12 @@ export const AriseConfigSchema = z
 			.meta({
 				description: "要停用的 Shadow Agents 列表 / List of Shadow Agents to disable",
 				title: "Disabled Shadows",
+			}).optional(),
+		/** 要停用的工具列表（可選）/ List of tools to disable (optional) */
+		disabled_tools: z.array(z.enum(ALL_ARISE_TOOLS))
+			.meta({
+				description: "要停用的工具列表 / List of tools to disable",
+				title: "Disabled Tools",
 			}).optional(),
 		/** 要停用的 Hook 列表（可選）/ List of hooks to disable (optional) */
 		disabled_hooks: z.array(HookName)

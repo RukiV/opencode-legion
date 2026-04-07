@@ -65,6 +65,7 @@ const OpencodeArise: IPlugin = async (ctx: PluginInput): Promise<IHooks> =>
 		'[index] Plugin initialized with config:',
 		`  disabled_shadows: ${JSON.stringify(config.disabled_shadows ?? [])}`,
 		`  disabled_hooks: ${JSON.stringify(config.disabled_hooks ?? [])}`,
+		`  disabled_tools: ${JSON.stringify(config.disabled_tools ?? [])}`,
 		`  show_banner: ${config.show_banner}`,
 		`  debug.enabled: ${config.debug?.enabled ?? false}`,
 		`  debug.level: ${config.debug?.level ?? '(default)'}`,

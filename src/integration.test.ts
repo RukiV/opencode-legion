@@ -1,7 +1,8 @@
 import { describe, expect, it, test, beforeEach, afterEach, mock } from "bun:test";
 import OpencodeArise from "./index";
-import { ALL_ARISE_TOOLS, EnumShadowAgentsName, EnumShadowSubAgentsName } from "./types/enums";
+import { ALL_ARISE_TOOLS, EnumShadowAgentsName, EnumShadowSubAgentsName, EnumAriseTools } from "./types/enums";
 import { EnumOpencodeAgentMode } from "./types/enum-opencode";
+import { getDisabledTools } from "./types/const-project";
 
 // Comprehensive mock context
 const createMockCtx = () => ({
@@ -70,9 +71,22 @@ describe("Plugin Integration", () => {
 
     const toolNames = Object.keys(hooks.tool!);
 
-    expect(hooks.tool!).toContainAllKeys(ALL_ARISE_TOOLS);
+    const disabledTools = getDisabledTools({} as any);
 
-    expect(toolNames).toHaveLength(ALL_ARISE_TOOLS.length);
+    let i = 0;
+
+    // 驗證所有已註冊的工具都是活躍的（未被禁用）
+    for (const toolName of ALL_ARISE_TOOLS)
+    {
+      if (!disabledTools.includes(toolName as EnumAriseTools))
+      {
+         expect(toolNames).toContain(toolName as EnumAriseTools);
+
+         i++;
+      }
+    }
+    
+    expect(toolNames).toHaveLength(i);
   });
 
   it("config hook sets default_agent to monarch", async () => {

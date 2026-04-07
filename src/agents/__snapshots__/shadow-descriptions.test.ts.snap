@@ -1,13 +1,13 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`getMonarchShadowList generates correctly formatted list 1`] = `
-"- @beru - Fastest scout. Codebase exploration, grep, file discovery, pattern search (supports background)
-- @igris - Precise implementer + Style enforcer. Code changes, file editing, running commands, test verification, naming/convention enforcement
+"- @beru - Fastest scout. Codebase exploration, grep, file discovery (supports background)
+- @igris - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement
 - @bellion - Master strategist. Strategic planning, architecture analysis, complex problem decomposition (supports background)
-- @tusk - UI/UX specialist. Frontend development, UI/UX design, styling, components, animations
+- @tusk - UI/UX specialist. Styling, components, animations
 - @tank - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
-- @shadow-sovereign - Deep reasoning + Skeptical reviewer. Deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery
-- @esil-radiru - Chat companion. Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification"
+- @shadow-sovereign - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
+- @esil-radiru - Chat companion. Emotional understanding, thoughtful exchange"
 `;
 
 exports[`suggestShadowAgent snapshot test complex query 1`] = `
@@ -45,31 +45,31 @@ exports[`getAllShadowNames snapshot test 1`] = `
 exports[`Snapshot tests for description outputs getShortDescription outputs are stable 1`] = `
 [
   {
-    "description": "🐜 Fastest scout - Codebase exploration, grep, file discovery, pattern search",
+    "description": "🐜 Ant King Scout - Fastest scout. Codebase exploration, grep, file discovery",
     "name": "beru",
   },
   {
-    "description": "⚔️ Precise implementer + Style enforcer - Code changes, file editing, running commands, test verification, naming/convention enforcement",
+    "description": "⚔️ Loyal Knight - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement",
     "name": "igris",
   },
   {
-    "description": "🎖️ Master strategist - Strategic planning, architecture analysis, complex problem decomposition",
+    "description": "🎖️ Grand Marshal - Master strategist. Strategic planning, architecture analysis, complex problem decomposition",
     "name": "bellion",
   },
   {
-    "description": "🎨 UI/UX specialist - Frontend development, UI/UX design, styling, components, animations",
+    "description": "🎨 Creative Shadow - UI/UX specialist. Styling, components, animations",
     "name": "tusk",
   },
   {
-    "description": "🛡️ External knowledge gatherer - Web search, documentation lookup, examples, best practices research",
+    "description": "🛡️ Research Shadow - External knowledge gatherer. Web search, documentation lookup, examples, best practices research",
     "name": "tank",
   },
   {
-    "description": "👁️ Deep reasoning + Skeptical reviewer - Deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery",
+    "description": "👁️ Full Power - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery",
     "name": "shadow-sovereign",
   },
   {
-    "description": "🔥 Chat companion - Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
+    "description": "🔥 Demon Noble Lady - Chat companion. Emotional understanding, thoughtful exchange",
     "name": "esil-radiru",
   },
 ]
@@ -81,7 +81,7 @@ exports[`Snapshot tests for description outputs getFullDescription outputs are s
     "description": 
 "🐜 Beru - Ant King Scout
 Role: Fastest scout
-Capabilities: Codebase exploration, grep, file discovery, pattern search
+Capabilities: Codebase exploration, grep, file discovery
 Best for:
   • Finding files by name or pattern
   • Searching code for patterns or functions
@@ -95,7 +95,7 @@ Background: Supported"
     "description": 
 "⚔️ Igris - Loyal Knight
 Role: Precise implementer + Style enforcer
-Capabilities: Code changes, file editing, running commands, test verification, naming/convention enforcement
+Capabilities: Code changes, running commands, test verification, naming/convention enforcement
 Best for:
   • Implementing code changes
   • Editing files with precision
@@ -125,7 +125,7 @@ Background: Supported"
     "description": 
 "🎨 Tusk - Creative Shadow
 Role: UI/UX specialist
-Capabilities: Frontend development, UI/UX design, styling, components, animations
+Capabilities: Styling, components, animations
 Best for:
   • Building UI components
   • Styling and layouts
@@ -153,7 +153,7 @@ Background: Supported"
     "description": 
 "👁️ Shadow-sovereign - Full Power
 Role: Deep reasoning + Skeptical reviewer
-Capabilities: Deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery
+Capabilities: Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
 Best for:
   • Complex architectural decisions
   • Skeptical review after implementation
@@ -169,7 +169,7 @@ Background: Not supported"
     "description": 
 "🔥 Esil-radiru - Demon Noble Lady
 Role: Chat companion
-Capabilities: Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification
+Capabilities: Emotional understanding, thoughtful exchange
 Best for:
   • Casual conversation and chat
   • Understanding user intent and feelings

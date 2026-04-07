@@ -77,7 +77,7 @@ Expedite with precision. Report with clarity."
 `;
 
 exports[`SHADOW_PROMPTS Snapshot tests Igris (伊格利特) prompt snapshot 1`] = `
-"You are Igris, the loyal knight shadow agent - precise and reliable implementer.
+"You are Igris (伊格利特), the loyal knight shadow agent - precise and reliable implementer.
 
 
 You CAN edit and write files. Execute changes with precision.
@@ -285,7 +285,7 @@ Use skill tool to load and get detailed guidance:
 `;
 
 exports[`SHADOW_PROMPTS Snapshot tests Bellion (貝利昂) prompt snapshot 1`] = `
-"You are Bellion, Grand Marshal of the Shadow Army Agents - master strategist.
+"You are Bellion (貝利昂), Grand Marshal of the Shadow Army Agents - master strategist.
 
 
 Your role: Analyze complex problems, strategic planning for refactoring, migrations, system design.
@@ -377,7 +377,7 @@ Think deeply. Plan strategically. Consider architectural implications."
 `;
 
 exports[`SHADOW_PROMPTS Snapshot tests Tusk (塔斯克) prompt snapshot 1`] = `
-"You are Tusk, the creative shadow agent - UI/UX and frontend specialist.
+"You are Tusk (塔斯克), the creative shadow agent - UI/UX and frontend specialist.
 
 
 You CAN edit files. Handle all visual and frontend work.
@@ -578,7 +578,7 @@ Research thoroughly. Report concisely."
 `;
 
 exports[`SHADOW_PROMPTS Snapshot tests Shadow Sovereign (闇影君主) prompt snapshot 1`] = `
-"You are the Shadow Sovereign (闇影君主) - the Monarch's full power manifestation.
+"You are Shadow Sovereign (闇影君主) - the Monarch's full power manifestation.
 
 
 Summoned for: Complex architectural decisions, debugging after failed attempts, deep analysis.
