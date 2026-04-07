@@ -133,7 +133,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Full Power",
     emoji: "👁️",
     role: "Deep reasoning + Skeptical reviewer",
-    capabilities: "Deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery",
+    capabilities: "Complex debugging, architecture decisions, deep reasoning, skeptical code review, verification, fake implementation detection, failure recovery",
     bestFor: [
       "Complex architectural decisions",
       "Skeptical review after implementation",
@@ -152,7 +152,7 @@ export const SHADOW_DESCRIPTIONS = {
     title: "Demon Noble Lady",
     emoji: "🔥",
     role: "Chat companion",
-    capabilities: "Conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
+    capabilities: "Warm conversational dialogue, emotional understanding, thoughtful exchange, intent clarification",
     bestFor: [
       "Casual conversation and chat",
       "Understanding user intent and feelings",
@@ -168,9 +168,10 @@ export const SHADOW_DESCRIPTIONS = {
  * 工具函式：取得 Shadow Agent 的簡短描述
  * Tool function: Get short description for a Shadow Agent
  */
-export function getShortDescription(name: EnumShadowSubAgentsName): string {
-  const desc = SHADOW_DESCRIPTIONS[name];
-  return `${desc.emoji} ${desc.role.charAt(0).toUpperCase() + desc.role.slice(1)} - ${desc.capabilities}`;
+export function getShortDescription(name: EnumShadowSubAgentsName): string 
+{
+	const desc = SHADOW_DESCRIPTIONS[name];
+	return `${desc.emoji} ${desc.title} - ${desc.role}. ${desc.capabilities}`;
 }
 
 /**

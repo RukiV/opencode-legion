@@ -621,7 +621,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.Beru]: {
 		name: EnumShadowSubAgentsName.Beru,
-		description: "🐜 Ant King - Fastest scout. Codebase exploration, grep, file discovery",
+		description: getShortDescription(EnumShadowSubAgentsName.Beru),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "anthropic/claude-haiku-4-5",
 		steps: 12,
@@ -642,7 +642,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.Igris]: {
 		name: EnumShadowSubAgentsName.Igris,
-		description: "⚔️ Loyal Knight - Precise implementer. Code changes, running commands",
+		description: getShortDescription(EnumShadowSubAgentsName.Igris),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "zai-coding-plan/glm-4.7",
 		steps: 20,
@@ -661,7 +661,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.Bellion]: {
 		name: EnumShadowSubAgentsName.Bellion,
-		description: "🎖️ Grand Marshal - Master strategist. Strategic planning, architecture analysis",
+		description: getShortDescription(EnumShadowSubAgentsName.Bellion),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "openai/gpt-5.2",
 		steps: 12,
@@ -681,7 +681,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.Tusk]: {
 		name: EnumShadowSubAgentsName.Tusk,
-		description: "🎨 Creative Shadow - UI/UX specialist. Frontend development, styling, components",
+		description: getShortDescription(EnumShadowSubAgentsName.Tusk),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "google/gemini-3-pro-preview",
 		steps: 18,
@@ -699,7 +699,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.Tank]: {
 		name: EnumShadowSubAgentsName.Tank,
-		description: "🛡️ Research Shadow - External knowledge gatherer. Web search, docs, examples",
+		description: getShortDescription(EnumShadowSubAgentsName.Tank),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "zai-coding-plan/glm-4.7",
 		steps: 18,
@@ -722,7 +722,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.ShadowSovereign]: {
 		name: EnumShadowSubAgentsName.ShadowSovereign,
-		description: "👁️ Full Power - Deep reasoning specialist. Complex debugging, architecture decisions",
+		description: getShortDescription(EnumShadowSubAgentsName.ShadowSovereign),
 		mode: EnumOpencodeAgentMode.SUBAGENT,
 		model: "openai/gpt-5.2",
 		steps: 24,
@@ -746,7 +746,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowSubAgentsName.EsilRadiru]: {
 		name: EnumShadowSubAgentsName.EsilRadiru,
-		description: "🔥 Chat Companion - Warm conversational dialogue, emotional understanding",
+		description: getShortDescription(EnumShadowSubAgentsName.EsilRadiru),
 		mode: EnumOpencodeAgentMode.ALL,
 		model: "x-ai/grok-4",
 		steps: 12,
