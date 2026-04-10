@@ -20,6 +20,29 @@
 import { z } from "zod";
 import { ARISE_TOOLS } from "../../agents/shadows";
 import { EnumAriseTools } from "../../types/enums";
+import { IZodRawShape } from "../../types/types-opencode";
+
+export type IShapeToZodObject<T extends IZodRawShape> = z.ZodObject<T>;
+
+/**
+ * @see z.infer
+ */
+export type IZodObjectToInfer<T> = T extends {
+    _zod: {
+        output: any;
+    };
+} ? T["_zod"]["output"] : never;
+
+/**
+ * @see z.input
+ */
+export type IZodObjectToInput<T> = T extends {
+    _zod: {
+        input: any;
+    };
+} ? T["_zod"]["input"] : never;
+
+export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInfer<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
 
 /** ==================== Git Summary ==================== */
 

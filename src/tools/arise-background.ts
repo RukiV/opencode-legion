@@ -42,11 +42,28 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 
 		async execute(args, context: ToolContext)
 		{
-			const { shadow, prompt, description, model } = args;
+			const { shadow, prompt, description, model, session_id: existingSessionId } = args;
 
 			try
 			{
-				
+				/**
+				 * Session 複用邏輯
+				 * Session reuse logic
+				 *
+				 * 如果提供了 existingSessionId，嘗試重用該 session
+				 * If existingSessionId is provided, try to reuse that session
+				 */
+				if (existingSessionId)
+				{
+					/**
+					 * 狀態日誌：嘗試使用現有 session
+					 * Status log: attempting to use existing session
+					 */
+					logArise2WithLevel("debug", () => [
+						`[arise-background]`,
+						`Reusing existing session: ${existingSessionId}`,
+					], { force: true });
+				}
 
 				/** 啟動背景任務 / Launch background task */
 				const task = await manager.launch({
@@ -55,6 +72,7 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 					description,
 					parentSessionId: context.sessionID,
 					model,
+					existingSessionId,
 				});
 
 				return formatAriseMsgSuccessMultiLine(

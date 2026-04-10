@@ -264,7 +264,24 @@ interface ICollaborateArgs
  * @param args - 工具參數
  * @returns 合併後的 Collaborate 配置
  */
-function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
+/**
+ * 合併後的 Collaborate 配置類型
+ * Merged collaborate configuration type
+ */
+interface IResolvedCollaborateConfig
+{
+	mode: EnumCollaborateMode;
+	shadows: INormalizedCollaborateShadowEntry[];
+	prompt: string;
+	total_rounds: number;
+	max_concurrent: number;
+	round_timeout_ms: number;
+	description?: string;
+	reuse_agent_session?: boolean;
+	block_subagent_tools?: boolean;
+}
+
+function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs): IResolvedCollaborateConfig
 {
 	return {
 		/** 協作模式 / Collaboration mode */
@@ -281,6 +298,8 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs)
 		round_timeout_ms: getRoundTimeoutMs(args.round_timeout_ms, config),
 		/** 任務描述 / Task description */
 		description: args.description,
+		reuse_agent_session: args.reuse_agent_session,
+		block_subagent_tools: args.block_subagent_tools,
 	};
 }
 
@@ -1192,6 +1211,8 @@ async function executePersistentCollaboration(
 		parentSessionId: context.sessionID,
 		context,
 		config: context as unknown as IAriseConfig,
+		reuseAgentSession: config.reuse_agent_session,
+		blockSubagentTools: config.block_subagent_tools,
 	});
 
 	const result = await executeNextRound(session, backgroundManager);
@@ -1232,6 +1253,28 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 
 	const roundResponses: string[] = [];
 	const useBatchedExecution = session.maxConcurrent > 1;
+	/** 是否重用子代理 session / Whether to reuse sub-agent session */
+	const reuseAgentSession = session.reuseAgentSession !== false;
+
+	/** 構建子代理指令 (如果需要阻止使用召喚工具) / Build sub-agent instructions (if blocking summoning tools) */
+	function buildAgentInstructions(basePrompt: string): string
+	{
+		let instructions = basePrompt;
+
+		/**
+		 * 如果需要阻止子代理使用召喚工具
+		 * If need to block sub-agent from using summoning tools
+		 */
+		if (session.blockSubagentTools)
+		{
+			instructions += `\n\nIMPORTANT RESTRICTIONS:
+- You MUST NOT use arise_summon, arise_background, or task tools
+- Complete all tasks yourself using available tools
+- Do not delegate work to other agents`;
+		}
+
+		return instructions;
+	}
 
 	if (useBatchedExecution)
 	{
@@ -1240,8 +1283,15 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 			const batch = session.shadows.slice(i, i + session.maxConcurrent);
 			const batchResults = await Promise.all(batch.map(async (entry) =>
 			{
-				let sessionId = session.agentSessionIds.get(entry.label);
-				let prompt = sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt;
+				/**
+				 * Session 重用邏輯
+				 * Session reuse logic
+				 *
+				 * reuse_agent_session=true (默認): 使用保存的 session
+				 * reuse_agent_session=false: 每次創建新的 session
+				 */
+				let sessionId = reuseAgentSession ? session.agentSessionIds.get(entry.label) : undefined;
+				let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
 
 				const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
 				if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);
@@ -1266,8 +1316,15 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 	{
 		for (const entry of session.shadows)
 		{
-			let sessionId = session.agentSessionIds.get(entry.label);
-			let prompt = sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt;
+			/**
+			 * Session 重用邏輯
+			 * Session reuse logic
+			 *
+			 * reuse_agent_session=true (默認): 使用保存的 session
+			 * reuse_agent_session=false: 每次創建新的 session
+			 */
+			let sessionId = reuseAgentSession ? session.agentSessionIds.get(entry.label) : undefined;
+			let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
 
 			const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
 			if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);

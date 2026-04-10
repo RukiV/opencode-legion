@@ -64,7 +64,7 @@ export type IReturnTypeOfPluginToolArise<T extends EnumAriseTools> = IReturnType
  * 從 ARISE_TOOLS 取得對應工具的參數類型
  * Gets the arguments type for the corresponding tool from ARISE_TOOLS
  *
- * @typeParam T - Arise 工具枚舉值
+ * @typeParam T - Arise 工 Enable for a specific Arise tool
  */
 export type IPluginToolAriseArgs<T extends EnumAriseTools> = typeof ARISE_TOOLS[T]["args"]
 

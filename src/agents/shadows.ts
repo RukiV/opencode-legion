@@ -164,6 +164,11 @@ const SHARED_SUMMON_ARGS = {
 	description: z
 		.string()
 		.meta({ description: "Short description (3-5 words, used in tracking output and background task status)" }),
+	/** 現有 session ID（用於繼續使用現有的 session）/ Existing session ID (for continuing existing session) */
+	session_id: z
+		.string()
+		.meta({ description: "Existing session ID to reuse (continue existing session instead of creating new one)" })
+		.optional(),
 };
 
 /**
@@ -579,6 +584,23 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				.meta({
 					description: "Pause a persistent collaboration session",
 					title: "Pause Session",
+				})
+				.optional(),
+			/** 是否重用子代理 session / Whether to reuse sub-agent sessions */
+			reuse_agent_session: z
+				.boolean()
+				.meta({
+					description: "Reuse the same session for each sub-agent across all rounds (default: true). When false, creates new session per round",
+					title: "Reuse Agent Session",
+				})
+				.optional()
+				.default(true),
+			/** 是否禁止子代理使用召喚工具 / Whether to block sub-agent summoning tools */
+			block_subagent_tools: z
+				.boolean()
+				.meta({
+					description: "Block sub-agents from using arise_summon, arise_background, or task tools",
+					title: "Block Sub-agent Tools",
 				})
 				.optional(),
 		},

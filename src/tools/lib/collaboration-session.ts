@@ -71,6 +71,10 @@ export interface ICollaborationSession
 	terminationReason?: string;
 	/** 最終摘要 / Final summary */
 	finalSummary?: string;
+	/** 是否重用子代理 session / Whether to reuse sub-agent sessions */
+	reuseAgentSession?: boolean;
+	/** 是否禁止子代理使用召喚工具 / Whether to block sub-agent summoning tools */
+	blockSubagentTools?: boolean;
 }
 
 /**
@@ -91,6 +95,8 @@ export interface ICreateCollaborationSessionOpts
 	context: ToolContext;
 	config: IAriseConfig;
 	model?: string;
+	reuseAgentSession?: boolean;
+	blockSubagentTools?: boolean;
 }
 
 /**

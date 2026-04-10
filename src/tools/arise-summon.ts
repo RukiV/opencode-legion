@@ -58,7 +58,7 @@ export function createAgentToolAriseSyncSummon(
 		 */
 		async execute(args, context)
 		{
-			const { shadow, prompt, run_in_background, description, model } = args;
+			const { shadow, prompt, run_in_background, description, model, session_id: existingSessionId } = args;
 			/** 任務描述（用於顯示）/ Task description (for display) */
 			const taskDesc = description ?? `${shadow} task`;
 
@@ -68,29 +68,75 @@ export function createAgentToolAriseSyncSummon(
 			try
 			{
 				/**
-				 * 建立新的 Session
-				 * Create new session
+				 * Session 複用邏輯
+				 * Session reuse logic
+				 *
+				 * 如果提供了 existingSessionId，嘗試繼續使用該 session
+				 * If existingSessionId is provided, try to reuse that session
+				 * 否則創建新的 session
+				 * Otherwise create new session
+				 */
+				if (existingSessionId)
+				{
+					/**
+					 * 狀態日誌：嘗試使用現有 session
+					 * Status log: attempting to use existing session
+					 */
+					logArise2WithLevel("debug", () => [
+						`[arise-summon]`,
+						`Reusing existing session: ${existingSessionId}`,
+					], { force: true });
+
+					// 驗證 session 是否存在（嘗試獲取訊息歷史）
+					try
+					{
+						await ctx.client.session.messages({
+							path: { id: existingSessionId },
+						});
+						sessionId = existingSessionId;
+					}
+					catch
+					{
+						/**
+						 * 狀態日誌：現有 session 不存在，創建新的
+						 * Status log: existing session not found, creating new one
+						 */
+						logArise2WithLevel("debug", () => [
+							`[arise-summon]`,
+							`Existing session not found: ${existingSessionId}, creating new one`,
+						], { force: true });
+
+						// No session ID found - will create new one below
+					}
+				}
+
+				/**
+				 * 建立新的 Session（如果需要）
+				 * Create new session (if needed)
 				 *
 				 * 每個 Shadow 任務都在獨立的 session 中執行
 				 * Each Shadow task executes in an isolated session
 				 */
-				const session = await ctx.client.session.create({
-					body: { title: formatAriseMsgTitle(taskDesc) },
-				});
-
-				sessionId = session.data?.id;
 				if (!sessionId)
 				{
-					/**
-					 * 錯誤日誌：建立 session 失敗
-					 * Error log: session creation failed
-					 */
-					logArise2WithLevel("error", () => [
-						`[arise-summon]`,
-						`Failed to create session for ${shadow}: no session ID returned`,
-					], { force: true });
+					const session = await ctx.client.session.create({
+						body: { title: formatAriseMsgTitle(taskDesc) },
+					});
 
-					return formatAriseMsgError(`Failed to create session for ${shadow}`);
+					sessionId = session.data?.id;
+					if (!sessionId)
+					{
+						/**
+						 * 錯誤日誌：建立 session 失敗
+						 * Error log: session creation failed
+						 */
+						logArise2WithLevel("error", () => [
+							`[arise-summon]`,
+							`Failed to create session for ${shadow}: no session ID returned`,
+						], { force: true });
+
+						return formatAriseMsgError(`Failed to create session for ${shadow}`);
+					}
 				}
 
 				/**
