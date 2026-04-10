@@ -127,7 +127,7 @@ export function createAgentToolListModels(ctx: PluginInput)
 
 				/** 根據篩選條件過濾提供者 / Filter providers based on criteria */
 				const filteredProviders = provider
-					? providers.filter((p) => p.id.toLowerCase().includes(provider.toLowerCase()))
+					? providers.filter((p) => p.id.toLowerCase().includes((provider as string).toLowerCase()))
 					: providers;
 
 				if (filteredProviders.length === 0)
