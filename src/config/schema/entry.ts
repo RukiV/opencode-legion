@@ -42,7 +42,9 @@ export type IZodObjectToInput<T> = T extends {
     };
 } ? T["_zod"]["input"] : never;
 
-export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInfer<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
+export type IAriseToolsToZodInfer<T extends EnumAriseTools> = IZodObjectToInfer<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
+
+export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInput<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
 
 /** ==================== Git Summary ==================== */
 
@@ -99,6 +101,9 @@ export type IGitSummaryOptions2 = z.input<z.ZodObject<typeof ARISE_TOOLS[typeof 
 
 
 /**
- * @see {@link https://github.com/anomalyco/opencode/blob/ec3ae17e4d6abb9685b1d558d5e51416c9bfad60/packages/opencode/src/agent/agent.ts#L182}
+ * ARISE_COLLABORATE 的參數類型 - 從 ARISE_TOOLS schema 派生
+ * ARISE_COLLABORATE args type - derived from ARISE_TOOLS schema
  */
-const OPENCODE_AGENT_EXPLORE_DESCRIPTION_ORIGINAL = `Fast agent specialized for exploring codebases. Use this when you need to quickly find files by patterns (eg. "src/components/**/*.tsx"), search code for keywords (eg. "API endpoints"), or answer questions about the codebase (eg. "how do API endpoints work?"). When calling this agent, specify the desired thoroughness level: "quick" for basic searches, "medium" for moderate exploration, or "very thorough" for comprehensive analysis across multiple locations and naming conventions.`;
+export type IAriseCollaborateOptionsInput = IAriseToolsToZodInput<EnumAriseTools.ARISE_COLLABORATE>;
+
+export type IAriseCollaborateOptionsInfer = IAriseToolsToZodInfer<EnumAriseTools.ARISE_COLLABORATE>;
