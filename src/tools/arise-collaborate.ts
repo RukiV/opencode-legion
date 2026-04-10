@@ -183,13 +183,13 @@ function buildPromptWithPreviousResult(
  * Execute tasks in batches
  *
  * @param items - 要處理的項目列表
- * @param maxConcurrent - 每批最大並行數
+ * @param max_concurrent - 每批最大並行數
  * @param processor - 處理每個項目的非同步函式
  * @returns 所有批次的結果陣列
  */
 async function executeInBatches<TInput, TOutput>(
 	items: TInput[],
-	maxConcurrent: number,
+	max_concurrent: number,
 	processor: (item: TInput) => Promise<TOutput>,
 ): Promise<TOutput[]>
 {
@@ -198,9 +198,9 @@ async function executeInBatches<TInput, TOutput>(
 	// This function is not currently used because existing logic requires more custom handling
 	const results: TOutput[] = [];
 
-	for (let i = 0; i < items.length; i += maxConcurrent)
+	for (let i = 0; i < items.length; i += max_concurrent)
 	{
-		const batch = items.slice(i, i + maxConcurrent);
+		const batch = items.slice(i, i + max_concurrent);
 		const batchPromises = batch.map(processor);
 		const batchResults = await Promise.all(batchPromises);
 		results.push(...batchResults);
@@ -248,6 +248,10 @@ interface ICollaborateArgs
 	end_session?: boolean;
 	/** 暫停 session / Pause session */
 	pause_session?: boolean;
+	/** 是否重用子代理 session（可選）/ Whether to reuse sub-agent session (optional) */
+	reuse_agent_session?: boolean;
+	/** 是否禁止子代理使用召喚工具（可選）/ Whether to block sub-agent summoning tools (optional) */
+	block_subagent_tools?: boolean;
 }
 
 // ==================== 解析並合併 Config 與工具參數
@@ -277,8 +281,8 @@ interface IResolvedCollaborateConfig
 	max_concurrent: number;
 	round_timeout_ms: number;
 	description?: string;
-	reuse_agent_session?: boolean;
-	block_subagent_tools?: boolean;
+	reuse_agent_session: boolean;
+	block_subagent_tools: boolean;
 }
 
 function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs): IResolvedCollaborateConfig
@@ -298,8 +302,10 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs):
 		round_timeout_ms: getRoundTimeoutMs(args.round_timeout_ms, config),
 		/** 任務描述 / Task description */
 		description: args.description,
-		reuse_agent_session: args.reuse_agent_session,
-		block_subagent_tools: args.block_subagent_tools,
+		/** 是否重用子代理 session / Whether to reuse sub-agent sessions */
+		reuse_agent_session: args.reuse_agent_session ?? false,
+		/** 是否禁止子代理使用召喚工具 / Whether to block sub-agent summoning tools */
+		block_subagent_tools: args.block_subagent_tools ?? false,
 	};
 }
 
@@ -411,7 +417,7 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
 
 				logArise2WithLevel("debug", () => [
 					`[arise-collaborate]`,
-					`Continuing session: ${args.session_id}, currentRound=${session.currentRound}`,
+					`Continuing session: ${args.session_id}, current_round=${session.current_round}`,
 				], { force: true });
 
 				return await executeContinueSession(session, backgroundManager, context);
@@ -533,7 +539,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 * 回合迭代追蹤
 	 * Round iteration tracking
 	 */
-	const allResponses: string[] = [];
+	const all_responses: string[] = [];
 
 	/**
 	 * 判斷執行策略：傳統回合制 vs 分批並行
@@ -566,7 +572,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 		 * 回合回應收集
 		 * Round responses collection
 		 */
-		const roundResponses: string[] = [];
+		const round_responses: string[] = [];
 
 		/**
 		 * 根據 max_concurrent 選擇執行方式
@@ -594,7 +600,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 					 */
 					const promptWithContext = buildPromptWithDiscussionHistory(
 						config.prompt,
-						allResponses,
+						all_responses,
 						config.shadows,
 					);
 
@@ -632,8 +638,8 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				 */
 				for (const result of batchResults)
 				{
-					roundResponses.push(result.response);
-					allResponses.push(result.response);
+					round_responses.push(result.response);
+					all_responses.push(result.response);
 				}
 			}
 			// Close the if block
@@ -653,7 +659,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				 */
 				const promptWithContext = buildPromptWithDiscussionHistory(
 					config.prompt,
-					allResponses,
+					all_responses,
 					config.shadows,
 				);
 
@@ -676,8 +682,8 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 					config.round_timeout_ms,
 				);
 
-				roundResponses.push(responseText);
-				allResponses.push(responseText);
+				round_responses.push(responseText);
+				all_responses.push(responseText);
 			}
 		}
 
@@ -685,7 +691,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 		 * 檢查終止標記
 		 * Check termination markers
 		 */
-		for (const response of roundResponses)
+		for (const response of round_responses)
 		{
 			const termination = checkTermination(response);
 			if (termination.shouldStop)
@@ -720,7 +726,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 		 * 檢查是否達成共識（所有回應相同或相似）
 		 * Check if consensus reached (all responses same or similar)
 		 */
-		if (roundResponses.every(r => r === roundResponses[0]) && roundResponses.length > 0)
+		if (round_responses.every(r => r === round_responses[0]) && round_responses.length > 0)
 		{
 			logArise2WithLevel("debug", () => [
 				`[arise-collaborate:planning]`,
@@ -736,12 +742,12 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 * Compose final result
 	 */
 	const details = [
-		`Rounds: ${Math.min(config.total_rounds, allResponses.length / config.shadows.length)}`,
+		`Rounds: ${Math.min(config.total_rounds, all_responses.length / config.shadows.length)}`,
 		`Agents: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		`Mode: planning`,
 		"",
 		"Final consensus:",
-		allResponses[allResponses.length - 1] ?? "No consensus reached",
+		all_responses[all_responses.length - 1] ?? "No consensus reached",
 	].join('\n');
 
 	return formatAriseMsgSuccessMultiLine(
@@ -1129,8 +1135,8 @@ function buildSessionStatusDetails(session: ICollaborationSession): string
 {
 	const agentStatus = session.shadows.map(e =>
 	{
-		const roundCount = session.perAgentRoundCount.get(e.label) ?? 0;
-		const hasSession = session.agentSessionIds.has(e.label);
+		const roundCount = session.per_agent_round_count.get(e.label) ?? 0;
+		const hasSession = session.agent_session_ids.has(e.label);
 		return `  - ${getShadowDisplayName(e)}: ${roundCount} rounds, session: ${hasSession
 			? "active"
 			: "not yet created"}`;
@@ -1140,7 +1146,7 @@ function buildSessionStatusDetails(session: ICollaborationSession): string
 		`Session ID: ${session.id}`,
 		`Mode: ${session.mode}`,
 		`Status: ${session.status}`,
-		`Round: ${session.currentRound}/${session.totalRounds}`,
+		`Round: ${session.current_round}/${session.total_rounds}`,
 		`Agents: ${session.shadows.length}`,
 		`Terminated: ${session.terminated ? "Yes" : "No"}`,
 		"",
@@ -1156,9 +1162,9 @@ function buildSessionStatusDetails(session: ICollaborationSession): string
  */
 function buildFinalSummary(session: ICollaborationSession): string
 {
-	const allResponses = session.allResponses;
-	if (allResponses.length === 0) return "No responses collected.";
-	return `Total rounds: ${session.currentRound}\nTotal responses: ${allResponses.length}\nTermination: ${session.terminatedBy ?? "manual"}\n\nFinal response:\n${allResponses[allResponses.length - 1]}`;
+	const all_responses = session.all_responses;
+	if (all_responses.length === 0) return "No responses collected.";
+	return `Total rounds: ${session.current_round}\nTotal responses: ${all_responses.length}\nTermination: ${session.terminated_by ?? "manual"}\n\nFinal response:\n${all_responses[all_responses.length - 1]}`;
 }
 
 /**
@@ -1169,12 +1175,12 @@ function buildSessionEndDetails(session: ICollaborationSession): string
 	return [
 		`Session ID: ${session.id}`,
 		`Mode: ${session.mode}`,
-		`Total rounds executed: ${session.currentRound}`,
-		`Termination: ${session.terminatedBy ?? "manual"}`,
-		`Reason: ${session.terminationReason ?? "N/A"}`,
+		`Total rounds executed: ${session.current_round}`,
+		`Termination: ${session.terminated_by ?? "manual"}`,
+		`Reason: ${session.termination_reason ?? "N/A"}`,
 		"",
 		"Final summary:",
-		session.finalSummary ?? "No summary available.",
+		session.final_summary ?? "No summary available.",
 	].join("\n");
 }
 
@@ -1190,7 +1196,9 @@ async function executePersistentCollaboration(
 		total_rounds: number;
 		max_concurrent: number;
 		round_timeout_ms: number;
-		description?: string
+		description?: string;
+		reuse_agent_session: boolean;
+		block_subagent_tools: boolean;
 	},
 	context: ToolContext,
 ): Promise<string>
@@ -1205,18 +1213,18 @@ async function executePersistentCollaboration(
 		shadows: config.shadows,
 		prompt: config.prompt,
 		description: config.description,
-		totalRounds: config.total_rounds,
-		maxConcurrent: config.max_concurrent,
-		roundTimeoutMs: config.round_timeout_ms,
-		parentSessionId: context.sessionID,
+		total_rounds: config.total_rounds,
+		max_concurrent: config.max_concurrent,
+		round_timeout_ms: config.round_timeout_ms,
+		parent_session_id: context.sessionID,
 		context,
 		config: context as unknown as IAriseConfig,
-		reuseAgentSession: config.reuse_agent_session,
-		blockSubagentTools: config.block_subagent_tools,
+		reuse_agent_session: config.reuse_agent_session,
+		block_subagent_tools: config.block_subagent_tools,
 	});
 
 	const result = await executeNextRound(session, backgroundManager);
-	session.lastActivityAt = Date.now();
+	session.last_activity_at = Date.now();
 
 	return formatAriseMsgSuccessMultiLine(`Persistent collaboration created: ${session.id}`, buildSessionStatusDetails(session));
 }
@@ -1228,33 +1236,33 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 {
 	if (session.terminated)
 	{
-		return formatAriseMsgError(`Session ${session.id} is already terminated: ${session.terminatedBy}`);
+		return formatAriseMsgError(`Session ${session.id} is already terminated: ${session.terminated_by}`);
 	}
 
-	if (session.currentRound >= session.totalRounds)
+	if (session.current_round >= session.total_rounds)
 	{
 		session.status = EnumCollaborationSessionStatus.Completed;
 		session.terminated = true;
-		session.terminatedBy = EnumCollaborateTermination.STOP;
-		session.terminatedAt = Date.now();
-		session.terminationReason = "Max rounds reached";
-		session.finalSummary = buildFinalSummary(session);
+		session.terminated_by = EnumCollaborateTermination.STOP;
+		session.terminated_at = Date.now();
+		session.termination_reason = "Max rounds reached";
+		session.final_summary = buildFinalSummary(session);
 		return formatAriseMsgSuccessMultiLine(`Session completed: max rounds reached`, buildSessionEndDetails(session));
 	}
 
-	session.currentRound++;
-	const round = session.currentRound;
+	session.current_round++;
+	const round = session.current_round;
 	session.status = EnumCollaborationSessionStatus.Executing;
 
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:persistent]`,
-		`Executing round ${round}/${session.totalRounds} for session ${session.id}`,
+		`Executing round ${round}/${session.total_rounds} for session ${session.id}`,
 	], { force: true });
 
-	const roundResponses: string[] = [];
-	const useBatchedExecution = session.maxConcurrent > 1;
+	const round_responses: string[] = [];
+	const useBatchedExecution = session.max_concurrent > 1;
 	/** 是否重用子代理 session / Whether to reuse sub-agent session */
-	const reuseAgentSession = session.reuseAgentSession !== false;
+	const reuse_agent_session = session.reuse_agent_session !== false;
 
 	/** 構建子代理指令 (如果需要阻止使用召喚工具) / Build sub-agent instructions (if blocking summoning tools) */
 	function buildAgentInstructions(basePrompt: string): string
@@ -1265,7 +1273,7 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 		 * 如果需要阻止子代理使用召喚工具
 		 * If need to block sub-agent from using summoning tools
 		 */
-		if (session.blockSubagentTools)
+		if (session.block_subagent_tools)
 		{
 			instructions += `\n\nIMPORTANT RESTRICTIONS:
 - You MUST NOT use arise_summon, arise_background, or task tools
@@ -1278,9 +1286,9 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 
 	if (useBatchedExecution)
 	{
-		for (let i = 0; i < session.shadows.length; i += session.maxConcurrent)
+		for (let i = 0; i < session.shadows.length; i += session.max_concurrent)
 		{
-			const batch = session.shadows.slice(i, i + session.maxConcurrent);
+			const batch = session.shadows.slice(i, i + session.max_concurrent);
 			const batchResults = await Promise.all(batch.map(async (entry) =>
 			{
 				/**
@@ -1290,25 +1298,25 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 				 * reuse_agent_session=true (默認): 使用保存的 session
 				 * reuse_agent_session=false: 每次創建新的 session
 				 */
-				let sessionId = reuseAgentSession ? session.agentSessionIds.get(entry.label) : undefined;
+				let sessionId = reuse_agent_session ? session.agent_session_ids.get(entry.label) : undefined;
 				let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
 
 				const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
-				if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);
+				if (!sessionId) session.agent_session_ids.set(entry.label, task.sessionId);
 
-				const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.roundTimeoutMs);
-				const currentCount = session.perAgentRoundCount.get(entry.label) ?? 0;
-				session.perAgentRoundCount.set(entry.label, currentCount + 1);
+				const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.round_timeout_ms);
+				const currentCount = session.per_agent_round_count.get(entry.label) ?? 0;
+				session.per_agent_round_count.set(entry.label, currentCount + 1);
 
 				return { label: entry.label, response: responseText };
 			}));
 
 			for (const result of batchResults)
 			{
-				roundResponses.push(result.response);
-				session.allResponses.push(result.response);
-				if (!session.roundResponses.has(round)) session.roundResponses.set(round, new Map());
-				session.roundResponses.get(round)!.set(result.label, result.response);
+				round_responses.push(result.response);
+				session.all_responses.push(result.response);
+				if (!session.round_responses.has(round)) session.round_responses.set(round, new Map());
+				session.round_responses.get(round)!.set(result.label, result.response);
 			}
 		}
 	}
@@ -1323,43 +1331,43 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 			 * reuse_agent_session=true (默認): 使用保存的 session
 			 * reuse_agent_session=false: 每次創建新的 session
 			 */
-			let sessionId = reuseAgentSession ? session.agentSessionIds.get(entry.label) : undefined;
+			let sessionId = reuse_agent_session ? session.agent_session_ids.get(entry.label) : undefined;
 			let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
 
 			const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
-			if (!sessionId) session.agentSessionIds.set(entry.label, task.sessionId);
+			if (!sessionId) session.agent_session_ids.set(entry.label, task.sessionId);
 
-			const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.roundTimeoutMs);
-			const currentCount = session.perAgentRoundCount.get(entry.label) ?? 0;
-			session.perAgentRoundCount.set(entry.label, currentCount + 1);
+			const responseText = await waitForTaskCompletion(backgroundManager, task.id, session.round_timeout_ms);
+			const currentCount = session.per_agent_round_count.get(entry.label) ?? 0;
+			session.per_agent_round_count.set(entry.label, currentCount + 1);
 
-			roundResponses.push(responseText);
-			session.allResponses.push(responseText);
-			if (!session.roundResponses.has(round)) session.roundResponses.set(round, new Map());
-			session.roundResponses.get(round)!.set(entry.label, responseText);
+			round_responses.push(responseText);
+			session.all_responses.push(responseText);
+			if (!session.round_responses.has(round)) session.round_responses.set(round, new Map());
+			session.round_responses.get(round)!.set(entry.label, responseText);
 
 			const termination = checkTermination(responseText);
 			if (termination.shouldStop)
 			{
 				session.terminated = true;
-				session.terminatedBy = termination.terminationType ?? undefined;
-				session.terminatedAt = Date.now();
-				session.terminationReason = `Auto-detected: ${termination.terminationType}`;
-				session.terminationMarkers.push(termination.terminationType!);
-				session.finalSummary = buildFinalSummary(session);
+				session.terminated_by = termination.terminationType ?? undefined;
+				session.terminated_at = Date.now();
+				session.termination_reason = `Auto-detected: ${termination.terminationType}`;
+				session.termination_markers.push(termination.terminationType!);
+				session.final_summary = buildFinalSummary(session);
 				session.status = EnumCollaborationSessionStatus.Completed;
 				return formatAriseMsgSuccessMultiLine(`Session terminated: ${termination.terminationType}`, buildSessionEndDetails(session));
 			}
 		}
 	}
 
-	if (roundResponses.every(r => r === roundResponses[0]) && roundResponses.length > 0)
+	if (round_responses.every(r => r === round_responses[0]) && round_responses.length > 0)
 	{
 		session.terminated = true;
-		session.terminatedBy = EnumCollaborateTermination.STOP;
-		session.terminatedAt = Date.now();
-		session.terminationReason = "Consensus reached";
-		session.finalSummary = buildFinalSummary(session);
+		session.terminated_by = EnumCollaborateTermination.STOP;
+		session.terminated_at = Date.now();
+		session.termination_reason = "Consensus reached";
+		session.final_summary = buildFinalSummary(session);
 		session.status = EnumCollaborationSessionStatus.Completed;
 	}
 
@@ -1387,12 +1395,12 @@ async function executeContinueSession(session: ICollaborationSession,
 
 	if (session.terminated)
 	{
-		return formatAriseMsgSuccessMultiLine(`Session already terminated: ${session.terminatedBy}`, `Reason: ${session.terminationReason ?? "No reason provided"}`);
+		return formatAriseMsgSuccessMultiLine(`Session already terminated: ${session.terminated_by}`, `Reason: ${session.termination_reason ?? "No reason provided"}`);
 	}
 
 	session.context = context;
 	const result = await executeNextRound(session, backgroundManager);
-	session.lastActivityAt = Date.now();
+	session.last_activity_at = Date.now();
 	return result;
 }
 
@@ -1406,10 +1414,10 @@ function executeEndSession(sessionId: string): string
 
 	session.status = EnumCollaborationSessionStatus.Completed;
 	session.terminated = true;
-	session.terminatedBy = EnumCollaborateTermination.STOP;
-	session.terminatedAt = Date.now();
-	session.terminationReason = "Manually ended by user";
-	session.finalSummary = buildFinalSummary(session);
+	session.terminated_by = EnumCollaborateTermination.STOP;
+	session.terminated_at = Date.now();
+	session.termination_reason = "Manually ended by user";
+	session.final_summary = buildFinalSummary(session);
 
 	return formatAriseMsgSuccessMultiLine(`Collaboration session ended: ${session.id}`, buildSessionEndDetails(session));
 }
@@ -1428,9 +1436,9 @@ function executePauseSession(sessionId: string): string
 	}
 
 	session.status = EnumCollaborationSessionStatus.Paused;
-	session.lastActivityAt = Date.now();
+	session.last_activity_at = Date.now();
 
-	return formatAriseMsgSuccessMultiLine(`Session paused: ${session.id}`, `Round: ${session.currentRound}/${session.totalRounds}\nUse session_id: "${session.id}" to resume.`);
+	return formatAriseMsgSuccessMultiLine(`Session paused: ${session.id}`, `Round: ${session.current_round}/${session.total_rounds}\nUse session_id: "${session.id}" to resume.`);
 }
 
 /**
@@ -1452,7 +1460,7 @@ function executeListSessions(): string
 			s.status === EnumCollaborationSessionStatus.Executing ? "▶" :
 				s.status === EnumCollaborationSessionStatus.Paused ? "⏸" :
 					s.status === EnumCollaborationSessionStatus.Completed ? "✅" : "❌";
-		return `${statusIcon} ${s.id} | ${s.mode} | Round ${s.currentRound}/${s.totalRounds} | ${s.status} | ${s.shadows.map(e => e.label)
+		return `${statusIcon} ${s.id} | ${s.mode} | Round ${s.current_round}/${s.total_rounds} | ${s.status} | ${s.shadows.map(e => e.label)
 			.join(", ")}`;
 	}).join("\n");
 

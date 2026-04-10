@@ -30,25 +30,25 @@ export interface ICollaborationSession
 	/** 狀態 / Status */
 	status: EnumCollaborationSessionStatus;
 	/** 目前回合數 / Current round number */
-	currentRound: number;
+	current_round: number;
 	/** 總回合數 / Total rounds */
-	totalRounds: number;
+	total_rounds: number;
 	/** 最大並行數 / Max concurrent */
-	maxConcurrent: number;
+	max_concurrent: number;
 	/** 回合超時（毫秒）/ Round timeout (ms) */
-	roundTimeoutMs: number;
+	round_timeout_ms: number;
 	/** 每個 agent 回合數 / Per-agent rounds */
-	perAgentRounds?: number;
+	per_agent_rounds?: number;
 	/** 每個 agent 已執行回合數 / Per-agent executed rounds */
-	perAgentRoundCount: Map<string, number>;
+	per_agent_round_count: Map<string, number>;
 	/** 所有回應歷史 / All response history */
-	allResponses: string[];
+	all_responses: string[];
 	/** 回合回應記錄（round → agent label → response）/ Round responses */
-	roundResponses: Map<number, Map<string, string>>;
+	round_responses: Map<number, Map<string, string>>;
 	/** 每個 agent 的 session ID 映射 / Per-agent session ID mapping */
-	agentSessionIds: Map<string, string>;
+	agent_session_ids: Map<string, string>;
 	/** 父 Session ID / Parent session ID */
-	parentSessionId: string;
+	parent_session_id: string;
 	/** 工具上下文 / Tool context */
 	context: ToolContext;
 	/** Arise 配置 / Arise config */
@@ -56,25 +56,25 @@ export interface ICollaborationSession
 	/** 指定模型 / Specified model */
 	model?: string;
 	/** 創建時間 / Created timestamp */
-	createdAt: number;
+	created_at: number;
 	/** 最後活動時間 / Last activity timestamp */
-	lastActivityAt: number;
+	last_activity_at: number;
 	/** 終止標記列表 / Termination markers detected */
-	terminationMarkers: EnumCollaborateTermination[];
+	termination_markers: EnumCollaborateTermination[];
 	/** 是否被終止 / Whether terminated */
 	terminated: boolean;
 	/** 終止類型 / Termination type */
-	terminatedBy?: EnumCollaborateTermination;
+	terminated_by?: EnumCollaborateTermination;
 	/** 終止時間 / Termination timestamp */
-	terminatedAt?: number;
+	terminated_at?: number;
 	/** 終止原因 / Termination reason */
-	terminationReason?: string;
+	termination_reason?: string;
 	/** 最終摘要 / Final summary */
-	finalSummary?: string;
+	final_summary?: string;
 	/** 是否重用子代理 session / Whether to reuse sub-agent sessions */
-	reuseAgentSession?: boolean;
+	reuse_agent_session?: boolean;
 	/** 是否禁止子代理使用召喚工具 / Whether to block sub-agent summoning tools */
-	blockSubagentTools?: boolean;
+	block_subagent_tools?: boolean;
 }
 
 /**
@@ -87,16 +87,16 @@ export interface ICreateCollaborationSessionOpts
 	shadows: INormalizedCollaborateShadowEntry[];
 	prompt: string;
 	description?: string;
-	totalRounds: number;
-	maxConcurrent: number;
-	roundTimeoutMs: number;
-	perAgentRounds?: number;
-	parentSessionId: string;
+	total_rounds: number;
+	max_concurrent: number;
+	round_timeout_ms: number;
+	per_agent_rounds?: number;
+	parent_session_id: string;
 	context: ToolContext;
 	config: IAriseConfig;
 	model?: string;
-	reuseAgentSession?: boolean;
-	blockSubagentTools?: boolean;
+	reuse_agent_session?: boolean;
+	block_subagent_tools?: boolean;
 }
 
 /**
@@ -139,22 +139,22 @@ export class CollaborationSessionManager
 			prompt: opts.prompt,
 			description: opts.description,
 			status: EnumCollaborationSessionStatus.Idle,
-			currentRound: 0,
-			totalRounds: opts.totalRounds,
-			maxConcurrent: opts.maxConcurrent,
-			roundTimeoutMs: opts.roundTimeoutMs,
-			perAgentRounds: opts.perAgentRounds,
-			perAgentRoundCount: new Map(),
-			allResponses: [],
-			roundResponses: new Map(),
-			agentSessionIds: new Map(),
-			parentSessionId: opts.parentSessionId,
+			current_round: 0,
+			total_rounds: opts.total_rounds,
+			max_concurrent: opts.max_concurrent,
+			round_timeout_ms: opts.round_timeout_ms,
+			per_agent_rounds: opts.per_agent_rounds,
+			per_agent_round_count: new Map(),
+			all_responses: [],
+			round_responses: new Map(),
+			agent_session_ids: new Map(),
+			parent_session_id: opts.parent_session_id,
 			context: opts.context,
 			config: opts.config,
 			model: opts.model,
-			createdAt: now,
-			lastActivityAt: now,
-			terminationMarkers: [],
+			created_at: now,
+			last_activity_at: now,
+			termination_markers: [],
 			terminated: false,
 		};
 
@@ -219,7 +219,7 @@ export class CollaborationSessionManager
 			if (
 				(session.status === EnumCollaborationSessionStatus.Completed ||
 					session.status === EnumCollaborationSessionStatus.Cancelled) &&
-				(now - session.lastActivityAt) > maxAgeMs
+				(now - session.last_activity_at) > maxAgeMs
 			)
 			{
 				this.sessions.delete(id);
