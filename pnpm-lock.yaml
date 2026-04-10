@@ -41,6 +41,9 @@ importers:
       deepmerge-plus:
         specifier: ^4.0.1
         version: 4.0.1(ts-toolbelt@9.6.0)
+      env-bool:
+        specifier: ^2.0.3
+        version: 2.0.3
       fs-extra:
         specifier: ^11.3.4
         version: 11.3.4
@@ -458,8 +461,8 @@ packages:
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
 
-  env-bool@2.0.1:
-    resolution: {integrity: sha512-+CaEpgdJ2S0Bnknj6/YkJkqFQdv7a+cE/UfO24BTFa6FiQV7SfNl10+h3vRSblH6+WRizKQjdiZ9rRlN8thaQg==}
+  env-bool@2.0.3:
+    resolution: {integrity: sha512-4CFhqLKibEs0b1QmP0oY/SvUtfAb1Xl708GsMPeDNZazcpn8He3G9OCaJuKnfUoHFnJzV4ioZxH1lu2IGkLRUw==}
 
   err-code@3.0.1:
     resolution: {integrity: sha512-GiaH0KJUewYok+eeY05IIgjtAe4Yltygk9Wqp1V5yVWLdhf0hYZchRjNIT9bb0mSwRcIusT3cx7PJUf3zEIfUA==}
@@ -1229,7 +1232,7 @@ snapshots:
       '@types/luxon': 3.7.1
       chalk: 2.4.2
       debug: 4.4.3
-      env-bool: 2.0.1
+      env-bool: 2.0.3
       luxon: 3.7.2
       ts-type: 2.1.10(@types/bluebird@3.5.42)(@types/node@25.5.0)(ts-toolbelt@9.6.0)
       tslib: 2.8.1
@@ -1264,7 +1267,7 @@ snapshots:
 
   emoji-regex@8.0.0: {}
 
-  env-bool@2.0.1: {}
+  env-bool@2.0.3: {}
 
   err-code@3.0.1: {}
 

@@ -88,6 +88,7 @@
     "dayjs-tz-helper": "^1.0.8",
     "debug-color2": "^1.3.2",
     "deepmerge-plus": "^4.0.1",
+    "env-bool": "^2.0.3",
     "fs-extra": "^11.3.4",
     "jsonc-parser": "^3.3.1",
     "lodash-es": "^4.18.1",

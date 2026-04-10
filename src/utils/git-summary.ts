@@ -118,19 +118,19 @@ export function formatGitSummary(result: IGitSummaryResult): string
 {
 	const sections: string[] = [];
 
-	const code_block = `\\\`\\\`\\\``;
+	const code_block = `=========`;
 
 	sections.push('## git status');
 	sections.push(`${code_block}\n${result.status}\n${code_block}` || '(clean working tree)');
 
 	if (result.hasDiffStat)
 	{
-		sections.push('');
+		sections.push('\n---\n\n');
 		sections.push('## git diff --stat');
 		sections.push(`${code_block}\n${result.diffStat}\n${code_block}` || '(no diff)');
 	}
 
-	sections.push('');
+	sections.push('\n---\n\n');
 	sections.push(`## git log --oneline -${result.logCount}`);
 	sections.push(`${code_block}\n${result.log}\n${code_block}` || '(no commits)');
 
