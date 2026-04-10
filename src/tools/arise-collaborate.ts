@@ -6,8 +6,8 @@
  * Implements multi-Shadow Agent collaboration functionality
  */
 
-import type { PluginInput, ToolContext } from "@opencode-ai/plugin";
-import type { IAriseConfig } from "../config/schema";
+import type { PluginInput, ToolContext } from '@opencode-ai/plugin';
+import type { IAriseConfig } from '../config/schema';
 import {
 	EnumAriseTools,
 	EnumCollaborateMode,
@@ -15,14 +15,14 @@ import {
 	BackgroundTaskStatus,
 	EnumCollaborationSessionStatus,
 	EnumCollaborateTermination,
-} from "../types/enums";
-import { getAriseToolsConfigEntry } from "../agents/lib/arise-tools-utils";
+} from '../types/enums';
+import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
-import { logArise2WithLevel } from "../utils/debug-control";
+import { logArise2WithLevel } from '../utils/debug-control';
 import {
 	formatAriseMsgError,
 	formatAriseMsgSuccessMultiLine,
-} from "../utils/string/arise-message";
+} from '../utils/string/arise-message';
 import {
 	DEFAULT_COLLABORATE_TOTAL_ROUNDS,
 	MAX_COLLABORATE_TOTAL_ROUNDS,
@@ -30,23 +30,23 @@ import {
 	MAX_COLLABORATE_MAX_CONCURRENT,
 	DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS,
 	COLLABORATE_ROUND_TIMEOUT_MS_MAX,
-} from "../types/const-default";
-import type { BackgroundManager } from "./lib/background-manager";
+} from '../types/const-default';
+import type { BackgroundManager } from './lib/background-manager';
 import {
 	getMaxConcurrent,
 	getRoundTimeoutMs,
 	getTotalRounds,
-} from "./lib/arise-collaborate-validator";
-import { checkTermination } from "./lib/arise-collaborate-termination";
+} from './lib/arise-collaborate-validator';
+import { checkTermination } from './lib/arise-collaborate-termination';
 import {
 	normalizeShadowsEntries,
 	getShadowDisplayName,
 	type INormalizedCollaborateShadowEntry,
-} from "./lib/arise-collaborate-normalizer";
+} from './lib/arise-collaborate-normalizer';
 import {
 	collaborationSessionManager,
 	type ICollaborationSession,
-} from "./lib/collaboration-session";
+} from './lib/collaboration-session';
 
 // ==================== 共用常數 / Shared Constants ====================
 
