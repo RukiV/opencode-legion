@@ -15,6 +15,8 @@
  */
 import { execSync } from 'child_process';
 import type { IGitSummaryOptions } from '../config/schema/entry';
+import { EnumOpenCodeMessageTag } from '../types/opencode/enum-message';
+import { _createTag } from './string/arise-message';
 
 /** 重新匯出選項型別，方便外部僅從此模組匯入 / Re-export options type for convenience */
 export type { IGitSummaryOptions } from '../config/schema/entry';
@@ -121,18 +123,24 @@ export function formatGitSummary(result: IGitSummaryResult): string
 	const code_block = `=========`;
 
 	sections.push('## git status');
-	sections.push(`${code_block}\n${result.status}\n${code_block}` || '(clean working tree)');
+	sections.push(_createTag(EnumOpenCodeMessageTag.ENTRIES, `${code_block}\n${result.status}\n${code_block}`, {
+			lineBreak: true,
+		}) || '(clean working tree)');
 
 	if (result.hasDiffStat)
 	{
 		sections.push('\n---\n\n');
 		sections.push('## git diff --stat');
-		sections.push(`${code_block}\n${result.diffStat}\n${code_block}` || '(no diff)');
+		sections.push(_createTag(EnumOpenCodeMessageTag.ENTRIES, `${code_block}\n${result.diffStat}\n${code_block}`, {
+			lineBreak: true,
+		}) || '(no diff)');
 	}
 
 	sections.push('\n---\n\n');
 	sections.push(`## git log --oneline -${result.logCount}`);
-	sections.push(`${code_block}\n${result.log}\n${code_block}` || '(no commits)');
+	sections.push(_createTag(EnumOpenCodeMessageTag.ENTRIES, `${code_block}\n${result.log}\n${code_block}`, {
+			lineBreak: true,
+		}) || '(no commits)');
 
 	return sections.join('\n');
 }

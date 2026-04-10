@@ -42,5 +42,7 @@ export interface ISessionRecord
 		status?: BackgroundTaskStatus;
 		/** 错误讯息 / Error message */
 		error?: string;
+		/** 工具权限配置（控制子代理可用工具）/ Tool permission config (controls sub-agent available tools) */
+		tools?: Record<string, boolean>;
 	};
 }

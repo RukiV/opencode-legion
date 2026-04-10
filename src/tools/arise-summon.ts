@@ -15,6 +15,7 @@ import {
 	formatAriseMsgError,
 	formatAriseMsgSuccessMultiLine,
 	formatAriseMsgLogBody,
+	formatAriseMsgTaskOutput,
 } from '../utils/string/arise-message';
 import { runtimeCache } from '../utils/session/session-cache';
 
@@ -58,7 +59,7 @@ export function createAgentToolAriseSyncSummon(
 		 */
 		async execute(args, context)
 		{
-			const { shadow, prompt, run_in_background, description, model, session_id: existingSessionId } = args;
+			const { shadow, prompt, run_in_background, description, model, session_id: existingSessionId, tools } = args;
 			/** 任務描述（用於顯示）/ Task description (for display) */
 			const taskDesc = description ?? `${shadow} task`;
 
@@ -172,6 +173,8 @@ export function createAgentToolAriseSyncSummon(
 							shadow: shadow,
 							parentSessionId: context.sessionID,
 							resolvedModel: formatModelBodyDescription(modelBody),
+							/** 儲存工具權限配置 / Store tools permission config */
+							tools: tools,
 						},
 					};
 					runtimeCache.cacheSessionRecord(updatedRecord);
@@ -216,6 +219,8 @@ export function createAgentToolAriseSyncSummon(
 						parentSessionId: context.sessionID,
 						model,
 						existingSessionId: sessionId,
+						// 動態工具權限控制 / Dynamic tools permission control
+						tools,
 					});
 
 					/**
@@ -248,6 +253,8 @@ Use arise_background_output("${task.id}") or arise_background_output("${task.ses
 							agent: shadow,
 							model: modelBody,
 							parts: [{ type: "text", text: prompt }],
+							// 動態工具權限控制 / Dynamic tools permission control
+							...(tools ? { tools } : {}),
 						},
 					});
 
@@ -281,8 +288,12 @@ Use arise_background_output("${task.id}") or arise_background_output("${task.ses
 						 */
 						const textParts = extractTextFromMessageParts(lastAssistant.parts);
 
-						return formatAriseMsgSuccessMultiLine(
-							`${shadow} reports:`,
+						/**
+						 * 使用 task.ts 格式輸出
+						 * Use task.ts format for output
+						 */
+						return formatAriseMsgTaskOutput(
+							sessionId,
 							textParts || "(No text response)",
 						);
 					}

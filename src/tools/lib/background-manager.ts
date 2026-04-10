@@ -94,6 +94,8 @@ export interface BackgroundTask
 	overrideAutoResume?: boolean;
 	/** Runtime override for auto-resume (background tasks) / Runtime 覆寫 auto-resume（background tasks） */
 	overrideBackgroundAutoResume?: boolean;
+	/** 工具權限配置（控制子代理可用工具）/ Tools permission config (controls sub-agent available tools) */
+	tools?: Record<string, boolean>;
 }
 
 /**
@@ -789,6 +791,8 @@ export class BackgroundManager
 		parentSessionId: string;
 		model?: string;
 		existingSessionId?: string;
+		/** 工具權限配置 / Tools permission config */
+		tools?: Record<string, boolean>;
 	}): Promise<BackgroundTask>
 	{
 		const taskId = this.generateTaskId();
@@ -849,6 +853,8 @@ export class BackgroundManager
 			status: BackgroundTaskStatus.Running,
 			startedAt: Date.now(),
 			retryCount: 0,
+			/** 工具權限配置 / Tools permission config */
+			tools: opts.tools,
 		};
 
 		logArise2WithLevel("debug", () => [

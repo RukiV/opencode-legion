@@ -8,6 +8,7 @@
 import type { ITSTypeAndStringLiteral, ITSValueOrArrayMaybeReadonly } from "ts-type";
 import { ARISE_PREFIX } from "../../types/const-default";
 import { EnumLogLevel } from "../../types/enum-opencode";
+import { EnumOpenCodeMessageTag } from "../../types/opencode/enum-message";
 
 type IAllowedMessageInput = ITSValueOrArrayMaybeReadonly<string | undefined>;
 
@@ -207,4 +208,40 @@ export function formatAriseMsgLogBody(options: IAriseMsgLogOptions): {
 			message,
 		]),
 	};
+}
+
+/**
+ * 任務輸出格式化（再現 task.ts 格式）
+ * Task output format (reproduce task.ts format)
+ *
+ * 使用與原始 task.ts 相同的輸出格式：
+ * - task_id: ses_xxx (for resuming to continue this task if needed)
+ * - <task_result> 標籤包裝結果
+ * - </task_result> 關閉標籤
+ *
+ * Uses the same output format as original task.ts:
+ * - task_id: ses_xxx (for resuming to continue this task if needed)
+ * - <task_result> wrapper for result
+ * - </task_result> closing tag
+ *
+ * @param taskId - Task ID 或 Session ID
+ * @param result - 任務執行結果
+ * @returns 格式化後的輸出
+ */
+export function formatAriseMsgTaskOutput(taskId: string, result: string): string
+{
+	return `${_createTaskIdResume(taskId)}\n${_createTag(EnumOpenCodeMessageTag.TASK_RESULT, result)}`;
+}
+
+export function _createTag(tag: EnumOpenCodeMessageTag, result: string, opts?: {
+	lineBreak?: boolean;
+}): string
+{
+	const c = opts?.lineBreak ? '\n' : '';
+	return `<${tag}>${c}${result}${c}</${tag}>`;
+}
+
+export function _createTaskIdResume(taskId: string): string
+{
+	return `task_id: ${taskId} (for resuming to continue this task if needed)`;
 }

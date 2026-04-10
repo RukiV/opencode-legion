@@ -19,6 +19,7 @@ import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
 import { type Hooks, type PluginInput, tool, Plugin } from '@opencode-ai/plugin';
 import type { ITSOverwrite, ITSPartialRecord, ITSTypeAndStringLiteral } from 'ts-type';
 import { EnumOpencodeAgentPermission } from './enum-opencode';
+import { IAriseToolsToZodInfer, IShapeToZodObject, IZodObjectToInput } from '../config/schema/entry';
 
 /**
  * Zod 原始結構類型
@@ -44,9 +45,9 @@ export type IReturnTypeOfPluginTool<Args extends IZodRawShape> = {
 	/** 工具描述 / Tool description */
 	description: string;
 	/** 工具參數 schema / Tool arguments schema */
-	args: Args;
+	args: NoInfer<Args>;
 	/** 工具執行函式 / Tool execute function */
-	execute(args: z.infer<z.ZodObject<Args>>, context: ToolContext): Promise<string>;
+	execute(args: IZodObjectToInput<IShapeToZodObject<NoInfer<Args>>>, context: ToolContext): Promise<string>;
 }
 
 /**
@@ -55,7 +56,14 @@ export type IReturnTypeOfPluginTool<Args extends IZodRawShape> = {
  *
  * @typeParam T - Arise 工具枚舉值
  */
-export type IReturnTypeOfPluginToolArise<T extends EnumAriseTools> = IReturnTypeOfPluginTool<IPluginToolAriseArgs<T>>
+export type IReturnTypeOfPluginToolArise<T extends EnumAriseTools> = {
+	/** 工具描述 / Tool description */
+	description: string;
+	/** 工具參數 schema / Tool arguments schema */
+	args: IPluginToolAriseArgs<T>;
+	/** 工具執行函式 / Tool execute function */
+	execute(args: IAriseToolsToZodInfer<T>, context: ToolContext): Promise<string>;
+}
 
 /**
  * Arise 工具參數類型
@@ -77,9 +85,7 @@ export type IPluginToolAriseArgs<T extends EnumAriseTools> = typeof ARISE_TOOLS[
  *
  * > error TS2742: The inferred type of 'ARISE_TOOLS' cannot be named without a reference to '.pnpm/zod@4.1.8/node_modules/zod'. This is likely not portable. A type annotation is necessary.
  */
-export function tool2<T extends IZodRawShape>(input: IReturnTypeOfPluginTool<T>): IReturnTypeOfPluginTool<T>
-export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolArise<NoInfer<T>>): IReturnTypeOfPluginToolArise<T>
-export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolArise<NoInfer<T>>): IReturnTypeOfPluginToolArise<T>
+export function tool2<T extends EnumAriseTools>(input: IReturnTypeOfPluginToolArise<T>): IReturnTypeOfPluginToolArise<T>
 {
 	return tool(input as any) as any
 }

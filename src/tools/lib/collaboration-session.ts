@@ -10,6 +10,7 @@ import type { ToolContext } from "@opencode-ai/plugin";
 import type { IAriseConfig } from "../../config/schema";
 import { EnumCollaborateMode, EnumCollaborateTermination, EnumCollaborationSessionStatus } from "../../types/enums";
 import type { INormalizedCollaborateShadowEntry } from "./arise-collaborate-normalizer";
+import { IAriseCollaborateOptionsInfer } from "../../config/schema/entry";
 
 /**
  * 協作 Session 物件
@@ -81,22 +82,13 @@ export interface ICollaborationSession
  * 創建 session 的選項
  * Options for creating a session
  */
-export interface ICreateCollaborationSessionOpts
+export interface ICreateCollaborationSessionOpts extends IAriseCollaborateOptionsInfer
 {
-	mode: EnumCollaborateMode;
 	shadows: INormalizedCollaborateShadowEntry[];
-	prompt: string;
-	description?: string;
-	total_rounds: number;
-	max_concurrent: number;
-	round_timeout_ms: number;
-	per_agent_rounds?: number;
+
 	parent_session_id: string;
 	context: ToolContext;
 	config: IAriseConfig;
-	model?: string;
-	reuse_agent_session?: boolean;
-	block_subagent_tools?: boolean;
 }
 
 /**
@@ -140,9 +132,9 @@ export class CollaborationSessionManager
 			description: opts.description,
 			status: EnumCollaborationSessionStatus.Idle,
 			current_round: 0,
-			total_rounds: opts.total_rounds,
-			max_concurrent: opts.max_concurrent,
-			round_timeout_ms: opts.round_timeout_ms,
+			total_rounds: opts.total_rounds!,
+			max_concurrent: opts.max_concurrent!,
+			round_timeout_ms: opts.round_timeout_ms!,
 			per_agent_rounds: opts.per_agent_rounds,
 			per_agent_round_count: new Map(),
 			all_responses: [],

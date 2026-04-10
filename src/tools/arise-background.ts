@@ -13,6 +13,7 @@ import {
 	formatAriseMsgSuccessMultiLine,
 	formatAriseMsgInfo,
 	formatAriseMsgMulti,
+	formatAriseMsgTaskOutput,
 } from "../utils/string/arise-message";
 import { runtimeCache } from "../utils/session/session-cache";
 import type { ISessionRecord } from "../types/session";
@@ -42,7 +43,7 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 
 		async execute(args, context: ToolContext)
 		{
-			const { shadow, prompt, description, model, session_id: existingSessionId } = args;
+			const { shadow, prompt, description, model, session_id: existingSessionId, tools } = args;
 
 			try
 			{
@@ -73,6 +74,8 @@ export function createAgentToolAriseBackgroundTask(manager: BackgroundManager)
 					parentSessionId: context.sessionID,
 					model,
 					existingSessionId,
+					/** 工具權限配置 / Tools permission config */
+					tools,
 				});
 
 				return formatAriseMsgSuccessMultiLine(
@@ -125,8 +128,6 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 		{
 			const { task_id } = args;
 
-			
-
 			/** 優先嘗試用 taskId 查詢 / Try taskId first */
 			let task = manager.getTask(task_id);
 
@@ -158,8 +159,8 @@ export function createAgentToolAriseBackgroundOutput(manager: BackgroundManager)
 			}
 
 			/** 任務成功完成 / Task completed successfully */
-			return formatAriseMsgSuccessMultiLine(
-				`${task.shadow} completed (${duration}):`,
+			return formatAriseMsgTaskOutput(
+				task.sessionId,
 				task.result ?? "(No output)",
 			);
 		},
@@ -223,7 +224,7 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 							const firstMessage = messages.data?.[0];
 							if (firstMessage?.info)
 							{
-								
+
 
 								/**
 								 * 类型断言：SDK 返回的消息包含 info 字段
@@ -272,7 +273,7 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 									_msg.push("[ERROR]");
 
 									_msg.push("Model format: None (no valid model info found)");
-									
+
 									_msg.push(`available fields: model=${(messageInfo as any).model}, providerID=${(messageInfo as any).providerID}, modelID=${(messageInfo as any).modelID}`);
 								}
 

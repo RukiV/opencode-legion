@@ -101,13 +101,13 @@ export const ALLOWED_SHADOWS = [
 	EnumShadowSubAgentsName.Tank,
 	EnumShadowSubAgentsName.ShadowSovereign,
 	EnumShadowSubAgentsName.EsilRadiru,
-] as const satisfies EnumShadowSubAgentsName[];
+] as const satisfies readonly EnumShadowSubAgentsName[];
 
 export const BACKGROUND_SHADOWS = [
 	EnumShadowSubAgentsName.Beru,
 	EnumShadowSubAgentsName.Tank,
 	EnumShadowSubAgentsName.Bellion,
-] as const satisfies EnumShadowSubAgentsName[];
+] as const satisfies readonly EnumShadowSubAgentsName[];
 
 export type IBackgroundShadowAgentsName = typeof BACKGROUND_SHADOWS[number];
 

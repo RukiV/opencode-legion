@@ -20,11 +20,14 @@
 import { z } from "zod";
 import { ARISE_TOOLS } from "../../agents/shadows";
 import { EnumAriseTools } from "../../types/enums";
-import { IZodRawShape } from "../../types/types-opencode";
+import { IPluginToolAriseArgs, IZodRawShape } from "../../types/types-opencode";
 
 export type IShapeToZodObject<T extends IZodRawShape> = z.ZodObject<T>;
 
 /**
+ * 獲取驗證通過後的資料型別
+ * 特性：如果你的 Schema 中使用了 .transform()、.default() 或 .preprocess()，z.infer 得到的會是處理過後的型別。
+ * 
  * @see z.infer
  */
 export type IZodObjectToInfer<T> = T extends {
@@ -34,6 +37,9 @@ export type IZodObjectToInfer<T> = T extends {
 } ? T["_zod"]["output"] : never;
 
 /**
+ * 用於獲取驗證之前，預期接收到的原始資料型別
+ * 特性：它會保留所有尚未轉換的原始結構。
+ * 
  * @see z.input
  */
 export type IZodObjectToInput<T> = T extends {
@@ -42,9 +48,17 @@ export type IZodObjectToInput<T> = T extends {
     };
 } ? T["_zod"]["input"] : never;
 
-export type IAriseToolsToZodInfer<T extends EnumAriseTools> = IZodObjectToInfer<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
+/**
+ * 獲取驗證通過後的資料型別
+ * 特性：如果你的 Schema 中使用了 .transform()、.default() 或 .preprocess()，z.infer 得到的會是處理過後的型別。
+ */
+export type IAriseToolsToZodInfer<T extends EnumAriseTools> = IZodObjectToInfer<IShapeToZodObject<IPluginToolAriseArgs<T>>>;
 
-export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInput<IShapeToZodObject<typeof ARISE_TOOLS[T]["args"]>>;
+/**
+ * 用於獲取驗證之前，預期接收到的原始資料型別
+ * 特性：它會保留所有尚未轉換的原始結構。
+ */
+export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInput<IShapeToZodObject<IPluginToolAriseArgs<T>>>;
 
 /** ==================== Git Summary ==================== */
 

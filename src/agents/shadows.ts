@@ -169,6 +169,14 @@ const SHARED_SUMMON_ARGS = {
 		.string()
 		.meta({ description: "Existing session ID to reuse (continue existing session instead of creating new one)" })
 		.optional(),
+	/** 工具權限控制（控制子代理可用工具）/ Tool permission control (controls sub-agent available tools) */
+	tools: z
+		.record(z.string(), z.boolean())
+		.meta({ 
+			description: "Tool permission control: { \"toolName\": true/false }. E.g., { \"todowrite\": false, \"task\": false } to disable tools",
+			title: "Tools Config",
+		})
+		.optional(),
 };
 
 /**

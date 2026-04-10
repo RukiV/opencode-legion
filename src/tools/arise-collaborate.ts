@@ -15,6 +15,7 @@ import {
 	BackgroundTaskStatus,
 	EnumCollaborationSessionStatus,
 	EnumCollaborateTermination,
+	EnumShadowSubAgentsName,
 } from '../types/enums';
 import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
@@ -47,6 +48,7 @@ import {
 	collaborationSessionManager,
 	type ICollaborationSession,
 } from './lib/collaboration-session';
+import { IAriseCollaborateOptionsInfer, IAriseCollaborateOptionsInput } from '../config/schema/entry';
 
 // ==================== 共用常數 / Shared Constants ====================
 
@@ -215,14 +217,14 @@ async function executeInBatches<TInput, TOutput>(
  * Collaborate 工具參數類型
  * Collaborate tool arguments type
  */
-interface ICollaborateArgs
+interface ICollaborateArgs extends IAriseCollaborateOptionsInput
 {
 	/** 協作模式 / Collaboration mode */
 	mode: EnumCollaborateMode;
 	/** 參與的 Shadow Agent 列表 / List of participating Shadow agents */
 	shadows: {
 		/** Shadow agent 名稱 / Shadow agent name */
-		agent: typeof ALLOWED_SHADOWS[number];
+		agent: EnumShadowSubAgentsName;
 		/** 模型名稱，預設 "AUTO" / Model name, default "AUTO" */
 		model?: string;
 		/** 自訂標籤，選填 / Custom label, optional */
@@ -254,9 +256,6 @@ interface ICollaborateArgs
 	block_subagent_tools?: boolean;
 }
 
-// ==================== 解析並合併 Config 與工具參數
-// ==================== Resolve and merge Config with tool arguments
-
 /**
  * 解析並合併 Config 與工具參數
  * Resolve and merge Config with tool arguments
@@ -268,26 +267,10 @@ interface ICollaborateArgs
  * @param args - 工具參數
  * @returns 合併後的 Collaborate 配置
  */
-/**
- * 合併後的 Collaborate 配置類型
- * Merged collaborate configuration type
- */
-interface IResolvedCollaborateConfig
-{
-	mode: EnumCollaborateMode;
-	shadows: INormalizedCollaborateShadowEntry[];
-	prompt: string;
-	total_rounds: number;
-	max_concurrent: number;
-	round_timeout_ms: number;
-	description?: string;
-	reuse_agent_session: boolean;
-	block_subagent_tools: boolean;
-}
-
-function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs): IResolvedCollaborateConfig
+function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs): IAriseCollaborateOptionsInfer
 {
 	return {
+		...args,
 		/** 協作模式 / Collaboration mode */
 		mode: args.mode,
 		/** 已正規化的 Shadows 列表 / Normalized shadows list */
@@ -306,6 +289,7 @@ function resolveCollaborateConfig(config: IAriseConfig, args: ICollaborateArgs):
 		reuse_agent_session: args.reuse_agent_session ?? false,
 		/** 是否禁止子代理使用召喚工具 / Whether to block sub-agent summoning tools */
 		block_subagent_tools: args.block_subagent_tools ?? false,
+		persistent: args.persistent!,
 	};
 }
 
@@ -525,15 +509,7 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executePlanningMode(backgroundManager: BackgroundManager, config: {
-	mode: EnumCollaborateMode;
-	shadows: INormalizedCollaborateShadowEntry[];
-	prompt: string;
-	total_rounds: number;
-	max_concurrent: number;
-	round_timeout_ms: number;
-	description?: string;
-}, context: ToolContext): Promise<string>
+async function executePlanningMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
 {
 	/**
 	 * 回合迭代追蹤
@@ -548,7 +524,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 * max_concurrent <= 1 或未設定時，使用傳統回合制（依序執行）
 	 * When max_concurrent <= 1 or not set, use traditional round-based (sequential)
 	 */
-	const useBatchedExecution = config.max_concurrent > 1;
+	const useBatchedExecution = config.max_concurrent! > 1;
 
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:planning]`,
@@ -561,7 +537,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 * 迴圈執行直到達到總回合數
 	 * Loop until total rounds reached
 	 */
-	for (let round = 1; round <= config.total_rounds; round++)
+	for (let round = 1; round <= config.total_rounds!; round++)
 	{
 		logArise2WithLevel("debug", () => [
 			`[arise-collaborate:planning]`,
@@ -584,9 +560,9 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 			 * 分批執行，每批不超過 max_concurrent
 			 * Execute in batches, each batch no more than max_concurrent
 			 */
-			for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
+			for (let i = 0; i < config.shadows.length; i += config.max_concurrent!)
 			{
-				const batch = config.shadows.slice(i, i + config.max_concurrent);
+				const batch = config.shadows.slice(i, i + config.max_concurrent!);
 
 				/**
 				 * 並行啟動這批任務
@@ -601,7 +577,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 					const promptWithContext = buildPromptWithDiscussionHistory(
 						config.prompt,
 						all_responses,
-						config.shadows,
+						config.shadows as INormalizedCollaborateShadowEntry[],
 					);
 
 					const task = await launchShadowTask(
@@ -620,7 +596,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 					const responseText = await waitForTaskCompletion(
 						backgroundManager,
 						task.id,
-						config.round_timeout_ms,
+						config.round_timeout_ms!,
 					);
 
 					return { shadow: getShadowDisplayName(entry), response: responseText };
@@ -660,7 +636,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				const promptWithContext = buildPromptWithDiscussionHistory(
 					config.prompt,
 					all_responses,
-					config.shadows,
+					config.shadows as INormalizedCollaborateShadowEntry[],
 				);
 
 				const task = await launchShadowTask(
@@ -679,7 +655,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 				const responseText = await waitForTaskCompletion(
 					backgroundManager,
 					task.id,
-					config.round_timeout_ms,
+					config.round_timeout_ms!,
 				);
 
 				round_responses.push(responseText);
@@ -742,7 +718,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
 	 * Compose final result
 	 */
 	const details = [
-		`Rounds: ${Math.min(config.total_rounds, all_responses.length / config.shadows.length)}`,
+		`Rounds: ${Math.min(config.total_rounds!, all_responses.length / config.shadows.length)}`,
 		`Agents: ${config.shadows.map(s => getShadowDisplayName(s)).join(', ')}`,
 		`Mode: planning`,
 		"",
@@ -765,14 +741,7 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executeParallelMode(backgroundManager: BackgroundManager, config: {
-	mode: EnumCollaborateMode;
-	shadows: INormalizedCollaborateShadowEntry[];
-	prompt: string;
-	max_concurrent: number;
-	round_timeout_ms: number;
-	description?: string;
-}, context: ToolContext): Promise<string>
+async function executeParallelMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
 {
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:parallel]`,
@@ -792,9 +761,9 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 	 * 分批執行，每批不超過 max_concurrent
 	 * Execute in batches, each batch no more than max_concurrent
 	 */
-	for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
+	for (let i = 0; i < config.shadows.length; i += config.max_concurrent!)
 	{
-		const batch = config.shadows.slice(i, i + config.max_concurrent);
+		const batch = config.shadows.slice(i, i + config.max_concurrent!);
 
 		/**
 		 * 並行啟動這批任務並等待結果
@@ -815,10 +784,10 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
 				const response = await waitForTaskCompletion(
 					backgroundManager,
 					task.id,
-					config.round_timeout_ms,
+					config.round_timeout_ms!,
 				);
 
-				return { ...entry, task, response };
+				return { ...(entry as INormalizedCollaborateShadowEntry), task, response };
 			}),
 		);
 
@@ -892,14 +861,7 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executeChainMode(backgroundManager: BackgroundManager, config: {
-	mode: EnumCollaborateMode;
-	shadows: INormalizedCollaborateShadowEntry[];
-	prompt: string;
-	max_concurrent: number;
-	round_timeout_ms: number;
-	description?: string;
-}, context: ToolContext): Promise<string>
+async function executeChainMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
 {
 	/**
 	 * 判斷執行策略：傳統回合制 vs 分批並行
@@ -908,7 +870,7 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 	 * max_concurrent <= 1 或未設定時，使用傳統回合制（依序執行）
 	 * When max_concurrent <= 1 or not set, use traditional round-based (sequential)
 	 */
-	const useBatchedExecution = config.max_concurrent > 1;
+	const useBatchedExecution = config.max_concurrent! > 1;
 
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:chain]`,
@@ -934,9 +896,9 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 		 * 分批執行，每批不超過 max_concurrent
 		 * Execute in batches, each batch no more than max_concurrent
 		 */
-		for (let i = 0; i < config.shadows.length; i += config.max_concurrent)
+		for (let i = 0; i < config.shadows.length; i += config.max_concurrent!)
 		{
-			const batch = config.shadows.slice(i, i + config.max_concurrent);
+			const batch = config.shadows.slice(i, i + config.max_concurrent!);
 
 			/**
 			 * 這批 agents 同時執行
@@ -970,10 +932,10 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 					const result = await waitForTaskCompletion(
 						backgroundManager,
 						task.id,
-						config.round_timeout_ms,
+						config.round_timeout_ms!,
 					);
 
-					return { ...entry, result };
+					return { ...(entry as INormalizedCollaborateShadowEntry), result };
 				}),
 			);
 
@@ -1052,11 +1014,11 @@ async function executeChainMode(backgroundManager: BackgroundManager, config: {
 			const responseText = await waitForTaskCompletion(
 				backgroundManager,
 				task.id,
-				config.round_timeout_ms,
+				config.round_timeout_ms!,
 			);
 
 			previousResult = responseText;
-			chainResults.push({ ...entry, result: responseText });
+			chainResults.push({ ...(entry as INormalizedCollaborateShadowEntry), result: responseText });
 
 			/**
 			 * 檢查終止標記
@@ -1189,17 +1151,7 @@ function buildSessionEndDetails(session: ICollaborationSession): string
  */
 async function executePersistentCollaboration(
 	backgroundManager: BackgroundManager,
-	config: {
-		mode: EnumCollaborateMode;
-		shadows: INormalizedCollaborateShadowEntry[];
-		prompt: string;
-		total_rounds: number;
-		max_concurrent: number;
-		round_timeout_ms: number;
-		description?: string;
-		reuse_agent_session: boolean;
-		block_subagent_tools: boolean;
-	},
+	config: IAriseCollaborateOptionsInfer,
 	context: ToolContext,
 ): Promise<string>
 {
@@ -1210,7 +1162,7 @@ async function executePersistentCollaboration(
 
 	const session = collaborationSessionManager.create({
 		mode: config.mode,
-		shadows: config.shadows,
+		shadows: config.shadows as INormalizedCollaborateShadowEntry[],
 		prompt: config.prompt,
 		description: config.description,
 		total_rounds: config.total_rounds,
@@ -1221,6 +1173,7 @@ async function executePersistentCollaboration(
 		config: context as unknown as IAriseConfig,
 		reuse_agent_session: config.reuse_agent_session,
 		block_subagent_tools: config.block_subagent_tools,
+		persistent: config.persistent,
 	});
 
 	const result = await executeNextRound(session, backgroundManager);

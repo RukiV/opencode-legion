@@ -6,7 +6,8 @@
  * Normalize shadows input to unified format, auto-generate labels
  */
 
-import type { IAllShadowAgentsName } from "../../types/enums";
+import { IAriseCollaborateOptionsInfer } from "../../config/schema/entry";
+import type { EnumShadowSubAgentsName, IAllShadowAgentsName } from "../../types/enums";
 import { _trimLazy } from "../../utils/string/string-utils";
 import { getOrInsertComputedFromMap, getOrInsertFromMap } from "../../utils/syntax/map-set";
 import { ITSPickExtra } from 'ts-type';
@@ -19,7 +20,7 @@ export interface INormalizedCollaborateShadowEntry
 {
 	index: number;
 	/** Shadow agent 名稱 / Shadow agent name */
-	agent: IAllShadowAgentsName;
+	agent: EnumShadowSubAgentsName;
 	/** 模型名稱，可選 / Model name, optional */
 	model?: string;
 	/** 自訂標籤，選填 / Custom label, optional */
@@ -203,7 +204,7 @@ export function extractModels(
  * @param entry - 正規化後的陣列項目
  * @returns 顯示名稱
  */
-export function getShadowDisplayName(entry: INormalizedCollaborateShadowEntry): string
+export function getShadowDisplayName(entry: INormalizedCollaborateShadowEntry | IAriseCollaborateOptionsInfer["shadows"][number]): string
 {
 	return `${entry.label}(${entry.agent}${entry.model ? ` - ${entry.model}` : ""})`;
 }
