@@ -9,54 +9,30 @@
 import type { PluginInput, ToolContext } from '@opencode-ai/plugin';
 import type { IAriseConfig } from '../config/schema';
 import {
+	BackgroundTaskStatus,
 	EnumAriseTools,
 	EnumCollaborateMode,
-	ALLOWED_SHADOWS,
-	BackgroundTaskStatus,
-	EnumCollaborationSessionStatus,
 	EnumCollaborateTermination,
-	EnumShadowSubAgentsName,
+	EnumCollaborationSessionStatus,
 } from '../types/enums';
 import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
 import { logArise2WithLevel } from '../utils/debug-control';
-import {
-	formatAriseMsgError,
-	formatAriseMsgSuccessMultiLine,
-} from '../utils/string/arise-message';
-import {
-	DEFAULT_COLLABORATE_TOTAL_ROUNDS,
-	MAX_COLLABORATE_TOTAL_ROUNDS,
-	DEFAULT_COLLABORATE_MAX_CONCURRENT,
-	MAX_COLLABORATE_MAX_CONCURRENT,
-	DEFAULT_COLLABORATE_ROUND_TIMEOUT_MS,
-	COLLABORATE_ROUND_TIMEOUT_MS_MAX,
-} from '../types/const-default';
+import { formatAriseMsgError, formatAriseMsgSuccessMultiLine } from '../utils/string/arise-message';
+import { POLL_INTERVAL_MS } from '../types/const-default';
 import type { BackgroundManager } from './lib/background-manager';
-import {
-	getMaxConcurrent,
-	getRoundTimeoutMs,
-	getTotalRounds,
-} from './lib/arise-collaborate-validator';
+import { getMaxConcurrent, getRoundTimeoutMs, getTotalRounds } from './lib/arise-collaborate-validator';
 import { checkTermination } from './lib/arise-collaborate-termination';
 import {
-	normalizeShadowsEntries,
 	getShadowDisplayName,
 	type INormalizedCollaborateShadowEntry,
+	normalizeShadowsEntries,
 } from './lib/arise-collaborate-normalizer';
-import {
-	collaborationSessionManager,
-	type ICollaborationSession,
-} from './lib/collaboration-session';
-import { IAriseCollaborateOptionsInfer, IAriseCollaborateOptionsInput } from '../config/schema/entry';
+import { collaborationSessionManager, type ICollaborationSession } from './lib/collaboration-session';
+import { IAriseCollaborateOptionsInfer } from '../config/schema/entry';
+import { ICollaborateArgs } from './lib/types-summon';
 
 // ==================== 共用常數 / Shared Constants ====================
-
-/**
- * 輪詢間隔（毫秒）
- * Poll interval in milliseconds
- */
-const POLL_INTERVAL_MS = 500;
 
 // ==================== 共用工具函式 / Shared Utility Functions ====================
 
@@ -212,49 +188,6 @@ async function executeInBatches<TInput, TOutput>(
 }
 
 // ==================== 類型定義 / Type Definitions ====================
-
-/**
- * Collaborate 工具參數類型
- * Collaborate tool arguments type
- */
-interface ICollaborateArgs extends IAriseCollaborateOptionsInput
-{
-	/** 協作模式 / Collaboration mode */
-	mode: EnumCollaborateMode;
-	/** 參與的 Shadow Agent 列表 / List of participating Shadow agents */
-	shadows: {
-		/** Shadow agent 名稱 / Shadow agent name */
-		agent: EnumShadowSubAgentsName;
-		/** 模型名稱，預設 "AUTO" / Model name, default "AUTO" */
-		model?: string;
-		/** 自訂標籤，選填 / Custom label, optional */
-		label?: string;
-	}[];
-	/** 任務提示 / Task prompt */
-	prompt: string;
-	/** 任務描述（可選）/ Task description (optional) */
-	description?: string;
-	/** 總回合數（可選）/ Total rounds (optional) */
-	total_rounds?: number;
-	/** 最大並行數（可選）/ Max concurrent (optional) */
-	max_concurrent?: number;
-	/** 回合超時（毫秒，可選）/ Round timeout in ms (optional) */
-	round_timeout_ms?: number;
-	/** 每個 agent 回合數（可選）/ Per-agent rounds (optional) */
-	per_agent_rounds?: number;
-	/** 是否創建持久化 session / Whether to create persistent session */
-	persistent?: boolean;
-	/** 現有 session ID（繼續協作）/ Existing session ID (continue collaboration) */
-	session_id?: string;
-	/** 結束 session / End session */
-	end_session?: boolean;
-	/** 暫停 session / Pause session */
-	pause_session?: boolean;
-	/** 是否重用子代理 session（可選）/ Whether to reuse sub-agent session (optional) */
-	reuse_agent_session?: boolean;
-	/** 是否禁止子代理使用召喚工具（可選）/ Whether to block sub-agent summoning tools (optional) */
-	block_subagent_tools?: boolean;
-}
 
 /**
  * 解析並合併 Config 與工具參數

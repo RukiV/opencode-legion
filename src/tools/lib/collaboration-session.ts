@@ -101,13 +101,13 @@ export interface ICreateCollaborationSessionOpts extends IAriseCollaborateOption
 export class CollaborationSessionManager
 {
 	/** Session 儲存 / Session storage */
-	private sessions: Map<string, ICollaborationSession> = new Map();
+	protected sessions: Map<string, ICollaborationSession> = new Map();
 
 	/**
 	 * 產生唯一 session ID
 	 * Generate unique session ID
 	 */
-	private generateSessionId(): string
+	protected generateSessionId(): string
 	{
 		return `collab_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 	}

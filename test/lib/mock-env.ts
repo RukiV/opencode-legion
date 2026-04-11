@@ -114,10 +114,10 @@ export class MockEnv implements IMockEnv {
 	public readonly safeFsNative: typeof import("fs");
 
 	/** 配置選項 / Configuration options */
-	private readonly options: Required<IMockEnvOptions>;
+	protected readonly options: Required<IMockEnvOptions>;
 
 	/** 已建立的臨時目錄清單 / List of created temporary directories */
-	private readonly createdTempDirs: string[] = [];
+	protected readonly createdTempDirs: string[] = [];
 
 	/**
 	 * 建構子

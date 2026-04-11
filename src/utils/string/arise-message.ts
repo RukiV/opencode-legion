@@ -228,7 +228,9 @@ export function formatAriseMsgLogBody(options: IAriseMsgLogOptions): {
  * @param result - 任務執行結果
  * @returns 格式化後的輸出
  */
-export function formatAriseMsgTaskOutput(taskId: string, result: string): string
+export function formatAriseMsgTaskOutput(taskId: string, result: string, opts?: {
+	lineBreak?: boolean;
+}): string
 {
 	return `${_createTaskIdResume(taskId)}\n${_createTag(EnumOpenCodeMessageTag.TASK_RESULT, result)}`;
 }
@@ -237,7 +239,7 @@ export function _createTag(tag: EnumOpenCodeMessageTag, result: string, opts?: {
 	lineBreak?: boolean;
 }): string
 {
-	const c = opts?.lineBreak ? '\n' : '';
+	const c = (opts?.lineBreak ?? true) ? '\n' : '';
 	return `<${tag}>${c}${result}${c}</${tag}>`;
 }
 

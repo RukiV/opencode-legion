@@ -152,9 +152,9 @@ const DEFAULT_OPTIONS: IMockFsInternalOptions = {
  */
 export class MockFs {
 	/** 根目錄 / Root directory */
-	private readonly root: MockDirectory;
+	protected readonly root: MockDirectory;
 	/** 配置選項 / Configuration options */
-	private readonly options: IMockFsInternalOptions;
+	protected readonly options: IMockFsInternalOptions;
 
 	/**
 	 * 建構子
@@ -171,7 +171,7 @@ export class MockFs {
 	 * 建立目錄項目
 	 * Create directory entry
 	 */
-	private _createDirectory(): MockDirectory {
+	protected _createDirectory(): MockDirectory {
 		return {
 			type: "directory",
 			entries: new Map(),
@@ -184,7 +184,7 @@ export class MockFs {
 	 * 建立檔案項目
 	 * Create file entry
 	 */
-	private _createFile(content: string = ""): MockFile {
+	protected _createFile(content: string = ""): MockFile {
 		return {
 			type: "file",
 			content,
@@ -200,7 +200,7 @@ export class MockFs {
 	 * @param path - 檔案路徑 / File path
 	 * @returns 包含父目錄和檔案名稱的元組 / Tuple containing parent directory and filename
 	 */
-	private _resolvePath(path: string): [MockDirectory, string] {
+	protected _resolvePath(path: string): [MockDirectory, string] {
 		const parts = path.split(/[/\\]/).filter(Boolean);
 		let current: MockDirectory = this.root;
 
@@ -230,7 +230,7 @@ export class MockFs {
 	 * 取得路徑對應的項目
 	 * Get entry at path
 	 */
-	private _getEntry(path: string): MockFsEntry | undefined {
+	protected _getEntry(path: string): MockFsEntry | undefined {
 		if (path === "/" || path === "") {
 			return this.root;
 		}
@@ -257,7 +257,7 @@ export class MockFs {
 	 * 安全檢查路徑
 	 * Safety check path
 	 */
-	private _safetyCheck(path: string, allowRelative: boolean = false): IFsSafetyResult {
+	protected _safetyCheck(path: string, allowRelative: boolean = false): IFsSafetyResult {
 		if (!this.options.enableSafetyCheck) {
 			return { isSafe: true, reason: "Safety check disabled", rule: "whitelist" };
 		}
@@ -268,7 +268,7 @@ export class MockFs {
 	 * 確保路徑安全並解析
 	 * Ensure path is safe and resolve
 	 */
-	private _ensureSafety(path: string, allowRelative: boolean = false): void {
+	protected _ensureSafety(path: string, allowRelative: boolean = false): void {
 		const result = this._safetyCheck(path, allowRelative);
 		if (!result.isSafe) {
 			throw new Error(`[MockFS] ${result.reason} (rule: ${result.rule})`);
@@ -331,7 +331,7 @@ export class MockFs {
 	 * @param mockPath - MockFS 中的檔案路徑 / File path in MockFS
 	 * @param content - 檔案內容 / File content
 	 */
-	private _writeAuditFile(mockPath: string, content: string): void {
+	protected _writeAuditFile(mockPath: string, content: string): void {
 		if (!this.options.auditEnabled || !this.options.auditDir) return;
 
 		// Pattern 過濾：檢查路徑是否符合 auditPatterns

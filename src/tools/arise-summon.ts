@@ -42,7 +42,7 @@ export function createAgentToolAriseSyncSummon(
 		args,
 	} = getAriseToolsConfigEntry(EnumAriseTools.ARISE_SYNC_SUMMON);
 
-	return tool2({
+	return tool2<EnumAriseTools.ARISE_SYNC_SUMMON>({
 		description,
 		args,
 

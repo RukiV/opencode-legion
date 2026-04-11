@@ -144,7 +144,7 @@ export interface IModelBody
  *
  * @note Bash 使用 pattern matching，單獨定義於 {@see EnumShadowAgentPermissionKey2.bash}
  */
-export const enum EnumShadowAgentPermissionKey
+export enum EnumShadowAgentPermissionKey
 {
 	/** 讀取檔案 (matches file path) / Read a file */
 	Read = 'read',

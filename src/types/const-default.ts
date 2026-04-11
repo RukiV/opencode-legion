@@ -169,3 +169,9 @@ export const PROVIDERS_CACHE_FILENAME = "providers-cache.json";
  */
 export const PROVIDERS_HISTORY_FILENAME = "providers-history.json";
 export const DEFAULT_DATE_TIME_FORMAT = "YYYY-MM-DD HH:mm:ss ZZ";
+
+/**
+ * 輪詢間隔（毫秒）
+ * Poll interval in milliseconds
+ */
+export const POLL_INTERVAL_MS = 500;

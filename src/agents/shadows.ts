@@ -22,7 +22,7 @@ import { ITSRequiredWith } from "ts-type";
 import { LEGACY_PLUGIN_NAME } from '../types/const-default';
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
 import { SHADOW_PROMPTS } from './lib/shadow-prompts';
-import { IShadowAgentPermission } from '../types/types-opencode';
+import { EnumShadowAgentPermissionKey, IShadowAgentPermission } from '../types/types-opencode';
 
 // Import from lib files
 import {
@@ -171,7 +171,12 @@ const SHARED_SUMMON_ARGS = {
 		.optional(),
 	/** 工具權限控制（控制子代理可用工具）/ Tool permission control (controls sub-agent available tools) */
 	tools: z
-		.record(z.string(), z.boolean())
+		.record(z.union([
+			z.enum(EnumAriseTools),
+			z.enum(EnumShadowAgentPermissionKey),
+			// z.string(),
+			]), 
+				z.literal(false))
 		.meta({ 
 			description: "Tool permission control: { \"toolName\": true/false }. E.g., { \"todowrite\": false, \"task\": false } to disable tools",
 			title: "Tools Config",

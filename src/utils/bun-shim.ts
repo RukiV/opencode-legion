@@ -93,7 +93,7 @@ class BunShim {
  */
 export class BunFile implements IBunFile {
 	/** 檔案路徑 / File path */
-	private readonly _path: string;
+	protected readonly _path: string;
 
 	/**
 	 * 建構子

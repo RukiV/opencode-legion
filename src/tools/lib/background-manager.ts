@@ -2,103 +2,38 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event } from "@opencode-ai/sdk";
 import type { ISessionRecord } from "../../types/session";
 import {
+	getAutoResumeConfig,
+	getAutoResumeSafetyPrompt,
 	getPollInterval,
 	getRetryDelayIncrement,
 	getRetryDelayMax,
-	getAutoResumeConfig,
-	getAutoResumeSafetyPrompt,
 } from "../../config/getters";
 import { DEFAULT_RETRY_DELAY_INCREMENT, HIGH_LOAD_BONUS_DELAY_MS } from "../../types/const-default";
 import { type IAriseConfig } from "../../config/schema";
 import {
+	BackgroundTaskStatus,
 	EnumAutoResumeOnError,
 	EnumAutoResumeTarget,
 	IAllShadowAgentsName,
-	BackgroundTaskStatus,
 } from "../../types/enums";
-import { EnumSessionStatusType, EnumLogLevel } from "../../types/enum-opencode";
+import { EnumLogLevel, EnumSessionStatusType } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
-import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
+import { formatModelBodyDescription, resolveModelContext } from "../../utils/model-resolver";
 import {
-	formatAriseMsg,
 	formatAriseMsgError,
-	formatAriseMsgTitleCustom,
-	formatAriseMsgPrefixId,
-	formatAriseMsgSuccessMultiLine,
-	formatAriseMsgSessionTitle,
 	formatAriseMsgLogBody,
+	formatAriseMsgPrefixId,
+	formatAriseMsgSessionTitle,
+	formatAriseMsgSuccessMultiLine,
+	formatAriseMsgTitleCustom,
 } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
 import { isHighLoadError } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
 import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
 import { EnumOpenCodeEventType, isEventWithType } from '../../types/opencode/enum-event';
-
-/**
- * === 配置取得說明 / Configuration Getter Guide ===
- *
- * BackgroundManager 提供公開的 getter 方法，透過 getters.ts 中的函式取得 per-agent 配置。
- * BackgroundManager exposes public getter methods that delegate to getters.ts for per-agent config.
- *
- * 公開方法 / Public methods:
- * - getPollInterval(agentName?) -> number
- * - getRetryDelayIncrement(agentName?) -> number
- * - getRetryDelayMax(agentName?) -> number
- *
- * 內部使用的 getter（從 getters.ts 直接呼叫）:
- * - getAutoResumeConfig(config, agentName?) -> auto_resume 物件 / object
- *
- * 使用範例 / Usage example:
- *   const pollInterval = manager.getPollInterval("beru");
- *   const maxDelay = manager.getRetryDelayMax("igris");
- *
- * 優先順序：agents[agentName].property -> background.property -> 預設值
- * Priority: agents[agentName].property -> background.property -> default
- */
-
-/**
- * 背景任務結構定義
- * Background task structure definition
- *
- * 追蹤每個背景 Shadow 任務的狀態和結果
- * Tracks the status and result of each background Shadow task
- */
-export interface BackgroundTask
-{
-	/** 任務唯一識別符 / Unique task identifier */
-	id: string;
-	/** 關聯的 Session ID / Associated session ID */
-	sessionId: string;
-	/** 父 Session ID（發起任務的 session）/ Parent session ID (session that launched the task) */
-	parentSessionId: string;
-	/** Shadow 名稱 / Shadow name */
-	shadow: string;
-	/** 任務描述 / Task description */
-	description: string;
-	/** 任務狀態 / Task status */
-	status: BackgroundTaskStatus;
-	/** 任務開始時間戳 / Task start timestamp */
-	startedAt: number;
-	/** 任務完成時間戳（可選）/ Task completion timestamp (optional) */
-	completedAt?: number;
-	/** 任務結果（可選）/ Task result (optional) */
-	result?: string;
-	/** 錯誤訊息（可選）/ Error message (optional) */
-	error?: string;
-	/** 輪詢重試次數 / Polling retry count */
-	retryCount: number;
-	/** Auto-resume 重試次數 / Auto-resume retry count */
-	resumeRetryCount?: number;
-	/** Auto-resume 是否正在等待重試 / Auto-resume is waiting for retry */
-	resumePending?: boolean;
-	/** Runtime override for auto-resume (foreground tasks) / Runtime 覆寫 auto-resume（foreground tasks） */
-	overrideAutoResume?: boolean;
-	/** Runtime override for auto-resume (background tasks) / Runtime 覆寫 auto-resume（background tasks） */
-	overrideBackgroundAutoResume?: boolean;
-	/** 工具權限配置（控制子代理可用工具）/ Tools permission config (controls sub-agent available tools) */
-	tools?: Record<string, boolean>;
-}
+import { IBackgroundTask, IBackgroundTaskLaunchParams } from './types-summon';
 
 /**
  * 背景任務管理器
@@ -110,11 +45,11 @@ export interface BackgroundTask
 export class BackgroundManager
 {
 	/** 任務儲存（以 taskId 為 key）/ Task storage (keyed by taskId) */
-	private tasks: Map<string, BackgroundTask> = new Map();
+	protected tasks: Map<string, IBackgroundTask> = new Map();
 	/** Plugin 上下文 / Plugin context */
-	private ctx: PluginInput;
+	protected ctx: PluginInput;
 	/** AriseConfig 物件（用於取得 per-agent 覆寫配置）/ AriseConfig object (for per-agent override config) */
-	private config: IAriseConfig;
+	protected config: IAriseConfig;
 
 	/**
 	 * 建構函式
@@ -280,7 +215,7 @@ export class BackgroundManager
 	 * @param task - 背景任務
 	 * @returns 是否應該執行 auto-resume
 	 */
-	shouldAutoResume(task: BackgroundTask): boolean
+	shouldAutoResume(task: IBackgroundTask): boolean
 	{
 		return this.checkAutoResume(task).should;
 	}
@@ -295,7 +230,7 @@ export class BackgroundManager
 	 * @param task - 背景任務
 	 * @returns { should: boolean, reason: string }
 	 */
-	private checkAutoResume(task: BackgroundTask): { should: boolean, reason: string }
+	protected checkAutoResume(task: IBackgroundTask): { should: boolean, reason: string }
 	{
 		/**
 		 * 檢查是否為背景任務
@@ -446,7 +381,7 @@ export class BackgroundManager
 	 * @param task - 任務物件
 	 * @param reason - 跳過原因
 	 */
-	private async notifyAutoResumeSkipped(task: BackgroundTask, reason: string)
+	protected async notifyAutoResumeSkipped(task: IBackgroundTask, reason: string)
 	{
 		const message = `Auto-resume skipped for task ${task.id} (${task.shadow}): ${reason}`;
 
@@ -494,7 +429,7 @@ export class BackgroundManager
 	 *
 	 * @param task - 要重試的任務
 	 */
-	private async performAutoResume(task: BackgroundTask): Promise<void>
+	protected async performAutoResume(task: IBackgroundTask): Promise<void>
 	{
 		/**
 		 * 取得 auto-resume 配置（支援 per-agent 覆寫）
@@ -774,16 +709,7 @@ export class BackgroundManager
 	 * @param opts.existingSessionId - 可選的現有 session ID（如果傳入則跳過建立新 session）
 	 * @returns 建立的任務物件
 	 */
-	async launch(opts: {
-		shadow: string;
-		prompt: string;
-		description: string;
-		parentSessionId: string;
-		model?: string;
-		existingSessionId?: string;
-		/** 工具權限配置 / Tools permission config */
-		tools?: Record<string, boolean>;
-	}): Promise<BackgroundTask>
+	async launch(opts: IBackgroundTaskLaunchParams): Promise<IBackgroundTask>
 	{
 		const taskId = this.generateTaskId();
 
@@ -834,7 +760,7 @@ export class BackgroundManager
 		 * 建立任務物件
 		 * Create task object
 		 */
-		const task: BackgroundTask = {
+		const task: IBackgroundTask = {
 			id: taskId,
 			sessionId,
 			parentSessionId: opts.parentSessionId,
@@ -982,7 +908,7 @@ export class BackgroundManager
 	 * @param taskId - 任務 ID
 	 * @param agentName - Shadow 名稱
 	 */
-	private schedulePolling(taskId: string, agentName?: IAllShadowAgentsName): void
+	protected schedulePolling(taskId: string, agentName?: IAllShadowAgentsName): void
 	{
 		const task = this.tasks.get(taskId);
 		if (!task) return;
@@ -1053,7 +979,7 @@ export class BackgroundManager
 	 *
 	 * @param taskId - 任務 ID
 	 */
-	private async pollTaskCompletion(taskId: string): Promise<void>
+	protected async pollTaskCompletion(taskId: string): Promise<void>
 	{
 		const task = this.tasks.get(taskId);
 		if (!task || task.status !== BackgroundTaskStatus.Running) return;
@@ -1188,7 +1114,7 @@ export class BackgroundManager
 	 *
 	 * @param task - 任務物件
 	 */
-	private async extractResult(task: BackgroundTask): Promise<void>
+	protected async extractResult(task: IBackgroundTask): Promise<void>
 	{
 		try
 		{
@@ -1243,7 +1169,7 @@ export class BackgroundManager
 	 *
 	 * @param task - 任務物件
 	 */
-	private async notifyParent(task: BackgroundTask): Promise<void>
+	protected async notifyParent(task: IBackgroundTask): Promise<void>
 	{
 		/**
 		 * 計算任務執行時長
@@ -1275,7 +1201,7 @@ export class BackgroundManager
 	}
 
 	/** 取得指定任務 / Get specific task */
-	getTask(taskId: string): BackgroundTask | undefined
+	getTask(taskId: string): IBackgroundTask | undefined
 	{
 		return this.tasks.get(taskId);
 	}
@@ -1290,13 +1216,13 @@ export class BackgroundManager
 	 * @param sessionId - Session ID (ses_xxx)
 	 * @returns 任務或 undefined
 	 */
-	getTaskBySessionId(sessionId: string): BackgroundTask | undefined
+	getTaskBySessionId(sessionId: string): IBackgroundTask | undefined
 	{
 		return Array.from(this.tasks.values()).find((t) => t.sessionId === sessionId);
 	}
 
 	/** 取得所有任務 / Get all tasks */
-	getAllTasks(): BackgroundTask[]
+	getAllTasks(): IBackgroundTask[]
 	{
 		return Array.from(this.tasks.values());
 	}
@@ -1307,7 +1233,7 @@ export class BackgroundManager
 	 *
 	 * @param sessionId - 父 session ID
 	 */
-	getTasksForSession(sessionId: string): BackgroundTask[]
+	getTasksForSession(sessionId: string): IBackgroundTask[]
 	{
 		return Array.from(this.tasks.values()).filter(
 			(t) => t.parentSessionId === sessionId,
@@ -1536,7 +1462,7 @@ Use arise_background_output("${task.id}") to check the result.`,
 	 *
 	 * @param taskId - 任務 ID
 	 */
-	private _publicSchedulePolling(taskId: string): void
+	protected _publicSchedulePolling(taskId: string): void
 	{
 		/**
 		 * 狀態日誌：開始公開輪詢
