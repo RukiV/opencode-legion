@@ -7,13 +7,6 @@
  */
 
 import { ITSTypeAndStringLiteral } from "ts-type";
-import { EnumOpenCodeEventType } from "./opencode/enum-event";
-
-/**
- * 重新匯出 EnumOpenCodeEventType 供外部使用
- * Re-export EnumOpenCodeEventType for external use
- */
-export { EnumOpenCodeEventType };
 
 /**
  * Shadow Agent 模式

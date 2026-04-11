@@ -14,7 +14,8 @@ import { ITSPickExtra } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
 import { runtimeCache } from '../utils/session/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
-import { EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
+import { EnumOpenCodeEventType, EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
+import { logArise2WithLevel } from "../utils/debug-control";
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 
@@ -182,14 +183,13 @@ export function createFullEventHandler(
 	return async function fullEventHandler(input: { event: Event }): Promise<void>
 	{
 		const event = input.event;
-		const eventType = event.type;
 		const sessionId = extractSessionId(event);
 		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
 		params.ctx.client.app?.log?.({
 			body: formatAriseMsgLogBody({
-				message: `event received: type=${eventType}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+				message: `event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
 				level: EnumLogLevel.Debug,
 				label: "event-handler",
 			}),
@@ -198,7 +198,7 @@ export function createFullEventHandler(
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
 
-		switch (eventType)
+		switch (event.type)
 		{
 			case EnumOpenCodeEventTypeWithSession.SessionCreated:
 				await handleSessionCreated(event, params);
@@ -236,6 +236,66 @@ export function createFullEventHandler(
 					}),
 				});
 				break;
+			case EnumOpenCodeEventType.LspClientDiagnostics:
+			{
+				/**
+				 * 處理 LSP 客戶端診斷資訊
+				 * Handle LSP client diagnostics
+				 *
+				 * LSP 診斷提供程式碼分析、類型錯誤檢查等功能
+				 * LSP diagnostics provide code analysis, type checking, etc.
+				 *
+				 * @see https://opencode.ai/docs/#/open_code/events?id=lsp-client-diagnostics-lsp-clientdiagnostics
+				 */
+				const diagnosticsProperties = (event.properties as { diagnostics?: unknown[] } | undefined);
+				const lspDiagnostics = diagnosticsProperties?.diagnostics ?? [];
+
+				logArise2WithLevel("info", () => [
+					`[background-manager]`,
+					`LSP Client Diagnostics received (${lspDiagnostics.length} items):`,
+					JSON.stringify(lspDiagnostics, null, 2),
+				]);
+
+				// TODO: 根據診斷結果執行對應的 action
+				// Perform corresponding action based on diagnostics
+				// Currently just logging for future expansion
+				break;
+			}
+			case EnumOpenCodeEventType.LspUpdated:
+			{
+				/**
+				 * 處理 LSP 更新事件
+				 * Handle LSP updated event
+				 *
+				 * LSP 提供者更新或重新載入時觸發
+				 * Triggered when LSP provider is updated or reloaded
+				 *
+				 * @see https://opencode.ai/docs/#/open_code/events?id=lsp-updated-lsp-updated
+				 */
+				const lspUpdatedProperties = (event.properties as { isReconnectionRequired?: boolean } | undefined);
+				const isReconnectionRequired = lspUpdatedProperties?.isReconnectionRequired;
+
+				logArise2WithLevel("info", () => [
+					`[background-manager]`,
+					`LSP Updated: isReconnectionRequired=${isReconnectionRequired}`,
+				]);
+
+				/**
+				 * 若有重新連線需求，可選擇重建相關任務
+				 * If reconnection required, optionally rebuild related tasks
+				 */
+				if (isReconnectionRequired)
+				{
+					logArise2WithLevel("debug", () => [
+						`[background-manager]`,
+						`LSP reconnection required: deciding whether to rebuild related tasks`,
+					]);
+					// TODO: 實現重新連線邏輯
+					// TODO: Implement reconnection logic
+					// For now, just logging for future expansion
+				}
+				break;
+			}
 			default:
 				/**
 				 * 記錄未處理的事件類型，有助於：
@@ -250,7 +310,7 @@ export function createFullEventHandler(
 				 */
 				params.ctx.client.app?.log?.({
 					body: formatAriseMsgLogBody({
-						message: `unhandled event type: ${eventType}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+						message: `unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
 						level: EnumLogLevel.Debug,
 						label: "event-handler",
 					}),

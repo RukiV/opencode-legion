@@ -14,6 +14,7 @@
  */
 
 import { ITSTypeAndStringLiteral } from 'ts-type';
+import * as OpenCodePlugin from '@opencode-ai/plugin';
 
 /**
  * =============================================================================
