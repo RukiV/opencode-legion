@@ -6,7 +6,7 @@ import { EnumOpenCodeHookNameStable, EnumOpenCodeHookNameExperimental } from "./
 import { loadAriseConfig } from "./config/io";
 import { _isAutoModel } from "./utils/model-resolver";
 import { createConfigHandler } from "./plugin/config-handler";
-import { createFullEventHandler, extractSessionId } from "./plugin/event-handler";
+import { createFullEventHandler, extractEventSessionId } from "./plugin/event-handler";
 import { createAriseBannerHook } from "./hooks/arise-banner";
 import { createOutputShaperHook } from "./hooks/output-shaper";
 import { createCompactionPreserverHook } from "./hooks/compaction-preserver";

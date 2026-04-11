@@ -26,16 +26,6 @@ export function extractTextFromMessageParts(parts?: Array<{ type: string; text?:
 		.join("\n") ?? "";
 }
 
-/* ============ 錯誤處理 / Error Handling ============ */
-
-/**
- * 從 error.ts 重新匯出 getErrorMessage
- * Re-export getErrorMessage from error.ts
- *
- * @deprecated 請直接從 utils/error 匯入 / Import directly from utils/error
- */
-export { getErrorMessage } from "../error";
-
 /* ============ 時間格式化 / Time Formatting ============ */
 
 /**
@@ -61,4 +51,31 @@ export function formatDuration(startedAt: number, completedAt?: number): string
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = seconds % 60;
 	return `${minutes}m${remainingSeconds}s`;
+}
+
+/**
+ * 從訊息 parts 中提取文字內容
+ * Extract text content from message parts
+ *
+ * @param parts - 訊息 parts 陣列 / Message parts array
+ * @returns 提取的文字內容 / Extracted text content
+ */
+export function extractTextFromMessageParts2(parts: unknown[]): string
+{
+	if (!parts || !Array.isArray(parts))
+	{
+		return "";
+	}
+
+	return parts
+		.map((part) =>
+		{
+			if (typeof part === "object" && part !== null)
+			{
+				const partObj = part as { text?: string; type?: string; content?: string };
+				return partObj.text ?? partObj.content ?? "";
+			}
+			return String(part);
+		})
+		.join("");
 }

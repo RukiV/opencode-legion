@@ -17,6 +17,7 @@ import { EnumOpenCodeEventType, EnumOpenCodeEventTypeWithSession } from '../type
 import { logArise2WithLevel } from "../utils/debug-control";
 import { log2OpenCode, showToastOpenCode } from '../utils/log/opencode-log';
 import { IEventHandlerContext } from '../types/types-opencode';
+import { extractTextFromMessageParts2 } from '../utils/string/message';
 
 /**
  * 從事件中提取會話 ID
@@ -25,7 +26,7 @@ import { IEventHandlerContext } from '../types/types-opencode';
  * @param event - OpenCode 事件物件 / OpenCode event object
  * @returns 會話 ID（若存在）/ Session ID (if exists)
  */
-export function extractSessionId(event: Event)
+export function extractEventSessionId(event: Event)
 {
 	const properties = event.properties as Extract<NonNullable<Event["properties"]>, { sessionID: string | undefined }>;
 	return properties?.sessionID;
@@ -38,9 +39,9 @@ export function extractSessionId(event: Event)
  * 清除會話的模型緩存
  * Clears the model cache for the session
  */
-export function handleSessionDeleted(event: EventSessionDeleted, params?: ICreateEventHandlerParams)
+export function handleEventSessionDeleted(event: EventSessionDeleted, params?: ICreateEventHandlerParams)
 {
-	const sessionId = extractSessionId(event);
+	const sessionId = extractEventSessionId(event);
 	if (sessionId)
 	{
 		runtimeCache.clearSessionModel(sessionId);
@@ -54,7 +55,7 @@ export function handleSessionDeleted(event: EventSessionDeleted, params?: ICreat
  * 顯示橫幅（如果有的話）
  * Shows banner (if available)
  */
-async function handleSessionCreated(
+async function handleEventSessionCreated(
 	event: EventSessionCreated,
 	params: Pick<ICreateEventHandlerParams, "bannerHook">,
 ): Promise<void>
@@ -69,7 +70,7 @@ async function handleSessionCreated(
  * 執行 TODO 檢查並顯示提醒（如果需要的話）
  * Performs TODO check and shows reminder (if needed)
  */
-async function handleSessionIdle(
+async function handleEventSessionIdle(
 	event: EventSessionIdle,
 	params: Pick<ICreateEventHandlerParams, "todoEnforcer"> & { ctx: IEventHandlerContext },
 ): Promise<void>
@@ -78,7 +79,7 @@ async function handleSessionIdle(
 	{
 		return;
 	}
-	const sessionId = extractSessionId(event);
+	const sessionId = extractEventSessionId(event);
 	if (!sessionId)
 	{
 		return;
@@ -98,7 +99,7 @@ async function handleSessionIdle(
 			 */
 			const recentMessages = messages.data.slice(-5).map((m) =>
 			{
-				const textContent = extractTextFromMessageParts(m.parts);
+				const textContent = extractTextFromMessageParts2(m.parts);
 				return { content: textContent };
 			});
 
@@ -183,7 +184,7 @@ export function createFullEventHandler(
 	return async function fullEventHandler(input: { event: Event }): Promise<void>
 	{
 		const event = input.event;
-		const sessionId = extractSessionId(event);
+		const sessionId = extractEventSessionId(event);
 		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
@@ -198,7 +199,7 @@ export function createFullEventHandler(
 		switch (event.type)
 		{
 			case EnumOpenCodeEventTypeWithSession.SessionCreated as ITSTypeAndStringLiteral<EnumOpenCodeEventTypeWithSession.SessionCreated>:
-				await handleSessionCreated(event, params);
+				await handleEventSessionCreated(event, params);
 				/**
 				 * session created 時模型可能尚未快取（model 在 chat.params 鉤子中記錄），
 				 * 因此首次日誌顯示 N/A，後續事件會顯示正確模型
@@ -221,10 +222,10 @@ export function createFullEventHandler(
 						label: "session",
 					}),
 				}));
-				await handleSessionIdle(event, params);
+				await handleEventSessionIdle(event, params);
 				break;
 			case EnumOpenCodeEventTypeWithSession.SessionDeleted as ITSTypeAndStringLiteral<EnumOpenCodeEventTypeWithSession.SessionDeleted>:
-				handleSessionDeleted(event, params);
+				handleEventSessionDeleted(event, params);
 				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `session deleted: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}, cache cleared`,
@@ -317,29 +318,3 @@ export function createFullEventHandler(
 	};
 }
 
-/**
- * 從訊息 parts 中提取文字內容
- * Extract text content from message parts
- *
- * @param parts - 訊息 parts 陣列 / Message parts array
- * @returns 提取的文字內容 / Extracted text content
- */
-function extractTextFromMessageParts(parts: unknown[]): string
-{
-	if (!parts || !Array.isArray(parts))
-	{
-		return "";
-	}
-
-	return parts
-		.map((part) =>
-		{
-			if (typeof part === "object" && part !== null)
-			{
-				const partObj = part as { text?: string; type?: string; content?: string };
-				return partObj.text ?? partObj.content ?? "";
-			}
-			return String(part);
-		})
-		.join("");
-}

@@ -18,9 +18,6 @@ import type { IGitSummaryOptions } from '../config/schema/entry';
 import { EnumOpenCodeMessageTag } from '../types/opencode/enum-message';
 import { _createTag } from './string/arise-message';
 
-/** 重新匯出選項型別，方便外部僅從此模組匯入 / Re-export options type for convenience */
-export type { IGitSummaryOptions } from '../config/schema/entry';
-
 /**
  * Git 摘要結果
  * Git summary result
