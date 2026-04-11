@@ -1,6 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
 import { PLUGIN_VERSION, PLUGIN_VERSION_HOMEPAGE } from "../types/version";
 import { console } from 'debug-color2';
+import { showToastOpenCode } from '../utils/log/opencode-log';
 
 /**
  * 產生居中填充的字串
@@ -91,25 +92,6 @@ let bannerShownThisProcess = false;
  * @returns 橫幅 Hook 物件
  */
 export function createAriseBannerHook(ctx: PluginInput) {
-  /**
-   * 顯示 Toast 通知
-   * Show toast notification
-   */
-  const showToast = async () => {
-    try {
-      await ctx.client.tui.showToast({
-        body: {
-          title: "opencode-arise",
-          message: TOAST_MESSAGE,
-          variant: "info",
-          duration: 4000,
-        },
-      });
-    } catch {
-      /** TUI 可能不可用（非互動模式）/ TUI might not be available (non-interactive mode) */
-    }
-  };
-
   return {
     /**
      * 會話創建時的回調
@@ -119,7 +101,14 @@ export function createAriseBannerHook(ctx: PluginInput) {
       /** 只在程序首次執行時顯示 / Only show on first execution of process */
       if (!bannerShownThisProcess) {
         bannerShownThisProcess = true;
-        await showToast();
+        await showToastOpenCode(ctx, () => ({
+          body: {
+            title: "opencode-arise",
+            message: TOAST_MESSAGE,
+            variant: "info",
+            duration: 4000,
+          },
+        }));
       }
     },
   };

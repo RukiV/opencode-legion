@@ -16,6 +16,7 @@ import { runtimeCache } from '../utils/session/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
 import { EnumOpenCodeEventType, EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
 import { logArise2WithLevel } from "../utils/debug-control";
+import { log2OpenCode, showToastOpenCode } from '../utils/log/opencode-log';
 
 export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
 
@@ -107,24 +108,24 @@ async function handleSessionIdle(
 
 			if (result.hasIncompleteTodos && result.reminderMessage)
 			{
-				await params.ctx.client.tui?.showToast({
+				await showToastOpenCode(params.ctx, () => ({
 					body: {
 						title: "Arise - Incomplete Tasks",
 						message: "You have pending TODOs. Complete them before stopping.",
 						variant: "warning",
 						duration: 5000,
 					},
-				});
+				}));
 			}
 		}
 	} catch (error)
 	{
-		params.ctx.client.app?.log?.({
+		await log2OpenCode(params.ctx, () => ({
 			body: formatAriseMsgLogBody({
 				message: `TODO enforcement failed: ${getErrorMessage(error)}`,
 				level: EnumLogLevel.Warn,
 			}),
-		});
+		}));
 	}
 }
 
@@ -187,13 +188,13 @@ export function createFullEventHandler(
 		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
-		params.ctx.client.app?.log?.({
+		await log2OpenCode(params.ctx, () => ({
 			body: formatAriseMsgLogBody({
 				message: `event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
 				level: EnumLogLevel.Debug,
 				label: "event-handler",
 			}),
-		});
+		}));
 
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
@@ -208,33 +209,33 @@ export function createFullEventHandler(
 				 * Model may not be cached yet at session created (model is recorded in chat.params hook),
 				 * so first log shows N/A, subsequent events show correct model
 				 */
-				params.ctx.client.app?.log?.({
+				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `session created: sessionId=${sessionId ?? "N/A"}, model=${model ?? "pending (will be set on first chat)"}`,
 						level: EnumLogLevel.Info,
 						label: "session",
 					}),
-				});
+				}));
 				break;
 			case EnumOpenCodeEventTypeWithSession.SessionIdle:
-				params.ctx.client.app?.log?.({
+				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `session idle: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
 						level: EnumLogLevel.Debug,
 						label: "session",
 					}),
-				});
+				}));
 				await handleSessionIdle(event, params);
 				break;
 			case EnumOpenCodeEventTypeWithSession.SessionDeleted:
 				handleSessionDeleted(event, params);
-				params.ctx.client.app?.log?.({
+				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `session deleted: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}, cache cleared`,
 						level: EnumLogLevel.Info,
 						label: "session",
 					}),
-				});
+				}));
 				break;
 			case EnumOpenCodeEventType.LspClientDiagnostics:
 			{
@@ -308,13 +309,13 @@ export function createFullEventHandler(
 				 * 2. Evaluating whether new handlers are needed
 				 * 3. Tracing event flow during debugging
 				 */
-				params.ctx.client.app?.log?.({
+				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
 						level: EnumLogLevel.Debug,
 						label: "event-handler",
 					}),
-				});
+				}));
 				break;
 		}
 	};

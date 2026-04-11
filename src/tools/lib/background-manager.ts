@@ -16,7 +16,7 @@ import {
 	IAllShadowAgentsName,
 	BackgroundTaskStatus,
 } from "../../types/enums";
-import { EnumSessionStatusType, EnumLogLevel, EnumOpenCodeEventType } from "../../types/enum-opencode";
+import { EnumSessionStatusType, EnumLogLevel } from "../../types/enum-opencode";
 import { createDefaultConfig } from "../../types/config-defaults";
 import { getErrorMessage } from "../../utils/error";
 import { resolveModelContext, formatModelBodyDescription } from "../../utils/model-resolver";
@@ -32,6 +32,8 @@ import {
 import { logArise2WithLevel } from "../../utils/debug-control";
 import { isHighLoadError } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
+import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
+import { EnumOpenCodeEventType } from '../../types/opencode/enum-event';
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
@@ -444,7 +446,7 @@ export class BackgroundManager
 	 * @param task - 任務物件
 	 * @param reason - 跳過原因
 	 */
-	private notifyAutoResumeSkipped(task: BackgroundTask, reason: string): void
+	private async notifyAutoResumeSkipped(task: BackgroundTask, reason: string)
 	{
 		const message = `Auto-resume skipped for task ${task.id} (${task.shadow}): ${reason}`;
 
@@ -453,28 +455,22 @@ export class BackgroundManager
 			`notifyAutoResumeSkipped: ${message}`,
 		]);
 
-		this.ctx.client.app.log?.({
+		await log2OpenCode(this.ctx, () => ({
 			body: formatAriseMsgLogBody({
 				label: "Auto-resume",
 				message,
 				level: EnumLogLevel.Info,
 			}),
-		});
+		}));
 
-		this.ctx.client.tui.showToast?.({
+		await showToastOpenCode(this.ctx, () => ({
 			body: {
 				title: "Auto-resume Skipped",
 				message,
 				variant: "warning",
 				duration: 5000,
 			},
-		}).catch(() =>
-		{
-			logArise2WithLevel("debug", () => [
-				`[background-manager]`,
-				`notifyAutoResumeSkipped: TUI not available, skipping toast`,
-			]);
-		});
+		}));
 	}
 
 	/**
@@ -524,32 +520,26 @@ export class BackgroundManager
 		 * 記錄重試嘗試
 		 * Log retry attempt
 		 */
-		this.ctx.client.app.log?.({
+		await log2OpenCode(this.ctx, () => ({
 			body: formatAriseMsgLogBody({
 				label: "Auto-resume",
 				message: `Retrying task ${task.id}, attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
 				level: EnumLogLevel.Info,
 			}),
-		});
+		}));
 
 		/**
 		 * 顯示 toast 通知使用者 auto-resume 已觸發
 		 * Show toast notification to user that auto-resume was triggered
 		 */
-		this.ctx.client.tui.showToast?.({
+		await showToastOpenCode(this.ctx, () => ({
 			body: {
 				title: "Auto-resume Triggered",
 				message: `Retrying task ${task.id} (${task.shadow}), attempt ${(task.resumeRetryCount ?? 0) + 1}/${autoResumeConfig.max_retries ?? 3}`,
 				variant: "info",
 				duration: 5000,
 			},
-		}).catch(() =>
-		{
-			logArise2WithLevel("debug", () => [
-				`[background-manager]`,
-				`performAutoResume: TUI not available, skipping toast`,
-			]);
-		});
+		}));
 
 		/**
 		 * 等待配置的重試延遲（偵測高負載時額外增加 10 秒）
@@ -681,7 +671,7 @@ export class BackgroundManager
 					]);
 					this.pollTaskCompletion(task.id);
 				})
-				.catch((err) =>
+				.catch(async (err) =>
 				{
 					/**
 					 * 處理 promptAsync 的錯誤
@@ -703,34 +693,34 @@ export class BackgroundManager
 					{
 						// 通知模式：記錄但不做進一步重試
 						// Notify mode: log but don't retry further
-						this.ctx.client.app.log?.({
+						await log2OpenCode(this.ctx, () => ({
 							body: formatAriseMsgLogBody({
 								label: "Auto-resume",
 								message: `Task ${task.id} failed with error: ${task.error}. Waiting for manual intervention.`,
 								level: EnumLogLevel.Warn,
 							}),
-						});
+						}));
 					}
 					else if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Retry)
 					{
 						// 遞迴嘗試 auto-resume（會再次檢查 shouldAutoResume）
 						// Recursively attempt auto-resume (will check shouldAutoResume again)
-						this.ctx.client.app.log?.({
+						await log2OpenCode(this.ctx, () => ({
 							body: formatAriseMsgLogBody({
 								label: "Auto-resume",
 								message: `Task ${task.id} retry failed: ${task.error}. Will retry again...`,
 								level: EnumLogLevel.Warn,
 							}),
-						});
-						this.performAutoResume(task).catch((e) =>
+						}));
+						await this.performAutoResume(task).catch((e) =>
 						{
-							this.ctx.client.app.log?.({
+							return log2OpenCode(this.ctx, () => ({
 								body: formatAriseMsgLogBody({
 									label: "Auto-resume",
 									message: `Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
 									level: EnumLogLevel.Error,
 								}),
-							});
+							}));
 						});
 					}
 				});
@@ -750,13 +740,13 @@ export class BackgroundManager
 				`performAutoResume: failed to create retry session for taskId=${task.id}, error=${task.error}`,
 			]);
 
-			this.ctx.client.app.log?.({
+			await log2OpenCode(this.ctx, () => ({
 				body: formatAriseMsgLogBody({
 					label: "Auto-resume",
 					message: `Failed to create retry session for task ${task.id}: ${task.error}`,
 					level: EnumLogLevel.Error,
 				}),
-			});
+			}));
 		}
 	}
 
@@ -938,7 +928,7 @@ export class BackgroundManager
 				]);
 				this.schedulePolling(taskId, opts.shadow as IAllShadowAgentsName);
 			})
-			.catch((err) =>
+			.catch(async (err) =>
 			{
 				task.status = BackgroundTaskStatus.Error;
 				task.error = getErrorMessage(err);
@@ -959,20 +949,20 @@ export class BackgroundManager
 				 */
 				if (resumeCheck.should)
 				{
-					this.performAutoResume(task).catch((e) =>
+					await this.performAutoResume(task).catch((e) =>
 					{
-						this.ctx.client.app.log?.({
+						return log2OpenCode(this.ctx, () => ({
 							body: formatAriseMsgLogBody({
 								label: "Auto-resume",
 								message: `Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
 								level: EnumLogLevel.Error,
 							}),
-						});
+						}));
 					});
 				}
 				else
 				{
-					this.notifyAutoResumeSkipped(task, resumeCheck.reason);
+					await this.notifyAutoResumeSkipped(task, resumeCheck.reason);
 				}
 			});
 
@@ -1173,18 +1163,18 @@ export class BackgroundManager
 				 */
 				this.performAutoResume(task).catch((e) =>
 				{
-					this.ctx.client.app.log?.({
+					return log2OpenCode(this.ctx, () => ({
 						body: formatAriseMsgLogBody({
 							label: "Auto-resume",
 							message: `Unexpected error in performAutoResume: ${getErrorMessage(e)}`,
 							level: EnumLogLevel.Error,
 						}),
-					});
+					}));
 				});
 			}
 			else
 			{
-				this.notifyAutoResumeSkipped(task, resumeCheck.reason);
+				await this.notifyAutoResumeSkipped(task, resumeCheck.reason);
 			}
 		}
 	}
@@ -1270,16 +1260,16 @@ export class BackgroundManager
 				`notifyParent: showing toast, task=${task.shadow} finished: ${task.description} (${duration}s)`,
 			]);
 
-			await this.ctx.client.tui.showToast({
+			await showToastOpenCode(this.ctx, () => ({
 				body: {
 					title: "Shadow Complete",
 					message: `${task.shadow} finished: ${task.description} (${duration}s)`,
 					variant: "success",
 					duration: 3000,
 				},
-			});
+			}));
 		}
-		catch
+		catch (e)
 		{
 		}
 	}
@@ -1342,13 +1332,13 @@ export class BackgroundManager
 		}
 		catch (error)
 		{
-			this.ctx.client.app.log?.({
+			await log2OpenCode(this.ctx, () => ({
 				body: formatAriseMsgLogBody({
 					label: "Auto-resume",
 					message: `Failed to abort session ${task.sessionId}: ${getErrorMessage(error)}`,
 					level: EnumLogLevel.Warn,
 				}),
-			});
+			}));
 		}
 
 		task.status = BackgroundTaskStatus.Error;
