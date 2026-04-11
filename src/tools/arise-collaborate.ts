@@ -30,7 +30,7 @@ import {
 } from './lib/arise-collaborate-normalizer';
 import { collaborationSessionManager, type ICollaborationSession } from './lib/collaboration-session';
 import { IAriseCollaborateOptionsInfer } from '../config/schema/entry';
-import { ICollaborateArgs } from './lib/types-summon';
+import { ICollaborateArgs } from './lib/types/types-summon';
 
 // ==================== 共用常數 / Shared Constants ====================
 

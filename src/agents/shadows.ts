@@ -1,45 +1,31 @@
 import { type Agent } from '@opencode-ai/sdk';
-import type { ITSPartialRecord, ITSPickExtra } from 'ts-type';
+import type { ITSPickExtra } from 'ts-type';
 import { z } from "zod";
 import {
+	ALLOWED_LOG_LEVELS,
 	EnumOpencodeAgentMode,
 	EnumOpencodeAgentPermission,
-	ALLOWED_LOG_LEVELS,
 	EnumReasoningEffort,
 } from '../types/enum-opencode';
 import {
-	EnumShadowAgentsName,
-	EnumShadowSubAgentsName,
+	ALLOWED_COLLABORATE_MODES,
 	ALLOWED_SHADOWS,
 	BACKGROUND_SHADOWS,
-	type IAllShadowAgentsName,
 	EnumAriseTools,
-	ALL_ARISE_TOOLS,
-	ALLOWED_COLLABORATE_MODES,
-	EnumCollaborateMode,
+	EnumShadowAgentsName,
+	EnumShadowSubAgentsName,
+	type IAllShadowAgentsName,
 } from '../types/enums';
-import { ITSRequiredWith } from "ts-type";
-import { LEGACY_PLUGIN_NAME } from '../types/const-default';
-import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
 import { SHADOW_PROMPTS } from './lib/shadow-prompts';
-import { EnumShadowAgentPermissionKey, IShadowAgentPermission } from '../types/types-opencode';
+import { IShadowAgentPermission } from '../types/types-opencode';
 
 // Import from lib files
-import {
-	SHADOW_DESCRIPTIONS,
-	IShadowDescription,
-	getShortDescription,
-	getMonarchShadowList,
-	getFullDescription,
-	getShadowAgentsMarkdownTable,
-	suggestShadowAgent,
-	getAllShadowNames,
-} from './lib/shadow-descriptions';
+import { getShortDescription } from './lib/shadow-descriptions';
 import { TOOL_SHORT_DESCRIPTIONS } from './lib/arise-tools-descriptions';
-import { getAriseToolsSection } from './lib/arise-tools-utils';
 import { SHADOW_MONARCH_PROMPT } from './lib/shadow-prompt-monarch';
 import { createSummoningStrategy, TASK_ID_SESSION_ID_FORMAT } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
+import { GIT_SUMMARY_ARGS, SHARED_SUMMON_ARGS } from '../tools/lib/types/shared-schema';
 
 /**
  * Shadow Agent 介面
@@ -144,45 +130,6 @@ interface I_AriseToolsConfigEntry
 	/** 工具參數定義（Zod Schema）/ Tool arguments definition (Zod Schema) */
 	args: unknown;
 }
-
-/**
- * 召喚工具共用 args
- * Shared args for summon tools
- *
- * prompt 和 model 的描述在 ARISE_SUMMON / ARISE_BACKGROUND 之間一致
- * prompt and model descriptions are consistent across ARISE_SUMMON / ARISE_BACKGROUND
- */
-const SHARED_SUMMON_ARGS = {
-	prompt: z
-		.string()
-		.meta({ description: "The task for the shadow agent (be specific)" }),
-	model: z
-		.string()
-		.meta({ description: "Override model for this shadow agent (format: provider/model, e.g. opencode/big-pickle, or AUTO to use parent task's model)" })
-		.optional(),
-	/** 召喚工具共用 description arg 的描述文字 / Shared description arg text for summon tools */
-	description: z
-		.string()
-		.meta({ description: "Short description (3-5 words, used in tracking output and background task status)" }),
-	/** 現有 session ID（用於繼續使用現有的 session）/ Existing session ID (for continuing existing session) */
-	session_id: z
-		.string()
-		.meta({ description: "Existing session ID to reuse (continue existing session instead of creating new one)" })
-		.optional(),
-	/** 工具權限控制（控制子代理可用工具）/ Tool permission control (controls sub-agent available tools) */
-	tools: z
-		.record(z.union([
-			z.enum(EnumAriseTools),
-			z.enum(EnumShadowAgentPermissionKey),
-			// z.string(),
-			]), 
-				z.literal(false))
-		.meta({ 
-			description: "Tool permission control: { \"toolName\": true/false }. E.g., { \"todowrite\": false, \"task\": false } to disable tools",
-			title: "Tools Config",
-		})
-		.optional(),
-};
 
 /**
  * ⚠️ Arise Tools 描述 — 直接影響 agent 行為的 source of truth

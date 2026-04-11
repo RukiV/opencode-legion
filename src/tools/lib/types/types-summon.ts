@@ -1,5 +1,5 @@
-import { BackgroundTaskStatus, EnumCollaborateMode, EnumShadowSubAgentsName } from '../../types/enums';
-import { IAriseCollaborateOptionsInput } from '../../config/schema/entry';
+import { BackgroundTaskStatus, EnumCollaborateMode, EnumShadowSubAgentsName } from '../../../types/enums';
+import { IAriseCollaborateOptionsInput } from '../../../config/schema/entry';
 
 /**
  * 背景任務結構定義

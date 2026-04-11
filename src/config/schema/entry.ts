@@ -20,6 +20,7 @@ import { z } from "zod";
 import { ARISE_TOOLS } from "../../agents/shadows";
 import { EnumAriseTools } from "../../types/enums";
 import { IPluginToolAriseArgs, IZodRawShape } from "../../types/types-opencode";
+import { GIT_SUMMARY_ARGS } from '../../tools/lib/types/shared-schema';
 
 export type IShapeToZodObject<T extends IZodRawShape> = z.ZodObject<T>;
 
@@ -44,7 +45,7 @@ export type IZodObjectToInfer<T> = T extends {
 /**
  * 從 Zod object schema 推導「輸入」型別（驗證前、處理前）
  * Derive "input" type from Zod object schema (before validation/processing)
- * 
+ *
  * 用於獲取驗證之前，預期接收到的原始資料型別
  * Get the data type before validation, expected to receive
  *
@@ -78,42 +79,6 @@ export type IAriseToolsToZodInfer<T extends EnumAriseTools> = IZodObjectToInfer<
 export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInput<IShapeToZodObject<IPluginToolAriseArgs<T>>>;
 
 /** ==================== Git Summary ==================== */
-
-/**
- * Git 摘要工具參數 Zod raw shape
- * Git summary tool args Zod raw shape
- *
- * 可直接用於 ARISE_TOOLS 的 args 欄位
- * Can be directly used in ARISE_TOOLS args field
- */
-export const GIT_SUMMARY_ARGS = {
-	/** 顯示近期 commit 數量 / Number of recent commits to show */
-	log_count: z
-		.number()
-		.meta({
-			description: "Number of recent commits to show (default: 10)",
-			title: "Log Count",
-		})
-		.optional()
-		.default(10),
-	/** 是否包含 diff --stat / Include diff --stat output */
-	diff_stat: z
-		.boolean()
-		.meta({
-			description: "Include diff --stat output (default: true)",
-			title: "Diff Stat",
-		})
-		.optional()
-		.default(true),
-	/** 目標目錄路徑（相對於專案根目錄或絕對路徑）/ Target directory path (relative to project root or absolute path) */
-	cwd: z
-		.string()
-		.meta({
-			description: "Target directory to run git commands in (relative to project root or absolute path). Defaults to current working directory.",
-			title: "Working Directory",
-		})
-		.optional(),
-} as const;
 
 /**
  * 從 Git Summary Zod schema 推導「輸入」型別
@@ -156,7 +121,7 @@ export type IGitSummaryOptions2 = z.input<z.ZodObject<typeof ARISE_TOOLS[typeof 
  * @example
  * ```typescript
  * import type { IAriseCollaborateOptionsInput } from './entry';
- * 
+ *
  * // 呼叫者 / Caller - 傳遞可選參數
  * const opts: IAriseCollaborateOptionsInput = { log_count: 20 }; // ✅ 可選
  * const opts?: IAriseCollaborateOptionsInput; // ✅ 可選
@@ -177,7 +142,7 @@ export type IAriseCollaborateOptionsInput = IAriseToolsToZodInput<EnumAriseTools
  * @example
  * ```typescript
  * import type { IAriseCollaborateOptionsInfer } from './entry';
- * 
+ *
  * // 接收者 / Receiver - 回傳完整型別（含預設值）
  * export async function handleCollab(opts: IAriseCollaborateOptionsInfer) {
  *   // 此時 log_count 可能已有預設值 10

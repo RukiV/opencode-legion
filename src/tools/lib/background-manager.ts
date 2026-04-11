@@ -33,7 +33,7 @@ import { isHighLoadError } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
 import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
 import { EnumOpenCodeEventType, isEventWithType } from '../../types/opencode/enum-event';
-import { IBackgroundTask, IBackgroundTaskLaunchParams } from './types-summon';
+import { IBackgroundTask, IBackgroundTaskLaunchParams } from './types/types-summon';
 
 /**
  * 背景任務管理器
