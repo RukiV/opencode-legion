@@ -10,14 +10,14 @@
  * - ARISE 工具專用的 Enum 定義於 enums.ts
  */
 
-import { ToolContext, type ToolDefinition } from '@opencode-ai/plugin/tool';
+import { ToolContext } from '@opencode-ai/plugin/tool';
 import { z } from 'zod';
 import { EnumAriseTools } from './enums';
 import { ARISE_TOOLS } from '../agents/shadows';
 import type { IAriseTools } from './types';
 import { $ZodType, $ZodTypeInternals } from 'zod/v4/core';
-import { type Hooks, type PluginInput, tool, Plugin } from '@opencode-ai/plugin';
-import type { ITSOverwrite, ITSPartialRecord, ITSTypeAndStringLiteral } from 'ts-type';
+import { type Hooks, Plugin, type PluginInput, tool } from '@opencode-ai/plugin';
+import { ITSOverwrite, ITSPartialRecord, ITSPickExtra, ITSTypeAndStringLiteral } from 'ts-type';
 import { EnumOpencodeAgentPermission } from './enum-opencode';
 import { IAriseToolsToZodInfer, IShapeToZodObject, IZodObjectToInput } from '../config/schema/entry';
 
@@ -112,10 +112,10 @@ export type IHooks = ITSOverwrite<Hooks, {
  */
 export type IPlugin = (input: PluginInput) => Promise<IHooks>;
 
-export interface IModelBody 
+export interface IModelBody
 {
-  providerID: string;
-  modelID: string;
+	providerID: string;
+	modelID: string;
 }
 
 /**
@@ -152,9 +152,9 @@ export const enum EnumShadowAgentPermissionKey
 	/** 檔案修改 (covers edit, write, patch, multiedit) / All file modifications */
 	Edit = 'edit',
 
-	/** 
+	/**
 	 * 檔案寫入 (covers write, patch, multiedit) / File writing
-	 * 
+	 *
 	 * 向後相容性 / Backward compatibility
 	 */
 	Write = 'write',
@@ -167,8 +167,6 @@ export const enum EnumShadowAgentPermissionKey
 
 	/** 列出目錄 (matches directory path) / List files in a directory */
 	List = 'list',
-
-	
 
 	/** 載入 skill (matches skill name) / Load a skill */
 	Skill = 'skill',
@@ -233,15 +231,18 @@ export type IShadowAgentPermissionCore<P extends string> = Record<P, EnumOpencod
  *   bash: { "git *": "allow", "npm *": "deny" }
  * }
  */
-export type IShadowAgentPermission = ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey>, EnumOpencodeAgentPermission> 
+export type IShadowAgentPermission =
+	ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey>, EnumOpencodeAgentPermission>
 
 	/**
 	 * Shadow Agent 權限鍵值 可使用 pattern matching (如 "git *"、"npm *")
 	 * Shadow Agent permission key that supports pattern matching
 	 */
-	& ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey2>, EnumOpencodeAgentPermission | ITSPartialRecord<string | "*",  EnumOpencodeAgentPermission>>
+	& ITSPartialRecord<ITSTypeAndStringLiteral<EnumShadowAgentPermissionKey2>, EnumOpencodeAgentPermission | ITSPartialRecord<string | "*", EnumOpencodeAgentPermission>>
 	/**
 	 * 會導致 設定崩潰 的權限設定
 	 */
 	& ITSPartialRecord<EnumShadowAgentPermissionKeyInvalid | EnumAriseTools, never>
 	;
+
+export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;

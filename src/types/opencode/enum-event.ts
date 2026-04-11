@@ -10,6 +10,7 @@
  */
 
 import { ITSTypeAndStringLiteral } from 'ts-type';
+import type { Event } from "@opencode-ai/sdk";
 
 /**
  * OpenCode 事件類型列舉
@@ -130,7 +131,7 @@ export const ALL_OPENCODE_EVENT_TYPES = [
 	EnumOpenCodeEventType.PtyExited,
 	EnumOpenCodeEventType.PtyDeleted,
 	EnumOpenCodeEventType.ServerConnected,
-] as const satisfies EnumOpenCodeEventType[];
+] as const satisfies readonly EnumOpenCodeEventType[];
 
 /**
  * 會話事件類型列舉
@@ -173,4 +174,11 @@ export type IOpenCodeEventTypeWithSession = ITSTypeAndStringLiteral<EnumOpenCode
 export function isSessionEvent(eventType: string | EnumOpenCodeEventTypeWithSession | EnumOpenCodeEventType): eventType is IOpenCodeEventTypeWithSession
 {
 	return SUPPORTED_SESSION_EVENT_TYPES.includes(eventType as EnumOpenCodeEventTypeWithSession);
+}
+
+export function isEventWithType<T extends ITSTypeAndStringLiteral<EnumOpenCodeEventType>>(event: Event,
+	eventType: T,
+): event is Extract<Event, { type: ITSTypeAndStringLiteral<T> }>
+{
+	return event.type === eventType;
 }

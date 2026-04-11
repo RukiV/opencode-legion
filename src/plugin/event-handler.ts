@@ -6,19 +6,17 @@
  * Handles the logic structure of OpenCode event hook
  */
 
-import type { PluginInput } from "@opencode-ai/plugin";
 import type { Event, EventSessionCreated, EventSessionDeleted, EventSessionIdle } from "@opencode-ai/sdk";
 import { EnumLogLevel } from "../types/enum-opencode";
 import { getErrorMessage } from "../utils/error";
-import { ITSPickExtra } from "ts-type";
+import { ITSTypeAndStringLiteral } from "ts-type";
 import { formatAriseMsgLogBody } from "../utils/string/arise-message";
 import { runtimeCache } from '../utils/session/session-cache';
 import { BackgroundManager } from "../tools/lib/background-manager";
 import { EnumOpenCodeEventType, EnumOpenCodeEventTypeWithSession } from '../types/opencode/enum-event';
 import { logArise2WithLevel } from "../utils/debug-control";
 import { log2OpenCode, showToastOpenCode } from '../utils/log/opencode-log';
-
-export type IEventHandlerContext = ITSPickExtra<PluginInput, "client">;
+import { IEventHandlerContext } from '../types/types-opencode';
 
 /**
  * 從事件中提取會話 ID
@@ -58,7 +56,7 @@ export function handleSessionDeleted(event: EventSessionDeleted, params?: ICreat
  */
 async function handleSessionCreated(
 	event: EventSessionCreated,
-	params: Pick<ICreateEventHandlerParams, "bannerHook">
+	params: Pick<ICreateEventHandlerParams, "bannerHook">,
 ): Promise<void>
 {
 	await params.bannerHook?.onSessionCreated();
@@ -73,7 +71,7 @@ async function handleSessionCreated(
  */
 async function handleSessionIdle(
 	event: EventSessionIdle,
-	params: Pick<ICreateEventHandlerParams, "todoEnforcer"> & { ctx: IEventHandlerContext }
+	params: Pick<ICreateEventHandlerParams, "todoEnforcer"> & { ctx: IEventHandlerContext },
 ): Promise<void>
 {
 	if (!params.todoEnforcer)
@@ -118,7 +116,8 @@ async function handleSessionIdle(
 				}));
 			}
 		}
-	} catch (error)
+	}
+	catch (error)
 	{
 		await log2OpenCode(params.ctx, () => ({
 			body: formatAriseMsgLogBody({
@@ -149,7 +148,7 @@ export interface ICreateEventHandlerParams
 		shapeOutput: (
 			tool: string,
 			output: string,
-			metadata: Record<string, unknown>
+			metadata: Record<string, unknown>,
 		) => Promise<string>;
 	} | null;
 	compactionPreserver?: {
@@ -174,7 +173,7 @@ export interface ICreateEventHandlerParams
 export function createFullEventHandler(
 	params: ICreateEventHandlerParams & {
 		ctx: IEventHandlerContext;
-	}
+	},
 )
 {
 	/**
@@ -188,20 +187,17 @@ export function createFullEventHandler(
 		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
-		await log2OpenCode(params.ctx, () => ({
-			body: formatAriseMsgLogBody({
-				message: `event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
-				level: EnumLogLevel.Debug,
-				label: "event-handler",
-			}),
-		}));
+		await logArise2WithLevel("debug", () => ([
+			"fullEventHandler",
+			`event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+		]));
 
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
 
 		switch (event.type)
 		{
-			case EnumOpenCodeEventTypeWithSession.SessionCreated:
+			case EnumOpenCodeEventTypeWithSession.SessionCreated as ITSTypeAndStringLiteral<EnumOpenCodeEventTypeWithSession.SessionCreated>:
 				await handleSessionCreated(event, params);
 				/**
 				 * session created 時模型可能尚未快取（model 在 chat.params 鉤子中記錄），
@@ -217,7 +213,7 @@ export function createFullEventHandler(
 					}),
 				}));
 				break;
-			case EnumOpenCodeEventTypeWithSession.SessionIdle:
+			case EnumOpenCodeEventTypeWithSession.SessionIdle as ITSTypeAndStringLiteral<EnumOpenCodeEventTypeWithSession.SessionIdle>:
 				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
 						message: `session idle: sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
@@ -227,7 +223,7 @@ export function createFullEventHandler(
 				}));
 				await handleSessionIdle(event, params);
 				break;
-			case EnumOpenCodeEventTypeWithSession.SessionDeleted:
+			case EnumOpenCodeEventTypeWithSession.SessionDeleted as ITSTypeAndStringLiteral<EnumOpenCodeEventTypeWithSession.SessionDeleted>:
 				handleSessionDeleted(event, params);
 				await log2OpenCode(params.ctx, () => ({
 					body: formatAriseMsgLogBody({
@@ -237,7 +233,7 @@ export function createFullEventHandler(
 					}),
 				}));
 				break;
-			case EnumOpenCodeEventType.LspClientDiagnostics:
+			case EnumOpenCodeEventType.LspClientDiagnostics as ITSTypeAndStringLiteral<EnumOpenCodeEventType.LspClientDiagnostics>:
 			{
 				/**
 				 * 處理 LSP 客戶端診斷資訊
@@ -248,13 +244,12 @@ export function createFullEventHandler(
 				 *
 				 * @see https://opencode.ai/docs/#/open_code/events?id=lsp-client-diagnostics-lsp-clientdiagnostics
 				 */
-				const diagnosticsProperties = (event.properties as { diagnostics?: unknown[] } | undefined);
-				const lspDiagnostics = diagnosticsProperties?.diagnostics ?? [];
+				const lspDiagnostics = (event.properties as any as { diagnostics: unknown[] }).diagnostics;
 
 				logArise2WithLevel("info", () => [
-					`[background-manager]`,
-					`LSP Client Diagnostics received (${lspDiagnostics.length} items):`,
-					JSON.stringify(lspDiagnostics, null, 2),
+					"[fullEventHandler]",
+					`LSP Client Diagnostics received${lspDiagnostics?.length > 0 ? ` (${lspDiagnostics.length} items)` : ""}:`,
+					JSON.stringify(lspDiagnostics ?? event.properties, null, 2) + "\n\n",
 				]);
 
 				// TODO: 根據診斷結果執行對應的 action
@@ -262,7 +257,7 @@ export function createFullEventHandler(
 				// Currently just logging for future expansion
 				break;
 			}
-			case EnumOpenCodeEventType.LspUpdated:
+			case EnumOpenCodeEventType.LspUpdated as ITSTypeAndStringLiteral<EnumOpenCodeEventType.LspUpdated>:
 			{
 				/**
 				 * 處理 LSP 更新事件
@@ -276,11 +271,6 @@ export function createFullEventHandler(
 				const lspUpdatedProperties = (event.properties as { isReconnectionRequired?: boolean } | undefined);
 				const isReconnectionRequired = lspUpdatedProperties?.isReconnectionRequired;
 
-				logArise2WithLevel("info", () => [
-					`[background-manager]`,
-					`LSP Updated: isReconnectionRequired=${isReconnectionRequired}`,
-				]);
-
 				/**
 				 * 若有重新連線需求，可選擇重建相關任務
 				 * If reconnection required, optionally rebuild related tasks
@@ -288,12 +278,21 @@ export function createFullEventHandler(
 				if (isReconnectionRequired)
 				{
 					logArise2WithLevel("debug", () => [
-						`[background-manager]`,
+						"[fullEventHandler]",
 						`LSP reconnection required: deciding whether to rebuild related tasks`,
+						JSON.stringify(event.properties, null, 2),
 					]);
 					// TODO: 實現重新連線邏輯
 					// TODO: Implement reconnection logic
 					// For now, just logging for future expansion
+				}
+				else
+				{
+					logArise2WithLevel("info", () => [
+						"[fullEventHandler]",
+						`LSP Updated: isReconnectionRequired=${isReconnectionRequired}`,
+						JSON.stringify(event.properties, null, 2),
+					]);
 				}
 				break;
 			}
@@ -309,13 +308,10 @@ export function createFullEventHandler(
 				 * 2. Evaluating whether new handlers are needed
 				 * 3. Tracing event flow during debugging
 				 */
-				await log2OpenCode(params.ctx, () => ({
-					body: formatAriseMsgLogBody({
-						message: `unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
-						level: EnumLogLevel.Debug,
-						label: "event-handler",
-					}),
-				}));
+				logArise2WithLevel("debug", () => ([
+					"[fullEventHandler]",
+					`unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+				]));
 				break;
 		}
 	};

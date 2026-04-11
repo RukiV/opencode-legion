@@ -33,7 +33,7 @@ import { logArise2WithLevel } from "../../utils/debug-control";
 import { isHighLoadError } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
 import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
-import { EnumOpenCodeEventType } from '../../types/opencode/enum-event';
+import { EnumOpenCodeEventType, isEventWithType } from '../../types/opencode/enum-event';
 
 /**
  * === 配置取得說明 / Configuration Getter Guide ===
@@ -1358,9 +1358,9 @@ export class BackgroundManager
 	 */
 	handleEvent(event: Event): void
 	{
-		if (event.type === EnumOpenCodeEventType.SessionIdle)
+		if (isEventWithType(event, EnumOpenCodeEventType.SessionIdle))
 		{
-			const sessionId = event.properties?.sessionID;
+			const sessionId = event.properties.sessionID;
 			if (sessionId)
 			{
 				/**
