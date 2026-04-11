@@ -12,12 +12,24 @@ This document records the complete workflow, common issues, and recommended prac
 
 ```
 src/
-├── types/enums.ts              ← 1. 新增枚舉值
-├── agents/shadows.ts           ← 2. 新增工具描述與 Zod schema
-├── utils/<tool-name>.ts        ← 3. 核心邏輯（推薦獨立於 opencode）
-├── tools/<tool-name>.ts        ← 4. OpenCode 工具包裝層
-├── tools/index.ts              ← 5. 註冊工具
-test/temp/<tool-name>-standalone.ts  ← 6. 獨立執行驗證（選填）
+├── types/enums.ts                          ← 1. 新增枚舉值
+├── agents/shadows.ts                       ← 2. 新增工具描述與 Zod schema
+├── config/schema/entry.ts                   ← 2b.（選用）抽離 Zod schema 常數
+├── utils/<tool-name>.ts                    ← 3. 核心邏輯（推薦獨立於 opencode）
+├── tools/<tool-name>.ts                    ← 4. OpenCode 工具包裝層
+├── tools/index.ts                          ← 5. 註冊工具
+├── hooks/                                   # Lifecycle Hooks（視需）
+│    │   ├── arsie-banner.ts             # 橫幅顯示 Hook
+│    ├── compaction-preserver.ts         # 對話壓縮保留 Hook
+│    ├── output-shaper.ts                # 輸出格式化 Hook
+│    └── todo-enforcer.ts                # TODO 強制執行 Hook
+├── tests/                                  # 測試輔助目錄（Decoupled 模式）
+│   ├── temp/                             # 臨時測試檔案
+│   ├── issues/                           # Issues 相關測試
+│   ├── lib/                              # 測試輔助庫（Mock 環境）
+│   ├── fixtures/                         # 測試資料集（集中管理）
+│   └── scripts/                          # 測試腳本（資料生成/環境準備）
+test/temp/<tool-name>-standalone.ts           ← 6. 獨立執行驗證（選用）
 ```
 
 ---
@@ -44,7 +56,7 @@ export const ALL_ARISE_TOOLS = [
 ### 命名規範
 
 | 項目 | 格式 | 範例 |
-|------|------|------|
+|--|--|--|
 | 枚舉名 | `ARISE_{功能}` | `ARISE_GIT_SUMMARY` |
 | 枚舉值 | `arise_{功能}` | `arise_git_summary` |
 
@@ -58,7 +70,7 @@ export const ALL_ARISE_TOOLS = [
 
 ```typescript
 [EnumAriseTools.ARISE_GIT_SUMMARY]: {
-  description: `Get a Git repository status summary in one shot. ...` as const,
+  description: `Get a Git repository status summary...` as const,
   shortDescription: "Get Git status summary (status + diff stat + recent log)" as const,
 
   args: {
@@ -88,14 +100,12 @@ export const ALL_ARISE_TOOLS = [
 
 當工具的選項型別需要在多處使用（如核心邏輯、測試），可從 Zod schema 推導，避免重複定義。
 
-有兩種做法，兩者推導出的型別**完全等價**（`satisfies` 保留窄化型別，`args` 不會被寬化為 `unknown`）：
+**Approach 1：抽離命名常數（推薦用於獨立執行）**
 
-#### Approach 1：抽離命名常數
-
-將 Zod schema 抽離為獨立常數（如 `GIT_SUMMARY_ARGS`），在 `ARISE_TOOLS` 中引用。
+將 Zod schema 抽離為獨立常數，在 `ARISE_TOOLS` 中引用。
 
 ```typescript
-// src/config/schema/entry.ts
+// src/config/schema/entry.ts — 單一 source of truth
 export const GIT_SUMMARY_ARGS = {
   log_count: z.number().describe("...").optional().default(5),
   diff_stat: z.boolean().describe("...").optional().default(true),
@@ -103,11 +113,11 @@ export const GIT_SUMMARY_ARGS = {
 
 export type IGitSummaryOptions = z.input<z.ZodObject<typeof GIT_SUMMARY_ARGS>>;
 
-// src/agents/shadows.ts
+// src/agents/shadows.ts — 引用常數
 import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
 
 [EnumAriseTools.ARISE_GIT_SUMMARY]: {
-  args: GIT_SUMMARY_ARGS,  // 引用常數
+  args: GIT_SUMMARY_ARGS,
 },
 
 // src/utils/git-summary.ts（核心邏輯）
@@ -120,7 +130,7 @@ import type { IGitSummaryOptions } from '../config/schema/entry';
 | 適合獨立執行驗證 | 設定分散在多個檔案 |
 | 可跨工具共用 schema | 需要知道 schema 的定義位置 |
 
-#### Approach 2：直接從 ARISE_TOOLS 推導
+**Approach 2：直接從 ARISE_TOOLS 推導（推薦用於簡單設定）**
 
 不抽離常數，直接從 `ARISE_TOOLS` 物件索引取得 `args` 來推導型別。
 
@@ -149,10 +159,10 @@ export type IGitSummaryOptions = z.input<z.ZodObject<
 | **直覺，不需要查看其他檔案** | 匯入路徑較長 |
 | 當 args 簡單且不跨工具共用時更簡潔 | 複雜 schema 時可讀性較差 |
 
-#### 選擇建議
+**選擇建議**
 
 | 場景 | 推薦做法 |
-|------|----------|
+|--|--|
 | 核心邏輯需要獨立執行（不依賴 opencode） | Approach 1（抽離常數） |
 | args 簡單，設定集中管理 | **Approach 2**（直接推導） |
 | schema 需要跨工具共用 | Approach 1（抽離常數） |
@@ -180,7 +190,7 @@ export function getGitSummary(options?: IGitSummaryOptions): IGitSummaryResult {
 export function formatGitSummary(result: IGitSummaryResult): string { ... }
 ```
 
-### 為什麼要獨立化？
+**為什麼要獨立化？**
 
 | 優點 | 說明 |
 |------|------|
@@ -195,7 +205,7 @@ export function formatGitSummary(result: IGitSummaryResult): string { ... }
 
 **檔案：** `src/tools/<tool-name>.ts`
 
-包裝層負責：
+**包裝層負責：**
 1. 從 `ARISE_TOOLS` 取得描述和 schema
 2. 呼叫核心邏輯
 3. 使用 `formatAriseMsg*` 格式化輸出
@@ -264,6 +274,48 @@ export function createPluginTools(ctx: PluginInput, backgroundManager: Backgroun
 
 ---
 
+## 步驟 6：獨立執行驗證（選用）
+
+**檔案：** `test/temp/<tool-name>-standalone.ts`（或 `test/scripts/`）
+
+**推薦用途：**
+- 用於開發階段快速驗證核心邏輯
+- 記錄複雜的參數調整過程（如演算法嘗試、參數組合探索）
+- 需要審閱時的參考檔案
+
+**不推薦用途：**
+- 作為最終測試（應移至正式測試目錄）
+- 長期保留但未分類的臨時檔案
+
+**範例：**
+
+```typescript
+#!/usr/bin/env tsx
+
+/**
+ * 獨立驗證腳本：Git Summary 工具
+ * 可直接執行 core logic，不需啟動 OpenCode
+ */
+
+import { getGitSummary, formatGitSummary } from '../../src/utils/git-summary';
+import type { IGitSummaryOptions } from '../../src/utils/git-summary';
+
+const options: IGitSummaryOptions = {
+  log_count: 5,
+  diff_stat: true,
+};
+
+try {
+  const result = getGitSummary(options);
+  console.log(formatGitSummary(result));
+} catch (error) {
+  console.error('Error:', error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
+```
+
+---
+
 ## 常見問題
 
 ### Q1：`@opencode-ai/plugin` 無法在獨立環境匯入
@@ -297,10 +349,10 @@ D:\...\node_modules\@opencode-ai\plugin\package.json
 
 ```typescript
 // ✅ 正確
-z.number().describe("...").optional().default(5)
+z.number().describe("...")?.optional().default(5)
 
 // ❌ 錯誤：.default() 在 .optional() 後面
-z.number().describe("...").default(5).optional()
+z.number().describe("...")?.default(5).optional()
 ```
 
 ---
@@ -309,7 +361,7 @@ z.number().describe("...").default(5).optional()
 
 | 做法 | 說明 |
 |------|------|
-| **核心邏輯獨立** | 放在 `src/tools/lib/` 或 `src/utils/` ，盡量將不依賴 opencode 的部分放在獨立的檔案中 |
+| **核心邏輯獨立** | 放在 `src/utils/`，盡量將不依賴 opencode 的部分放在獨立的檔案中 |
 | **包裝層薄** | `src/tools/` 只做「取得描述 → 呼叫核心 → 格式化輸出」 |
 | **使用 `tool2`** | 避免 TypeScript 推導錯誤 |
 | **`as const` 描述** | 保留字面量類型 |
@@ -317,48 +369,28 @@ z.number().describe("...").default(5).optional()
 | **錯誤處理** | `try/catch` + `formatAriseMsgError` |
 | **獨立驗證腳本** | `test/temp/<tool>-standalone.ts` 可直接執行核心邏輯 (可保留作為參考或在下次需要時復用) |
 | **Zod 順序** | `.meta()` → `.default()` → `.optional()` |
+| **測試架構** | 依 `test-file-best-practices.md` 規範組織：issues、lib、fixtures、scripts |
 
 ---
 
-## 本次實作案例：`arise_git_summary`
-
-| 步驟 | 檔案 | 變更 |
-|------|------|------|
-| 枚舉 | `src/types/enums.ts` | +`ARISE_GIT_SUMMARY` |
-| 描述 | `src/agents/shadows.ts` | +工具描述、引用 schema 常數 |
-| Schema | `src/config/schema/entry.ts` | **新檔案**，Zod raw shape + 推導型別 |
-| 核心 | `src/utils/git-summary.ts` | **新檔案**，獨立邏輯 + re-export 型別 |
-| 包裝 | `src/tools/arise-git-summary.ts` | **新檔案**，OpenCode 整合 |
-| 註冊 | `src/tools/index.ts` | 匯入 + 註冊 |
-| 驗證 | `test/temp/git-summary-standalone.ts` | 獨立執行腳本 |
-
-### 型別推導方式
-
-本案例使用 **Approach 1**（抽離常數），因為核心邏輯需要獨立執行驗證：
-
-```typescript
-// src/config/schema/entry.ts — 單一 source of truth
-export const GIT_SUMMARY_ARGS = { ... } as const;
-export type IGitSummaryOptions = z.input<z.ZodObject<typeof GIT_SUMMARY_ARGS>>;
-
-// src/agents/shadows.ts — 引用常數
-import { GIT_SUMMARY_ARGS } from '../config/schema/entry';
-args: GIT_SUMMARY_ARGS,
-
-// src/utils/git-summary.ts — 匯入推導型別
-import type { IGitSummaryOptions } from '../config/schema/entry';
-```
-
-若不需要獨立執行驗證，也可使用 **Approach 2** 直接從 `ARISE_TOOLS` 推導，省去 `config/schema/entry.ts` 檔案。
-
-### 時間線
+## 開發流程時間線
 
 1. 先探索現有工具架構（beru 偵察）
-2. 依序修改 enums → shadows → 建立核心 → 建立包裝 → 註冊
-3. typecheck 驗證
-4. 發現 `@opencode-ai/plugin` 無法獨立匯入
-5. 重構：核心邏輯抽離到 `src/utils/`
-6. 再次 typecheck + 獨立執行驗證
-7. 討論型別推導：`z.input` vs `z.infer`（選擇 `z.input` 保留 optional 語義）
-8. 討論 Approach 1 vs Approach 2（選擇 Approach 1 因為需要獨立執行）
-9. Schema 檔案從 `config/schema/index.ts` 重命名為 `config/schema/entry.ts`（避免目錄引用歧義）
+2. 依序修改：`enums` → `shadows` → 建立核心 → 建立包裝 → 註冊
+3. 依選擇執行：
+   - **Approach 1** 或 **Approach 2**（根據獨立執行需求）
+   - `test/temp/<tool>-standalone.ts`（獨立驗證腳本）
+4. 執行 `pnpm run typecheck` 驗證
+5. 如需獨立執行環境測試，調整核心邏輯架構
+6. 討論型別推導：`z.input` vs `z.infer`
+7. 執行獨立驗證腳本確認功能正確
+
+---
+
+## 相關資源
+
+- [AGENTS.md](./AGENTS.md) - Agents 執行規則與最佳實踐
+- [test-file-best-practices.md](./test-file-best-practices.md) - 測試檔案最佳實踐
+- [comment-format-rules.md](./comment-format-rules.md) - 註解格式規範
+- [docs/rules/zod-syntax-order.md](./docs/rules/zod-syntax-order.md) - Zod Schema 鏈結順序
+- [docs/STRUCTURE.md](./docs/STRUCTURE.md) - 專案結構總覽
