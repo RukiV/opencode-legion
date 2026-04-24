@@ -16,7 +16,7 @@ import type { IAriseConfig } from '../config/schema';
  * Usage: Choose tools to disable from ALL_ARISE_TOOLS
  */
 const DISABLED_TOOLS_CODE_LEVEL = [
-	EnumAriseTools.ARISE_COLLABORATE,
+	// EnumAriseTools.ARISE_COLLABORATE,
 ] as readonly EnumAriseTools[];
 
 /**

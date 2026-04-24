@@ -77,6 +77,22 @@ export function setShadowAgentsConfig(params: {
 
 	const opencodeModel = parseModelString(opencodeConfig.model).detectAutoModelBody ? DEFAULT_MODEL : opencodeConfig.model!;
 
+	opencodeConfig.experimental ??= {};
+	opencodeConfig.experimental.primary_tools ??= [];
+
+	/**
+	 * 防止子代理無限呼叫子代理
+	 */
+	opencodeConfig.experimental.primary_tools = [...new Set([
+		...opencodeConfig.experimental.primary_tools,
+		EnumAriseTools.ARISE_SYNC_SUMMON,
+		EnumAriseTools.ARISE_ASYNC_BACKGROUND,
+		EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL,
+		EnumAriseTools.ARISE_CONTINUE,
+		EnumAriseTools.ARISE_COLLABORATE,
+		'task',
+	])];
+
 	for (const [name, shadow] of tsObjectEntries(SHADOW_AGENTS))
 	{
 		const shadowName = name;
