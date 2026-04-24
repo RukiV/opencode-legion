@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.37](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.36...@bluelovers/opencode-arise@0.1.37) (2026-04-24)
+
+
+### BREAKING CHANGES
+
+* **tools:** 工具 args 類型變更為 IPluginToolAriseArgs<T>
+
+
+
+### 🐛　Bug Fixes
+
+* **config:** 防止子代理无限递归调用 ([bff8818](https://github.com/bluelovers/opencode-arise/commit/bff881880d64a57e062df952ab77584cfe7d3b04))
+* **tools:** 修复提供者筛选时的类型断言问题 ([4848ebb](https://github.com/bluelovers/opencode-arise/commit/4848ebb4a6d0c4c8879a489063999427c6ceff0e))
+
+
+### ✨　Features
+
+* **collaborate:** 新增 session 複用與子代理工具阻擋功能 ([7d33550](https://github.com/bluelovers/opencode-arise/commit/7d33550785bee5f671d8804c9aff9599019e5977))
+* **event-handler:** 新增 LSP 診斷與更新事件處理 ([6d29ab1](https://github.com/bluelovers/opencode-arise/commit/6d29ab1951652fb77ca37310453743868eb54d0b))
+
+
+### 📦　Code Refactoring
+
+* **collaborate:** 重構變數命名為 snake_case 命名規範 ([9be2330](https://github.com/bluelovers/opencode-arise/commit/9be2330545c0f1d978905eeeeee703698c9488a5))
+* **config:** 改進 Zod 類型推導與註解 ([e018fe1](https://github.com/bluelovers/opencode-arise/commit/e018fe1efa71002325692aa31c836996e8b50e72))
+* **event-handler:** rename functions with Event prefix for clarity ([1e79bb0](https://github.com/bluelovers/opencode-arise/commit/1e79bb082a8318f0ceec0c35c32382780b20172d))
+* **event-handler:** 改善事件類型安全性和日誌記錄 ([82d55b2](https://github.com/bluelovers/opencode-arise/commit/82d55b20b882dd4b985062b33e0d6a34b8fea129))
+* **log:** centralize Toast and Log utilities with error handling ([51d10d6](https://github.com/bluelovers/opencode-arise/commit/51d10d67bb1594a8048d6b5f1654bcf9cd0756ea))
+* **schema:** 新增 ARISE_COLLABORATE 類型並重構工具類型命名 ([4f26f91](https://github.com/bluelovers/opencode-arise/commit/4f26f91d81098cda2f708177d22c56dda6b440bb))
+* **tools:** 提取召喚工具共用參數 schema ([1aa6e0b](https://github.com/bluelovers/opencode-arise/commit/1aa6e0b5359886208f9e4da4cfbc8a7f82aa7c19))
+* **tools:** extract shared types and improve type safety ([738e74c](https://github.com/bluelovers/opencode-arise/commit/738e74c9cf9d7b56cf8909e8fc30426e35b3a346))
+* **tools:** 新增動態工具權限控制與 task.ts 輸出格式 ([c98b29d](https://github.com/bluelovers/opencode-arise/commit/c98b29dd443786eb0868294a7ec5ee088b1b9951))
+* **utils:** 重構 formatGitSummary 使用等號做為程式碼區塊分隔符號 ([87814ac](https://github.com/bluelovers/opencode-arise/commit/87814ac4ffe83017682d8c60f491169f29a73bbd))
+
+
+### 📚　Documentation
+
+* 更新專案結構文檔與工具開發 workflow ([03d9ee2](https://github.com/bluelovers/opencode-arise/commit/03d9ee2cdb428918d9632dc19fd20fe10fbdf618))
+* **config:** 重構文檔目錄結構並新增 LSP 監控策略分析文檔 ([ba0a689](https://github.com/bluelovers/opencode-arise/commit/ba0a6894b004fb3e3f7e91304b788d1f49b133be))
+* **role:** 添加《我独自升级》角色参考资料与角色转换规则 ([c223ad2](https://github.com/bluelovers/opencode-arise/commit/c223ad2591939551dac9228c79e533c730558f37))
+
+
+### 💎　Styles
+
+* 移除 staged 檔案的行首空白 ([8d9884b](https://github.com/bluelovers/opencode-arise/commit/8d9884b2100f69a529744737491864442d11d4ea))
+
+
+### 🛠　Build System
+
+* openspec ([eca9155](https://github.com/bluelovers/opencode-arise/commit/eca9155c3862fac1c0117622b02f8216b8bcfe1d))
+
+
+### 🔖　Miscellaneous
+
+* . ([aea5f21](https://github.com/bluelovers/opencode-arise/commit/aea5f2189556ed7ce049065a0408e490a1c1fc83))
+
+
+
 ## [0.1.36](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.35...@bluelovers/opencode-arise@0.1.36) (2026-04-07)
 
 
