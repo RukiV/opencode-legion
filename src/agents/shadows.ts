@@ -107,7 +107,11 @@ export type IShadowAgents = {
  * these texts to understand what a tool does and how to use it. Inaccurate
  * descriptions will cause agents to pick the wrong tool or pass wrong args.
  *
- * @internal - only for valid ARISE_TOOLS satisfies 約束
+ * @internal - 内部接口，不对外开放
+ * Internal interface, not for external use
+ *
+ * 使用下划线前缀表示这是内部实现细节，仅用于 ARISE_TOOLS satisfies 约束
+ * Using underscore prefix to indicate this is internal implementation detail, only for ARISE_TOOLS satisfies constraint
  */
 interface I_AriseToolsConfigEntry
 {

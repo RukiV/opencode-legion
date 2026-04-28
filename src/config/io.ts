@@ -21,8 +21,7 @@ import { formatAriseMsgError } from "../utils/string/arise-message";
 import type { PluginInput } from '@opencode-ai/plugin';
 import { ITSValueOrArrayMaybeReadonly } from 'ts-type';
 import { IReturnHasPlugin } from '../types/types';
-
-type JsonObject = Record<string, unknown>;
+import type { JsonObject } from '../types/common';
 
 /**
  * 解析 JSONC（帶註解的 JSON）

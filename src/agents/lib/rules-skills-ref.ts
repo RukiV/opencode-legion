@@ -13,7 +13,7 @@
 export const RULES_SKILLS_INDEX = `## 📚 Rules & Skills Index
 
 ### Rules (in system prompt OR read by name)
-Rules 可以透過名稱讀取或已被注入到 system prompt：
+
 - **typescript-naming-convention** - Type naming rules (I* for interfaces, Enum* for enums)
 - **comment-format-rules** - Comment format rules (block comments, bilingual)
 - **test-file-best-practices** - Test file organization
@@ -28,12 +28,12 @@ Use skill tool to load and get detailed guidance:
 - **js-git-friendly-coding-style**
   → Git-friendly code style (Tab indentation, Allman braces)
   → Reduces diff noise, better merging
-  
+
 - **analyze-code-commenter**
   → Add bilingual comments (Chinese + English)
   → Proper block/single-line usage
   → JSDoc with logic separation
-  
+
 - **code-refactoring-expert**
   → Safe refactoring patterns
   → Backward compatibility
@@ -68,5 +68,5 @@ Use skill tool to load and get detailed guidance:
  */
 export const RULES_SKILLS_SHORT = `## 📚 Rules & Skills (Quick Ref)
 Rules: typescript-naming-convention, comment-format-rules, test-file-best-practices, unimplemented-code-handling-rules
-Skills: js-git-friendly-coding-style, analyze-code-commenter, code-refactoring-expert, typescript-unimplemented-handler
+Skills: js-git-friendly-coding-style, analyze-code-commenter, code-refactoring-expert, typescript-unimplemented-handler, factual-accuracy-guard
 Load: skill(name: "skill-name") — skill may override outdated rules` as const;
