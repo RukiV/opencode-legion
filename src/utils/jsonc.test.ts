@@ -13,18 +13,22 @@ import { createJsonHandler, detectFormat } from "./config/jsonc";
 
 /* ============ createJsonHandler 工廠函數測試 / createJsonHandler factory function tests ============ */
 
-describe("createJsonHandler", () => {
-	test("解析標準 JSON", () => {
+describe("createJsonHandler", () =>
+{
+	test("解析標準 JSON", () =>
+	{
 		const handler = createJsonHandler('{"a": 1, "b": "hello"}');
 		expect(handler.valueOf()).toEqual({ a: 1, b: "hello" });
 	});
 
-	test("解析 JSON 陣列", () => {
+	test("解析 JSON 陣列", () =>
+	{
 		const handler = createJsonHandler('[1, 2, 3]');
 		expect(handler.valueOf()).toEqual([1, 2, 3]);
 	});
 
-	test("解析帶單行註解的 JSONC", () => {
+	test("解析帶單行註解的 JSONC", () =>
+	{
 		const jsonc = `{
   // 這是單行註解
   "a": 1,
@@ -34,7 +38,8 @@ describe("createJsonHandler", () => {
 		expect(handler.valueOf()).toEqual({ a: 1, b: 2 });
 	});
 
-	test("解析帶多行註解的 JSONC", () => {
+	test("解析帶多行註解的 JSONC", () =>
+	{
 		const jsonc = `{
   /* 這是
      多行註解 */
@@ -44,7 +49,8 @@ describe("createJsonHandler", () => {
 		expect(handler.valueOf()).toEqual({ a: 1 });
 	});
 
-	test("解析帶尾隨逗號的 JSONC", () => {
+	test("解析帶尾隨逗號的 JSONC", () =>
+	{
 		const jsonc = `{
   "a": 1,
   "b": 2,
@@ -53,7 +59,8 @@ describe("createJsonHandler", () => {
 		expect(handler.valueOf()).toEqual({ a: 1, b: 2 });
 	});
 
-	test("解析複雜巢狀結構", () => {
+	test("解析複雜巢狀結構", () =>
+	{
 		const jsonc = `{
   // 設定
   "settings": {
@@ -72,7 +79,8 @@ describe("createJsonHandler", () => {
 		});
 	});
 
-	test("處理 URL 中的雙斜線", () => {
+	test("處理 URL 中的雙斜線", () =>
+	{
 		const jsonc = `{
   "url": "https://example.com/path//more"
 }`;
@@ -85,22 +93,26 @@ describe("createJsonHandler", () => {
 
 /* ============ detectFormat 函數測試 / detectFormat function tests ============ */
 
-describe("detectFormat", () => {
-	test("偵測 2 空格縮排", () => {
+describe("detectFormat", () =>
+{
+	test("偵測 2 空格縮排", () =>
+	{
 		const text = '{\n  "a": 1\n}';
 		const options = detectFormat(text);
 		expect(options.insertSpaces).toBe(true);
 		expect(options.tabSize).toBe(2);
 	});
 
-	test("偵測 4 空格縮排", () => {
+	test("偵測 4 空格縮排", () =>
+	{
 		const text = '{\n    "a": 1\n}';
 		const options = detectFormat(text);
 		expect(options.insertSpaces).toBe(true);
 		expect(options.tabSize).toBe(4);
 	});
 
-	test("偵測 Tab 縮排", () => {
+	test("偵測 Tab 縮排", () =>
+	{
 		const text = '{\n\t"a": 1\n}';
 		const options = detectFormat(text);
 		expect(options.insertSpaces).toBe(false);
@@ -109,47 +121,55 @@ describe("detectFormat", () => {
 
 /* ============ JsonHandler 類測試 / JsonHandler class tests ============ */
 
-describe("JsonHandler instance methods", () => {
-	test("基本讀取", () => {
+describe("JsonHandler instance methods", () =>
+{
+	test("基本讀取", () =>
+	{
 		const handler = createJsonHandler('{"a": 1, "b": 2}');
 		expect(handler.get(["a"])).toBe(1);
 		expect(handler.get(["b"])).toBe(2);
 		expect(handler.get(["c"])).toBeUndefined();
 	});
 
-	test("設定值", () => {
+	test("設定值", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 		expect(handler.get(["b"])).toBe(2);
 	});
 
-	test("刪除值", () => {
+	test("刪除值", () =>
+	{
 		const handler = createJsonHandler('{"a": 1, "b": 2}');
 		handler.delete(["a"]);
 		expect(handler.has(["a"])).toBe(false);
 	});
 
-	test("檢查存在性", () => {
+	test("檢查存在性", () =>
+	{
 		const handler = createJsonHandler('{"exists": true}');
 		expect(handler.has(["exists"])).toBe(true);
 		expect(handler.has(["notExists"])).toBe(false);
 	});
 
-	test("stringify 應用修改", () => {
+	test("stringify 應用修改", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 		const result = handler.stringify();
 		expect(JSON.parse(result)).toEqual({ a: 1, b: 2 });
 	});
 
-	test("stringify 刪除欄位", () => {
+	test("stringify 刪除欄位", () =>
+	{
 		const handler = createJsonHandler('{"a": 1, "b": 2}');
 		handler.delete(["a"]);
 		const result = handler.stringify();
 		expect(JSON.parse(result)).toEqual({ b: 2 });
 	});
 
-	test("巢狀路徑操作", () => {
+	test("巢狀路徑操作", () =>
+	{
 		const handler = createJsonHandler('{"user": {"name": "test"}}');
 		expect(handler.get(["user", "name"])).toBe("test");
 
@@ -165,7 +185,8 @@ describe("JsonHandler instance methods", () => {
 		});
 	});
 
-	test("重置為原始狀態", () => {
+	test("重置為原始狀態", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 		handler.reset();
@@ -173,20 +194,23 @@ describe("JsonHandler instance methods", () => {
 		expect(handler.get(["a"])).toBe(1);
 	});
 
-	test("清空暫存區", () => {
+	test("清空暫存區", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 		handler.clearStaging();
 		expect(handler.get(["b"])).toBeUndefined();
 	});
 
-	test("取得原始文字", () => {
+	test("取得原始文字", () =>
+	{
 		const original = '{"a": 1}';
 		const handler = createJsonHandler(original);
 		expect(handler.getSourceText()).toBe(original);
 	});
 
-	test("格式化選項", () => {
+	test("格式化選項", () =>
+	{
 		const handler = createJsonHandler('{"a":1}');
 		const options = handler.getFormattingOptions();
 		expect(options).toHaveProperty("insertSpaces");
@@ -196,11 +220,13 @@ describe("JsonHandler instance methods", () => {
 		expect(handler.getFormattingOptions().tabSize).toBe(4);
 	});
 
-	test("解析錯誤拋出", () => {
+	test("解析錯誤拋出", () =>
+	{
 		expect(() => createJsonHandler('{"a": invalid}')).toThrow();
 	});
 
-	test("valueOf 回傳完整物件", () => {
+	test("valueOf 回傳完整物件", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 		expect(handler.valueOf()).toEqual({ a: 1, b: 2 });
@@ -209,22 +235,26 @@ describe("JsonHandler instance methods", () => {
 
 /* ============ JsonHandler Staging Area 測試 / JsonHandler Staging Area tests ============ */
 
-describe("JsonHandler Staging Area", () => {
-	test("多次設定同一路徑", () => {
+describe("JsonHandler Staging Area", () =>
+{
+	test("多次設定同一路徑", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["a"], 2);
 		handler.set(["a"], 3);
 		expect(handler.get(["a"])).toBe(3);
 	});
 
-	test("刪除後重新設定", () => {
+	test("刪除後重新設定", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.delete(["a"]);
 		handler.set(["a"], 2);
 		expect(handler.get(["a"])).toBe(2);
 	});
 
-	test("isStagedChanged 回傳 staging 大小", () => {
+	test("isStagedChanged 回傳 staging 大小", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		expect(handler.isStagedChanged()).toBe(0);
 
@@ -235,12 +265,14 @@ describe("JsonHandler Staging Area", () => {
 		expect(handler.isStagedChanged()).toBe(2);
 
 		// 可以在條件判斷中使用（非布林值）
-		if (handler.isStagedChanged()) {
+		if (handler.isStagedChanged())
+		{
 			// size > 0 會被視為 truthy
 		}
 	});
 
-	test("overwriteStaged 完全覆寫", () => {
+	test("overwriteStaged 完全覆寫", () =>
+	{
 		const handler = createJsonHandler('{"a": 1, "b": 2}');
 		handler.set(["c"], 3);
 
@@ -251,7 +283,8 @@ describe("JsonHandler Staging Area", () => {
 		expect(handler.get(["d"])).toBe(4);
 	});
 
-	test("applyStaged 合併暫存", () => {
+	test("applyStaged 合併暫存", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 
@@ -263,7 +296,8 @@ describe("JsonHandler Staging Area", () => {
 		expect(handler.get(["c"])).toBe(3);
 	});
 
-	test("getStagedChanges 回傳拷貝", () => {
+	test("getStagedChanges 回傳拷貝", () =>
+	{
 		const handler = createJsonHandler('{"a": 1}');
 		handler.set(["b"], 2);
 
@@ -276,8 +310,10 @@ describe("JsonHandler Staging Area", () => {
 
 /* ============ JSONC 註解處理測試 / JSONC comment handling tests ============ */
 
-describe("JSONC 註解處理", () => {
-	test("註解在物件內", () => {
+describe("JSONC 註解處理", () =>
+{
+	test("註解在物件內", () =>
+	{
 		const handler = createJsonHandler(`{
   "name": "test",
   // 註解
@@ -286,7 +322,8 @@ describe("JSONC 註解處理", () => {
 		expect(handler.valueOf()).toEqual({ name: "test", value: 123 });
 	});
 
-	test("註解在陣列內", () => {
+	test("註解在陣列內", () =>
+	{
 		const handler = createJsonHandler(`[
   1,
   // 註解
@@ -296,7 +333,8 @@ describe("JSONC 註解處理", () => {
 		expect(handler.valueOf()).toEqual([1, 2, 3]);
 	});
 
-	test("多行註解跨越多行", () => {
+	test("多行註解跨越多行", () =>
+	{
 		const handler = createJsonHandler(`{
   /* 第一行
      第二行
@@ -306,7 +344,8 @@ describe("JSONC 註解處理", () => {
 		expect(handler.valueOf()).toEqual({ value: 1 });
 	});
 
-	test("巢狀結構中的註解", () => {
+	test("巢狀結構中的註解", () =>
+	{
 		const handler = createJsonHandler(`{
   "outer": {
     // 內層註解
@@ -321,7 +360,8 @@ describe("JSONC 註解處理", () => {
 		});
 	});
 
-	test("字串中包含註解符號不應被視為註解", () => {
+	test("字串中包含註解符號不應被視為註解", () =>
+	{
 		const handler = createJsonHandler(`{
   "url": "https://example.com/path//more",
   "comment": "這是 /* 多行 */ 註解文字"

@@ -38,7 +38,7 @@ export function createForceZodArraySchema<T extends z.ZodTypeAny>(itemSchema: T)
 {
 	return z.preprocess(
 		(val) => (val === undefined ? [] : Array.isArray(val) ? val : [val]),
-		z.array(itemSchema)
+		z.array(itemSchema),
 	);
 }
 
@@ -93,9 +93,9 @@ export function unwrapZodNullable<T extends z.ZodTypeAny>(schema: z.ZodNullable<
  */
 export type IZodUnwrapAll<T> =
 	T extends z.ZodDefault<infer Inner> ? IZodUnwrapAll<Inner> :
-	T extends z.ZodOptional<infer Inner> ? IZodUnwrapAll<Inner> :
-	T extends z.ZodNullable<infer Inner> ? IZodUnwrapAll<Inner> :
-	T;
+		T extends z.ZodOptional<infer Inner> ? IZodUnwrapAll<Inner> :
+			T extends z.ZodNullable<infer Inner> ? IZodUnwrapAll<Inner> :
+				T;
 
 /**
  * 類型守衛：檢查是否為包裝類型（有 innerType 的類型）
@@ -105,6 +105,7 @@ function _isWrapperType(def: z.core.$ZodTypeDef): def is z.core.$ZodTypeDef & { 
 {
 	return def && typeof def === "object" && "innerType" in def && def.innerType !== undefined;
 }
+
 export function unwrapZodAll<T extends z.ZodTypeAny>(schema: T): IZodUnwrapAll<T>
 {
 	const def = schema.def;
@@ -124,10 +125,11 @@ export function unwrapZodAll<T extends z.ZodTypeAny>(schema: T): IZodUnwrapAll<T
 export function unwrapZodAllShape<T extends z.ZodObject>(schema: T): IZodUnwrapAll<T>
 {
 	const entries = Object.entries(schema.shape)
-		.map(([key, value]) => {
+		.map(([key, value]) =>
+		{
 			return [key, unwrapZodAll(value)];
 		})
-		;
+	;
 
 	return Object.fromEntries(entries) as IZodUnwrapAll<T>;
 }

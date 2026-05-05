@@ -22,24 +22,24 @@ import { AUTO_MODEL } from "../../../src/types/const-default";
  * @returns The effective model to use / 要使用的有效模型
  */
 export function getEffectiveModel(
-  parentModel: string | undefined,
-  defaultModel: string | undefined,
-  userModel?: string,
+	parentModel: string | undefined,
+	defaultModel: string | undefined,
+	userModel?: string,
 ): string | undefined
 {
-  const _isAutoModel = (model?: string): boolean => model === AUTO_MODEL;
-  const _isDefinedAndNotAutoModel = (model?: string): boolean => !!model && model.trim().length > 0 && !_isAutoModel(model);
+	const _isAutoModel = (model?: string): boolean => model === AUTO_MODEL;
+	const _isDefinedAndNotAutoModel = (model?: string): boolean => !!model && model.trim().length > 0 && !_isAutoModel(model);
 
-  if (_isDefinedAndNotAutoModel(userModel))
-  {
-    return userModel;
-  }
+	if (_isDefinedAndNotAutoModel(userModel))
+	{
+		return userModel;
+	}
 
-  if (_isAutoModel(defaultModel))
-  {
-    return parentModel ?? defaultModel;
-  }
-  return defaultModel;
+	if (_isAutoModel(defaultModel))
+	{
+		return parentModel ?? defaultModel;
+	}
+	return defaultModel;
 }
 
 /**

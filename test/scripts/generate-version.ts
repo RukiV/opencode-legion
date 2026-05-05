@@ -36,7 +36,7 @@ const version = packageJson.version;
  */
 function generateVersionFile()
 {
-  return `/**
+	return `/**
  * ═══════════════════════════════════════════════════════════
  * ⚠️  注意 / WARNING ⚠️
  * ═══════════════════════════════════════════════════════════

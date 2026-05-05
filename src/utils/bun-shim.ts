@@ -16,7 +16,8 @@ import { createJsonHandler } from "./config/jsonc";
  * 模擬 Bun.file() 返回的檔案物件
  * Simulates the file object returned by Bun.file()
  */
-export interface IBunFile {
+export interface IBunFile
+{
 	/** 檔案路徑 / File path */
 	readonly path: string;
 
@@ -68,7 +69,8 @@ export interface IBunFile {
  * 提供 Bun 全域物件的相容實現
  * Provides compatible implementation of Bun global object
  */
-class BunShim {
+class BunShim
+{
 	/**
 	 * 建立檔案物件
 	 * Create file object
@@ -79,7 +81,8 @@ class BunShim {
 	 * @param path - 檔案路徑 / File path
 	 * @returns 檔案物件 / File object
 	 */
-	file(path: string): IBunFile {
+	file(path: string): IBunFile
+	{
 		return new BunFile(path);
 	}
 }
@@ -91,7 +94,8 @@ class BunShim {
  * 實現 Bun 文件物件的所有必要方法
  * Implements all necessary methods of Bun file object
  */
-export class BunFile implements IBunFile {
+export class BunFile implements IBunFile
+{
 	/** 檔案路徑 / File path */
 	protected readonly _path: string;
 
@@ -101,7 +105,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @param path - 檔案路徑 / File path
 	 */
-	constructor(path: string) {
+	constructor(path: string)
+	{
 		this._path = path;
 	}
 
@@ -109,7 +114,8 @@ export class BunFile implements IBunFile {
 	 * 取得檔案路徑
 	 * Get file path
 	 */
-	get path(): string {
+	get path(): string
+	{
 		return this._path;
 	}
 
@@ -122,7 +128,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @returns Promise<boolean> - 檔案是否存在
 	 */
-	async exists(): Promise<boolean> {
+	async exists(): Promise<boolean>
+	{
 		return pathExists(this._path);
 	}
 
@@ -135,7 +142,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @returns Promise<string> - 檔案內容
 	 */
-	async text(): Promise<string> {
+	async text(): Promise<string>
+	{
 		return readFile(this._path, "utf-8");
 	}
 
@@ -148,7 +156,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @returns Promise<unknown> - 解析後的 JSON 物件
 	 */
-	async json(): Promise<unknown> {
+	async json(): Promise<unknown>
+	{
 		const content = await this.text();
 		// 使用 JsonHandler 解析，支援註解和尾隨逗號
 		const handler = createJsonHandler(content);
@@ -164,7 +173,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @returns Promise<ArrayBuffer> - 檔案內容的 ArrayBuffer
 	 */
-	async arrayBuffer(): Promise<ArrayBuffer> {
+	async arrayBuffer(): Promise<ArrayBuffer>
+	{
 		const buffer = await readFile(this._path);
 		return buffer.buffer.slice(
 			buffer.byteOffset,
@@ -181,7 +191,8 @@ export class BunFile implements IBunFile {
 	 *
 	 * @returns Promise<Blob> - 檔案內容的 Blob
 	 */
-	async blob(): Promise<Blob> {
+	async blob(): Promise<Blob>
+	{
 		const buffer = await readFile(this._path);
 		return new Blob([buffer]);
 	}
@@ -193,7 +204,8 @@ export class BunFile implements IBunFile {
  *
  * @returns BunShim - Bun 偽裝類實例
  */
-function createBunShim(): BunShim {
+function createBunShim(): BunShim
+{
 	return new BunShim();
 }
 

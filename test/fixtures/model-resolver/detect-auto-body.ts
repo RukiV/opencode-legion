@@ -27,25 +27,79 @@ export interface IDetectAutoBodyCase
 
 /** detectAutoModelBody 測試案例列表 / detectAutoModelBody test cases list */
 export const detectAutoBodyCases: IDetectAutoBodyCase[] =
-[
-	// 完整模型
-	{ name: "完整模型", input: { providerID: "openai", modelID: "gpt-4o" }, expectedDetectType: EnumDetectAutoModelBody.Normal, expectedModelBody: { providerID: "openai", modelID: "gpt-4o" } },
+	[
+		// 完整模型
+		{
+			name: "完整模型",
+			input: { providerID: "openai", modelID: "gpt-4o" },
+			expectedDetectType: EnumDetectAutoModelBody.Normal,
+			expectedModelBody: { providerID: "openai", modelID: "gpt-4o" },
+		},
 
-	// 完全 AUTO
-	{ name: "undefined 輸入", input: undefined, expectedDetectType: EnumDetectAutoModelBody.Auto },
-	{ name: "空物件", input: {}, expectedDetectType: EnumDetectAutoModelBody.Auto },
-	{ name: "兩者都是 AUTO", input: { providerID: "AUTO", modelID: "AUTO" }, expectedDetectType: EnumDetectAutoModelBody.Auto },
+		// 完全 AUTO
+		{ name: "undefined 輸入", input: undefined, expectedDetectType: EnumDetectAutoModelBody.Auto },
+		{ name: "空物件", input: {}, expectedDetectType: EnumDetectAutoModelBody.Auto },
+		{
+			name: "兩者都是 AUTO",
+			input: { providerID: "AUTO", modelID: "AUTO" },
+			expectedDetectType: EnumDetectAutoModelBody.Auto,
+		},
 
-	// provider 為 AUTO
-	{ name: "provider=AUTO", input: { providerID: "AUTO", modelID: "gpt-4o" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithModel, expectedModelBody: { modelID: "gpt-4o" } },
-	{ name: "provider=空字串", input: { providerID: "", modelID: "gpt-4o" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithModel, expectedModelBody: { modelID: "gpt-4o" } },
-	{ name: "provider=undefined 字串", input: { providerID: "undefined", modelID: "gpt-4o" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithModel, expectedModelBody: { modelID: "gpt-4o" } },
-	{ name: "provider=null 字串", input: { providerID: "null", modelID: "gpt-4o" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithModel, expectedModelBody: { modelID: "gpt-4o" } },
+		// provider 為 AUTO
+		{
+			name: "provider=AUTO",
+			input: { providerID: "AUTO", modelID: "gpt-4o" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithModel,
+			expectedModelBody: { modelID: "gpt-4o" },
+		},
+		{
+			name: "provider=空字串",
+			input: { providerID: "", modelID: "gpt-4o" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithModel,
+			expectedModelBody: { modelID: "gpt-4o" },
+		},
+		{
+			name: "provider=undefined 字串",
+			input: { providerID: "undefined", modelID: "gpt-4o" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithModel,
+			expectedModelBody: { modelID: "gpt-4o" },
+		},
+		{
+			name: "provider=null 字串",
+			input: { providerID: "null", modelID: "gpt-4o" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithModel,
+			expectedModelBody: { modelID: "gpt-4o" },
+		},
 
-	// modelID 為 AUTO
-	{ name: "modelID=AUTO", input: { providerID: "openai", modelID: "AUTO" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider, expectedModelBody: { providerID: "openai" } },
-	{ name: "modelID=空字串", input: { providerID: "openai", modelID: "" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider, expectedModelBody: { providerID: "openai" } },
-	{ name: "modelID=undefined 字串", input: { providerID: "openai", modelID: "undefined" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider, expectedModelBody: { providerID: "openai" } },
-	{ name: "modelID=null 字串", input: { providerID: "openai", modelID: "null" }, expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider, expectedModelBody: { providerID: "openai" } },
-	{ name: "modelID=.", input: { providerID: "openai", modelID: "." }, expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider, expectedModelBody: { providerID: "openai" } },
-];
+		// modelID 為 AUTO
+		{
+			name: "modelID=AUTO",
+			input: { providerID: "openai", modelID: "AUTO" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider,
+			expectedModelBody: { providerID: "openai" },
+		},
+		{
+			name: "modelID=空字串",
+			input: { providerID: "openai", modelID: "" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider,
+			expectedModelBody: { providerID: "openai" },
+		},
+		{
+			name: "modelID=undefined 字串",
+			input: { providerID: "openai", modelID: "undefined" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider,
+			expectedModelBody: { providerID: "openai" },
+		},
+		{
+			name: "modelID=null 字串",
+			input: { providerID: "openai", modelID: "null" },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider,
+			expectedModelBody: { providerID: "openai" },
+		},
+		{
+			name: "modelID=.",
+			input: { providerID: "openai", modelID: "." },
+			expectedDetectType: EnumDetectAutoModelBody.AutoWithProvider,
+			expectedModelBody: { providerID: "openai" },
+		},
+	];

@@ -25,12 +25,30 @@ export interface IResolveAutoModelCoreCase
 
 /** _resolveAutoModelCore 測試案例列表 / _resolveAutoModelCore test cases list */
 export const resolveAutoModelCoreCases: IResolveAutoModelCoreCase[] =
-[
-	{ name: "model 有效", model: "gpt-4", parentModel: "parent", defaultModel: "default", expected: "gpt-4" },
-	{ name: "model AUTO, 有 parent", model: AUTO_MODEL, parentModel: "parent", defaultModel: "default", expected: "parent" },
-	{ name: "model AUTO, 無 parent 有 default", model: AUTO_MODEL, parentModel: undefined, defaultModel: "default", expected: "default" },
-	{ name: "model AUTO, 全無", model: AUTO_MODEL, parentModel: undefined, defaultModel: undefined, expected: DEFAULT_MODEL },
-	{ name: "model undefined", model: undefined, parentModel: "parent", defaultModel: "default", expected: undefined },
-	{ name: "model 空字串", model: "", parentModel: "parent", defaultModel: "default", expected: undefined },
-	{ name: "model 純空白", model: "   ", parentModel: "parent", defaultModel: "default", expected: undefined },
-];
+	[
+		{ name: "model 有效", model: "gpt-4", parentModel: "parent", defaultModel: "default", expected: "gpt-4" },
+		{
+			name: "model AUTO, 有 parent",
+			model: AUTO_MODEL,
+			parentModel: "parent",
+			defaultModel: "default",
+			expected: "parent",
+		},
+		{
+			name: "model AUTO, 無 parent 有 default",
+			model: AUTO_MODEL,
+			parentModel: undefined,
+			defaultModel: "default",
+			expected: "default",
+		},
+		{
+			name: "model AUTO, 全無",
+			model: AUTO_MODEL,
+			parentModel: undefined,
+			defaultModel: undefined,
+			expected: DEFAULT_MODEL,
+		},
+		{ name: "model undefined", model: undefined, parentModel: "parent", defaultModel: "default", expected: undefined },
+		{ name: "model 空字串", model: "", parentModel: "parent", defaultModel: "default", expected: undefined },
+		{ name: "model 純空白", model: "   ", parentModel: "parent", defaultModel: "default", expected: undefined },
+	];

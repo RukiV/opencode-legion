@@ -17,7 +17,7 @@ import { _isNonNullable } from '../type/type-guard';
 export function processArray(
 	arr: string[],
 	separator: string = '\n',
-	predicate: (value: string) => boolean = _isNonNullable
+	predicate: (value: string) => boolean = _isNonNullable,
 ): string
 {
 	return arr.filter(predicate).join(separator);

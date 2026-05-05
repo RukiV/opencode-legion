@@ -23,12 +23,12 @@ export interface IResolveAutoModelBaseCase
 
 /** _resolveAutoModelBase 測試案例列表 / _resolveAutoModelBase test cases list */
 export const resolveAutoModelBaseCases: IResolveAutoModelBaseCase[] =
-[
-	{ name: "parentModel 有效", parentModel: "parent-model", defaultModel: "default-model", expected: "parent-model" },
-	{ name: "parentModel undefined", parentModel: undefined, defaultModel: "default-model", expected: "default-model" },
-	{ name: "parentModel AUTO", parentModel: AUTO_MODEL, defaultModel: "default-model", expected: "default-model" },
-	{ name: "parentModel 空字串", parentModel: "", defaultModel: "default-model", expected: "default-model" },
-	{ name: "兩者都 undefined", parentModel: undefined, defaultModel: undefined, expected: DEFAULT_MODEL },
-	{ name: "兩者都 AUTO", parentModel: AUTO_MODEL, defaultModel: AUTO_MODEL, expected: DEFAULT_MODEL },
-	{ name: "兩者都空字串", parentModel: "", defaultModel: "", expected: DEFAULT_MODEL },
-];
+	[
+		{ name: "parentModel 有效", parentModel: "parent-model", defaultModel: "default-model", expected: "parent-model" },
+		{ name: "parentModel undefined", parentModel: undefined, defaultModel: "default-model", expected: "default-model" },
+		{ name: "parentModel AUTO", parentModel: AUTO_MODEL, defaultModel: "default-model", expected: "default-model" },
+		{ name: "parentModel 空字串", parentModel: "", defaultModel: "default-model", expected: "default-model" },
+		{ name: "兩者都 undefined", parentModel: undefined, defaultModel: undefined, expected: DEFAULT_MODEL },
+		{ name: "兩者都 AUTO", parentModel: AUTO_MODEL, defaultModel: AUTO_MODEL, expected: DEFAULT_MODEL },
+		{ name: "兩者都空字串", parentModel: "", defaultModel: "", expected: DEFAULT_MODEL },
+	];

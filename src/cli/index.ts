@@ -35,13 +35,17 @@ import { console } from 'debug-color2';
  * 如果配置已存在則不會覆蓋
  * Won't overwrite if config already exists
  */
-function createDefaultAriseConfigHandler(): void {
+function createDefaultAriseConfigHandler(): void
+{
 	const configPath = getAriseConfigPath();
 	const success = createDefaultAriseConfig(configPath);
 
-	if (success) {
+	if (success)
+	{
 		console.log(`✓ Created default config at ${configPath}`);
-	} else {
+	}
+	else
+	{
 		console.log(`✓ opencode-arise.json already exists at ${configPath}`);
 	}
 }
@@ -62,12 +66,14 @@ function createDefaultAriseConfigHandler(): void {
  * 3. Register plugin
  * 4. Create default config
  */
-function install(): void {
+function install(): void
+{
 	console.yellow.log(getBanner());
 	console.log("\n🌑 Installing opencode-arise...\n");
 
 	const configPath = findOpencodeConfig();
-	if (!configPath) {
+	if (!configPath)
+	{
 		console.error("✗ OpenCode config not found. Is OpenCode installed?");
 		console.error("  Expected: ~/.config/opencode/opencode.json");
 		process.exit(1);
@@ -88,9 +94,11 @@ function install(): void {
 	const checkResult = checkPluginRegistration(configPath);
 
 	/** 顯示舊版插件警告 / Show legacy plugin warning */
-	if (checkResult.hasLegacyPlugin) {
+	if (checkResult.hasLegacyPlugin)
+	{
 		console.log(`\n⚠️  Warning: Found legacy plugin name(s):`);
-		for (const legacyName of checkResult.legacyPluginNames) {
+		for (const legacyName of checkResult.legacyPluginNames)
+		{
 			console.log(`  - "${legacyName}"`);
 		}
 		console.log(`  Please manually remove the legacy plugin name from your config file.`);
@@ -98,12 +106,16 @@ function install(): void {
 	}
 
 	/** 檢查是否已註冊 / Check if already registered */
-	if (checkResult.isRegistered) {
+	if (checkResult.isRegistered)
+	{
 		console.log(`✓ ${PLUGIN_NAME} is already registered`);
-	} else {
+	}
+	else
+	{
 		/** 註冊插件 / Register plugin */
 		const success = registerPlugin(configPath);
-		if (!success) {
+		if (!success)
+		{
 			console.error("✗ Failed to register plugin in config");
 			process.exit(1);
 		}
@@ -140,13 +152,17 @@ function install(): void {
  * 3. Whether there are legacy plugins
  * 4. Whether Arise config exists
  */
-function doctor(): void {
+function doctor(): void
+{
 	console.log("🔍 Checking opencode-arise installation...\n");
 
 	const configPath = findOpencodeConfig();
-	if (!configPath) {
+	if (!configPath)
+	{
 		console.log(`✗ OpenCode config not found: ${configPath}`);
-	} else {
+	}
+	else
+	{
 		console.log(`✓ OpenCode config: ${configPath}`);
 
 		/**
@@ -165,19 +181,26 @@ function doctor(): void {
 		 * success = false 表示無法讀取配置檔案
 		 * success = false means config file could not be read
 		 */
-		if (!result.success) {
+		if (!result.success)
+		{
 			console.log(`✗ Failed to read config`);
-		} else if (result.isRegistered) {
+		}
+		else if (result.isRegistered)
+		{
 			console.log(`✓ ${PLUGIN_NAME} is registered`);
-		} else {
+		}
+		else
+		{
 			console.log(`✗ ${PLUGIN_NAME} is NOT registered`);
 			console.log(`  Run: bunx opencode-arise install`);
 		}
 
 		/** 顯示舊版插件警告 / Show legacy plugin warning */
-		if (result.hasLegacyPlugin) {
+		if (result.hasLegacyPlugin)
+		{
 			console.log(`\n⚠️  Warning: Found legacy plugin name(s):`);
-			for (const legacyName of result.legacyPluginNames) {
+			for (const legacyName of result.legacyPluginNames)
+			{
 				console.log(`  - "${legacyName}"`);
 			}
 			console.log(`  Please remove the legacy plugin name and restart OpenCode.`);
@@ -185,9 +208,12 @@ function doctor(): void {
 	}
 
 	const ariseConfigPath = getAriseConfigPath();
-	if (existsSync(ariseConfigPath)) {
+	if (existsSync(ariseConfigPath))
+	{
 		console.log(`✓ opencode-arise.json exists: ${ariseConfigPath}`);
-	} else {
+	}
+	else
+	{
 		console.log(`○ opencode-arise.json not found (optional): ${ariseConfigPath}`);
 	}
 
@@ -210,19 +236,23 @@ function doctor(): void {
  * 3. Validate using Zod schema
  * 4. Display validation results and errors (if any)
  */
-function validateConfig(): void {
+function validateConfig(): void
+{
 	console.log("🔍 Validating opencode-arise configuration...\n");
 
 	const paths = getAriseConfigPaths();
 	let hasConfig = false;
 	let hasErrors = false;
 
-	for (const configPath of paths) {
-		if (existsSync(configPath)) {
+	for (const configPath of paths)
+	{
+		if (existsSync(configPath))
+		{
 			hasConfig = true;
 			console.log(`📄 Found config: ${configPath}`);
 
-			try {
+			try
+			{
 				const content = readFileSync(configPath, "utf-8");
 				const handler = createJsonHandler(content);
 				const parsed = handler.valueOf();
@@ -230,28 +260,36 @@ function validateConfig(): void {
 				/** 使用 Zod schema 驗證 / Validate using Zod schema */
 				const result = AriseConfigSchema.safeParse(parsed);
 
-				if (result.success) {
+				if (result.success)
+				{
 					console.log(`   ✓ Valid configuration`);
 
 					/** 顯示有效配置摘要 / Show valid config summary */
 					const config = result.data;
-					if (config.disabled_shadows?.length) {
+					if (config.disabled_shadows?.length)
+					{
 						console.log(`   Disabled shadows: ${config.disabled_shadows.join(", ")}`);
 					}
-					if (config.agents) {
+					if (config.agents)
+					{
 						const agentCount = Object.keys(config.agents).length;
 						console.log(`   Custom agent configs: ${agentCount}`);
 					}
-				} else {
+				}
+				else
+				{
 					console.log(`   ✗ Invalid configuration`);
 					hasErrors = true;
 
 					/** 顯示 Zod 驗證錯誤 / Show Zod validation errors */
-					for (const issue of result.error.issues) {
+					for (const issue of result.error.issues)
+					{
 						console.log(`     - ${issue.path.join(".")}: ${issue.message}`);
 					}
 				}
-			} catch (err) {
+			}
+			catch (err)
+			{
 				console.log(`   ✗ Failed to parse config: ${getErrorMessage(err)}`);
 				hasErrors = true;
 			}
@@ -259,7 +297,8 @@ function validateConfig(): void {
 		}
 	}
 
-	if (!hasConfig) {
+	if (!hasConfig)
+	{
 		console.log(`○ No configuration file found (optional)`);
 		console.log(`  Default configuration will be used.`);
 		console.log(`  Run 'bunx opencode-arise install' to create a default config.`);
@@ -273,7 +312,8 @@ function validateConfig(): void {
  * 顯示版本資訊
  * Show version information
  */
-function showVersion(): void {
+function showVersion(): void
+{
 	console.log(`opencode-arise@${PLUGIN_VERSION}`);
 }
 
@@ -281,7 +321,8 @@ function showVersion(): void {
  * 顯示幫助訊息
  * Show help message
  */
-function showHelp(): void {
+function showHelp(): void
+{
 	console.yellow.log(getBanner());
 	console.log(`
 Usage: opencode-arise <command>
@@ -309,7 +350,8 @@ Examples:
 const args = process.argv.slice(2);
 const command = args[0];
 
-	switch (command) {
+switch (command)
+{
 	case "install":
 		install();
 		break;
@@ -331,7 +373,8 @@ const command = args[0];
 		break;
 	default:
 		/** 未知命令顯示錯誤和幫助 / Unknown command shows error and help */
-		if (command) {
+		if (command)
+		{
 			console.error(`Unknown command: ${command}`);
 		}
 		showHelp();

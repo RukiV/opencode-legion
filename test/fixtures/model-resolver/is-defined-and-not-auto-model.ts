@@ -19,11 +19,11 @@ export interface IIsDefinedAndNotAutoModelCase
 
 /** _isDefinedAndNotAutoModel 測試案例列表 / _isDefinedAndNotAutoModel test cases list */
 export const isDefinedAndNotAutoModelCases: IIsDefinedAndNotAutoModelCase[] =
-[
-	{ name: "gpt-4", input: "gpt-4" },
-	{ name: "claude-3", input: "claude-3" },
-	{ name: "AUTO", input: AUTO_MODEL },
-	{ name: "空字串", input: "" },
-	{ name: "純空白", input: "   " },
-	{ name: "undefined", input: undefined },
-];
+	[
+		{ name: "gpt-4", input: "gpt-4" },
+		{ name: "claude-3", input: "claude-3" },
+		{ name: "AUTO", input: AUTO_MODEL },
+		{ name: "空字串", input: "" },
+		{ name: "純空白", input: "   " },
+		{ name: "undefined", input: undefined },
+	];

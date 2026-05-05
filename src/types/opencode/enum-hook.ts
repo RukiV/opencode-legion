@@ -29,7 +29,8 @@ import * as OpenCodePlugin from '@opencode-ai/plugin';
  * 這些 Hooks 在官方文檔中有完整說明
  * These hooks are fully documented in official documentation
  */
-export const enum EnumOpenCodeHookNameStable {
+export const enum EnumOpenCodeHookNameStable
+{
 	/** 聊天訊息接收鉤子 / Chat message received hook */
 	ChatMessage = "chat.message",
 
@@ -75,7 +76,8 @@ export const enum EnumOpenCodeHookNameStable {
  * - experimental.chat.messages.transform: compaction 期間不觸發、變更會被丟棄
  * - experimental.chat.system.transform: 變更會被丟棄、無法與 messages.transform 協調
  */
-export const enum EnumOpenCodeHookNameExperimental {
+export const enum EnumOpenCodeHookNameExperimental
+{
 	/** 聊天訊息轉換鉤子 / Chat messages transform hook */
 	ExperimentalChatMessagesTransform = "experimental.chat.messages.transform",
 
@@ -95,7 +97,8 @@ export const enum EnumOpenCodeHookNameExperimental {
  *
  * 包含所有穩定和實驗性 Hooks
  */
-export const enum EnumOpenCodeHookName {
+export const enum EnumOpenCodeHookName
+{
 	// 穩定 Hooks
 	/** 聊天訊息接收鉤子 / Chat message received hook */
 	ChatMessage = "chat.message",
@@ -187,7 +190,8 @@ export const ALL_OPENCODE_HOOK_NAMES = [
  * @param hookName - Hook 名稱 / Hook name
  * @returns 是否為實驗性 Hook / Whether it's an experimental hook
  */
-export function isExperimentalHook(hookName: string): boolean {
+export function isExperimentalHook(hookName: string): boolean
+{
 	return ALL_EXPERIMENTAL_HOOK_NAMES.includes(hookName as EnumOpenCodeHookNameExperimental);
 }
 

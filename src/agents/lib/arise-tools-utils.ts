@@ -15,7 +15,8 @@ import { getAriseToolsMarkdown } from './arise-tools-descriptions';
  * 取得工具列表的格式化字串 (含 OpenCode 內建 task 工具)
  * Format tools list including OpenCode built-in task tool
  */
-export function getAriseToolsSection(): string {
+export function getAriseToolsSection(): string
+{
 	const ariseTools = getAriseToolsMarkdown();
 	return `## Available Tools
 ${ariseTools}

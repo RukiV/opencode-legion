@@ -82,7 +82,8 @@ export function writeOpencodeConfig(configPath: string, config: JsonObject): boo
 
 		// 設定配置值
 		// Set config values
-		for (const [key, value] of Object.entries(config)) {
+		for (const [key, value] of Object.entries(config))
+		{
 			handler.set([key], value);
 		}
 
@@ -151,8 +152,6 @@ export function isPluginNameMatch(name1: string, name2: string): boolean
 	}
 }
 
-
-
 /**
  * 檢查 config.plugin 是否包含指定插件
  * Check if config.plugin contains the specified plugin(s)
@@ -198,7 +197,9 @@ export function isPluginNameMatch(name1: string, name2: string): boolean
  * // 取得實際匹配的插件名稱 / Get actual matched plugin names:
  * const matchedNames = result[PLUGIN_NAME]; // string[] | undefined
  */
-export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeReadonly<NoInfer<T> | string>, pluginNames: ITSValueOrArrayMaybeReadonly<T>): IReturnHasPlugin<T>
+export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeReadonly<NoInfer<T> | string>,
+	pluginNames: ITSValueOrArrayMaybeReadonly<T>,
+): IReturnHasPlugin<T>
 {
 	/**
 	 * 將 pluginNames 轉換為 Set 以最佳化查詢
@@ -253,7 +254,9 @@ export function hasPlugin<T extends string>(pluginList: ITSValueOrArrayMaybeRead
  * const checkResult = hasPlugin(pluginList, [PLUGIN_NAME, LEGACY_PLUGIN_NAME] as const);
  * const isRegistered = isPluginRegisteredFromResult(checkResult, PLUGIN_NAME);
  */
-export function isPluginRegisteredFromResult<T extends string>(result: IReturnHasPlugin<any>, pluginName: T): result is {
+export function isPluginRegisteredFromResult<T extends string>(result: IReturnHasPlugin<any>,
+	pluginName: T,
+): result is {
 	[key in T]: string[];
 }
 {
@@ -337,7 +340,7 @@ export function checkPluginRegistration(configPath: string): IPluginRegistration
 	if (!config)
 	{
 		return {
-			success: false
+			success: false,
 		} satisfies Partial<IPluginRegistrationResult> as any;
 	}
 

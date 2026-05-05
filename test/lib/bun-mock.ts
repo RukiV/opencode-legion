@@ -19,7 +19,8 @@ import { MockFs } from "./mock-fs";
  * 將 PathLike 轉換為字串
  * Convert PathLike to string
  */
-function toPathString(path: string | { toString(): string } | Buffer): string {
+function toPathString(path: string | { toString(): string } | Buffer): string
+{
 	if (typeof path === "string") return path;
 	if (Buffer.isBuffer(path)) return path.toString();
 	return path.toString();
@@ -54,7 +55,8 @@ function toPathString(path: string | { toString(): string } | Buffer): string {
  * });
  * ```
  */
-export interface IBunMockIntegrator {
+export interface IBunMockIntegrator
+{
 	/** MockFs 實例 */
 	readonly mockFs: MockFs;
 
@@ -90,8 +92,9 @@ export function createBunMockIntegrator(
 		auditDir?: string;
 		auditEnabled?: boolean;
 		files?: Record<string, string>;
-	} = {}
-): IBunMockIntegrator {
+	} = {},
+): IBunMockIntegrator
+{
 	const mockFs = new MockFs({
 		enableSafetyCheck: options.enableSafetyCheck ?? false,
 		auditDir: options.auditDir,
@@ -99,35 +102,53 @@ export function createBunMockIntegrator(
 	});
 
 	// 預設寫入檔案
-	if (options.files) {
+	if (options.files)
+	{
 		mockFs.setFiles(options.files);
 	}
 
 	const integrator: IBunMockIntegrator = {
-		get mockFs() {
+		get mockFs()
+		{
 			return mockFs;
 		},
 
-		setup() {
+		setup()
+		{
 			// 建立 fs mock
 			const fsMock = {
 				// 同步操作
-				readFileSync: (path: Parameters<typeof import("fs")["readFileSync"]>[0], options?: Parameters<typeof import("fs")["readFileSync"]>[1]) => {
+				readFileSync: (path: Parameters<typeof import("fs")["readFileSync"]>[0],
+					options?: Parameters<typeof import("fs")["readFileSync"]>[1],
+				) =>
+				{
 					return mockFs.readFileSync(toPathString(path), "utf-8");
 				},
-				writeFileSync: (path: Parameters<typeof import("fs")["writeFileSync"]>[0], data: string | Buffer, options?: Parameters<typeof import("fs")["writeFileSync"]>[2]) => {
+				writeFileSync: (path: Parameters<typeof import("fs")["writeFileSync"]>[0],
+					data: string | Buffer,
+					options?: Parameters<typeof import("fs")["writeFileSync"]>[2],
+				) =>
+				{
 					mockFs.writeFileSync(toPathString(path), typeof data === "string" ? data : data.toString(), "utf-8");
 				},
-				existsSync: (path: Parameters<typeof import("fs")["existsSync"]>[0]) => {
+				existsSync: (path: Parameters<typeof import("fs")["existsSync"]>[0]) =>
+				{
 					return mockFs.existsSync(toPathString(path));
 				},
-				mkdirSync: (path: Parameters<typeof import("fs")["mkdirSync"]>[0], options?: { recursive?: boolean; mode?: number }) => {
+				mkdirSync: (path: Parameters<typeof import("fs")["mkdirSync"]>[0],
+					options?: { recursive?: boolean; mode?: number },
+				) =>
+				{
 					mockFs.mkdirSync(toPathString(path), options?.recursive ?? true);
 				},
-				rmSync: (path: Parameters<typeof import("fs")["rmSync"]>[0], options?: Parameters<typeof import("fs")["rmSync"]>[1]) => {
+				rmSync: (path: Parameters<typeof import("fs")["rmSync"]>[0],
+					options?: Parameters<typeof import("fs")["rmSync"]>[1],
+				) =>
+				{
 					mockFs.rmSync(toPathString(path), { recursive: options?.recursive ?? false });
 				},
-				statSync: (path: Parameters<typeof import("fs")["statSync"]>[0]) => {
+				statSync: (path: Parameters<typeof import("fs")["statSync"]>[0]) =>
+				{
 					const stat = mockFs.statSync(toPathString(path));
 					return {
 						isFile: () => stat.isFile,
@@ -139,67 +160,105 @@ export function createBunMockIntegrator(
 						birthtime: stat.createdAt,
 					};
 				},
-				readdirSync: (path: Parameters<typeof import("fs")["readdirSync"]>[0]) => {
+				readdirSync: (path: Parameters<typeof import("fs")["readdirSync"]>[0]) =>
+				{
 					return mockFs.readdirSync(toPathString(path));
 				},
-				copyFileSync: (src: Parameters<typeof import("fs")["copyFileSync"]>[0], dest: Parameters<typeof import("fs")["copyFileSync"]>[1]) => {
+				copyFileSync: (src: Parameters<typeof import("fs")["copyFileSync"]>[0],
+					dest: Parameters<typeof import("fs")["copyFileSync"]>[1],
+				) =>
+				{
 					mockFs.copyFileSync(toPathString(src), toPathString(dest));
 				},
-				unlinkSync: (path: Parameters<typeof import("fs")["unlinkSync"]>[0]) => {
+				unlinkSync: (path: Parameters<typeof import("fs")["unlinkSync"]>[0]) =>
+				{
 					mockFs.rmSync(toPathString(path));
 				},
-				readlinkSync: (path: Parameters<typeof import("fs")["readlinkSync"]>[0]) => {
+				readlinkSync: (path: Parameters<typeof import("fs")["readlinkSync"]>[0]) =>
+				{
 					return mockFs.readFileSync(toPathString(path), "utf-8");
 				},
-				symlinkSync: (target: Parameters<typeof import("fs")["symlinkSync"]>[0], path: Parameters<typeof import("fs")["symlinkSync"]>[1]) => {
+				symlinkSync: (target: Parameters<typeof import("fs")["symlinkSync"]>[0],
+					path: Parameters<typeof import("fs")["symlinkSync"]>[1],
+				) =>
+				{
 					mockFs.writeFileSync(toPathString(path), toPathString(target), "utf-8");
 				},
-				accessSync: (path: Parameters<typeof import("fs")["accessSync"]>[0]) => {
-					if (!mockFs.existsSync(toPathString(path))) {
+				accessSync: (path: Parameters<typeof import("fs")["accessSync"]>[0]) =>
+				{
+					if (!mockFs.existsSync(toPathString(path)))
+					{
 						throw Object.assign(new Error("ENOENT"), { code: "ENOENT", path: toPathString(path) });
 					}
 				},
-				realpathSync: (path: Parameters<typeof import("fs")["realpathSync"]>[0]) => {
+				realpathSync: (path: Parameters<typeof import("fs")["realpathSync"]>[0]) =>
+				{
 					return toPathString(path);
 				},
-				lstatSync: (path: Parameters<typeof import("fs")["lstatSync"]>[0]) => {
+				lstatSync: (path: Parameters<typeof import("fs")["lstatSync"]>[0]) =>
+				{
 					return fsMock.statSync(path);
 				},
 
 				// Promise 操作
-				readFile: async (path: Parameters<typeof import("fs")["readFile"]>[0], options?: Parameters<typeof import("fs")["readFile"]>[1]) => {
+				readFile: async (path: Parameters<typeof import("fs")["readFile"]>[0],
+					options?: Parameters<typeof import("fs")["readFile"]>[1],
+				) =>
+				{
 					return mockFs.readFileSync(toPathString(path), "utf-8");
 				},
-				writeFile: async (path: Parameters<typeof import("fs")["writeFile"]>[0], data: string | Buffer, options?: Parameters<typeof import("fs")["writeFile"]>[2]) => {
+				writeFile: async (path: Parameters<typeof import("fs")["writeFile"]>[0],
+					data: string | Buffer,
+					options?: Parameters<typeof import("fs")["writeFile"]>[2],
+				) =>
+				{
 					mockFs.writeFileSync(toPathString(path), typeof data === "string" ? data : data.toString(), "utf-8");
 				},
-				mkdir: async (path: Parameters<typeof import("fs")["mkdir"]>[0], options?: { recursive?: boolean; mode?: number }) => {
+				mkdir: async (path: Parameters<typeof import("fs")["mkdir"]>[0],
+					options?: { recursive?: boolean; mode?: number },
+				) =>
+				{
 					mockFs.mkdirSync(toPathString(path), options?.recursive ?? true);
 				},
-				rm: async (path: Parameters<typeof import("fs")["rm"]>[0], options?: Parameters<typeof import("fs")["rm"]>[1]) => {
+				rm: async (path: Parameters<typeof import("fs")["rm"]>[0],
+					options?: Parameters<typeof import("fs")["rm"]>[1],
+				) =>
+				{
 					mockFs.rmSync(toPathString(path), { recursive: options?.recursive ?? false });
 				},
-				copyFile: async (src: Parameters<typeof import("fs")["copyFile"]>[0], dest: Parameters<typeof import("fs")["copyFile"]>[1]) => {
+				copyFile: async (src: Parameters<typeof import("fs")["copyFile"]>[0],
+					dest: Parameters<typeof import("fs")["copyFile"]>[1],
+				) =>
+				{
 					mockFs.copyFileSync(toPathString(src), toPathString(dest));
 				},
-				unlink: async (path: Parameters<typeof import("fs")["unlink"]>[0]) => {
+				unlink: async (path: Parameters<typeof import("fs")["unlink"]>[0]) =>
+				{
 					mockFs.rmSync(toPathString(path));
 				},
-				access: async (path: Parameters<typeof import("fs")["access"]>[0]) => {
-					if (!mockFs.existsSync(toPathString(path))) {
+				access: async (path: Parameters<typeof import("fs")["access"]>[0]) =>
+				{
+					if (!mockFs.existsSync(toPathString(path)))
+					{
 						throw Object.assign(new Error("ENOENT"), { code: "ENOENT", path: toPathString(path) });
 					}
 				},
-				stat: async (path: Parameters<typeof import("fs")["stat"]>[0]) => {
+				stat: async (path: Parameters<typeof import("fs")["stat"]>[0]) =>
+				{
 					return fsMock.statSync(path);
 				},
-				readdir: async (path: Parameters<typeof import("fs")["readdir"]>[0]) => {
+				readdir: async (path: Parameters<typeof import("fs")["readdir"]>[0]) =>
+				{
 					return mockFs.readdirSync(toPathString(path));
 				},
-				readlink: async (path: Parameters<typeof import("fs")["readlink"]>[0]) => {
+				readlink: async (path: Parameters<typeof import("fs")["readlink"]>[0]) =>
+				{
 					return mockFs.readFileSync(toPathString(path), "utf-8");
 				},
-				symlink: async (target: Parameters<typeof import("fs")["symlink"]>[0], path: Parameters<typeof import("fs")["symlink"]>[1]) => {
+				symlink: async (target: Parameters<typeof import("fs")["symlink"]>[0],
+					path: Parameters<typeof import("fs")["symlink"]>[1],
+				) =>
+				{
 					mockFs.writeFileSync(toPathString(path), toPathString(target), "utf-8");
 				},
 				constants: {},
@@ -212,10 +271,12 @@ export function createBunMockIntegrator(
 				// fs-extra 額外方法
 				ensureDir: async (path: string) => mockFs.mkdirSync(toPathString(path), true),
 				ensureDirSync: (path: string) => mockFs.mkdirSync(toPathString(path), true),
-				outputFile: async (path: string, data: string | Buffer) => {
+				outputFile: async (path: string, data: string | Buffer) =>
+				{
 					mockFs.writeFileSync(toPathString(path), typeof data === "string" ? data : data.toString(), "utf-8");
 				},
-				outputFileSync: (path: string, data: string | Buffer) => {
+				outputFileSync: (path: string, data: string | Buffer) =>
+				{
 					mockFs.writeFileSync(toPathString(path), typeof data === "string" ? data : data.toString(), "utf-8");
 				},
 				outputJson: async (path: string, data: unknown) => mockFs.writeJsonSync(toPathString(path), data),
@@ -226,28 +287,36 @@ export function createBunMockIntegrator(
 				pathExistsSync: (path: string) => mockFs.existsSync(toPathString(path)),
 				remove: async (path: string) => mockFs.rmSync(toPathString(path), { recursive: true }),
 				removeSync: (path: string) => mockFs.rmSync(toPathString(path), { recursive: true }),
-				move: async (src: string, dest: string) => {
+				move: async (src: string, dest: string) =>
+				{
 					const content = mockFs.readFileSync(toPathString(src), "utf-8");
 					mockFs.writeFileSync(toPathString(dest), content, "utf-8");
 					mockFs.rmSync(toPathString(src));
 				},
-				moveSync: (src: string, dest: string) => {
+				moveSync: (src: string, dest: string) =>
+				{
 					const content = mockFs.readFileSync(toPathString(src), "utf-8");
 					mockFs.writeFileSync(toPathString(dest), content, "utf-8");
 					mockFs.rmSync(toPathString(src));
 				},
 				copy: async (src: string, dest: string) => mockFs.copyFileSync(toPathString(src), toPathString(dest)),
 				copySync: (src: string, dest: string) => mockFs.copyFileSync(toPathString(src), toPathString(dest)),
-				emptyDir: async (path: string) => {
-					if (mockFs.isDirectory(toPathString(path))) {
-						for (const entry of mockFs.readdirSync(toPathString(path))) {
+				emptyDir: async (path: string) =>
+				{
+					if (mockFs.isDirectory(toPathString(path)))
+					{
+						for (const entry of mockFs.readdirSync(toPathString(path)))
+						{
 							mockFs.rmSync(`${toPathString(path)}/${entry}`, { recursive: true });
 						}
 					}
 				},
-				emptyDirSync: (path: string) => {
-					if (mockFs.isDirectory(toPathString(path))) {
-						for (const entry of mockFs.readdirSync(toPathString(path))) {
+				emptyDirSync: (path: string) =>
+				{
+					if (mockFs.isDirectory(toPathString(path)))
+					{
+						for (const entry of mockFs.readdirSync(toPathString(path)))
+						{
 							mockFs.rmSync(`${toPathString(path)}/${entry}`, { recursive: true });
 						}
 					}
@@ -262,21 +331,26 @@ export function createBunMockIntegrator(
 			mock.module("fs-extra", () => fsExtraMock as unknown as typeof import("fs-extra"));
 		},
 
-		writeFiles(files: Record<string, string>) {
+		writeFiles(files: Record<string, string>)
+		{
 			mockFs.setFiles(files);
 		},
 
-		writeJsonFiles(files: Record<string, unknown>) {
-			for (const [path, data] of Object.entries(files)) {
+		writeJsonFiles(files: Record<string, unknown>)
+		{
+			for (const [path, data] of Object.entries(files))
+			{
 				mockFs.writeJsonSync(path, data);
 			}
 		},
 
-		exists(path: string) {
+		exists(path: string)
+		{
 			return mockFs.existsSync(path);
 		},
 
-		readFile(path: string) {
+		readFile(path: string)
+		{
 			return mockFs.readFileSync(path, "utf-8");
 		},
 	};
@@ -317,28 +391,32 @@ export function mockFsModule(
 		enableSafetyCheck?: boolean;
 		auditDir?: string;
 		auditEnabled?: boolean;
-	} = {}
+	} = {},
 ): {
 	mockFs: MockFs;
 	setup(): void;
-} {
+}
+{
 	const mockFs = new MockFs({
 		enableSafetyCheck: options.enableSafetyCheck ?? false,
 		auditDir: options.auditDir,
 		auditEnabled: options.auditEnabled,
 	});
 
-	if (Object.keys(files).length > 0) {
+	if (Object.keys(files).length > 0)
+	{
 		mockFs.setFiles(files);
 	}
 
-	const setup = () => {
+	const setup = () =>
+	{
 		// 這個函式需要由 Bun test 的 beforeEach 呼叫
 		// 才能確保 mock 在正確的時機生效
 	};
 
 	return {
-		get mockFs() {
+		get mockFs()
+		{
 			return mockFs;
 		},
 		setup,

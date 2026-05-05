@@ -71,7 +71,8 @@ const DANGEROUS_KEYWORDS: readonly string[] = [
  * 路徑安全檢查結果
  * Path safety check result
  */
-export interface IFsSafetyResult {
+export interface IFsSafetyResult
+{
 	/** 是否安全 / Whether the path is safe */
 	isSafe: boolean;
 	/** 原因說明 / Reason explanation */
@@ -99,7 +100,8 @@ export interface IFsSafetyResult {
 export function checkFsSafety(
 	targetPath: string,
 	allowRelative: boolean = false,
-): IFsSafetyResult {
+): IFsSafetyResult
+{
 	/** 標準化並解析為絕對路徑 / Normalize and resolve to absolute path */
 	const normalizedPath = normalize(targetPath);
 	const resolvedPath = isAbsolute(targetPath)
@@ -108,8 +110,10 @@ export function checkFsSafety(
 
 	// 檢查 1：相對路徑檢查
 	// Check 1: Relative path check
-	if (!isAbsolute(targetPath)) {
-		if (!allowRelative) {
+	if (!isAbsolute(targetPath))
+	{
+		if (!allowRelative)
+		{
 			return {
 				isSafe: false,
 				reason: `相對路徑不允許直接操作: ${targetPath}`,
@@ -120,13 +124,15 @@ export function checkFsSafety(
 
 	// 檢查 2：白名單前綴檢查（使用 pathInsideDirectory + pathIsSame）
 	// Check 2: Whitelist prefix check (using pathInsideDirectory + pathIsSame)
-	for (const prefix of SAFE_PREFIXES) {
+	for (const prefix of SAFE_PREFIXES)
+	{
 		// 使用 pathInsideDirectory 檢查路徑是否在目錄內
 		// 使用 pathIsSame 檢查路徑是否等於白名單本身
 		// Use pathInsideDirectory to check if path is inside directory
 		// Use pathIsSame to check if path equals the whitelist itself
 		const normalizedPrefix = normalize(prefix);
-		if (pathInsideDirectory(resolvedPath, normalizedPrefix) || pathIsSame(resolvedPath, normalizedPrefix)) {
+		if (pathInsideDirectory(resolvedPath, normalizedPrefix) || pathIsSame(resolvedPath, normalizedPrefix))
+		{
 			return {
 				isSafe: true,
 				reason: `路徑在允許的白名單內: ${prefix}`,
@@ -137,8 +143,10 @@ export function checkFsSafety(
 
 	// 檢查 3：危險關鍵詞檢查
 	// Check 3: Dangerous keyword check
-	for (const keyword of DANGEROUS_KEYWORDS) {
-		if (resolvedPath.toLowerCase().includes(keyword.toLowerCase())) {
+	for (const keyword of DANGEROUS_KEYWORDS)
+	{
+		if (resolvedPath.toLowerCase().includes(keyword.toLowerCase()))
+		{
 			return {
 				isSafe: false,
 				reason: `路徑包含危險關鍵詞: ${keyword}`,
@@ -149,7 +157,8 @@ export function checkFsSafety(
 
 	// 檢查 4：是否在專案根目錄之外
 	// Check 4: Outside project root check
-	if (!resolvedPath.startsWith(__ROOT)) {
+	if (!resolvedPath.startsWith(__ROOT))
+	{
 		return {
 			isSafe: false,
 			reason: `路徑在專案根目錄之外: ${resolvedPath}`,
@@ -179,9 +188,11 @@ export function assertFsSafety(
 	targetPath: string,
 	operation: string = "file operation",
 	allowRelative: boolean = false,
-): asserts targetPath is string {
+): asserts targetPath is string
+{
 	const result = checkFsSafety(targetPath, allowRelative);
-	if (!result.isSafe) {
+	if (!result.isSafe)
+	{
 		throw new Error(
 			`[FsSafety] 禁止 ${operation}：${result.reason} (rule: ${result.rule})`,
 		);
@@ -203,24 +214,31 @@ export function assertFsSafety(
  * await safeFs.writeFile("/etc/passwd", "content"); // ❌ Throws error
  * ```
  */
-export function createSafeFsWrapper<T extends object>(fsOperations: T): T {
+export function createSafeFsWrapper<T extends object>(fsOperations: T): T
+{
 	const wrapper: Record<string, unknown> = {};
 
-	for (const [key, value] of Object.entries(fsOperations)) {
-		if (typeof value === "function") {
+	for (const [key, value] of Object.entries(fsOperations))
+	{
+		if (typeof value === "function")
+		{
 			// 包裝函式
 			// Wrap function
-			wrapper[key] = function (...args: unknown[]) {
+			wrapper[key] = function (...args: unknown[])
+			{
 				// 檢查第一個參數是否為路徑
 				// Check if first argument is a path
 				const [firstArg, ...restArgs] = args;
-				if (typeof firstArg === "string") {
+				if (typeof firstArg === "string")
+				{
 					const operationName = key.replace(/Sync$/, "");
 					assertFsSafety(firstArg, operationName);
 				}
 				return (value as (...args: unknown[]) => unknown).apply(fsOperations, args);
 			};
-		} else {
+		}
+		else
+		{
 			// 非函式屬性直接複製
 			// Copy non-function properties directly
 			wrapper[key] = value;
@@ -236,7 +254,8 @@ export function createSafeFsWrapper<T extends object>(fsOperations: T): T {
  *
  * @returns 不可變的安全路徑前綴陣列 / Immutable safe path prefixes array
  */
-export function getSafePrefixes(): readonly string[] {
+export function getSafePrefixes(): readonly string[]
+{
 	return SAFE_PREFIXES;
 }
 
@@ -246,6 +265,7 @@ export function getSafePrefixes(): readonly string[] {
  *
  * @returns 不可變的危險關鍵詞陣列 / Immutable dangerous keywords array
  */
-export function getDangerousKeywords(): readonly string[] {
+export function getDangerousKeywords(): readonly string[]
+{
 	return DANGEROUS_KEYWORDS;
 }

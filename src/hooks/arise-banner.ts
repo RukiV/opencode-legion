@@ -11,18 +11,20 @@ import { showToastOpenCode } from '../utils/log/opencode-log';
  * @param totalWidth - 總寬度（不含邊框字符）
  * @returns 填充後的字串
  */
-function centerPad(text: string, totalWidth: number): string {
-  const textLength = text.length;
-  const padding = totalWidth - textLength;
+function centerPad(text: string, totalWidth: number): string
+{
+	const textLength = text.length;
+	const padding = totalWidth - textLength;
 
-  if (padding <= 0) {
-    return text;
-  }
+	if (padding <= 0)
+	{
+		return text;
+	}
 
-  const leftPadding = Math.floor(padding / 2);
-  const rightPadding = padding - leftPadding;
+	const leftPadding = Math.floor(padding / 2);
+	const rightPadding = padding - leftPadding;
 
-  return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
+	return " ".repeat(leftPadding) + text + " ".repeat(rightPadding);
 }
 
 /** 從 package.json 取得的版本號 */
@@ -38,10 +40,11 @@ const BANNER_CONTENT_WIDTH = 58;
  * @param version - 版本號
  * @returns 對齊後的版本號行
  */
-function generateVersionLine(version: string): string {
-  const versionText = `v${version}`;
-  const padded = centerPad(versionText, BANNER_CONTENT_WIDTH);
-  return `║${padded}║`;
+function generateVersionLine(version: string): string
+{
+	const versionText = `v${version}`;
+	const padded = centerPad(versionText, BANNER_CONTENT_WIDTH);
+	return `║${padded}║`;
 }
 
 /**
@@ -54,11 +57,12 @@ function generateVersionLine(version: string): string {
  * @param version - 版本號（可選，預設為 PLUGIN_VERSION）
  * @returns ASCII 藝術橫幅字串
  */
-function generateBannerASCII(version?: string): string {
-  const ver = version ?? PLUGIN_VERSION;
-  const versionLine = generateVersionLine(ver);
+function generateBannerASCII(version?: string): string
+{
+	const ver = version ?? PLUGIN_VERSION;
+	const versionLine = generateVersionLine(ver);
 
-  return `
+	return `
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
 ║               ⚔️  A R I S E !  ⚔️                     ║
@@ -91,27 +95,30 @@ let bannerShownThisProcess = false;
  * @param ctx - Plugin 上下文
  * @returns 橫幅 Hook 物件
  */
-export function createAriseBannerHook(ctx: PluginInput) {
-  return {
-    /**
-     * 會話創建時的回調
-     * Callback when session is created
-     */
-    async onSessionCreated() {
-      /** 只在程序首次執行時顯示 / Only show on first execution of process */
-      if (!bannerShownThisProcess) {
-        bannerShownThisProcess = true;
-        await showToastOpenCode(ctx, () => ({
-          body: {
-            title: "opencode-arise",
-            message: TOAST_MESSAGE,
-            variant: "info",
-            duration: 4000,
-          },
-        }));
-      }
-    },
-  };
+export function createAriseBannerHook(ctx: PluginInput)
+{
+	return {
+		/**
+		 * 會話創建時的回調
+		 * Callback when session is created
+		 */
+		async onSessionCreated()
+		{
+			/** 只在程序首次執行時顯示 / Only show on first execution of process */
+			if (!bannerShownThisProcess)
+			{
+				bannerShownThisProcess = true;
+				await showToastOpenCode(ctx, () => ({
+					body: {
+						title: "opencode-arise",
+						message: TOAST_MESSAGE,
+						variant: "info",
+						duration: 4000,
+					},
+				}));
+			}
+		},
+	};
 }
 
 /**
@@ -120,9 +127,10 @@ export function createAriseBannerHook(ctx: PluginInput) {
  *
  * @returns ASCII 藝術橫幅字串
  */
-export function getBanner(): string {
-  // 每次調用時重新讀取版本號，確保顯示最新版本
-  return generateBannerASCII(PLUGIN_VERSION);
+export function getBanner(): string
+{
+	// 每次調用時重新讀取版本號，確保顯示最新版本
+	return generateBannerASCII(PLUGIN_VERSION);
 }
 
 /**
@@ -132,9 +140,11 @@ export function getBanner(): string {
  * 用於 CLI 模式的初始化輸出
  * Used for initialization output in CLI mode
  */
-export function printBannerToConsole(): void {
-  if (!bannerShownThisProcess) {
-    console.yellow.log(getBanner());
-    bannerShownThisProcess = true;
-  }
+export function printBannerToConsole(): void
+{
+	if (!bannerShownThisProcess)
+	{
+		console.yellow.log(getBanner());
+		bannerShownThisProcess = true;
+	}
 }

@@ -27,14 +27,18 @@ import {
 } from "../lib/impl/patch-console-logger-reference";
 import { EnumLogLevel } from "../../src/types/enum-opencode";
 
-describe("patchConsoleLogger (deprecated)", () => {
+describe("patchConsoleLogger (deprecated)", () =>
+{
 	// 每個測試前重置狀態
-	beforeEach(() => {
+	beforeEach(() =>
+	{
 		resetDebugControl();
 	});
 
-	describe("基本功能 / Basic functionality", () => {
-		it("should patch consoleLogger methods", () => {
+	describe("基本功能 / Basic functionality", () =>
+	{
+		it("should patch consoleLogger methods", () =>
+		{
 			// 呼叫 patchConsoleLogger 前，consoleLogger 應該未被修補
 			// 修補後，方法應該被包裝
 			patchConsoleLogger();
@@ -43,7 +47,8 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(() => patchConsoleLogger()).not.toThrow();
 		});
 
-		it("should filter methods based on log level", () => {
+		it("should filter methods based on log level", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Error);
 
@@ -54,7 +59,8 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(canLog(EnumLogLevel.Info)).toBe(false);
 		});
 
-		it("should respect debug enabled state", () => {
+		it("should respect debug enabled state", () =>
+		{
 			setDebugEnabled(false);
 			expect(canLog(EnumLogLevel.Error)).toBe(false);
 
@@ -63,8 +69,10 @@ describe("patchConsoleLogger (deprecated)", () => {
 		});
 	});
 
-	describe("日誌級別過濾 / Log level filtering", () => {
-		it("should allow Error level when set to Error", () => {
+	describe("日誌級別過濾 / Log level filtering", () =>
+	{
+		it("should allow Error level when set to Error", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Error);
 
@@ -74,7 +82,8 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should allow Error and Warn when set to Warn", () => {
+		it("should allow Error and Warn when set to Warn", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Warn);
 
@@ -84,7 +93,8 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should allow Error, Warn, Info when set to Info", () => {
+		it("should allow Error, Warn, Info when set to Info", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Info);
 
@@ -94,7 +104,8 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should allow all levels when set to Debug", () => {
+		it("should allow all levels when set to Debug", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Debug);
 
@@ -105,8 +116,10 @@ describe("patchConsoleLogger (deprecated)", () => {
 		});
 	});
 
-	describe("setLogLevel / getLogLevel", () => {
-		it("should set and get log level", () => {
+	describe("setLogLevel / getLogLevel", () =>
+	{
+		it("should set and get log level", () =>
+		{
 			setLogLevel(EnumLogLevel.Error);
 			expect(getLogLevel()).toBe(EnumLogLevel.Error);
 
@@ -114,14 +127,17 @@ describe("patchConsoleLogger (deprecated)", () => {
 			expect(getLogLevel()).toBe(EnumLogLevel.Debug);
 		});
 
-		it("should default to warn level after reset", () => {
+		it("should default to warn level after reset", () =>
+		{
 			resetDebugControl();
 			expect(getLogLevel()).toBe(EnumLogLevel.Warn);
 		});
 	});
 
-	describe("限制說明 / Limitation notes", () => {
-		it("should document chain call limitation", () => {
+	describe("限制說明 / Limitation notes", () =>
+	{
+		it("should document chain call limitation", () =>
+		{
 			// patchConsoleLogger 的已知限制：
 			// - 不支援鏈式呼叫（如 consoleLogger.yellow.log）
 			// - 因為直接修改方法，無法保留對原始物件的引用

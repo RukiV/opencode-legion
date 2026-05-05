@@ -214,7 +214,7 @@ export function getDefaultAriseConfig(): IAriseConfig
 		Object.entries(SHADOW_AGENTS).map(([name, agent]) => [
 			name,
 			{ model: agent.model },
-		])
+		]),
 	) as IAriseConfig["agents"];
 
 	return {
@@ -264,7 +264,8 @@ export function createDefaultAriseConfig(configPath?: string): boolean
 		const handler = createJsonHandler(JSON.stringify(defaultConfig, null, 2));
 		writeFileSync(targetPath, handler.stringify(), "utf-8");
 		return true;
-	} catch (err)
+	}
+	catch (err)
 	{
 		console.error("✗ Failed to create config:", err);
 		return false;

@@ -34,7 +34,7 @@ export { tzDayjsSafeParse as tzDayjs }
  */
 export function formatDate(dateOrMilliseconds: dayjs.ConfigType, format: string = DEFAULT_DATE_TIME_FORMAT): string
 {
-  return tzDayjsSafeParse(dateOrMilliseconds).format(format);
+	return tzDayjsSafeParse(dateOrMilliseconds).format(format);
 }
 
 /**
@@ -46,7 +46,7 @@ export function formatDate(dateOrMilliseconds: dayjs.ConfigType, format: string 
  */
 export function fromNow(dateOrMilliseconds: dayjs.ConfigType): string
 {
-  return tzDayjsSafeParse(dateOrMilliseconds).fromNow();
+	return tzDayjsSafeParse(dateOrMilliseconds).fromNow();
 }
 
 export default dayjs;

@@ -66,14 +66,15 @@ export function createPluginTools(ctx: PluginInput,
 	 * 過濾掉 Code-level 禁用的工具
 	 * Filter out code-level disabled tools
 	 */
-	const filteredTools = tsObjectEntries(allTools).reduce((entries, [key]) => {
-			if (!disabledTools.includes(key))
-			{
-				entries[key] = allTools[key]() as any;
-			}
+	const filteredTools = tsObjectEntries(allTools).reduce((entries, [key]) =>
+	{
+		if (!disabledTools.includes(key))
+		{
+			entries[key] = allTools[key]() as any;
+		}
 
-			return entries
-		}, {} as IAriseTools) as IAriseTools;
+		return entries
+	}, {} as IAriseTools) as IAriseTools;
 
 	return filteredTools;
 }

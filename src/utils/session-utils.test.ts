@@ -24,7 +24,8 @@ import {
 	type IMessageInfo,
 } from "./session-utils";
 
-describe("Session Utils", () => {
+describe("Session Utils", () =>
+{
 	/**
 	 * 測試資料工廠
 	 * Test data factory
@@ -32,7 +33,7 @@ describe("Session Utils", () => {
 	const createMockMessage = (
 		role: string,
 		id: string,
-		overrides?: Partial<IMessageData>
+		overrides?: Partial<IMessageData>,
 	): IMessageData => ({
 		info: {
 			id,
@@ -41,7 +42,7 @@ describe("Session Utils", () => {
 			parentID: "parent-456",
 			agent: EnumShadowAgentsName.ShadowMonarch,
 			model: "gpt-4",
-			tools: [ "tool1", "tool2" ],
+			tools: ["tool1", "tool2"],
 		},
 		parts: [
 			{ type: "text", text: `Message from ${role}` },
@@ -49,8 +50,10 @@ describe("Session Utils", () => {
 		...overrides,
 	});
 
-	describe("findLastUserMessage", () => {
-		it("應該找到最後一個使用者訊息 / should find last user message", () => {
+	describe("findLastUserMessage", () =>
+	{
+		it("應該找到最後一個使用者訊息 / should find last user message", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("user", "msg-1"),
 				createMockMessage("assistant", "msg-2"),
@@ -64,7 +67,8 @@ describe("Session Utils", () => {
 			expect(result?.info?.role).toBe("user");
 		});
 
-		it("當沒有使用者訊息時應該返回 undefined / should return undefined when no user messages", () => {
+		it("當沒有使用者訊息時應該返回 undefined / should return undefined when no user messages", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("assistant", "msg-1"),
 				createMockMessage("system", "msg-2"),
@@ -75,14 +79,17 @@ describe("Session Utils", () => {
 			expect(result).toBeUndefined();
 		});
 
-		it("當陣列為空時應該返回 undefined / should return undefined for empty array", () => {
+		it("當陣列為空時應該返回 undefined / should return undefined for empty array", () =>
+		{
 			const result = findLastUserMessage([]);
 			expect(result).toBeUndefined();
 		});
 	});
 
-	describe("findLastAssistantMessage", () => {
-		it("應該找到最後一個助手訊息 / should find last assistant message", () => {
+	describe("findLastAssistantMessage", () =>
+	{
+		it("應該找到最後一個助手訊息 / should find last assistant message", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("assistant", "msg-1"),
 				createMockMessage("user", "msg-2"),
@@ -96,7 +103,8 @@ describe("Session Utils", () => {
 			expect(result?.info?.role).toBe("assistant");
 		});
 
-		it("當沒有助手訊息時應該返回 undefined / should return undefined when no assistant messages", () => {
+		it("當沒有助手訊息時應該返回 undefined / should return undefined when no assistant messages", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("user", "msg-1"),
 				createMockMessage("user", "msg-2"),
@@ -108,8 +116,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("findMessageById", () => {
-		it("應該根據 ID 找到訊息 / should find message by ID", () => {
+	describe("findMessageById", () =>
+	{
+		it("應該根據 ID 找到訊息 / should find message by ID", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("user", "msg-1"),
 				createMockMessage("assistant", "msg-2"),
@@ -121,7 +131,8 @@ describe("Session Utils", () => {
 			expect(result?.info?.id).toBe("msg-2");
 		});
 
-		it("當 ID 不存在時應該返回 undefined / should return undefined when ID not found", () => {
+		it("當 ID 不存在時應該返回 undefined / should return undefined when ID not found", () =>
+		{
 			const messages: IMessageData[] = [
 				createMockMessage("user", "msg-1"),
 			];
@@ -132,8 +143,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("extractResumeConfig", () => {
-		it("應該從使用者訊息提取恢復配置 / should extract resume config from user message", () => {
+	describe("extractResumeConfig", () =>
+	{
+		it("應該從使用者訊息提取恢復配置 / should extract resume config from user message", () =>
+		{
 			const userMessage = createMockMessage("user", "msg-1");
 			const sessionID = "session-abc";
 
@@ -143,11 +156,12 @@ describe("Session Utils", () => {
 				sessionID: "session-abc",
 				agent: EnumShadowAgentsName.ShadowMonarch,
 				model: "gpt-4",
-				tools: [ "tool1", "tool2" ],
+				tools: ["tool1", "tool2"],
 			});
 		});
 
-		it("當使用者訊息為 undefined 時應該只返回 sessionID / should return only sessionID when user message is undefined", () => {
+		it("當使用者訊息為 undefined 時應該只返回 sessionID / should return only sessionID when user message is undefined", () =>
+		{
 			const sessionID = "session-abc";
 
 			const result = extractResumeConfig(undefined, sessionID);
@@ -161,14 +175,17 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("createRecoveryPrompt", () => {
-		it("應該返回預設恢復文字 / should return default recovery text", () => {
+	describe("createRecoveryPrompt", () =>
+	{
+		it("應該返回預設恢復文字 / should return default recovery text", () =>
+		{
 			const result = createRecoveryPrompt();
 
 			expect(result).toBe("[session recovered - continuing previous task]");
 		});
 
-		it("應該返回自訂恢復文字 / should return custom recovery text", () => {
+		it("應該返回自訂恢復文字 / should return custom recovery text", () =>
+		{
 			const customText = "Custom recovery message";
 			const result = createRecoveryPrompt(customText);
 
@@ -176,8 +193,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("detectErrorType", () => {
-		it("應該檢測 tool_result_missing 錯誤 / should detect tool_result_missing error", () => {
+	describe("detectErrorType", () =>
+	{
+		it("應該檢測 tool_result_missing 錯誤 / should detect tool_result_missing error", () =>
+		{
 			const error = new Error("tool_result_missing: Tool result was cancelled");
 
 			const result = detectErrorType(error);
@@ -185,7 +204,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(EnumRecoveryErrorType.ToolResultMissing);
 		});
 
-		it("應該檢測 unavailable_tool 錯誤 / should detect unavailable_tool error", () => {
+		it("應該檢測 unavailable_tool 錯誤 / should detect unavailable_tool error", () =>
+		{
 			const error = new Error("unavailable_tool: Tool does not exist");
 
 			const result = detectErrorType(error);
@@ -193,7 +213,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(EnumRecoveryErrorType.UnavailableTool);
 		});
 
-		it("應該檢測 thinking_block_order 錯誤 / should detect thinking_block_order error", () => {
+		it("應該檢測 thinking_block_order 錯誤 / should detect thinking_block_order error", () =>
+		{
 			const error = new Error("Invalid thinking block order");
 
 			const result = detectErrorType(error);
@@ -201,7 +222,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(EnumRecoveryErrorType.ThinkingBlockOrder);
 		});
 
-		it("應該檢測 thinking_disabled_violation 錯誤 / should detect thinking_disabled_violation error", () => {
+		it("應該檢測 thinking_disabled_violation 錯誤 / should detect thinking_disabled_violation error", () =>
+		{
 			const error = new Error("thinking is disabled but thinking blocks were found");
 
 			const result = detectErrorType(error);
@@ -209,7 +231,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(EnumRecoveryErrorType.ThinkingDisabledViolation);
 		});
 
-		it("應該檢測 assistant_prefill_unsupported 錯誤 / should detect assistant_prefill_unsupported error", () => {
+		it("應該檢測 assistant_prefill_unsupported 錯誤 / should detect assistant_prefill_unsupported error", () =>
+		{
 			const error = new Error("Prefill not supported");
 
 			const result = detectErrorType(error);
@@ -217,7 +240,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(EnumRecoveryErrorType.AssistantPrefillUnsupported);
 		});
 
-		it("當錯誤無法識別時應該返回 null / should return null for unrecognized errors", () => {
+		it("當錯誤無法識別時應該返回 null / should return null for unrecognized errors", () =>
+		{
 			const error = new Error("Some random error");
 
 			const result = detectErrorType(error);
@@ -225,29 +249,35 @@ describe("Session Utils", () => {
 			expect(result).toBeNull();
 		});
 
-		it("應該處理非 Error 類型的錯誤 / should handle non-Error type errors", () => {
+		it("應該處理非 Error 類型的錯誤 / should handle non-Error type errors", () =>
+		{
 			const result = detectErrorType("tool_result_missing");
 
 			expect(result).toBe(EnumRecoveryErrorType.ToolResultMissing);
 		});
 	});
 
-	describe("isRecoverableError", () => {
-		it("當錯誤可恢復時應該返回 true / should return true for recoverable errors", () => {
+	describe("isRecoverableError", () =>
+	{
+		it("當錯誤可恢復時應該返回 true / should return true for recoverable errors", () =>
+		{
 			const error = new Error("tool_result_missing: something");
 
 			expect(isRecoverableError(error)).toBe(true);
 		});
 
-		it("當錯誤不可恢復時應該返回 false / should return false for non-recoverable errors", () => {
+		it("當錯誤不可恢復時應該返回 false / should return false for non-recoverable errors", () =>
+		{
 			const error = new Error("Some random error");
 
 			expect(isRecoverableError(error)).toBe(false);
 		});
 	});
 
-	describe("getErrorTypeTitle", () => {
-		it("應該返回正確的錯誤類型標題 / should return correct error type title", () => {
+	describe("getErrorTypeTitle", () =>
+	{
+		it("應該返回正確的錯誤類型標題 / should return correct error type title", () =>
+		{
 			expect(getErrorTypeTitle(EnumRecoveryErrorType.ToolResultMissing)).toBe("Tool Crash Recovery");
 			expect(getErrorTypeTitle(EnumRecoveryErrorType.UnavailableTool)).toBe("Tool Recovery");
 			expect(getErrorTypeTitle(EnumRecoveryErrorType.ThinkingBlockOrder)).toBe("Thinking Block Recovery");
@@ -256,18 +286,24 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("getErrorTypeMessage", () => {
-		it("應該返回正確的錯誤類型訊息 / should return correct error type message", () => {
+	describe("getErrorTypeMessage", () =>
+	{
+		it("應該返回正確的錯誤類型訊息 / should return correct error type message", () =>
+		{
 			expect(getErrorTypeMessage(EnumRecoveryErrorType.ToolResultMissing)).toBe("Injecting cancelled tool results...");
-			expect(getErrorTypeMessage(EnumRecoveryErrorType.UnavailableTool)).toBe("Recovering from unavailable tool call...");
+			expect(getErrorTypeMessage(EnumRecoveryErrorType.UnavailableTool))
+				.toBe("Recovering from unavailable tool call...");
 			expect(getErrorTypeMessage(EnumRecoveryErrorType.ThinkingBlockOrder)).toBe("Fixing message structure...");
 			expect(getErrorTypeMessage(EnumRecoveryErrorType.ThinkingDisabledViolation)).toBe("Stripping thinking blocks...");
-			expect(getErrorTypeMessage(EnumRecoveryErrorType.AssistantPrefillUnsupported)).toBe("Prefill not supported; continuing without recovery.");
+			expect(getErrorTypeMessage(EnumRecoveryErrorType.AssistantPrefillUnsupported))
+				.toBe("Prefill not supported; continuing without recovery.");
 		});
 	});
 
-	describe("extractTextFromMessage", () => {
-		it("應該從訊息中提取文字內容 / should extract text content from message", () => {
+	describe("extractTextFromMessage", () =>
+	{
+		it("應該從訊息中提取文字內容 / should extract text content from message", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "text", text: "Hello" },
@@ -280,7 +316,8 @@ describe("Session Utils", () => {
 			expect(result).toBe("Hello\nWorld");
 		});
 
-		it("當沒有文字 parts 時應該返回空字串 / should return empty string when no text parts", () => {
+		it("當沒有文字 parts 時應該返回空字串 / should return empty string when no text parts", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "image", url: "http://example.com/image.png" },
@@ -292,7 +329,8 @@ describe("Session Utils", () => {
 			expect(result).toBe("");
 		});
 
-		it("當 parts 為空時應該返回空字串 / should return empty string when parts is empty", () => {
+		it("當 parts 為空時應該返回空字串 / should return empty string when parts is empty", () =>
+		{
 			const message: IMessageData = { parts: [] };
 
 			const result = extractTextFromMessage(message);
@@ -300,7 +338,8 @@ describe("Session Utils", () => {
 			expect(result).toBe("");
 		});
 
-		it("當 parts 為 undefined 時應該返回空字串 / should return empty string when parts is undefined", () => {
+		it("當 parts 為 undefined 時應該返回空字串 / should return empty string when parts is undefined", () =>
+		{
 			const message: IMessageData = {};
 
 			const result = extractTextFromMessage(message);
@@ -309,8 +348,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("messageHasToolCall", () => {
-		it("當訊息包含特定工具呼叫時應該返回 true / should return true when message has specific tool call", () => {
+	describe("messageHasToolCall", () =>
+	{
+		it("當訊息包含特定工具呼叫時應該返回 true / should return true when message has specific tool call", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "tool_invoke", tool: "myTool" },
@@ -323,7 +364,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(true);
 		});
 
-		it("當訊息不包含特定工具呼叫時應該返回 false / should return false when message doesn't have specific tool call", () => {
+		it("當訊息不包含特定工具呼叫時應該返回 false / should return false when message doesn't have specific tool call", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "tool_invoke", tool: "otherTool" },
@@ -336,7 +378,8 @@ describe("Session Utils", () => {
 			expect(result).toBe(false);
 		});
 
-		it("當沒有 parts 時應該返回 false / should return false when no parts", () => {
+		it("當沒有 parts 時應該返回 false / should return false when no parts", () =>
+		{
 			const message: IMessageData = {};
 
 			const result = messageHasToolCall(message, "myTool");
@@ -345,8 +388,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("getToolCallsFromMessage", () => {
-		it("應該從訊息中提取所有工具呼叫 / should extract all tool calls from message", () => {
+	describe("getToolCallsFromMessage", () =>
+	{
+		it("應該從訊息中提取所有工具呼叫 / should extract all tool calls from message", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "tool_invoke", tool: "tool1" },
@@ -357,10 +402,11 @@ describe("Session Utils", () => {
 
 			const result = getToolCallsFromMessage(message);
 
-			expect(result).toEqual([ "tool1", "tool2" ]);
+			expect(result).toEqual(["tool1", "tool2"]);
 		});
 
-		it("當沒有工具呼叫時應該返回空陣列 / should return empty array when no tool calls", () => {
+		it("當沒有工具呼叫時應該返回空陣列 / should return empty array when no tool calls", () =>
+		{
 			const message: IMessageData = {
 				parts: [
 					{ type: "text", text: "Some text" },
@@ -372,7 +418,8 @@ describe("Session Utils", () => {
 			expect(result).toEqual([]);
 		});
 
-		it("當 parts 為 undefined 時應該返回空陣列 / should return empty array when parts is undefined", () => {
+		it("當 parts 為 undefined 時應該返回空陣列 / should return empty array when parts is undefined", () =>
+		{
 			const message: IMessageData = {};
 
 			const result = getToolCallsFromMessage(message);
@@ -381,8 +428,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("isValidMessageInfo", () => {
-		it("當訊息資訊包含必要欄位時應該返回 true / should return true when message info has required fields", () => {
+	describe("isValidMessageInfo", () =>
+	{
+		it("當訊息資訊包含必要欄位時應該返回 true / should return true when message info has required fields", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 				id: "msg-456",
@@ -391,7 +440,8 @@ describe("Session Utils", () => {
 			expect(isValidMessageInfo(info)).toBe(true);
 		});
 
-		it("當缺少 sessionID 時應該返回 false / should return false when sessionID is missing", () => {
+		it("當缺少 sessionID 時應該返回 false / should return false when sessionID is missing", () =>
+		{
 			const info: IMessageInfo = {
 				id: "msg-456",
 			};
@@ -399,7 +449,8 @@ describe("Session Utils", () => {
 			expect(isValidMessageInfo(info)).toBe(false);
 		});
 
-		it("當缺少 id 時應該返回 false / should return false when id is missing", () => {
+		it("當缺少 id 時應該返回 false / should return false when id is missing", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 			};
@@ -408,8 +459,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("isAssistantMessage", () => {
-		it("當角色為 assistant 時應該返回 true / should return true when role is assistant", () => {
+	describe("isAssistantMessage", () =>
+	{
+		it("當角色為 assistant 時應該返回 true / should return true when role is assistant", () =>
+		{
 			const info: IMessageInfo = {
 				role: "assistant",
 				sessionID: "session-123",
@@ -419,7 +472,8 @@ describe("Session Utils", () => {
 			expect(isAssistantMessage(info)).toBe(true);
 		});
 
-		it("當角色為 user 時應該返回 false / should return false when role is user", () => {
+		it("當角色為 user 時應該返回 false / should return false when role is user", () =>
+		{
 			const info: IMessageInfo = {
 				role: "user",
 				sessionID: "session-123",
@@ -429,7 +483,8 @@ describe("Session Utils", () => {
 			expect(isAssistantMessage(info)).toBe(false);
 		});
 
-		it("當角色為 undefined 時應該返回 false / should return false when role is undefined", () => {
+		it("當角色為 undefined 時應該返回 false / should return false when role is undefined", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 				id: "msg-456",
@@ -439,8 +494,10 @@ describe("Session Utils", () => {
 		});
 	});
 
-	describe("hasError", () => {
-		it("當包含錯誤時應該返回 true / should return true when has error", () => {
+	describe("hasError", () =>
+	{
+		it("當包含錯誤時應該返回 true / should return true when has error", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 				id: "msg-456",
@@ -450,7 +507,8 @@ describe("Session Utils", () => {
 			expect(hasError(info)).toBe(true);
 		});
 
-		it("當錯誤為 null 時應該返回 false / should return false when error is null", () => {
+		it("當錯誤為 null 時應該返回 false / should return false when error is null", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 				id: "msg-456",
@@ -460,7 +518,8 @@ describe("Session Utils", () => {
 			expect(hasError(info)).toBe(false);
 		});
 
-		it("當錯誤為 undefined 時應該返回 false / should return false when error is undefined", () => {
+		it("當錯誤為 undefined 時應該返回 false / should return false when error is undefined", () =>
+		{
 			const info: IMessageInfo = {
 				sessionID: "session-123",
 				id: "msg-456",

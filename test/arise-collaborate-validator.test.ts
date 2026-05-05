@@ -71,27 +71,27 @@ describe("arise_collaborate 參數驗證策略", () =>
 		{
 			for (const testCase of group.testCases)
 			{
-			it(testCase.name, () =>
-			{
-				let result: number;
-
-				switch (group.type)
+				it(testCase.name, () =>
 				{
-					case "max_concurrent":
-						result = getMaxConcurrent(testCase.callValue, testCase.config as IAriseConfig);
-						break;
-					case "round_timeout_ms":
-						result = getRoundTimeoutMs(testCase.callValue, testCase.config as IAriseConfig);
-						break;
-					case "total_rounds":
-						result = getTotalRounds(testCase.callValue, testCase.config as IAriseConfig);
-						break;
-					default:
-						throw new Error(`Unknown group type: ${group.type satisfies never}`);
-				}
+					let result: number;
 
-				expect(result).toBe(testCase.expected);
-			});
+					switch (group.type)
+					{
+						case "max_concurrent":
+							result = getMaxConcurrent(testCase.callValue, testCase.config as IAriseConfig);
+							break;
+						case "round_timeout_ms":
+							result = getRoundTimeoutMs(testCase.callValue, testCase.config as IAriseConfig);
+							break;
+						case "total_rounds":
+							result = getTotalRounds(testCase.callValue, testCase.config as IAriseConfig);
+							break;
+						default:
+							throw new Error(`Unknown group type: ${group.type satisfies never}`);
+					}
+
+					expect(result).toBe(testCase.expected);
+				});
 			}
 		});
 	}

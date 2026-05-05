@@ -10,13 +10,13 @@ import { EnumAriseTools } from '../types/enums';
 import { getAriseToolsConfigEntry } from '../agents/lib/arise-tools-utils';
 import { tool2 } from '../types/types-opencode';
 import
-	{
-		getDebugEnabled,
-		setDebugEnabled,
-		getLogLevel,
-		setLogLevel,
-		getDebugStatus,
-	} from '../utils/debug-control';
+{
+	getDebugEnabled,
+	setDebugEnabled,
+	getLogLevel,
+	setLogLevel,
+	getDebugStatus,
+} from '../utils/debug-control';
 import { formatAriseMsgSuccess, formatAriseMsgError } from '../utils/string/arise-message';
 import type { ILogLevel } from '../types/enum-opencode';
 import { createAgentToolListModels } from './arise-list-models';
@@ -88,9 +88,12 @@ export function createAgentToolDebug()
 				}
 
 				return formatAriseMsgSuccess(messages);
-			} catch (error)
+			}
+			catch (error)
 			{
-				return formatAriseMsgError(`Failed to update debug settings: ${error instanceof Error ? error.message : String(error)}`);
+				return formatAriseMsgError(`Failed to update debug settings: ${error instanceof Error
+					? error.message
+					: String(error)}`);
 			}
 		},
 	});

@@ -14,10 +14,13 @@
 import { describe, expect, it } from "bun:test";
 import { deepMerge, configMergeDeep, _arrayMergeLeftTargetWins, deepMerge3 } from "../src/utils/config/config-merge";
 
-describe("deepMerge vs configMergeDeep comparison", () => {
+describe("deepMerge vs configMergeDeep comparison", () =>
+{
 
-	describe("basic object merging", () => {
-		it("all three merge simple objects correctly", () => {
+	describe("basic object merging", () =>
+	{
+		it("all three merge simple objects correctly", () =>
+		{
 			const base = { a: 1, b: 2 };
 			const override = { b: 3, c: 4 };
 
@@ -42,7 +45,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("all three handle nested object merging", () => {
+		it("all three handle nested object merging", () =>
+		{
 			const base = { nested: { a: 1, b: 2 } };
 			const override = { nested: { b: 3, c: 4 } };
 
@@ -67,8 +71,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 		});
 	});
 
-	describe("array merging behavior", () => {
-		it("all three replace arrays with source array", () => {
+	describe("array merging behavior", () =>
+	{
+		it("all three replace arrays with source array", () =>
+		{
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
@@ -92,7 +98,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("all three use source array for merging", () => {
+		it("all three use source array for merging", () =>
+		{
 			const base = { items: [1, 2, 3] };
 			const override = { items: [4, 5] };
 
@@ -116,7 +123,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("_arrayMergeLeftTargetWins returns target unchanged", () => {
+		it("_arrayMergeLeftTargetWins returns target unchanged", () =>
+		{
 			const target = [1, 2, 3];
 			const source = [4, 5, 6];
 
@@ -135,8 +143,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 		});
 	});
 
-	describe("multiple object merging", () => {
-		it("all three handle multiple objects (deepMerge3 requires chaining)", () => {
+	describe("multiple object merging", () =>
+	{
+		it("all three handle multiple objects (deepMerge3 requires chaining)", () =>
+		{
 			const a = { x: 1 };
 			const b = { y: 2 };
 			const c = { z: 3 };
@@ -162,7 +172,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("all three merge with left-to-right precedence", () => {
+		it("all three merge with left-to-right precedence", () =>
+		{
 			const defaults = { a: 1, b: 1, c: 1 };
 			const user = { b: 2, c: 2 };
 			const override = { c: 3 };
@@ -188,8 +199,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 		});
 	});
 
-	describe("null and special value handling", () => {
-		it("deepMerge handles null in override", () => {
+	describe("null and special value handling", () =>
+	{
+		it("deepMerge handles null in override", () =>
+		{
 			const base = { value: "original" };
 			const override = { value: null };
 
@@ -210,7 +223,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("configMergeDeep [base, override] keeps leftmost null", () => {
+		it("configMergeDeep [base, override] keeps leftmost null", () =>
+		{
 			const base = { value: "original" };
 			const override = { value: null };
 
@@ -231,7 +245,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("deepMerge treats null in base as non-object", () => {
+		it("deepMerge treats null in base as non-object", () =>
+		{
 			const base = { nested: null };
 			const override = { nested: { a: 1 } };
 
@@ -253,8 +268,10 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 		});
 	});
 
-	describe("edge cases", () => {
-		it("deepMerge with empty objects", () => {
+	describe("edge cases", () =>
+	{
+		it("deepMerge with empty objects", () =>
+		{
 			const base = {};
 			const override = { a: 1 };
 
@@ -275,7 +292,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("configMergeDeep with empty array", () => {
+		it("configMergeDeep with empty array", () =>
+		{
 			const resultDeepMerge = deepMerge({}, {});
 			const resultConfigMerge = configMergeDeep([]);
 
@@ -292,7 +310,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("configMergeDeep with single object", () => {
+		it("configMergeDeep with single object", () =>
+		{
 			const input = { a: 1, b: 2 };
 
 			const resultDeepMerge = deepMerge({}, input);
@@ -312,7 +331,8 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("deepMerge does not mutate original objects", () => {
+		it("deepMerge does not mutate original objects", () =>
+		{
 			const base = { a: 1, nested: { x: 1 } };
 			const override = { b: 2 };
 
@@ -334,21 +354,23 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 		});
 	});
 
-	describe("deep nested merging", () => {
-		it("configMergeDeep left-priority differs from deepMerge at deep nesting", () => {
+	describe("deep nested merging", () =>
+	{
+		it("configMergeDeep left-priority differs from deepMerge at deep nesting", () =>
+		{
 			const base = {
 				level1: {
 					level2: {
-						level3: { a: 1, b: 2 }
-					}
-				}
+						level3: { a: 1, b: 2 },
+					},
+				},
 			};
 			const override = {
 				level1: {
 					level2: {
-						level3: { b: 3, c: 4 }
-					}
-				}
+						level3: { b: 3, c: 4 },
+					},
+				},
 			};
 
 			const resultDeepMerge = deepMerge(base, override);
@@ -357,9 +379,9 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			const expectedDeepNested = {
 				level1: {
 					level2: {
-						level3: { a: 1, b: 3, c: 4 }
-					}
-				}
+						level3: { a: 1, b: 3, c: 4 },
+					},
+				},
 			};
 
 			expect({
@@ -374,38 +396,41 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 			});
 		});
 
-		it("nested array behavior shows both functions use source array", () => {
-		const base = {
-			config: {
-				items: ["a", "b"]
-			}
-		};
-		const override = {
-			config: {
-				items: ["c"]
-			}
-		};
+		it("nested array behavior shows both functions use source array", () =>
+		{
+			const base = {
+				config: {
+					items: ["a", "b"],
+				},
+			};
+			const override = {
+				config: {
+					items: ["c"],
+				},
+			};
 
-		const resultDeepMerge = deepMerge(base, override);
-		const resultConfigMerge = configMergeDeep([base, override]);
+			const resultDeepMerge = deepMerge(base, override);
+			const resultConfigMerge = configMergeDeep([base, override]);
 
-		const expectedNestedArray = { config: { items: ["c"] } };
+			const expectedNestedArray = { config: { items: ["c"] } };
 
-		expect({
-			explain: "✅ 巢狀陣列行為相同 - 兩者都使用來源陣列\nNested array behavior same - both functions use source array",
-			tags: "nested-array, array, same",
-			input: { base, override },
-			resultDeepMerge,
-			resultConfigMerge,
-		}).toMatchSnapshot({
-			resultDeepMerge: expectedNestedArray,
-			resultConfigMerge: expectedNestedArray,
+			expect({
+				explain: "✅ 巢狀陣列行為相同 - 兩者都使用來源陣列\nNested array behavior same - both functions use source array",
+				tags: "nested-array, array, same",
+				input: { base, override },
+				resultDeepMerge,
+				resultConfigMerge,
+			}).toMatchSnapshot({
+				resultDeepMerge: expectedNestedArray,
+				resultConfigMerge: expectedNestedArray,
+			});
 		});
 	});
-	});
 
-	describe("function signature differences", () => {
-		it("deepMerge takes (base, override) while configMergeDeep takes array", () => {
+	describe("function signature differences", () =>
+	{
+		it("deepMerge takes (base, override) while configMergeDeep takes array", () =>
+		{
 			const obj1 = { a: 1 };
 			const obj2 = { b: 2 };
 			const obj3 = { c: 3 };
@@ -420,7 +445,7 @@ describe("deepMerge vs configMergeDeep comparison", () => {
 
 			expect({
 				explain: "✅ 函式簽章差異總結：deepMerge(base, override) vs configMergeDeep([objects...])\n" +
-"Function signature summary: deepMerge(base, override) vs configMergeDeep([objects...])",
+					"Function signature summary: deepMerge(base, override) vs configMergeDeep([objects...])",
 				tags: "signature, comparison, summary",
 				input: { obj1, obj2, obj3 },
 				resultDeepMerge,

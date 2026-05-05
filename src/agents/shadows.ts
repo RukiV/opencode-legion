@@ -525,7 +525,7 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 				})
 				.optional()
 				.default(true)
-				,
+			,
 			/** 現有 session ID（繼續協作）/ Existing session ID (continue collaboration) */
 			session_id: z
 				.string()

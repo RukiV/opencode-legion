@@ -107,7 +107,7 @@ export interface IProviderHistory
 
 export interface IProviderHistoryData
 {
-  /** 模型映射（key 為模型 ID） */
+	/** 模型映射（key 為模型 ID） */
 	models: {
 		[modelId: string]: IProviderHistoryItem;
 	};
@@ -178,7 +178,7 @@ function loadProvidersCacheFromFile(): IProvidersCache | null
 		const data = JSON.parse(content) as IProvidersCache;
 
 		// 驗證資料結構
-		if (!	data.data || !Array.isArray(	data.data) || typeof data.timestamp !== "number")
+		if (!data.data || !Array.isArray(data.data) || typeof data.timestamp !== "number")
 		{
 			return null;
 		}
@@ -518,7 +518,7 @@ export function generateProviderCacheReport(stats: IHistoryUpdateStats, timestam
 		"",
 		"  📦 Models per Provider / 各提供商模型數量:",
 		...Object.entries(stats.modelsPerProvider).map(([providerId, count]) =>
-			`     - ${providerId}: ${count} models`
+			`     - ${providerId}: ${count} models`,
 		),
 		"",
 		"  📈 Changes / 變動情況:",
@@ -625,7 +625,8 @@ export function setProvidersCache(
 	// 緩存物件不包含 history（歷史記錄單獨儲存於 providers-history.json）
 	// Cache object does NOT include history (history is stored separately in providers-history.json)
 	// providers Record 不包含 models（使用 IOpenCodeProviderCore），以減少檔案大小
-	const providersRecord = providers.reduce((acc, p) => {
+	const providersRecord = providers.reduce((acc, p) =>
+	{
 		acc[p.id] = {
 			id: p.id,
 			source: p.source,
@@ -637,9 +638,9 @@ export function setProvidersCache(
 		return acc;
 	}, {} as Record<string, IOpenCodeProviderCore>);
 
-  sortObject(providersRecord, {
-    useSource: true,
-  });
+	sortObject(providersRecord, {
+		useSource: true,
+	});
 
 	const cache: IProvidersCache = {
 		data: providers,
@@ -1042,7 +1043,8 @@ export function findFreeModels(providers: IOpenCodeProvider[]): IFreeModelInfo[]
 
 export function findFreeModelsRecord(providers: IOpenCodeProvider[])
 {
-	return findFreeModels(providers).reduce((record, entry) => {
+	return findFreeModels(providers).reduce((record, entry) =>
+	{
 		record[entry.providerId] ??= {} as any;
 		record[entry.providerId][entry.modelId] = entry;
 		return record;

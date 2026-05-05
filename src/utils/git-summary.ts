@@ -121,8 +121,8 @@ export function formatGitSummary(result: IGitSummaryResult): string
 
 	sections.push('## git status');
 	sections.push(_createTag(EnumOpenCodeMessageTag.ENTRIES, `${code_block}\n${result.status}\n${code_block}`, {
-			lineBreak: true,
-		}) || '(clean working tree)');
+		lineBreak: true,
+	}) || '(clean working tree)');
 
 	if (result.hasDiffStat)
 	{
@@ -136,8 +136,8 @@ export function formatGitSummary(result: IGitSummaryResult): string
 	sections.push('\n---\n\n');
 	sections.push(`## git log --oneline -${result.logCount}`);
 	sections.push(_createTag(EnumOpenCodeMessageTag.ENTRIES, `${code_block}\n${result.log}\n${code_block}`, {
-			lineBreak: true,
-		}) || '(no commits)');
+		lineBreak: true,
+	}) || '(no commits)');
 
 	return sections.join('\n');
 }

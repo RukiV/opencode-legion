@@ -31,7 +31,8 @@ import { createSafeFsWrapper, checkFsSafety, type IFsSafetyResult } from "./help
  * Mock 環境配置選項
  * Mock environment configuration options
  */
-export interface IMockEnvOptions {
+export interface IMockEnvOptions
+{
 	/** MockFS 配置 / MockFS configuration */
 	mockFs?: IMockFsOptions;
 	/** 是否使用安全 fs 包裝（預設 true）/ Whether to use safe fs wrapper (default: true) */
@@ -44,7 +45,8 @@ export interface IMockEnvOptions {
  * Mock 環境介面
  * Mock environment interface
  */
-export interface IMockEnv {
+export interface IMockEnv
+{
 	/** Mock 檔案系統 / Mock file system */
 	mockFs: MockFs;
 	/** 安全的 fs-extra 包裝 / Safe fs-extra wrapper */
@@ -103,7 +105,8 @@ export interface IMockEnv {
  * });
  * ```
  */
-export class MockEnv implements IMockEnv {
+export class MockEnv implements IMockEnv
+{
 	/** Mock 檔案系統 / Mock file system */
 	public readonly mockFs: MockFs;
 
@@ -125,7 +128,8 @@ export class MockEnv implements IMockEnv {
 	 *
 	 * @param options - 配置選項 / Configuration options
 	 */
-	constructor(options: IMockEnvOptions = {}) {
+	constructor(options: IMockEnvOptions = {})
+	{
 		this.options = {
 			mockFs: options.mockFs ?? {},
 			useSafeWrapper: options.useSafeWrapper ?? true,
@@ -159,7 +163,8 @@ export class MockEnv implements IMockEnv {
 		 * @param allowRelative - 是否允許相對路徑 / Whether to allow relative paths
 		 * @returns 安全檢查結果 / Safety check result
 		 */
-		check: (targetPath: string, allowRelative: boolean = false): IFsSafetyResult => {
+		check: (targetPath: string, allowRelative: boolean = false): IFsSafetyResult =>
+		{
 			return checkFsSafety(targetPath, allowRelative);
 		},
 
@@ -172,7 +177,8 @@ export class MockEnv implements IMockEnv {
 		 * @param allowRelative - 是否允許相對路徑 / Whether to allow relative paths
 		 * @throws Error 如果路徑不安全 / Throws Error if path is unsafe
 		 */
-		assert: (targetPath: string, operation: string = "operation", allowRelative: boolean = false): void => {
+		assert: (targetPath: string, operation: string = "operation", allowRelative: boolean = false): void =>
+		{
 			// 這個方法現在是 no-op，因為 MockFS 內建安全檢查
 			// This method is now a no-op because MockFS has built-in safety checks
 		},
@@ -196,7 +202,8 @@ export class MockEnv implements IMockEnv {
 		 * // 返回如：/path/to/test/temp/test-temp-123456/my-test
 		 * ```
 		 */
-		createDir: (name: string): string => {
+		createDir: (name: string): string =>
+		{
 			const timestamp = Date.now();
 			const dir = join(
 				__TEST_TEMP,
@@ -211,7 +218,8 @@ export class MockEnv implements IMockEnv {
 		 * 取得主臨時目錄路徑
 		 * Get main temp directory path
 		 */
-		getTempDir: (): string => {
+		getTempDir: (): string =>
+		{
 			return __TEST_TEMP;
 		},
 
@@ -219,7 +227,8 @@ export class MockEnv implements IMockEnv {
 		 * 取得測試 fixtures 路徑
 		 * Get test fixtures path
 		 */
-		getFixturesDir: (): string => {
+		getFixturesDir: (): string =>
+		{
 			return __TEST_FIXTURES;
 		},
 	};
@@ -231,7 +240,8 @@ export class MockEnv implements IMockEnv {
 	 * 清除所有模擬的檔案內容，但保留建立的臨時目錄
 	 * Clears all mocked file content but preserves created temp directories
 	 */
-	reset(): void {
+	reset(): void
+	{
 		this.mockFs.clear();
 	}
 
@@ -242,17 +252,22 @@ export class MockEnv implements IMockEnv {
 	 * 清除所有模擬的檔案內容和建立的臨時目錄
 	 * Clears all mocked file content and created temp directories
 	 */
-	cleanup(): void {
+	cleanup(): void
+	{
 		// 重置 MockFS
 		// Reset MockFS
 		this.mockFs.clear();
 
 		// 嘗試刪除建立的臨時目錄
 		// Try to delete created temp directories
-		for (const dir of this.createdTempDirs) {
-			try {
+		for (const dir of this.createdTempDirs)
+		{
+			try
+			{
 				fsExtra.removeSync(dir);
-			} catch {
+			}
+			catch
+			{
 				// 忽略刪除錯誤
 				// Ignore delete errors
 			}
@@ -296,7 +311,8 @@ export const defaultMockEnv = new MockEnv();
  * });
  * ```
  */
-export function createMockEnvHook(options?: IMockEnvOptions): () => MockEnv {
+export function createMockEnvHook(options?: IMockEnvOptions): () => MockEnv
+{
 	return () => new MockEnv(options);
 }
 
@@ -309,7 +325,8 @@ export function createMockEnvHook(options?: IMockEnvOptions): () => MockEnv {
  *
  * @returns 全域 Mock 環境 / Global mock environment
  */
-export function getGlobalMockEnv(): MockEnv {
+export function getGlobalMockEnv(): MockEnv
+{
 	return defaultMockEnv;
 }
 
@@ -331,7 +348,8 @@ export function getGlobalMockEnv(): MockEnv {
  * // 返回如：D:/path/to/test/temp/config.json
  * ```
  */
-export function safeTestPath(subPath: string): string {
+export function safeTestPath(subPath: string): string
+{
 	// 使用 normalize 確保路徑格式一致（正斜線）
 	// Use normalize to ensure consistent path format (forward slashes)
 	return normalize(join(__TEST_TEMP, subPath));
@@ -353,7 +371,8 @@ export function safeTestPath(subPath: string): string {
  * // 返回如：D:/path/to/test/fixtures/mock-data.json
  * ```
  */
-export function safeFixturesPath(subPath: string): string {
+export function safeFixturesPath(subPath: string): string
+{
 	return normalize(join(__TEST_FIXTURES, subPath));
 }
 
@@ -377,20 +396,23 @@ export function safeFixturesPath(subPath: string): string {
 export function setupTestTemp(
 	testName: string,
 	useTimestamp: boolean = true,
-): string {
+): string
+{
 	const timestamp = useTimestamp ? `-${Date.now()}` : "";
 	const dir = normalize(join(__TEST_TEMP, `${testName}${timestamp}`));
 
 	// 安全檢查：確保路徑在允許範圍內
 	// Safety check: ensure path is within allowed range
 	const result = checkFsSafety(dir);
-	if (!result.isSafe) {
+	if (!result.isSafe)
+	{
 		throw new Error(`[MockEnv] 不安全的測試目錄路徑: ${result.reason}`);
 	}
 
 	// 建立目錄
 	// Create directory
-	if (!fsExtra.existsSync(dir)) {
+	if (!fsExtra.existsSync(dir))
+	{
 		fsExtra.ensureDirSync(dir);
 	}
 
@@ -413,8 +435,10 @@ export function setupTestTemp(
  * cleanupTestTemp(dir);
  * ```
  */
-export function cleanupTestTemp(dir: string): void {
-	try {
+export function cleanupTestTemp(dir: string): void
+{
+	try
+	{
 		// 使用 normalize 確保路徑格式一致
 		// Use normalize to ensure consistent path format
 		const normalizedDir = normalize(dir);
@@ -426,13 +450,16 @@ export function cleanupTestTemp(dir: string): void {
 		// Safety check: ensure path is within allowed range
 		// Use pathInsideDirectory to check if inside directory
 		// Use pathIsSame to check if equals temp directory itself
-		if (!pathInsideDirectory(normalizedDir, normalizedTemp) && !pathIsSame(normalizedDir, normalizedTemp)) {
+		if (!pathInsideDirectory(normalizedDir, normalizedTemp) && !pathIsSame(normalizedDir, normalizedTemp))
+		{
 			console.warn(`[MockEnv] 嘗試刪除不在 temp 目錄內的路徑: ${dir}`);
 			return;
 		}
 
 		fsExtra.removeSync(dir);
-	} catch {
+	}
+	catch
+	{
 		// 忽略錯誤
 		// Ignore errors
 	}

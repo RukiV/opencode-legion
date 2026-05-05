@@ -21,7 +21,7 @@ function _sortObject<T extends Record<string, any>>(obj: T): T
 {
 	return sortObject(obj as any, {
 		keys: [
-			'$schema', 
+			'$schema',
 			'type',
 			'title',
 			'description',
@@ -35,8 +35,9 @@ function _sortObject<T extends Record<string, any>>(obj: T): T
 
 function sortObjectDeep<T extends Record<string, any>>(obj: T): T
 {
-	Object.entries(obj).forEach(([key, value]) => {
-		if (typeof value === 'object' && value !== null && !Array.isArray(value)) 
+	Object.entries(obj).forEach(([key, value]) =>
+	{
+		if (typeof value === 'object' && value !== null && !Array.isArray(value))
 		{
 			(obj as any)[key] = sortObjectDeep(value);
 		}

@@ -95,113 +95,113 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		console.log(`a-001`);
 
-/*
-		expect({
-			label: "label-001",
-			typeof: typeof output,
-			output,
-		}).toMatchSnapshot();
-*/
+		/*
+				expect({
+					label: "label-001",
+					typeof: typeof output,
+					output,
+				}).toMatchSnapshot();
+		*/
 
 		console.log(`a-002`);
 
-/*
-		expect(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
-*/
+		/*
+				expect(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
+		*/
 
 		console.log(`a-003`);
 
-/*
-		expect(output).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
-*/
+		/*
+				expect(output).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
+		*/
 
 		console.log(`a-004`);
 
-/*
-		expect(actual).toMatchInlineSnapshot(`
-		  {
-		    "bar": "bar",
-		    "foo": "foo",
-		  }
-		`);
-*/
+		/*
+				expect(actual).toMatchInlineSnapshot(`
+					{
+						"bar": "bar",
+						"foo": "foo",
+					}
+				`);
+		*/
 
 		console.log(`a-005`);
 
-/*
-		expect(JSON.stringify({
-			label: "label-002",
-			actual,
-		})).toMatchSnapshot(JSON.stringify({
-			label: "label-002",
-			actual: {
-				foo: "foo",
-				bar: "bar",
-			},
-		}));
-*/
+		/*
+				expect(JSON.stringify({
+					label: "label-002",
+					actual,
+				})).toMatchSnapshot(JSON.stringify({
+					label: "label-002",
+					actual: {
+						foo: "foo",
+						bar: "bar",
+					},
+				}));
+		*/
 
 		console.log(`a-006`);
 
-/*
-		expect({
-			label: "label-003-0",
-			actual,
-		}).toMatchSnapshot();
-*/
+		/*
+				expect({
+					label: "label-003-0",
+					actual,
+				}).toMatchSnapshot();
+		*/
 
 		console.log(`a-007`);
 
-/*
-		expect({
-			label: "label-003",
-			actual,
-		}).toMatchSnapshot();
-*/
+		/*
+				expect({
+					label: "label-003",
+					actual,
+				}).toMatchSnapshot();
+		*/
 
 		console.log(`[start] a-008-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		expect({
-			label: "label-004",
-			actual: {
-				foo: "foo",
-				bar: "bar",
-			},
-		}).toMatchInlineSnapshot(JSON.stringify({
-			label: "label-004",
-			actual: {
-				foo: "foo",
-				bar: "bar",
-			},
-		}));
-*/
+		/*
+				expect({
+					label: "label-004",
+					actual: {
+						foo: "foo",
+						bar: "bar",
+					},
+				}).toMatchInlineSnapshot(JSON.stringify({
+					label: "label-004",
+					actual: {
+						foo: "foo",
+						bar: "bar",
+					},
+				}));
+		*/
 
 		console.log(`[end] a-009-after-bug-happen-but-still-print`);
 
 		// ✅ 這個正常 / This works
-/*
-		expect(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
-*/
+		/*
+				expect(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
+		*/
 
 		console.log(`[start] a-010-next-code-will-bug`);
 
 		// ❌ BUG 2: Argument must be a string literal
 
-/*
-		expect(`"{"foo":"foo","bar":"bar"}"`).toMatchInlineSnapshot(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		}));
-*/
+		/*
+				expect(`"{"foo":"foo","bar":"bar"}"`).toMatchInlineSnapshot(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				}));
+		*/
 
 		console.log(`a-011-next-code-will-bug`);
 
@@ -209,133 +209,133 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 		// ⚠️ 即使在 expect(() => { ... }).not.toThrow() 裡面也會發生 BUG！
 		// ⚠️ Even when inside expect(() => { ... }).not.toThrow(), the BUG still occurs!
 
-/*
-		expect(() => {
+		/*
+				expect(() => {
 
 
-		expect(`"{"foo":"foo","bar":"bar"}"`).toMatchInlineSnapshot(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		}));
+				expect(`"{"foo":"foo","bar":"bar"}"`).toMatchInlineSnapshot(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				}));
 
 
-		}).not.toThrow();
-*/
+				}).not.toThrow();
+		*/
 
 		console.log(`[end] a-012-after-bug-happen-but-still-print`);
 
 		// ✅ 這個正常 / This works
 
-/*
-		expect(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
-*/
+		/*
+				expect(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				})).toMatchInlineSnapshot(`"{"foo":"foo","bar":"bar"}"`);
+		*/
 
 		console.log(`a-013`);
 
 		// ✅ 這個正常 / This works
 
-/*
-		expect({
-			label: "end",
-			actual,
-		}).toMatchSnapshot();
-*/
+		/*
+				expect({
+					label: "end",
+					actual,
+				}).toMatchSnapshot();
+		*/
 
 		console.log(`a-014`);
 
 		// ✅ 這個正常 / This works
 
-/*
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(`
-		  {
-		    "bar": "bar",
-		    "foo": "foo",
-		  }
-		`);
-*/
+		/*
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(`
+					{
+						"bar": "bar",
+						"foo": "foo",
+					}
+				`);
+		*/
 
 		console.log(`a-015`);
 
 		// ✅ 這個正常 / This works
 
-/*
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(`
-		  {
-		    "bar": "bar",
-		    "foo": "foo",
-		  }
-		`);
-*/
+		/*
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(`
+					{
+						"bar": "bar",
+						"foo": "foo",
+					}
+				`);
+		*/
 
 		console.log(`a-016`);
 
-/*
-		expect(JSON.stringify({
-			foo: "foo",
-			bar: "bar",
-		})).toMatchInlineSnapshot('"{"foo":"foo","bar":"bar"}"');
-*/
+		/*
+				expect(JSON.stringify({
+					foo: "foo",
+					bar: "bar",
+				})).toMatchInlineSnapshot('"{"foo":"foo","bar":"bar"}"');
+		*/
 
 		console.log(`a-017-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		let _s001 = `"{"foo":"foo","bar":"bar"}"`;
+		/*
+				let _s001 = `"{"foo":"foo","bar":"bar"}"`;
 
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(_s001);
-*/
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(_s001);
+		*/
 
 		console.log(`a-018-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		let _s002 = `{"foo":"foo","bar":"bar"}`;
+		/*
+				let _s002 = `{"foo":"foo","bar":"bar"}`;
 
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(_s002);
-*/
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(_s002);
+		*/
 
 		console.log(`a-019-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		const _s003 = `"{"foo":"foo","bar":"bar"}"`;
+		/*
+				const _s003 = `"{"foo":"foo","bar":"bar"}"`;
 
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(_s003);
-*/
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(_s003);
+		*/
 
 		console.log(`a-020-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		const _s004 = `{"foo":"foo","bar":"bar"}`;
+		/*
+				const _s004 = `{"foo":"foo","bar":"bar"}`;
 
-		expect({
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(_s004);
-*/
+				expect({
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(_s004);
+		*/
 
 		console.log(`a-021`);
 
@@ -349,19 +349,20 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		expect({
-			label: "a-022",
-			foo: "foo",
-			bar: "bar",
-		}).toMatchInlineSnapshot(JSON.stringify({
-			label: "a-022",
-			foo: "foo",
-			bar: "bar",
-		}));
-*/
+		/*
+				expect({
+					label: "a-022",
+					foo: "foo",
+					bar: "bar",
+				}).toMatchInlineSnapshot(JSON.stringify({
+					label: "a-022",
+					foo: "foo",
+					bar: "bar",
+				}));
+		*/
 
-		expect(() => {
+		expect(() =>
+		{
 
 			expect({
 				label: "a-023-01",
@@ -377,7 +378,8 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		}).toThrowErrorMatchingSnapshot();
 
-		expect(() => {
+		expect(() =>
+		{
 
 			expect({
 				label: "a-023-02",
@@ -387,7 +389,8 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		}).toThrowErrorMatchingSnapshot();
 
-		expect(() => {
+		expect(() =>
+		{
 
 			expect({
 				label: "a-023-03",
@@ -397,7 +400,8 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		}).toThrowErrorMatchingSnapshot();
 
-		expect(() => {
+		expect(() =>
+		{
 
 			expect({
 				label: "a-023-04",
@@ -407,7 +411,8 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		}).toThrowErrorMatchingSnapshot();
 
-		expect(() => {
+		expect(() =>
+		{
 
 			expect({
 				label: "a-023-04",
@@ -421,61 +426,63 @@ describe("toMatchInlineSnapshot with bad string literal", () =>
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		expect(() => {
+		/*
+				expect(() => {
 
-			const expected = '';
+					const expected = '';
 
-			expect({
-				label: "a-024",
-				foo: "foo",
-				bar: "bar",
-			}).toMatchInlineSnapshot(expected);
+					expect({
+						label: "a-024",
+						foo: "foo",
+						bar: "bar",
+					}).toMatchInlineSnapshot(expected);
 
-		}).not.toThrowError();
-*/
+				}).not.toThrowError();
+		*/
 
 		console.log(`a-025-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		expect(() => {
+		/*
+				expect(() => {
 
-			const expected = {};
+					const expected = {};
 
-			expect({
-				label: "a-023-02",
-				foo: "foo",
-				bar: "bar",
-			}).toMatchInlineSnapshot(expected as any, null as any);
+					expect({
+						label: "a-023-02",
+						foo: "foo",
+						bar: "bar",
+					}).toMatchInlineSnapshot(expected as any, null as any);
 
-		}).toThrow();
-*/
+				}).toThrow();
+		*/
 
 		console.log(`a-026-next-code-will-bug`);
 
 		// ❌ BUG: Argument must be a string literal
 
-/*
-		expect(() => {
+		/*
+				expect(() => {
 
-			const expected = {};
+					const expected = {};
 
-			expect({
-				label: "a-023-02",
-				foo: "foo",
-				bar: "bar",
-			}).toMatchInlineSnapshot(expected as any, void 0);
+					expect({
+						label: "a-023-02",
+						foo: "foo",
+						bar: "bar",
+					}).toMatchInlineSnapshot(expected as any, void 0);
 
-		}).toThrowErrorMatchingSnapshot();
-*/
+				}).toThrowErrorMatchingSnapshot();
+		*/
 
 		console.log(`[catched] a-027-next-code-can-be-catch`);
 
-		expect(() => {
+		expect(() =>
+		{
 
-			expect(() => {
+			expect(() =>
+			{
 
 				const expected = {};
 

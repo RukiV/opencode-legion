@@ -130,7 +130,7 @@ describe("toMatchObject 功能測試 / toMatchObject functionality", () =>
 		it("部分物件匹配 / Partial object match", () =>
 		{
 			expect({ a: 1, b: 2, c: 3 }).toMatchObject(
-				expect.objectContaining({ a: 1, b: 2 })
+				expect.objectContaining({ a: 1, b: 2 }),
 			);
 		});
 	});
@@ -165,8 +165,6 @@ describe("toMatchObject 功能測試 / toMatchObject functionality", () =>
 			});
 		});
 	});
-
-
 
 	describe("陣列 / Arrays", () =>
 	{

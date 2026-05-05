@@ -5,7 +5,7 @@ import { IReturnTypeOfPluginToolArise } from "./types-opencode";
 export type IReturnHasPlugin<T extends string> = ITSPartialRecord<T, string[]>;
 
 export type IAriseTools = {
-  [k in EnumAriseTools]: IReturnTypeOfPluginToolArise<k>;
+	[k in EnumAriseTools]: IReturnTypeOfPluginToolArise<k>;
 };
 
 /**

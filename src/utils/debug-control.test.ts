@@ -27,7 +27,8 @@ import type { IAriseConfig } from "../config/schema";
  * 測試用的預設配置工廠函式
  * Factory function for creating test configs
  */
-function createTestConfig(overrides?: Partial<IAriseConfig["debug"]>): IAriseConfig {
+function createTestConfig(overrides?: Partial<IAriseConfig["debug"]>): IAriseConfig
+{
 	return {
 		debug: {
 			enabled: false,
@@ -37,42 +38,50 @@ function createTestConfig(overrides?: Partial<IAriseConfig["debug"]>): IAriseCon
 	} as IAriseConfig;
 }
 
-describe("debug-control", () => {
+describe("debug-control", () =>
+{
 	// 每個測試前重置狀態
-	beforeEach(() => {
+	beforeEach(() =>
+	{
 		resetDebugControl();
 	});
 
-	describe("initDebugControl", () => {
-		it("should initialize with debug disabled by default", () => {
+	describe("initDebugControl", () =>
+	{
+		it("should initialize with debug disabled by default", () =>
+		{
 			const config = createTestConfig();
 			initDebugControl(config);
 
 			expect(getDebugEnabled()).toBe(false);
 		});
 
-		it("should initialize with debug enabled when config.enabled is true", () => {
+		it("should initialize with debug enabled when config.enabled is true", () =>
+		{
 			const config = createTestConfig({ enabled: true });
 			initDebugControl(config);
 
 			expect(getDebugEnabled()).toBe(true);
 		});
 
-		it("should set default log level to warn", () => {
+		it("should set default log level to warn", () =>
+		{
 			const config = createTestConfig();
 			initDebugControl(config);
 
 			expect(getLogLevel()).toBe(EnumLogLevel.Warn);
 		});
 
-		it("should respect config log level", () => {
+		it("should respect config log level", () =>
+		{
 			const config = createTestConfig({ level: EnumLogLevel.Debug });
 			initDebugControl(config);
 
 			expect(getLogLevel()).toBe(EnumLogLevel.Debug);
 		});
 
-		it("should handle config with undefined debug", () => {
+		it("should handle config with undefined debug", () =>
+		{
 			const config = {} as IAriseConfig;
 			initDebugControl(config);
 
@@ -81,19 +90,23 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("setDebugEnabled / getDebugEnabled", () => {
-		it("should enable debug mode", () => {
+	describe("setDebugEnabled / getDebugEnabled", () =>
+	{
+		it("should enable debug mode", () =>
+		{
 			setDebugEnabled(true);
 			expect(getDebugEnabled()).toBe(true);
 		});
 
-		it("should disable debug mode", () => {
+		it("should disable debug mode", () =>
+		{
 			setDebugEnabled(true);
 			setDebugEnabled(false);
 			expect(getDebugEnabled()).toBe(false);
 		});
 
-		it("should toggle debug mode", () => {
+		it("should toggle debug mode", () =>
+		{
 			expect(getDebugEnabled()).toBe(false);
 
 			setDebugEnabled(true);
@@ -104,8 +117,10 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("setLogLevel / getLogLevel", () => {
-		it("should set and get log level", () => {
+	describe("setLogLevel / getLogLevel", () =>
+	{
+		it("should set and get log level", () =>
+		{
 			setLogLevel(EnumLogLevel.Error);
 			expect(getLogLevel()).toBe(EnumLogLevel.Error);
 
@@ -116,7 +131,8 @@ describe("debug-control", () => {
 			expect(getLogLevel()).toBe(EnumLogLevel.Debug);
 		});
 
-		it("should default to warn level", () => {
+		it("should default to warn level", () =>
+		{
 			const config = createTestConfig();
 			initDebugControl(config);
 
@@ -124,8 +140,10 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("canLog", () => {
-		it("should return false when debug is disabled", () => {
+	describe("canLog", () =>
+	{
+		it("should return false when debug is disabled", () =>
+		{
 			setDebugEnabled(false);
 
 			expect(canLog(EnumLogLevel.Error)).toBe(false);
@@ -134,7 +152,8 @@ describe("debug-control", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should return true for error when level is error", () => {
+		it("should return true for error when level is error", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Error);
 
@@ -144,7 +163,8 @@ describe("debug-control", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should return true for error and warn when level is warn", () => {
+		it("should return true for error and warn when level is warn", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Warn);
 
@@ -154,7 +174,8 @@ describe("debug-control", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should return true for error, warn, and info when level is info", () => {
+		it("should return true for error, warn, and info when level is info", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Info);
 
@@ -164,7 +185,8 @@ describe("debug-control", () => {
 			expect(canLog(EnumLogLevel.Debug)).toBe(false);
 		});
 
-		it("should return true for all levels when level is debug", () => {
+		it("should return true for all levels when level is debug", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Debug);
 
@@ -175,8 +197,10 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("getDebugStatus", () => {
-		it("should return correct status after initialization", () => {
+	describe("getDebugStatus", () =>
+	{
+		it("should return correct status after initialization", () =>
+		{
 			const config = createTestConfig({ enabled: true, level: EnumLogLevel.Info });
 			initDebugControl(config);
 
@@ -187,7 +211,8 @@ describe("debug-control", () => {
 			});
 		});
 
-		it("should reflect changes in status", () => {
+		it("should reflect changes in status", () =>
+		{
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Debug);
 
@@ -198,7 +223,8 @@ describe("debug-control", () => {
 			});
 		});
 
-		it("should track toggle state accurately", () => {
+		it("should track toggle state accurately", () =>
+		{
 			setDebugEnabled(false);
 			setLogLevel(EnumLogLevel.Warn);
 
@@ -217,8 +243,10 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("log level priority", () => {
-		it("should correctly order log levels by priority", () => {
+	describe("log level priority", () =>
+	{
+		it("should correctly order log levels by priority", () =>
+		{
 			// Verify priority order: error < warn < info < debug
 			const levels = [
 				EnumLogLevel.Error,
@@ -241,8 +269,10 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("integration scenarios", () => {
-		it("should handle complete debug workflow", () => {
+	describe("integration scenarios", () =>
+	{
+		it("should handle complete debug workflow", () =>
+		{
 			// Start with minimal logging
 			const config = createTestConfig({ enabled: false, level: EnumLogLevel.Error });
 			initDebugControl(config);
@@ -272,7 +302,8 @@ describe("debug-control", () => {
 			expect(canLog(EnumLogLevel.Error)).toBe(false);
 		});
 
-		it("should maintain independent state for enabled and level", () => {
+		it("should maintain independent state for enabled and level", () =>
+		{
 			// Set initial state
 			setDebugEnabled(true);
 			setLogLevel(EnumLogLevel.Info);
@@ -289,15 +320,18 @@ describe("debug-control", () => {
 		});
 	});
 
-	describe("consoleLogger output filtering", () => {
+	describe("consoleLogger output filtering", () =>
+	{
 		// 使用 wrapConsoleLogger 包裝的 consoleLoggerWithLevel
 		// 這個版本支援完整的鏈式呼叫（如 .yellow.log）
 		// 測試策略：
 		// 1. 測試 canLog() 函數邏輯（直接驗證等級控制）
 		// 2. 使用 consoleLoggerWithLevel 驗證 Proxy 包裝正確運作
 
-		describe("canLog function", () => {
-			it("should return false when debug is disabled", () => {
+		describe("canLog function", () =>
+		{
+			it("should return false when debug is disabled", () =>
+			{
 				setDebugEnabled(false);
 				setLogLevel(EnumLogLevel.Debug);
 
@@ -305,7 +339,8 @@ describe("debug-control", () => {
 				expect(canLog(EnumLogLevel.Debug)).toBe(false);
 			});
 
-			it("should respect Error level (allows only Error)", () => {
+			it("should respect Error level (allows only Error)", () =>
+			{
 				setDebugEnabled(true);
 				setLogLevel(EnumLogLevel.Error);
 
@@ -317,7 +352,8 @@ describe("debug-control", () => {
 				expect(canLog(EnumLogLevel.Debug)).toBe(false);
 			});
 
-			it("should respect Warn level (allows Error + Warn)", () => {
+			it("should respect Warn level (allows Error + Warn)", () =>
+			{
 				setDebugEnabled(true);
 				setLogLevel(EnumLogLevel.Warn);
 
@@ -328,7 +364,8 @@ describe("debug-control", () => {
 				expect(canLog(EnumLogLevel.Debug)).toBe(false);
 			});
 
-			it("should respect Info level (allows Error + Warn + Info)", () => {
+			it("should respect Info level (allows Error + Warn + Info)", () =>
+			{
 				setDebugEnabled(true);
 				setLogLevel(EnumLogLevel.Info);
 
@@ -339,7 +376,8 @@ describe("debug-control", () => {
 				expect(canLog(EnumLogLevel.Debug)).toBe(false);
 			});
 
-			it("should respect Debug level (allows all)", () => {
+			it("should respect Debug level (allows all)", () =>
+			{
 				setDebugEnabled(true);
 				setLogLevel(EnumLogLevel.Debug);
 
@@ -351,8 +389,10 @@ describe("debug-control", () => {
 			});
 		});
 
-		describe("consoleLoggerWithLevel (wrapConsoleLogger)", () => {
-			it("should filter log output based on level", () => {
+		describe("consoleLoggerWithLevel (wrapConsoleLogger)", () =>
+		{
+			it("should filter log output based on level", () =>
+			{
 				setDebugEnabled(true);
 				setLogLevel(EnumLogLevel.Error);
 
@@ -373,8 +413,10 @@ describe("debug-control", () => {
 			});
 		});
 
-		describe("level priority comparison", () => {
-			it("should correctly compare log levels", () => {
+		describe("level priority comparison", () =>
+		{
+			it("should correctly compare log levels", () =>
+			{
 				setDebugEnabled(true);
 
 				// 驗證等級優先級: Error < Warn < Info < Debug

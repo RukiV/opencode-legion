@@ -225,7 +225,6 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 							if (firstMessage?.info)
 							{
 
-
 								/**
 								 * 类型断言：SDK 返回的消息包含 info 字段
 								 * SDK 类型：UserMessage.model = { providerID, modelID }, AssistantMessage 有 providerID/modelID 分開
@@ -260,7 +259,9 @@ export function createAgentToolAriseBackgroundStatus(manager: BackgroundManager,
 
 								if (modelObj)
 								{
-									_msg.push(role === "user" ? "Model format: UserMessage (model object), " : "Model format: AssistantMessage (providerID/modelID separated), ");
+									_msg.push(role === "user"
+										? "Model format: UserMessage (model object), "
+										: "Model format: AssistantMessage (providerID/modelID separated), ");
 
 									_msg.push(`providerID=${modelObj.providerID}, modelID=${modelObj.modelID}`);
 								}

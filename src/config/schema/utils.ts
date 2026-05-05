@@ -1,4 +1,3 @@
-
 import { EnumShadowAgentsName, IAllShadowAgentsName } from "../../types/enums";
 import { IShadowAgentPermission, SHADOW_AGENT_PERMISSION_KEY_INVALID } from "../../types/types-opencode";
 import { logArise2WithLevel } from "../../utils/debug-control";
@@ -21,22 +20,24 @@ import { logArise2WithLevel } from "../../utils/debug-control";
  * @returns 處理後的權限物件 / Processed permission object
  */
 export function _handlePermission<T extends IShadowAgentPermission>(permission: T, runtime?: {
-  agentsName?: IAllShadowAgentsName;
-}) 
+	agentsName?: IAllShadowAgentsName;
+})
 {
-  permission.edit = permission.edit ?? permission.write;
-  permission.write = permission.write ?? permission.edit;
+	permission.edit = permission.edit ?? permission.write;
+	permission.write = permission.write ?? permission.edit;
 
-  Object.keys(permission).forEach(key => {
-    if (SHADOW_AGENT_PERMISSION_KEY_INVALID.includes(key as any)) {
-      logArise2WithLevel('error', () => [
-        `[utils] _handlePermission: Invalid permission key: ${key}, value: ${permission[key as keyof T]}`,
-        runtime?.agentsName && `, agentsName: ${runtime.agentsName}`,
-      ], {
-        force: true,
-      });
-    }
-  });
+	Object.keys(permission).forEach(key =>
+	{
+		if (SHADOW_AGENT_PERMISSION_KEY_INVALID.includes(key as any))
+		{
+			logArise2WithLevel('error', () => [
+				`[utils] _handlePermission: Invalid permission key: ${key}, value: ${permission[key as keyof T]}`,
+				runtime?.agentsName && `, agentsName: ${runtime.agentsName}`,
+			], {
+				force: true,
+			});
+		}
+	});
 
-  return permission;
+	return permission;
 }

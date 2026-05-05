@@ -22,21 +22,26 @@ import { __TEST_TEMP } from "../../__root";
  * Part 1: Basic functionality tests (safety checks disabled)
  * ============================================================================
  */
-describe("MockFs - Basic Operations (Safety Disabled)", () => {
+describe("MockFs - Basic Operations (Safety Disabled)", () =>
+{
 	let mockFs: MockFs;
 
-	beforeEach(() => {
+	beforeEach(() =>
+	{
 		// 停用安全檢查以測試基本功能
 		// Disable safety checks for basic functionality testing
 		mockFs = new MockFs({ enableSafetyCheck: false });
 	});
 
-	afterEach(() => {
+	afterEach(() =>
+	{
 		mockFs.clear();
 	});
 
-	describe("writeFileSync / readFileSync", () => {
-		it("should write and read text file", () => {
+	describe("writeFileSync / readFileSync", () =>
+	{
+		it("should write and read text file", () =>
+		{
 			const path = "/test/file.txt";
 			const content = "Hello, World!";
 
@@ -46,7 +51,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(result).toBe(content);
 		});
 
-		it("should overwrite existing file", () => {
+		it("should overwrite existing file", () =>
+		{
 			const path = "/test/file.txt";
 
 			mockFs.writeFileSync(path, "original");
@@ -55,7 +61,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.readFileSync(path)).toBe("updated");
 		});
 
-		it("should handle empty content", () => {
+		it("should handle empty content", () =>
+		{
 			const path = "/test/empty.txt";
 
 			mockFs.writeFileSync(path, "");
@@ -64,7 +71,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(result).toBe("");
 		});
 
-		it("should handle unicode content", () => {
+		it("should handle unicode content", () =>
+		{
 			const path = "/test/unicode.txt";
 			const content = "你好世界 🌍 مرحبا";
 
@@ -74,17 +82,21 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(result).toBe(content);
 		});
 
-		it("should throw for non-existent file", () => {
+		it("should throw for non-existent file", () =>
+		{
 			const path = "/test/nonexistent.txt";
 
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.readFileSync(path);
 			}).toThrow();
 		});
 	});
 
-	describe("writeJsonSync / readJsonSync", () => {
-		it("should write and read JSON file", () => {
+	describe("writeJsonSync / readJsonSync", () =>
+	{
+		it("should write and read JSON file", () =>
+		{
 			const path = "/test/data.json";
 			const data = { name: "test", value: 123 };
 
@@ -94,7 +106,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(result).toEqual(data);
 		});
 
-		it("should pretty-print JSON", () => {
+		it("should pretty-print JSON", () =>
+		{
 			const path = "/test/data.json";
 			const data = { nested: { key: "value" } };
 
@@ -105,7 +118,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(content).toContain("  ");
 		});
 
-		it("should handle arrays", () => {
+		it("should handle arrays", () =>
+		{
 			const path = "/test/array.json";
 			const data = [1, 2, 3, "four", true];
 
@@ -116,8 +130,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("mkdirSync", () => {
-		it("should create directory", () => {
+	describe("mkdirSync", () =>
+	{
+		it("should create directory", () =>
+		{
 			const path = "/test/newdir";
 
 			mockFs.mkdirSync(path);
@@ -125,7 +141,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.isDirectory(path)).toBe(true);
 		});
 
-		it("should create nested directories", () => {
+		it("should create nested directories", () =>
+		{
 			const path = "/test/nested/deep/path";
 
 			mockFs.mkdirSync(path, true);
@@ -133,18 +150,22 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.isDirectory(path)).toBe(true);
 		});
 
-		it("should not throw when directory already exists", () => {
+		it("should not throw when directory already exists", () =>
+		{
 			const path = "/test/existing";
 
 			mockFs.mkdirSync(path);
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.mkdirSync(path);
 			}).not.toThrow();
 		});
 	});
 
-	describe("rmSync", () => {
-		it("should delete file", () => {
+	describe("rmSync", () =>
+	{
+		it("should delete file", () =>
+		{
 			const path = "/test/file.txt";
 
 			mockFs.writeFileSync(path, "content");
@@ -154,7 +175,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.existsSync(path)).toBe(false);
 		});
 
-		it("should delete empty directory", () => {
+		it("should delete empty directory", () =>
+		{
 			const path = "/test/emptydir";
 
 			mockFs.mkdirSync(path);
@@ -163,7 +185,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.isDirectory(path)).toBe(false);
 		});
 
-		it("should delete directory with recursive option", () => {
+		it("should delete directory with recursive option", () =>
+		{
 			const dirPath = "/test/fulldir";
 			const filePath = "/test/fulldir/file.txt";
 
@@ -177,28 +200,34 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("existsSync", () => {
-		it("should return true for existing file", () => {
+	describe("existsSync", () =>
+	{
+		it("should return true for existing file", () =>
+		{
 			const path = "/test/exists.txt";
 			mockFs.writeFileSync(path, "content");
 
 			expect(mockFs.existsSync(path)).toBe(true);
 		});
 
-		it("should return false for non-existent path", () => {
+		it("should return false for non-existent path", () =>
+		{
 			expect(mockFs.existsSync("/test/doesnotexist.txt")).toBe(false);
 		});
 	});
 
-	describe("isDirectory", () => {
-		it("should return true for directory", () => {
+	describe("isDirectory", () =>
+	{
+		it("should return true for directory", () =>
+		{
 			const path = "/test/mydir";
 			mockFs.mkdirSync(path);
 
 			expect(mockFs.isDirectory(path)).toBe(true);
 		});
 
-		it("should return false for file", () => {
+		it("should return false for file", () =>
+		{
 			const path = "/test/myfile.txt";
 			mockFs.writeFileSync(path, "content");
 
@@ -206,15 +235,18 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("isFile", () => {
-		it("should return true for file", () => {
+	describe("isFile", () =>
+	{
+		it("should return true for file", () =>
+		{
 			const path = "/test/myfile.txt";
 			mockFs.writeFileSync(path, "content");
 
 			expect(mockFs.isFile(path)).toBe(true);
 		});
 
-		it("should return false for directory", () => {
+		it("should return false for directory", () =>
+		{
 			const path = "/test/mydir";
 			mockFs.mkdirSync(path);
 
@@ -222,8 +254,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("readdirSync", () => {
-		it("should list directory contents", () => {
+	describe("readdirSync", () =>
+	{
+		it("should list directory contents", () =>
+		{
 			const dir = "/test/listing";
 			mockFs.mkdirSync(dir);
 			mockFs.writeFileSync(`${dir}/file1.txt`, "");
@@ -237,15 +271,19 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(entries).toContain("subdir");
 		});
 
-		it("should throw for non-existent directory", () => {
-			expect(() => {
+		it("should throw for non-existent directory", () =>
+		{
+			expect(() =>
+			{
 				mockFs.readdirSync("/test/nonexistent");
 			}).toThrow();
 		});
 	});
 
-	describe("statSync", () => {
-		it("should return file stats", () => {
+	describe("statSync", () =>
+	{
+		it("should return file stats", () =>
+		{
 			const path = "/test/stats.txt";
 			const content = "test content";
 			mockFs.writeFileSync(path, content);
@@ -257,7 +295,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(stats.size).toBe(content.length);
 		});
 
-		it("should return directory stats", () => {
+		it("should return directory stats", () =>
+		{
 			const path = "/test/statsdir";
 			mockFs.mkdirSync(path);
 
@@ -269,8 +308,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("copyFileSync", () => {
-		it("should copy file", () => {
+	describe("copyFileSync", () =>
+	{
+		it("should copy file", () =>
+		{
 			const src = "/test/source.txt";
 			const dest = "/test/dest.txt";
 			const content = "copy me";
@@ -282,7 +323,8 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 			expect(mockFs.existsSync(src)).toBe(true); // Original still exists
 		});
 
-		it("should overwrite existing destination", () => {
+		it("should overwrite existing destination", () =>
+		{
 			const src = "/test/source.txt";
 			const dest = "/test/dest.txt";
 
@@ -294,8 +336,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("setFiles", () => {
-		it("should set multiple files at once", () => {
+	describe("setFiles", () =>
+	{
+		it("should set multiple files at once", () =>
+		{
 			const files: Record<string, string> = {
 				"/test/file1.txt": "content 1",
 				"/test/file2.txt": "content 2",
@@ -310,8 +354,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("clear", () => {
-		it("should clear all files", () => {
+	describe("clear", () =>
+	{
+		it("should clear all files", () =>
+		{
 			mockFs.writeFileSync("/test/file1.txt", "content 1");
 			mockFs.writeFileSync("/test/file2.txt", "content 2");
 			mockFs.mkdirSync("/test/subdir");
@@ -324,8 +370,10 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
 		});
 	});
 
-	describe("toDebugString", () => {
-		it("should return string representation", () => {
+	describe("toDebugString", () =>
+	{
+		it("should return string representation", () =>
+		{
 			mockFs.writeFileSync("/test/file.txt", "content");
 			mockFs.mkdirSync("/test/subdir");
 
@@ -343,59 +391,76 @@ describe("MockFs - Basic Operations (Safety Disabled)", () => {
  * Part 2: Safety checks tests
  * ============================================================================
  */
-describe("MockFs - Safety Checks", () => {
-	describe("with safety checks enabled (default)", () => {
+describe("MockFs - Safety Checks", () =>
+{
+	describe("with safety checks enabled (default)", () =>
+	{
 		let mockFs: MockFs;
 
-		beforeEach(() => {
+		beforeEach(() =>
+		{
 			// 預設啟用安全檢查
 			// Enable safety checks by default
 			mockFs = new MockFs({ enableSafetyCheck: true });
 		});
 
-		afterEach(() => {
+		afterEach(() =>
+		{
 			mockFs.clear();
 		});
 
-		it("should block dangerous paths like /etc/passwd", () => {
-			expect(() => {
+		it("should block dangerous paths like /etc/passwd", () =>
+		{
+			expect(() =>
+			{
 				mockFs.writeFileSync("/etc/passwd", "malicious");
 			}).toThrow();
 		});
 
-		it("should block Windows system paths", () => {
-			expect(() => {
+		it("should block Windows system paths", () =>
+		{
+			expect(() =>
+			{
 				mockFs.writeFileSync("C:/Windows/System32/config.sys", "malicious");
 			}).toThrow();
 		});
 
-		it("should block paths outside project root", () => {
-			expect(() => {
+		it("should block paths outside project root", () =>
+		{
+			expect(() =>
+			{
 				mockFs.writeFileSync("/tmp/outside.txt", "malicious");
 			}).toThrow();
 		});
 
-		it("should allow paths within safe prefixes", () => {
+		it("should allow paths within safe prefixes", () =>
+		{
 			const safePath = `${__TEST_TEMP}/test.txt`;
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync(safePath, "content");
 			}).not.toThrow();
 		});
 	});
 
-	describe("with safety checks disabled", () => {
+	describe("with safety checks disabled", () =>
+	{
 		let mockFs: MockFs;
 
-		beforeEach(() => {
+		beforeEach(() =>
+		{
 			mockFs = new MockFs({ enableSafetyCheck: false });
 		});
 
-		afterEach(() => {
+		afterEach(() =>
+		{
 			mockFs.clear();
 		});
 
-		it("should allow dangerous paths when safety check disabled", () => {
-			expect(() => {
+		it("should allow dangerous paths when safety check disabled", () =>
+		{
+			expect(() =>
+			{
 				mockFs.writeFileSync("/etc/passwd", "malicious");
 			}).not.toThrow();
 		});
@@ -408,22 +473,28 @@ describe("MockFs - Safety Checks", () => {
  * Part 3: Configuration options tests
  * ============================================================================
  */
-describe("MockFs - Configuration Options", () => {
-	describe("auto-create directories", () => {
-		it("should create parent directories by default", () => {
+describe("MockFs - Configuration Options", () =>
+{
+	describe("auto-create directories", () =>
+	{
+		it("should create parent directories by default", () =>
+		{
 			const mockFs = new MockFs({ autoCreateDir: true, enableSafetyCheck: false });
 
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync("/test/nonexistent/parent/file.txt", "content");
 			}).not.toThrow();
 
 			mockFs.clear();
 		});
 
-		it("should throw when parent directory doesn't exist and autoCreateDir disabled", () => {
+		it("should throw when parent directory doesn't exist and autoCreateDir disabled", () =>
+		{
 			const mockFs = new MockFs({ autoCreateDir: false, enableSafetyCheck: false });
 
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync("/test/nonexistent/parent/file.txt", "content");
 			}).toThrow();
 
@@ -438,12 +509,15 @@ describe("MockFs - Configuration Options", () => {
  * Part 4: Default singleton tests
  * ============================================================================
  */
-describe("MockFs - Default Singleton", () => {
-	it("should be instance of MockFs", () => {
+describe("MockFs - Default Singleton", () =>
+{
+	it("should be instance of MockFs", () =>
+	{
 		expect(defaultMockFs instanceof MockFs).toBe(true);
 	});
 
-	it("should be usable for testing with safe paths", () => {
+	it("should be usable for testing with safe paths", () =>
+	{
 		// 使用安全的路徑前綴
 		// Use safe path prefix
 		const safePath = `${__TEST_TEMP}/default-test.txt`;
@@ -462,26 +536,31 @@ describe("MockFs - Default Singleton", () => {
  * Part 5: Audit Mode tests
  * ============================================================================
  */
-describe("MockFs - Audit Mode", () => {
+describe("MockFs - Audit Mode", () =>
+{
 	let auditCounter = 0;
 
 	// 每個測試使用唯一的 audit 目錄
-	const createUniqueAuditDir = () => {
+	const createUniqueAuditDir = () =>
+	{
 		return `${__TEST_TEMP}/audit/${Date.now()}-${++auditCounter}`;
 	};
 
-	describe("enableAudit / disableAudit", () => {
-		it("should start with audit disabled", () => {
+	describe("enableAudit / disableAudit", () =>
+	{
+		it("should start with audit disabled", () =>
+		{
 			const mockFs = new MockFs({ enableSafetyCheck: false });
 			expect(mockFs.isAuditEnabled).toBe(false);
 			expect(mockFs.isAuditModeEnabled()).toBe(false);
 		});
 
-		it("should enable audit mode", () => {
+		it("should enable audit mode", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
-				auditDir: auditDir
+				auditDir: auditDir,
 			});
 			mockFs.enableAudit();
 
@@ -489,12 +568,13 @@ describe("MockFs - Audit Mode", () => {
 			expect(mockFs.isAuditModeEnabled()).toBe(true);
 		});
 
-		it("should disable audit mode", () => {
+		it("should disable audit mode", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
-				auditEnabled: true
+				auditEnabled: true,
 			});
 			mockFs.disableAudit();
 
@@ -502,11 +582,12 @@ describe("MockFs - Audit Mode", () => {
 			expect(mockFs.isAuditModeEnabled()).toBe(false);
 		});
 
-		it("should enable audit with custom patterns", () => {
+		it("should enable audit with custom patterns", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
-				auditDir: auditDir
+				auditDir: auditDir,
 			});
 			mockFs.enableAudit(["**/*.ts", "!**/*.test.ts"]);
 
@@ -515,35 +596,39 @@ describe("MockFs - Audit Mode", () => {
 		});
 	});
 
-	describe("auditPatterns", () => {
-		it("should use default patterns", () => {
+	describe("auditPatterns", () =>
+	{
+		it("should use default patterns", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
-				auditDir: auditDir
+				auditDir: auditDir,
 			});
 
 			expect(mockFs.getAuditPatterns()).toEqual(["**/*"]);
 		});
 
-		it("should set custom patterns", () => {
+		it("should set custom patterns", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
-				auditDir: auditDir
+				auditDir: auditDir,
 			});
 			mockFs.setAuditPatterns(["**/*.json", "**/*.txt"]);
 
 			expect(mockFs.getAuditPatterns()).toEqual(["**/*.json", "**/*.txt"]);
 		});
 
-		it("should filter files by patterns", () => {
+		it("should filter files by patterns", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
 				auditEnabled: true,
-				auditPatterns: ["**/*.txt"]
+				auditPatterns: ["**/*.txt"],
 			});
 
 			mockFs.writeFileSync("/test/file.txt", "text content");
@@ -555,13 +640,14 @@ describe("MockFs - Audit Mode", () => {
 			expect(auditFiles).not.toContain("/test/data.json");
 		});
 
-		it("should support negation patterns", () => {
+		it("should support negation patterns", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
 				auditEnabled: true,
-				auditPatterns: ["**/*.ts", "!**/*.test.ts"]
+				auditPatterns: ["**/*.ts", "!**/*.test.ts"],
 			});
 
 			mockFs.writeFileSync("/test/util.ts", "util code");
@@ -575,25 +661,28 @@ describe("MockFs - Audit Mode", () => {
 		});
 	});
 
-	describe("audit writing", () => {
-		it("should not write to audit when disabled", () => {
+	describe("audit writing", () =>
+	{
+		it("should not write to audit when disabled", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
-				auditEnabled: false
+				auditEnabled: false,
 			});
 
 			mockFs.writeFileSync("/test/file.txt", "content");
 			expect(mockFs.getAuditFiles()).toHaveLength(0);
 		});
 
-		it("should write to audit when enabled", () => {
+		it("should write to audit when enabled", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
-				auditEnabled: true
+				auditEnabled: true,
 			});
 
 			mockFs.writeFileSync("/test/file.txt", "Hello, Audit!");
@@ -603,11 +692,12 @@ describe("MockFs - Audit Mode", () => {
 			expect(mockFs.readAuditFile("/test/file.txt")).toBe("Hello, Audit!");
 		});
 
-		it("should dynamically enable audit", () => {
+		it("should dynamically enable audit", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
-				auditDir: auditDir
+				auditDir: auditDir,
 			});
 
 			// Write before enabling
@@ -623,38 +713,43 @@ describe("MockFs - Audit Mode", () => {
 		});
 	});
 
-	describe("constructor options", () => {
-		it("should accept auditEnabled in constructor", () => {
-			const auditDir = createUniqueAuditDir();
-			const mockFs = new MockFs({
-				enableSafetyCheck: false,
-				auditDir: auditDir,
-				auditEnabled: true
-			});
-
-			expect(mockFs.isAuditEnabled).toBe(true);
-		});
-
-		it("should accept auditPatterns in constructor", () => {
+	describe("constructor options", () =>
+	{
+		it("should accept auditEnabled in constructor", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
 				auditEnabled: true,
-				auditPatterns: ["**/*.json"]
+			});
+
+			expect(mockFs.isAuditEnabled).toBe(true);
+		});
+
+		it("should accept auditPatterns in constructor", () =>
+		{
+			const auditDir = createUniqueAuditDir();
+			const mockFs = new MockFs({
+				enableSafetyCheck: false,
+				auditDir: auditDir,
+				auditEnabled: true,
+				auditPatterns: ["**/*.json"],
 			});
 
 			expect(mockFs.getAuditPatterns()).toEqual(["**/*.json"]);
 		});
 	});
 
-	describe("clearAuditDir", () => {
-		it("should clear audit directory", () => {
+	describe("clearAuditDir", () =>
+	{
+		it("should clear audit directory", () =>
+		{
 			const auditDir = createUniqueAuditDir();
 			const mockFs = new MockFs({
 				enableSafetyCheck: false,
 				auditDir: auditDir,
-				auditEnabled: true
+				auditEnabled: true,
 			});
 
 			mockFs.writeFileSync("/test/file1.txt", "content1");

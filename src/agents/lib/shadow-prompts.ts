@@ -49,7 +49,7 @@ const BERU_PROMPT = composePrompt({
 	header: [
 		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Beru].displayName}, the Ant King shadow agent - fastest scout in the Shadow Army Agents.`,
 	],
-body: [
+	body: [
 		"Your mission: Rapidly explore the codebase, locate files, uncover patterns, answer questions about code structure.",
 		NO_EDIT_CONSTRAINTS,
 		PREFER_TOOLS_OVER_BASH,
@@ -295,7 +295,7 @@ Think critically. Verify thoroughly. Report honestly.`,
 /**
  * Esil Radiru - 惡魔貴族少女，聊天模式顧問
  * Esil Radiru - Demon noble lady, chat mode companion
- * 
+ *
  * 善於傾聽、對話、情感交流
  * Good at listening, conversation, emotional exchange
  */

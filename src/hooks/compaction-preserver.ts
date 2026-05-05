@@ -9,19 +9,21 @@ import { formatAriseMsgTitle } from "../utils/string/arise-message";
  *
  * @returns 對話壓縮保留 Hook 物件
  */
-export function createCompactionPreserverHook() {
-  return {
-    /**
-     * 取得保留上下文
-     * Get preservation context
-     *
-     * 返回對話壓縮時應該保留和修剪的內容規則
-     * Returns rules for what to preserve and prune during conversation compaction
-     *
-     * @returns 保留規則字串
-     */
-    getPreservationContext(): string {
-      return formatAriseMsgTitle(`Compaction preservation rules:
+export function createCompactionPreserverHook()
+{
+	return {
+		/**
+		 * 取得保留上下文
+		 * Get preservation context
+		 *
+		 * 返回對話壓縮時應該保留和修剪的內容規則
+		 * Returns rules for what to preserve and prune during conversation compaction
+		 *
+		 * @returns 保留規則字串
+		 */
+		getPreservationContext(): string
+		{
+			return formatAriseMsgTitle(`Compaction preservation rules:
 - PRESERVE: All TODO items (pending, in_progress, completed)
 - PRESERVE: Key decisions and assumptions made
 - PRESERVE: File paths that were touched/edited
@@ -31,6 +33,6 @@ export function createCompactionPreserverHook() {
 - PRUNE: Repetitive exploration that didn't yield results
 
 Summarize work done, but keep enough context for the Monarch to continue.`);
-    },
-  };
+		},
+	};
 }

@@ -19,12 +19,16 @@ export interface IProcessingSet
 {
 	/** 檢查項目是否正在處理中 / Check if item is being processed */
 	has(item: string): boolean;
+
 	/** 添加項目到處理中集合 / Add item to processing set */
 	add(item: string): void;
+
 	/** 從處理中集合移除項目 / Remove item from processing set */
 	delete(item: string): void;
+
 	/** 清空處理中集合 / Clear processing set */
 	clear(): void;
+
 	/** 獲取處理中項目數量 / Get number of processing items */
 	size: number;
 }
@@ -37,8 +41,10 @@ export interface ICallbackRegistrar<T extends (...args: unknown[]) => void>
 {
 	/** 註冊回調函式 / Register callback function */
 	register(callback: T): void;
+
 	/** 執行所有註冊的回調 / Execute all registered callbacks */
 	execute(...args: Parameters<T>): void;
+
 	/** 清除所有回調 / Clear all callbacks */
 	clear(): void;
 }
@@ -143,7 +149,7 @@ export function createProcessingSet(): IProcessingSet
  * ```
  */
 export function withProcessingGuard<T extends (id: string, ...args: unknown[]) => Promise<unknown>>(
-	fn: T
+	fn: T,
 ): (id: string, ...args: Parameters<T> extends [string, ...infer R] ? R : never[]) => Promise<ReturnType<T> | null>
 {
 	const processing = createProcessingSet();
@@ -271,7 +277,7 @@ export function once<T extends (...args: unknown[]) => void>(callback: T): T
  */
 export function debounce<T extends (...args: unknown[]) => void>(
 	fn: T,
-	options: IDebounceOptions
+	options: IDebounceOptions,
 ): (...args: Parameters<T>) => void
 {
 	let timeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -332,7 +338,7 @@ export function debounce<T extends (...args: unknown[]) => void>(
  */
 export function throttle<T extends (...args: unknown[]) => void>(
 	fn: T,
-	options: IThrottleOptions
+	options: IThrottleOptions,
 ): (...args: Parameters<T>) => void
 {
 	let lastTime = 0;
@@ -411,7 +417,7 @@ export async function retryWithBackoff<T>(
 		maxDelay?: number;
 		/** 重試前的回調 / Callback before retry */
 		onRetry?: (attempt: number, error: unknown) => void;
-	}
+	},
 ): Promise<T>
 {
 	const { maxRetries, baseDelay, maxDelay = 30000, onRetry } = options;
@@ -474,7 +480,7 @@ export async function retryWithBackoff<T>(
  */
 export async function sequential<T, R>(
 	items: T[],
-	fn: (item: T, index: number) => Promise<R>
+	fn: (item: T, index: number) => Promise<R>,
 ): Promise<R[]>
 {
 	const results: R[] = [];
@@ -510,7 +516,7 @@ export async function sequential<T, R>(
 export async function parallelLimit<T, R>(
 	items: T[],
 	fn: (item: T, index: number) => Promise<R>,
-	concurrency: number
+	concurrency: number,
 ): Promise<R[]>
 {
 	const results: R[] = new Array(items.length);
@@ -531,7 +537,7 @@ export async function parallelLimit<T, R>(
 		if (executing.length >= concurrency)
 		{
 			const completedPromise = await Promise.race(
-				executing.map((p, idx) => p.then(() => idx))
+				executing.map((p, idx) => p.then(() => idx)),
 			);
 			executing.splice(completedPromise, 1);
 		}

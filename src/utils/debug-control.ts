@@ -342,13 +342,13 @@ type IConsoleLogFunction = ICrossConsole[IMethods2] & {
 
 export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: Parameters<T>)
 {
-  if (typeof argv[0] === 'string')
-  {
-    argv[0] = formatAriseMsg(argv[0]);
-  }
+	if (typeof argv[0] === 'string')
+	{
+		argv[0] = formatAriseMsg(argv[0]);
+	}
 
-  /** @ts-ignore */
-  consoleLog(...argv);
+	/** @ts-ignore */
+	consoleLog(...argv);
 }
 
 /**
@@ -380,43 +380,45 @@ export function logArise<T extends IConsoleLogFunction>(consoleLog: T, ...argv: 
 export function logArise2<T extends IConsoleLogFunction>(consoleLog: T, argv: Parameters<T>)
 {
 	if (typeof argv[0] === 'string')
-  	{
-    	argv[0] = formatAriseMsg(argv[0]);
-  	}
+	{
+		argv[0] = formatAriseMsg(argv[0]);
+	}
 
 	/** @ts-ignore */
-  	consoleLog(...argv);
+	consoleLog(...argv);
 }
 
-export interface ILogArise2Options 
+export interface ILogArise2Options
 {
-  /** console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel */
+	/** console 物件，預設為 consoleLoggerWithLevel / Console object, default is consoleLoggerWithLevel */
 	consoleLog?: Console2;
 	/** 強制輸出，無視 logLevel 限制 / Force output, ignore logLevel limit */
 	force?: boolean;
 
 	/**
 	 * 日誌等級 / Log level
-	 * 
+	 *
 	 * @internal
 	 */
 	level?: ILogLevel;
-	/** 
+	/**
 	 * 是否輸出 / Whether to output
-	 * 
+	 *
 	 * @internal
 	 */
 	doLog?: boolean;
 
 	/**
 	 * 方法名稱 / Method name
-	 * 
+	 *
 	 * @internal
 	 */
 	methodName?: IMethods2;
 }
 
-function _logArise2OptionsCore(methodName: IMethods2 | ILogArise2Options, opts?: ILogArise2Options): Required<ILogArise2Options>
+function _logArise2OptionsCore(methodName: IMethods2 | ILogArise2Options,
+	opts?: ILogArise2Options,
+): Required<ILogArise2Options>
 {
 	if (typeof methodName === 'object')
 	{
@@ -445,11 +447,11 @@ function _logArise2OptionsCore(methodName: IMethods2 | ILogArise2Options, opts?:
 		consoleLog ??= consoleLoggerWithLevel;
 		doLog = canLog(level);
 	}
-	
+
 	return {
 		...opts,
-		consoleLog, 
-		doLog, 
+		consoleLog,
+		doLog,
 		level,
 		force,
 		methodName,
@@ -505,7 +507,7 @@ function _logArise2OptionsCore(methodName: IMethods2 | ILogArise2Options, opts?:
 export function logArise2WithLevel<M extends IMethods2>(
 	methodName: M,
 	fn: () => Parameters<Console2[M]>,
-	opts?: ILogArise2Options
+	opts?: ILogArise2Options,
 ): void
 {
 
@@ -562,7 +564,7 @@ export function logArise2WithLevel<M extends IMethods2>(
 export function logArise2WithLevelMulti<M extends IMethods2>(
 	methodName: M,
 	lines: () => string[],
-	opts?: ILogArise2Options
+	opts?: ILogArise2Options,
 ): void
 {
 	/**
@@ -572,7 +574,8 @@ export function logArise2WithLevelMulti<M extends IMethods2>(
 	 * 由於 logArise2WithLevel 使用 M extends IMethods2 進行推導
 	 * 直接傳入字串陣列會導致類型不相容
 	 */
-	logArise2WithLevel(methodName, () => {
+	logArise2WithLevel(methodName, () =>
+	{
 		/**
 		 * 將多行字串連接成一行
 		 * Join multiple lines into a single line

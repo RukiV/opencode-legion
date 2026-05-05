@@ -1,4 +1,3 @@
-
 import { deepmergeAll, IAnyRecord } from 'deepmerge-plus';
 import { ITSPartialRecord, ITSDeepPartial } from 'ts-type';
 import { _isNonNullableObject } from '../type/type-guard';
@@ -64,7 +63,7 @@ export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
 /**
  * 深度合併兩個物件（我實作的版本）
  * Deep merge two objects (my implementation)
-*
+ *
  * 將 source 物件合併到 target 物件中，回傳新的合併後物件
  * Merges source object into target object, returns new merged object
  *
@@ -77,7 +76,9 @@ export function deepMerge(base: JsonObject, override: JsonObject): JsonObject
  * @param source - 來源物件（覆寫值）
  * @returns 合併後的新物件
  */
-export function deepMerge3<T extends IAnyRecord, U extends IAnyRecord = T>(target: ITSDeepPartial<T>, source: ITSDeepPartial<U> | undefined): NonNullable<T & U>
+export function deepMerge3<T extends IAnyRecord, U extends IAnyRecord = T>(target: ITSDeepPartial<T>,
+	source: ITSDeepPartial<U> | undefined,
+): NonNullable<T & U>
 {
 	// 如果 source 為 undefined 或 null，直接回傳 target
 	if (source === undefined || source === null)
@@ -115,10 +116,10 @@ export function configMergeDeep<T extends IAnyRecord>(inputList: [base: T, ...ov
 export function configMergeDeep<T extends IAnyRecord>(inputList: T[]): T
 export function configMergeDeep<T extends IAnyRecord>(inputList: T[]): T
 {
-  return deepmergeAll(inputList, {
-    // keyValueUpsertMode: true,
-    arrayMerge: _arrayMergeRightSourceWins,
-  });
+	return deepmergeAll(inputList, {
+		// keyValueUpsertMode: true,
+		arrayMerge: _arrayMergeRightSourceWins,
+	});
 }
 
 /**

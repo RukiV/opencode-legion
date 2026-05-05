@@ -1,6 +1,5 @@
 import { HIGH_LOAD_PATTERN } from "../../types/regexp";
 
-
 /**
  * 偵測錯誤訊息是否為高負載類型
  * Detect if error message indicates high load
@@ -11,6 +10,6 @@ import { HIGH_LOAD_PATTERN } from "../../types/regexp";
 
 export function isHighLoadError(error: string | undefined | null): boolean
 {
-  if (!error) return false;
-  return HIGH_LOAD_PATTERN.test(error);
+	if (!error) return false;
+	return HIGH_LOAD_PATTERN.test(error);
 }

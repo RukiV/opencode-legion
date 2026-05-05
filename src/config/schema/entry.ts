@@ -37,9 +37,9 @@ export type IShapeToZodObject<T extends IZodRawShape> = z.ZodObject<T>;
  * @see z.infer
  */
 export type IZodObjectToInfer<T> = T extends {
-    _zod: {
-        output: any;
-    };
+	_zod: {
+		output: any;
+	};
 } ? T["_zod"]["output"] : never;
 
 /**
@@ -55,9 +55,9 @@ export type IZodObjectToInfer<T> = T extends {
  * @see z.input
  */
 export type IZodObjectToInput<T> = T extends {
-    _zod: {
-        input: any;
-    };
+	_zod: {
+		input: any;
+	};
 } ? T["_zod"]["input"] : never;
 
 /**
@@ -106,7 +106,6 @@ export type IAriseToolsToZodInput<T extends EnumAriseTools> = IZodObjectToInput<
  */
 export type IGitSummaryOptions = z.input<z.ZodObject<typeof GIT_SUMMARY_ARGS>>;
 export type IGitSummaryOptions2 = z.input<z.ZodObject<typeof ARISE_TOOLS[typeof EnumAriseTools.ARISE_GIT_SUMMARY]['args']>>;
-
 
 /**
  * ARISE_COLLABORATE 的參數類型：「輸入」型別（驗證前、處理前）

@@ -14,43 +14,57 @@ import { __TEST_TEMP } from "../../__root";
 // Always create subdirectory under __TEST_TEMP
 const TEST_DIR = join(__TEST_TEMP, "fake-bun");
 
-describe("BunFile", () => {
-	beforeEach(() => {
+describe("BunFile", () =>
+{
+	beforeEach(() =>
+	{
 		// Create temp directory
 		ensureDirSync(TEST_DIR);
 	});
 
-	afterEach(() => {
+	afterEach(() =>
+	{
 		// Cleanup temp directory
-		try {
+		try
+		{
 			const files = [
 				"test.txt",
 				"test.json",
 				"empty.json",
 				"test.bin",
 			];
-			for (const file of files) {
-				try {
+			for (const file of files)
+			{
+				try
+				{
 					unlinkSync(resolve(TEST_DIR, file));
-				} catch {
+				}
+				catch
+				{
 					// Ignore cleanup errors
 				}
 			}
 			rmdirSync(TEST_DIR);
-		} catch {
+		}
+		catch
+		{
 			// Ignore cleanup errors
 		}
 	});
 
-	describe("path getter", () => {
-		test("returns the file path", () => {
+	describe("path getter", () =>
+	{
+		test("returns the file path", () =>
+		{
 			const file = new BunFile("/path/to/file.txt");
 			expect(file.path).toBe("/path/to/file.txt");
 		});
 	});
 
-	describe("exists()", () => {
-		test("returns true for existing file", async () => {
+	describe("exists()", () =>
+	{
+		test("returns true for existing file", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.txt");
 			writeFileSync(testPath, "test content");
 
@@ -60,7 +74,8 @@ describe("BunFile", () => {
 			expect(result).toBe(true);
 		});
 
-		test("returns false for non-existent file", async () => {
+		test("returns false for non-existent file", async () =>
+		{
 			const file = new BunFile(resolve(TEST_DIR, "non-existent.txt"));
 			const result = await file.exists();
 
@@ -68,8 +83,10 @@ describe("BunFile", () => {
 		});
 	});
 
-	describe("text()", () => {
-		test("reads file content as string", async () => {
+	describe("text()", () =>
+	{
+		test("reads file content as string", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.txt");
 			const content = "Hello, World! 你好世界！";
 			writeFileSync(testPath, content);
@@ -80,7 +97,8 @@ describe("BunFile", () => {
 			expect(result).toBe(content);
 		});
 
-		test("reads UTF-8 encoded content correctly", async () => {
+		test("reads UTF-8 encoded content correctly", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.txt");
 			const content = "中文內容\n多行文字\n🎉 Emoji";
 			writeFileSync(testPath, content, "utf-8");
@@ -91,15 +109,18 @@ describe("BunFile", () => {
 			expect(result).toBe(content);
 		});
 
-		test("throws error for non-existent file", async () => {
+		test("throws error for non-existent file", async () =>
+		{
 			const file = new BunFile(resolve(TEST_DIR, "non-existent.txt"));
 
 			await expect(file.text()).rejects.toThrow();
 		});
 	});
 
-	describe("json()", () => {
-		test("parses JSON file correctly", async () => {
+	describe("json()", () =>
+	{
+		test("parses JSON file correctly", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.json");
 			const data = { name: "test", value: 123, nested: { a: true } };
 			writeFileSync(testPath, JSON.stringify(data));
@@ -110,7 +131,8 @@ describe("BunFile", () => {
 			expect(result).toEqual(data);
 		});
 
-		test("parses JSON array correctly", async () => {
+		test("parses JSON array correctly", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.json");
 			const data = [1, 2, 3, "four"];
 			writeFileSync(testPath, JSON.stringify(data));
@@ -121,7 +143,8 @@ describe("BunFile", () => {
 			expect(result).toEqual(data);
 		});
 
-		test("parses empty object", async () => {
+		test("parses empty object", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "empty.json");
 			writeFileSync(testPath, "{}");
 
@@ -131,7 +154,8 @@ describe("BunFile", () => {
 			expect(result).toEqual({});
 		});
 
-		test("throws for invalid JSON", async () => {
+		test("throws for invalid JSON", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.json");
 			writeFileSync(testPath, "{ invalid json }");
 
@@ -142,8 +166,10 @@ describe("BunFile", () => {
 		});
 	});
 
-	describe("arrayBuffer()", () => {
-		test("returns ArrayBuffer with correct content", async () => {
+	describe("arrayBuffer()", () =>
+	{
+		test("returns ArrayBuffer with correct content", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.bin");
 			const content = new Uint8Array([0x48, 0x65, 0x6c, 0x6c, 0x6f]); // "Hello"
 			writeFileSync(testPath, content);
@@ -155,7 +181,8 @@ describe("BunFile", () => {
 			expect(view).toEqual(content);
 		});
 
-		test("returns empty ArrayBuffer for empty file", async () => {
+		test("returns empty ArrayBuffer for empty file", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.bin");
 			writeFileSync(testPath, new Uint8Array(0));
 
@@ -166,8 +193,10 @@ describe("BunFile", () => {
 		});
 	});
 
-	describe("blob()", () => {
-		test("returns Blob with correct content", async () => {
+	describe("blob()", () =>
+	{
+		test("returns Blob with correct content", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.bin");
 			const content = "Hello, Blob!";
 			writeFileSync(testPath, content);
@@ -179,7 +208,8 @@ describe("BunFile", () => {
 			expect(await result.text()).toBe(content);
 		});
 
-		test("returns empty Blob for empty file", async () => {
+		test("returns empty Blob for empty file", async () =>
+		{
 			const testPath = resolve(TEST_DIR, "test.bin");
 			writeFileSync(testPath, "");
 
@@ -191,13 +221,16 @@ describe("BunFile", () => {
 	});
 });
 
-describe("FakeBun", () => {
-	test("file() returns BunFile instance", () => {
+describe("FakeBun", () =>
+{
+	test("file() returns BunFile instance", () =>
+	{
 		const file = Bun.file("/path/to/test.txt");
 		expect(file).toBeInstanceOf(BunFile);
 	});
 
-	test("file() returns BunFile with correct path", () => {
+	test("file() returns BunFile with correct path", () =>
+	{
 		const testPath = "/path/to/test.txt";
 		const file = Bun.file(testPath);
 		expect(file.path).toBe(testPath);

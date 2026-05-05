@@ -27,9 +27,11 @@ const TEST_FILE = join(TEST_DIR, "test-file.txt");
 const TEST_JSON = join(TEST_DIR, "test-config.json");
 const TEST_NESTED = join(TEST_DIR, "nested/dir/file.txt");
 
-describe("MockFs 與真實目錄整合測試", () => {
+describe("MockFs 與真實目錄整合測試", () =>
+{
 	/** 初始化測試目錄和檔案 */
-	beforeAll(() => {
+	beforeAll(() =>
+	{
 		console.log(`[Test] 初始化測試目錄: ${TEST_DIR}`);
 
 		// 建立測試檔案
@@ -46,26 +48,32 @@ describe("MockFs 與真實目錄整合測試", () => {
 	});
 
 	/** 測試後清理 */
-	afterAll(() => {
+	afterAll(() =>
+	{
 		console.log(`[Test] 清理測試目錄`);
 
 		// 刪除測試時建立的檔案（保留原始檔案）
 		const testMarker = join(TEST_DIR, ".test-marker");
-		if (fsExtra.existsSync(testMarker)) {
+		if (fsExtra.existsSync(testMarker))
+		{
 			fsExtra.removeSync(testMarker);
 		}
 		const mockMarker = join(TEST_DIR, "mock-output.txt");
-		if (fsExtra.existsSync(mockMarker)) {
+		if (fsExtra.existsSync(mockMarker))
+		{
 			fsExtra.removeSync(mockMarker);
 		}
 		const mockNested = join(TEST_DIR, "mock-nested/output.txt");
-		if (fsExtra.existsSync(mockNested)) {
+		if (fsExtra.existsSync(mockNested))
+		{
 			fsExtra.removeSync(mockNested);
 		}
 	});
 
-	describe("1. MockFs 可以讀取真實檔案", () => {
-		it("應該能讀取真實檔案的內容（作為初始化資料）", () => {
+	describe("1. MockFs 可以讀取真實檔案", () =>
+	{
+		it("應該能讀取真實檔案的內容（作為初始化資料）", () =>
+		{
 			// 從真實檔案讀取內容
 			const realContent = fsExtra.readFileSync(TEST_FILE, "utf-8");
 			console.log(`[Test] 真實檔案內容: ${realContent}`);
@@ -91,7 +99,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			expect(mockJson.key).toBe("原始值");
 		});
 
-		it("應該能讀取巢狀目錄的檔案", () => {
+		it("應該能讀取巢狀目錄的檔案", () =>
+		{
 			const realContent = fsExtra.readFileSync(TEST_NESTED, "utf-8");
 
 			const mockFs = new MockFs({ enableSafetyCheck: false });
@@ -104,10 +113,12 @@ describe("MockFs 與真實目錄整合測試", () => {
 		});
 	});
 
-	describe("2. MockFs 寫入不會影響真實檔案", () => {
+	describe("2. MockFs 寫入不會影響真實檔案", () =>
+	{
 		let mockFs: MockFs;
 
-		beforeEach(() => {
+		beforeEach(() =>
+		{
 			mockFs = new MockFs({ enableSafetyCheck: false });
 
 			// 初始化 MockFs（從真實檔案讀取）
@@ -116,7 +127,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			});
 		});
 
-		it("MockFs 寫入後，真實檔案應該不變", () => {
+		it("MockFs 寫入後，真實檔案應該不變", () =>
+		{
 			// 在 MockFs 中寫入新內容
 			mockFs.writeFileSync(TEST_FILE, "Mock 修改後的內容", "utf-8");
 
@@ -131,7 +143,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			expect(realContent).toBe("原始檔案內容 (Original)");
 		});
 
-		it("MockFs 建立新檔案，真實目錄不應該有這個檔案", () => {
+		it("MockFs 建立新檔案，真實目錄不應該有這個檔案", () =>
+		{
 			const newFile = join(TEST_DIR, "mock-only.txt");
 			const markerFile = join(TEST_DIR, ".test-marker");
 
@@ -149,7 +162,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			console.log(`[Test] 確認：Mock 建立的檔案不會出現在真實檔案系統中`);
 		});
 
-		it("MockFs 刪除檔案，真實檔案不應該被刪除", () => {
+		it("MockFs 刪除檔案，真實檔案不應該被刪除", () =>
+		{
 			// 在 MockFs 中刪除檔案
 			mockFs.rmSync(TEST_FILE);
 
@@ -164,8 +178,10 @@ describe("MockFs 與真實目錄整合測試", () => {
 		});
 	});
 
-	describe("3. MockFs 可以處理任意目錄結構", () => {
-		it("MockFs 可以建立任意深度的目錄結構", () => {
+	describe("3. MockFs 可以處理任意目錄結構", () =>
+	{
+		it("MockFs 可以建立任意深度的目錄結構", () =>
+		{
 			const mockFs = new MockFs({ enableSafetyCheck: false });
 
 			const deepPath = join(TEST_DIR, "deep/nested/directory/structure/file.txt");
@@ -183,8 +199,10 @@ describe("MockFs 與真實目錄整合測試", () => {
 		});
 	});
 
-	describe("4. Audit Mode 可以將 Mock 變更寫入真實目錄", () => {
-		it("Audit Mode 寫入後，audit 目錄會有對應檔案", () => {
+	describe("4. Audit Mode 可以將 Mock 變更寫入真實目錄", () =>
+	{
+		it("Audit Mode 寫入後，audit 目錄會有對應檔案", () =>
+		{
 			// Audit Mode 使用相對路徑：/audit-output.txt
 			// 會寫入到 auditDir + /audit-output.txt
 			const auditDir = join(TEST_DIR, ".audit");
@@ -216,7 +234,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			fsExtra.removeSync(auditDir);
 		});
 
-		it("Audit Mode 可以過濾要寫入的檔案", () => {
+		it("Audit Mode 可以過濾要寫入的檔案", () =>
+		{
 			const auditDir = join(TEST_DIR, ".audit-filter");
 
 			// 只 audit .txt 檔案
@@ -244,7 +263,8 @@ describe("MockFs 與真實目錄整合測試", () => {
 			fsExtra.removeSync(auditDir);
 		});
 
-		it("Audit Mode 也可以使用絕對路徑（auditDir + 原始路徑）", () => {
+		it("Audit Mode 也可以使用絕對路徑（auditDir + 原始路徑）", () =>
+		{
 			const auditDir = join(TEST_DIR, ".audit-abs");
 
 			const mockFs = new MockFs({
@@ -268,32 +288,38 @@ describe("MockFs 與真實目錄整合測試", () => {
 		});
 	});
 
-	describe("5. 安全性檢查", () => {
-		it("安全模式下不允許操作危險路徑", () => {
+	describe("5. 安全性檢查", () =>
+	{
+		it("安全模式下不允許操作危險路徑", () =>
+		{
 			const mockFs = new MockFs({
 				enableSafetyCheck: true, // 啟用安全檢查
 			});
 
 			// 嘗試寫入危險路徑應該被阻止
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync("/etc/passwd", " malicious ");
 			}).toThrow();
 
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync("C:\\Windows\\System32\\config", " malicious ");
 			}).toThrow();
 
 			console.log(`[Test] 安全檢查正常運作`);
 		});
 
-		it("外部目錄需要停用安全檢查", () => {
+		it("外部目錄需要停用安全檢查", () =>
+		{
 			// 對於外部 temp 目錄，需要停用安全檢查
 			const mockFs = new MockFs({
 				enableSafetyCheck: false, // 停用安全檢查
 			});
 
 			// 可以寫入外部目錄
-			expect(() => {
+			expect(() =>
+			{
 				mockFs.writeFileSync(join(TEST_DIR, "external-test.txt"), "外部測試");
 			}).not.toThrow();
 

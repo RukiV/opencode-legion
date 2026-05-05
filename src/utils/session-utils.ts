@@ -40,7 +40,7 @@ export interface IMessageData
 	parts?: Array<{
 		type: string;
 		text?: string;
-		[ key: string ]: unknown;
+		[key: string]: unknown;
 	}>;
 }
 
@@ -124,9 +124,9 @@ export function findLastUserMessage(messages: IMessageData[]): IMessageData | un
 	 */
 	for (let i = messages.length - 1; i >= 0; i--)
 	{
-		if (messages[ i ]?.info?.role === "user")
+		if (messages[i]?.info?.role === "user")
 		{
-			return messages[ i ];
+			return messages[i];
 		}
 	}
 	return undefined;
@@ -143,9 +143,9 @@ export function findLastAssistantMessage(messages: IMessageData[]): IMessageData
 {
 	for (let i = messages.length - 1; i >= 0; i--)
 	{
-		if (messages[ i ]?.info?.role === "assistant")
+		if (messages[i]?.info?.role === "assistant")
 		{
-			return messages[ i ];
+			return messages[i];
 		}
 	}
 	return undefined;
@@ -161,7 +161,7 @@ export function findLastAssistantMessage(messages: IMessageData[]): IMessageData
  */
 export function findMessageById(
 	messages: IMessageData[],
-	messageId: string
+	messageId: string,
 ): IMessageData | undefined
 {
 	return messages.find((m) => m.info?.id === messageId);
@@ -189,7 +189,7 @@ export function findMessageById(
  */
 export function extractResumeConfig(
 	userMessage: IMessageData | undefined,
-	sessionID: string
+	sessionID: string,
 ): IResumeConfig
 {
 	return {
@@ -334,13 +334,13 @@ export function isRecoverableError(error: unknown): boolean
 export function getErrorTypeTitle(errorType: EnumRecoveryErrorType): string
 {
 	const titles: Record<EnumRecoveryErrorType, string> = {
-		[ EnumRecoveryErrorType.ToolResultMissing ]: "Tool Crash Recovery",
-		[ EnumRecoveryErrorType.UnavailableTool ]: "Tool Recovery",
-		[ EnumRecoveryErrorType.ThinkingBlockOrder ]: "Thinking Block Recovery",
-		[ EnumRecoveryErrorType.ThinkingDisabledViolation ]: "Thinking Strip Recovery",
-		[ EnumRecoveryErrorType.AssistantPrefillUnsupported ]: "Prefill Unsupported",
+		[EnumRecoveryErrorType.ToolResultMissing]: "Tool Crash Recovery",
+		[EnumRecoveryErrorType.UnavailableTool]: "Tool Recovery",
+		[EnumRecoveryErrorType.ThinkingBlockOrder]: "Thinking Block Recovery",
+		[EnumRecoveryErrorType.ThinkingDisabledViolation]: "Thinking Strip Recovery",
+		[EnumRecoveryErrorType.AssistantPrefillUnsupported]: "Prefill Unsupported",
 	};
-	return titles[ errorType ] ?? "Unknown Error";
+	return titles[errorType] ?? "Unknown Error";
 }
 
 /**
@@ -353,13 +353,13 @@ export function getErrorTypeTitle(errorType: EnumRecoveryErrorType): string
 export function getErrorTypeMessage(errorType: EnumRecoveryErrorType): string
 {
 	const messages: Record<EnumRecoveryErrorType, string> = {
-		[ EnumRecoveryErrorType.ToolResultMissing ]: "Injecting cancelled tool results...",
-		[ EnumRecoveryErrorType.UnavailableTool ]: "Recovering from unavailable tool call...",
-		[ EnumRecoveryErrorType.ThinkingBlockOrder ]: "Fixing message structure...",
-		[ EnumRecoveryErrorType.ThinkingDisabledViolation ]: "Stripping thinking blocks...",
-		[ EnumRecoveryErrorType.AssistantPrefillUnsupported ]: "Prefill not supported; continuing without recovery.",
+		[EnumRecoveryErrorType.ToolResultMissing]: "Injecting cancelled tool results...",
+		[EnumRecoveryErrorType.UnavailableTool]: "Recovering from unavailable tool call...",
+		[EnumRecoveryErrorType.ThinkingBlockOrder]: "Fixing message structure...",
+		[EnumRecoveryErrorType.ThinkingDisabledViolation]: "Stripping thinking blocks...",
+		[EnumRecoveryErrorType.AssistantPrefillUnsupported]: "Prefill not supported; continuing without recovery.",
 	};
-	return messages[ errorType ] ?? "Processing error...";
+	return messages[errorType] ?? "Processing error...";
 }
 
 /* ============ 訊息處理 / Message Processing ============ */
@@ -402,7 +402,7 @@ export function messageHasToolCall(message: IMessageData, toolName: string): boo
 	return message.parts.some(
 		(part) =>
 			part.type === "tool_invoke" &&
-			( part as { tool?: string } ).tool === toolName
+			(part as { tool?: string }).tool === toolName,
 	);
 }
 
@@ -422,7 +422,7 @@ export function getToolCallsFromMessage(message: IMessageData): string[]
 
 	return message.parts
 		.filter((part) => part.type === "tool_invoke")
-		.map((part) => ( part as { tool?: string } ).tool)
+		.map((part) => (part as { tool?: string }).tool)
 		.filter((tool): tool is string => tool !== undefined);
 }
 

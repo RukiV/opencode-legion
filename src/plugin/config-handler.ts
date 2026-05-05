@@ -75,7 +75,9 @@ export function setShadowAgentsConfig(params: {
 	const registeredAgents: string[] = [];
 	const skippedAgents: string[] = [];
 
-	const opencodeModel = parseModelString(opencodeConfig.model).detectAutoModelBody ? DEFAULT_MODEL : opencodeConfig.model!;
+	const opencodeModel = parseModelString(opencodeConfig.model).detectAutoModelBody
+		? DEFAULT_MODEL
+		: opencodeConfig.model!;
 
 	opencodeConfig.experimental ??= {};
 	opencodeConfig.experimental.primary_tools ??= [];
@@ -83,15 +85,17 @@ export function setShadowAgentsConfig(params: {
 	/**
 	 * 防止子代理無限呼叫子代理
 	 */
-	opencodeConfig.experimental.primary_tools = [...new Set([
-		...opencodeConfig.experimental.primary_tools,
-		EnumAriseTools.ARISE_SYNC_SUMMON,
-		EnumAriseTools.ARISE_ASYNC_BACKGROUND,
-		EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL,
-		EnumAriseTools.ARISE_CONTINUE,
-		EnumAriseTools.ARISE_COLLABORATE,
-		'task',
-	])];
+	opencodeConfig.experimental.primary_tools = [
+		...new Set([
+			...opencodeConfig.experimental.primary_tools,
+			EnumAriseTools.ARISE_SYNC_SUMMON,
+			EnumAriseTools.ARISE_ASYNC_BACKGROUND,
+			EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL,
+			EnumAriseTools.ARISE_CONTINUE,
+			EnumAriseTools.ARISE_COLLABORATE,
+			'task',
+		]),
+	];
 
 	for (const [name, shadow] of tsObjectEntries(SHADOW_AGENTS))
 	{
@@ -217,7 +221,7 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 			/** 設定 Shadow Agent 配置 / Set Shadow agents config */
 			setShadowAgentsConfig({
 				ariseConfig,
-				opencodeConfig
+				opencodeConfig,
 			});
 
 			/** 套用 OpenCode 代理覆寫 / Apply OpenCode agent overrides */

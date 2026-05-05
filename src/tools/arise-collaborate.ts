@@ -442,7 +442,10 @@ export function createAgentToolAriseCollaborate(ctx: PluginInput,
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executePlanningMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
+async function executePlanningMode(backgroundManager: BackgroundManager,
+	config: IAriseCollaborateOptionsInfer,
+	context: ToolContext,
+): Promise<string>
 {
 	/**
 	 * 回合迭代追蹤
@@ -674,7 +677,10 @@ async function executePlanningMode(backgroundManager: BackgroundManager, config:
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executeParallelMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
+async function executeParallelMode(backgroundManager: BackgroundManager,
+	config: IAriseCollaborateOptionsInfer,
+	context: ToolContext,
+): Promise<string>
 {
 	logArise2WithLevel("debug", () => [
 		`[arise-collaborate:parallel]`,
@@ -794,7 +800,10 @@ async function executeParallelMode(backgroundManager: BackgroundManager, config:
  * @param context - 工具上下文
  * @returns 執行結果
  */
-async function executeChainMode(backgroundManager: BackgroundManager, config: IAriseCollaborateOptionsInfer, context: ToolContext): Promise<string>
+async function executeChainMode(backgroundManager: BackgroundManager,
+	config: IAriseCollaborateOptionsInfer,
+	context: ToolContext,
+): Promise<string>
 {
 	/**
 	 * 判斷執行策略：傳統回合制 vs 分批並行
@@ -1185,7 +1194,9 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 				 * reuse_agent_session=false: 每次創建新的 session
 				 */
 				let sessionId = reuse_agent_session ? session.agent_session_ids.get(entry.label) : undefined;
-				let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
+				let prompt = buildAgentInstructions(sessionId
+					? buildNextTurnPrompt(entry.label, round, session)
+					: session.prompt);
 
 				const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
 				if (!sessionId) session.agent_session_ids.set(entry.label, task.sessionId);
@@ -1218,7 +1229,9 @@ async function executeNextRound(session: ICollaborationSession, backgroundManage
 			 * reuse_agent_session=false: 每次創建新的 session
 			 */
 			let sessionId = reuse_agent_session ? session.agent_session_ids.get(entry.label) : undefined;
-			let prompt = buildAgentInstructions(sessionId ? buildNextTurnPrompt(entry.label, round, session) : session.prompt);
+			let prompt = buildAgentInstructions(sessionId
+				? buildNextTurnPrompt(entry.label, round, session)
+				: session.prompt);
 
 			const task = await launchShadowTask(backgroundManager, entry.agent, prompt, session.description ?? `round ${round}`, session.context, entry.model, sessionId);
 			if (!sessionId) session.agent_session_ids.set(entry.label, task.sessionId);

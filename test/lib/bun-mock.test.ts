@@ -15,14 +15,18 @@
 import { describe, expect, it, beforeEach } from "bun:test";
 import { createBunMockIntegrator } from "./bun-mock";
 
-describe("BunMockIntegrator", () => {
-	describe("createBunMockIntegrator", () => {
-		it("should create integrator with mockFs", () => {
+describe("BunMockIntegrator", () =>
+{
+	describe("createBunMockIntegrator", () =>
+	{
+		it("should create integrator with mockFs", () =>
+		{
 			const integrator = createBunMockIntegrator();
 			expect(integrator.mockFs).toBeDefined();
 		});
 
-		it("should accept initial files", () => {
+		it("should accept initial files", () =>
+		{
 			const integrator = createBunMockIntegrator({
 				files: {
 					"/test/config.json": '{"key": "value"}',
@@ -35,20 +39,24 @@ describe("BunMockIntegrator", () => {
 			expect(integrator.readFile("/test/config.json")).toBe('{"key": "value"}');
 		});
 
-		it("should setup mock", () => {
+		it("should setup mock", () =>
+		{
 			const integrator = createBunMockIntegrator();
 			expect(() => integrator.setup()).not.toThrow();
 		});
 	});
 
-	describe("writeFiles / writeJsonFiles", () => {
+	describe("writeFiles / writeJsonFiles", () =>
+	{
 		let integrator: ReturnType<typeof createBunMockIntegrator>;
 
-		beforeEach(() => {
+		beforeEach(() =>
+		{
 			integrator = createBunMockIntegrator();
 		});
 
-		it("should write files", () => {
+		it("should write files", () =>
+		{
 			integrator.writeFiles({
 				"/file1.txt": "content 1",
 				"/file2.txt": "content 2",
@@ -59,7 +67,8 @@ describe("BunMockIntegrator", () => {
 			expect(integrator.readFile("/file1.txt")).toBe("content 1");
 		});
 
-		it("should write JSON files", () => {
+		it("should write JSON files", () =>
+		{
 			integrator.writeJsonFiles({
 				"/config.json": { name: "test", value: 123 },
 				"/settings.json": { debug: true },
@@ -71,8 +80,10 @@ describe("BunMockIntegrator", () => {
 		});
 	});
 
-	describe("mock.module integration", () => {
-		it("should intercept fs module after setup", async () => {
+	describe("mock.module integration", () =>
+	{
+		it("should intercept fs module after setup", async () =>
+		{
 			const integrator = createBunMockIntegrator({
 				files: {
 					"/mocked/data.json": '{"intercepted": true}',
@@ -87,7 +98,8 @@ describe("BunMockIntegrator", () => {
 			expect(content).toBe('{"intercepted": true}');
 		});
 
-		it("should intercept fs-extra module after setup", async () => {
+		it("should intercept fs-extra module after setup", async () =>
+		{
 			const integrator = createBunMockIntegrator({
 				files: {
 					"/mocked/extra.json": '{"fsExtra": true}',
@@ -101,7 +113,8 @@ describe("BunMockIntegrator", () => {
 			expect(content).toBe('{"fsExtra": true}');
 		});
 
-		it("should support async fs operations", async () => {
+		it("should support async fs operations", async () =>
+		{
 			const integrator = createBunMockIntegrator();
 
 			integrator.mockFs.writeJsonSync("/async/test.json", { async: true });
@@ -112,7 +125,8 @@ describe("BunMockIntegrator", () => {
 			expect(result).toBe('{\n  "async": true\n}');
 		});
 
-		it("should support fs-extra readJson", async () => {
+		it("should support fs-extra readJson", async () =>
+		{
 			const integrator = createBunMockIntegrator();
 
 			integrator.mockFs.writeJsonSync("/extra/json.json", { fsExtra: true });
@@ -123,7 +137,8 @@ describe("BunMockIntegrator", () => {
 			expect(result).toEqual({ fsExtra: true });
 		});
 
-		it("should support fs-extra pathExists", async () => {
+		it("should support fs-extra pathExists", async () =>
+		{
 			const integrator = createBunMockIntegrator();
 
 			integrator.mockFs.writeFileSync("/exists/file.txt", "exists");
@@ -137,7 +152,8 @@ describe("BunMockIntegrator", () => {
 			expect(notExists).toBe(false);
 		});
 
-		it("should support mkdir operations", async () => {
+		it("should support mkdir operations", async () =>
+		{
 			const integrator = createBunMockIntegrator();
 			integrator.setup();
 
@@ -147,7 +163,8 @@ describe("BunMockIntegrator", () => {
 			expect(integrator.exists("/new/dir")).toBe(true);
 		});
 
-		it("should support copy operations", async () => {
+		it("should support copy operations", async () =>
+		{
 			const integrator = createBunMockIntegrator();
 
 			integrator.mockFs.writeFileSync("/copy/source.txt", "original content");

@@ -157,12 +157,14 @@ export interface ICreateConfigGetterOptions
 export function _createConfigGetter<T extends keyof Exclude<IAriseConfig["background"], undefined>>(
 	configKey: T,
 	defaultValue: ILazyConfigGetterValue<NoInfer<T>, IAllShadowAgentsName>,
-	options: ICreateConfigGetterOptions = {}
+	options: ICreateConfigGetterOptions = {},
 )
 {
 	const { enableDeepMerge = false } = options;
 
-	return <A extends IAllShadowAgentsName = IAllShadowAgentsName>(config: IAriseConfig, agentName?: A): ILazyConfigGetterValue<NoInfer<T>, NoInfer<A>> =>
+	return <A extends IAllShadowAgentsName = IAllShadowAgentsName>(config: IAriseConfig,
+		agentName?: A,
+	): ILazyConfigGetterValue<NoInfer<T>, NoInfer<A>> =>
 	{
 		// 以預設值為基礎
 		// Start with default value as base
@@ -273,9 +275,9 @@ export const getRetryDelayMax = _createConfigGetter("retry_delay_max", DEFAULT_R
  * ===========================================
  * auto_resume 是巢狀物件，包含 enabled, max_retries, safety_prompt 等子欄位。
  * 若不使用深層合併，當 agent 只想覆寫 enabled 時，會失去其他欄位（如 safety_prompt）。
- * 
+ *
  * auto_resume is a nested object containing fields like enabled, max_retries, safety_prompt.
- * Without deep merge, when an agent only wants to override 'enabled', 
+ * Without deep merge, when an agent only wants to override 'enabled',
  * other fields (like safety_prompt) would be lost.
  *
  * ===========================================
@@ -326,7 +328,7 @@ export const getAutoResumeConfig = _createConfigGetter("auto_resume", createDefa
  */
 export function getAutoResumeSafetyPrompt(
 	config: IAriseConfig,
-	agentName?: IAllShadowAgentsName
+	agentName?: IAllShadowAgentsName,
 ): string | undefined
 {
 	const autoResume = getAutoResumeConfig(config, agentName);
@@ -346,7 +348,7 @@ export function getAutoResumeSafetyPrompt(
  */
 export function getAutoResumeEnabled(
 	config: IAriseConfig,
-	agentName?: IAllShadowAgentsName
+	agentName?: IAllShadowAgentsName,
 ): boolean
 {
 	const autoResume = getAutoResumeConfig(config, agentName);

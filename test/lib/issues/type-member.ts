@@ -1,4 +1,3 @@
-
 import { Console2 } from 'debug-color2';
 import { ITSExtractKeyof, ITSMemberMethods, ITSTypeAndStringLiteral } from 'ts-type';
 import { ICrossConsole, IMethods } from 'debug-color2/lib/types/CrossConsole';
@@ -11,7 +10,7 @@ type I_CheckMethods<T> = Extract<T, 'log'>;
  * 合法日誌函數類型（排除完整的 Console2 物件，但接受具體函數）
  */
 type LogFunction =
-	// 明確列出每個具體函數的簽名
+// 明確列出每個具體函數的簽名
 	| ((message?: any, ...optionalParams: any[]) => void)
 	// 排除有顏色屬性的物件（即完整的 Console2）
 	& { blue?: never; red?: never; green?: never; yellow?: never };
@@ -143,11 +142,13 @@ type MemberMethodsV4<T> = [T] extends [never]
 type MemberMethodsV5<T> = T extends infer U
 	? U extends never
 		? never
-		: { [K in keyof U]: U[K] extends (...args: any[]) => any
-			? K extends 'constructor' | 'new' | 'prototype' | 'length' | symbol
-				? never
-				: K
-			: never; }[keyof U]
+		: {
+			[K in keyof U]: U[K] extends (...args: any[]) => any
+				? K extends 'constructor' | 'new' | 'prototype' | 'length' | symbol
+					? never
+					: K
+				: never;
+		}[keyof U]
 	: never;
 
 /**
@@ -155,9 +156,11 @@ type MemberMethodsV5<T> = T extends infer U
  * 最簡潔實作，只保留核心邏輯
  */
 type MemberMethodsV6<T> = T extends object
-	? { [K in keyof T]: T[K] extends (...args: any[]) => any
-		? K extends 'constructor' | symbol ? never : K
-		: never; }[keyof T & string]
+	? {
+		[K in keyof T]: T[K] extends (...args: any[]) => any
+			? K extends 'constructor' | symbol ? never : K
+			: never;
+	}[keyof T & string]
 	: never;
 
 // ---------- 整合應用範例 (V4/V5/V6) ----------
@@ -174,7 +177,11 @@ type IMethodsEnhancedV6 = Exclude<ExtractKeyofV6<MemberMethodsV6<ICrossConsole>,
  */
 type IMethodsEnhancedV7<T = ICrossConsole> = T extends infer U
 	? U extends object
-		? Exclude<keyof { [K in keyof U as U[K] extends (...args: any[]) => any ? K : never]: any } & string, 'constructor' | 'new' | 'prototype' | 'Console' | 'length'>
+		? Exclude<keyof {
+			[K in keyof U as U[K] extends (...args: any[]) => any
+				? K
+				: never]: any
+		} & string, 'constructor' | 'new' | 'prototype' | 'Console' | 'length'>
 		: never
 	: never;
 
@@ -404,9 +411,11 @@ type MemberMethodsV11<T, ExcludeFn extends PropertyKey = never> = T extends infe
 	? U extends object
 		? ExcludeFn extends never
 			? { [K in keyof U]: U[K] extends (...args: any[]) => any ? K : never; }[keyof U]
-			: { [K in keyof U as U[K] extends (...args: any[]) => any
-				? K extends ExcludeFn ? never : K
-				: never]: any } extends infer M ? keyof M : never
+			: {
+				[K in keyof U as U[K] extends (...args: any[]) => any
+					? K extends ExcludeFn ? never : K
+					: never]: any
+			} extends infer M ? keyof M : never
 		: never
 	: never;
 
@@ -551,11 +560,13 @@ type MemberMethodsV12<
 			? { [K in keyof U]: U[K] extends ValueCond ? K : never; }[keyof U]
 			// 3b. 需要排除 - 使用「as」重映射語法進行鍵過濾
 			// 邏輯：先檢查值類型是否符合 ValueCond，再檢查鍵是否在 ExcludeKeys 中
-			: { [K in keyof U as U[K] extends ValueCond
-				// 若值符合條件，進一步檢查鍵是否需要排除
-				? K extends ExcludeKeys ? never : K  // 在排除列表中則設為 never，否則保留 K
-				// 若值不符合條件，設為 never（過濾掉）
-				: never]: any } extends infer M ? keyof M : never
+			: {
+				[K in keyof U as U[K] extends ValueCond
+					// 若值符合條件，進一步檢查鍵是否需要排除
+					? K extends ExcludeKeys ? never : K  // 在排除列表中則設為 never，否則保留 K
+					// 若值不符合條件，設為 never（過濾掉）
+					: never]: any
+			} extends infer M ? keyof M : never
 		// U 不是 object，返回 never（無法提取方法）
 		: never
 	// T 無法解析為 infer U，返回 never
@@ -702,7 +713,7 @@ type IMethodsV12<T = ICrossConsole> = FilterKeys<
 
 // V12b 組合（內化排除 - 最簡潔用法）
 // 將所有排除邏輯集中在 MemberMethodsV12 的 ExcludeKeys 參數中
-type IMethodsV12b<T = ICrossConsole> = 
+type IMethodsV12b<T = ICrossConsole> =
 	ExtractKeyofV12<MemberMethodsV12<T, Function, 'constructor' | 'new' | 'prototype' | 'Console' | 'length'>, string>
 	;
 
@@ -1141,14 +1152,16 @@ let verify_v13_12: V13_SpecificNumbers = 99;
 let verify_v13_13: V13_SpecificNumbers = 100;
 
 // 測試 8：enum 作為輸入類型
-enum LogLevel {
+enum LogLevel
+{
 	DEBUG = 'debug',
 	INFO = 'info',
 	WARN = 'warn',
 	ERROR = 'error'
 }
 
-enum StatusCode {
+enum StatusCode
+{
 	OK = 200,
 	NOT_FOUND = 404,
 	ERROR = 500
