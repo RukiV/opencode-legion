@@ -297,6 +297,10 @@ export function createFullEventHandler(
 				}
 				break;
 			}
+			// @ts-ignore - This is a valid case, but TypeScript doesn't recognize it
+			case EnumOpenCodeEventType.MessagePartDelta:
+				/** 不檢測此訊息，因為會導致訊息氾濫 */
+				break;
 			default:
 				/**
 				 * 記錄未處理的事件類型，有助於：

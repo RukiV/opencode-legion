@@ -39,7 +39,27 @@ export enum EnumOpenCodeEventType
 	MessageUpdated = "message.updated",
 	/** 訊息已移除 / Message removed */
 	MessageRemoved = "message.removed",
-	/** 訊息部分已更新 / Message part updated */
+	/**
+	 * 訊息部分已更新（增量）/ Message part updated (delta)
+	 *
+	 * @example
+	 * event: message.part.delta {
+	 * 	type: "message.part.delta",
+	 * 	properties: {
+	 * 		sessionID: "ses_20b011b4bffeHmwXKpDWqgdz0a",
+	 * 		messageID: "msg_df739512b001H1kwhFuwfYjA7x",
+	 * 		partID: "prt_df73a27da001giJKIovoUJ5kuK",
+	 * 		field: "text",
+	 * 		delta: "？",
+	 * 	},
+	 * }
+	 */
+	MessagePartDelta = "message.part.delta",
+	/**
+	 * 訊息部分已更新 / Message part updated
+	 *
+	 * 接收完 message.part.delta 時會觸發此事件
+	 */
 	MessagePartUpdated = "message.part.updated",
 	/** 訊息部分已移除 / Message part removed */
 	MessagePartRemoved = "message.part.removed",
