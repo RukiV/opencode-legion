@@ -18,6 +18,7 @@ import { logArise2WithLevel } from "../utils/debug-control";
 import { log2OpenCode, showToastOpenCode } from '../utils/log/opencode-log';
 import { IEventHandlerContext } from '../types/types-opencode';
 import { extractTextFromMessageParts2 } from '../utils/string/message';
+import { _extractModelInfo } from '../utils/session/opencode-session';
 
 /**
  * 從事件中提取會話 ID
@@ -186,12 +187,13 @@ export function createFullEventHandler(
 		const event = input.event;
 		const sessionId = extractEventSessionId(event);
 		const model = sessionId ? runtimeCache.getSessionModel(sessionId) : undefined;
+		const eventModel = _extractModelInfo((event.properties as any)?.info);
 
 		/** 記錄所有事件入口，便於追蹤事件流和未來擴充 / Log all event entries for tracing and future expansion */
-		await logArise2WithLevel("debug", () => ([
-			"fullEventHandler",
-			`event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
-		]));
+		// await logArise2WithLevel("debug", () => ([
+		// 	"fullEventHandler",
+		// 	`event received: type=${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+		// ]));
 
 		/** 讓背景任務管理器處理事件 / Let background manager handle events */
 		params.backgroundManager.handleEvent(event);
@@ -315,7 +317,9 @@ export function createFullEventHandler(
 				 */
 				logArise2WithLevel("debug", () => ([
 					"[fullEventHandler]",
-					`unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"}, model=${model ?? "N/A"}`,
+					`unhandled event type: ${event.type}, sessionId=${sessionId ?? "N/A"},`,
+					`model=${model ? JSON.stringify(model) : "N/A"}`,
+					'eventModel=', eventModel ? JSON.stringify(eventModel) : "N/A",
 				]));
 				break;
 		}

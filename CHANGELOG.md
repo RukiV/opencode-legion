@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.40](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.37...@bluelovers/opencode-arise@0.1.40) (2026-05-05)
+
+
+
+### ✨　Features
+
+* **opencode:** 添加 MessagePartDelta 事件类型和处理器 ([04157e0](https://github.com/bluelovers/opencode-arise/commit/04157e01f22f96d9836138ffb8fdcc375d72ba7c))
+
+
+### 💎　Styles
+
+* 統一代碼大括號格式 ([7f91937](https://github.com/bluelovers/opencode-arise/commit/7f919379df6211cb512a0c4e95f1406bbfcdd985))
+
+
+### 🔖　Miscellaneous
+
+* . ([412bc5e](https://github.com/bluelovers/opencode-arise/commit/412bc5ec101b0a789fab5741c2d9062bb67fa646))
+
+
+
 ## [0.1.37](https://github.com/bluelovers/opencode-arise/compare/@bluelovers/opencode-arise@0.1.36...@bluelovers/opencode-arise@0.1.37) (2026-04-24)
 
 

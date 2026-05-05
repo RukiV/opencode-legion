@@ -4,7 +4,10 @@ import { IModelBody } from '../../types/types-opencode';
 
 export function _extractModelInfo(messageInfo: ISessionMessagesResponsesEntry["info"])
 {
-	messageInfo ??= {} as any;
+	if (!messageInfo)
+	{
+		return;
+	}
 
 	if (typeNarrowed<{
 		model: IModelBody
