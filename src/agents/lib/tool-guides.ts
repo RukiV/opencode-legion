@@ -18,15 +18,15 @@ export function getInitialTestDescription<T extends EnumAriseTools.ARISE_SYNC_SU
 {
 	if (toolName === EnumAriseTools.ARISE_SYNC_SUMMON)
 	{
-		return "Summon 1 sync (arise_summon)" as const;
+		return `Summon 1 sync (${EnumAriseTools.ARISE_SYNC_SUMMON})` as const;
 	}
 
 	if (toolName === EnumAriseTools.ARISE_ASYNC_BACKGROUND)
 	{
-		return "Summon 1 async (arise_background)" as const;
+		return `Summon 1 async (${EnumAriseTools.ARISE_ASYNC_BACKGROUND}, only if task >20min with parallel need)` as const;
 	}
 
-	return "Summon 1 sync (arise_summon) + 1 async (arise_background) SEPARATELY" as const;
+	return `Summon 1 sync (${EnumAriseTools.ARISE_SYNC_SUMMON})` as const;
 }
 
 /**
@@ -40,15 +40,15 @@ export function getThenDecideDescription<T extends EnumAriseTools.ARISE_SYNC_SUM
 {
 	if (toolName === EnumAriseTools.ARISE_SYNC_SUMMON)
 	{
-		return "Then decide: use arise_summon or batch multiple sync" as const;
+		return `Then decide: use ${EnumAriseTools.ARISE_SYNC_SUMMON} or batch multiple sync` as const;
 	}
 
 	if (toolName === EnumAriseTools.ARISE_ASYNC_BACKGROUND)
 	{
-		return "Then decide: use arise_background or batch multiple async" as const;
+		return `Then decide: use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} (only if >20min) or batch multiple async` as const;
 	}
 
-	return "Then decide: use arise_summon, arise_background, or batch" as const;
+	return `Then decide: use ${EnumAriseTools.ARISE_SYNC_SUMMON} or batch multiple sync` as const;
 }
 
 /** ==================== 工具指南 / Tool Guides ==================== */
@@ -322,13 +322,14 @@ export const SUMMONING_METHOD_RULES = `## Summoning Method Rules
 ⚠️ REMINDER: Before summoning — if no TODO list exists, **use available tools to create one first**!
 
 **Tool usage:**
-- Need result NOW → arise_summon (sync, blocks and returns result)
-- Need result LATER (parallel) → arise_background (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via arise_background_status/output)
-- DON'T need result (fire-and-forget) → arise_summon with run_in_background=true
-- ⚠️ arise_summon with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
+- ⭐ General tasks (shorter or parallel) → ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background)
+- Need result LATER AND task >20min with parallel execution needed → ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} (async, ${BACKGROUND_SHADOWS.join('/')} only, trackable via ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS}/${EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT})
+- Task >20min, DON'T need result, AND parallel execution needed → ${EnumAriseTools.ARISE_SYNC_SUMMON} with run_in_background=true
+- ⚠️ ${EnumAriseTools.ARISE_SYNC_SUMMON} with run_in_background=true has NO way to retrieve results. Never use it if you need the result.
+- ⚠️ BACKGROUND MENTAL MODEL: Once you use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} or run_in_background=true, you MUST accept that results won't come within 15 steps or before the next conversation round. If you'd want to actively check, use ${EnumAriseTools.ARISE_SYNC_SUMMON} instead. If summon errors, do not retry.
 - When summoning shadow agents: **If no TODO list exists, use available tools (e.g., todowrite) to write task goals first**` as const;
 
-export const SUMMONING_METHOD_RULES_COLLABORATE = `- When multiple agents need to collaborate → use \`arise_collaborate\`` as const;
+export const SUMMONING_METHOD_RULES_COLLABORATE = `- When multiple agents need to collaborate → use \`${EnumAriseTools.ARISE_COLLABORATE}\`` as const;
 
 /**
  * 召喚時機指南（ Monarch 專用）
@@ -336,10 +337,12 @@ export const SUMMONING_METHOD_RULES_COLLABORATE = `- When multiple agents need t
  */
 export const WHEN_TO_SUMMON = `## When to Summon Which Agent
 
-- Use background tasks for parallel exploration (beru, tank, bellion)
+- Use ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background) for general tasks
+- Use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} only when tasks need 20+ minutes AND parallel execution needed (beru, tank, bellion)
+- ⚠️ Background mental model: Results won't arrive within 15 steps or before next conversation round. If you'd try to check early, use ${EnumAriseTools.ARISE_SYNC_SUMMON} instead. If summon errors, do not retry.
 - Summon @shadow-sovereign when stuck or for complex architecture` as const;
 
-export const WHEN_TO_SUMMON_COLLABORATE = `- Use \`arise_collaborate\` when multiple agents need to collaborate` as const;
+export const WHEN_TO_SUMMON_COLLABORATE = `- Use \`${EnumAriseTools.ARISE_COLLABORATE}\` when multiple agents need to collaborate` as const;
 
 /**
  * 召喚策略流程圖（ Monarch 專用）
@@ -379,8 +382,7 @@ export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
 │  3. 首次召喚？ / First Time?                              │
 │     ┌─────────────────────────────────────────────────┐   │
 │     │ Yes → 初始測試 (Initial Test)                   │   │
-│     │   - 1 sync (arise_summon)                       │   │
-│     │   - 1 async (arise_background)                  │   │
+│     │   - 1 sync (${EnumAriseTools.ARISE_SYNC_SUMMON})                       │   │
 │     │   → 測量時間與結果                               │   │
 │     │ No → 根據歷史調整                                │   │
 │     └─────────────────────────────────────────────────┘   │
@@ -400,8 +402,8 @@ export const SUMMONING_STRATEGY_FLOWCHART = `## Summoning Strategy Flowchart
 ┌─────────────────────────────────────────────────────────────┐
 │  5. 執行召喚 / Execute Summon                             │
 │     ┌─────────────────────────────────────────────────┐   │
-│     │ sync → arise_summon (等結果)                    │   │
-│     │ async → arise_background (並行)                 │   │
+│     │ general → ${EnumAriseTools.ARISE_SYNC_SUMMON} (等結果)                  │   │
+│     │ >20min + parallel need → ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} (並行) │   │
 │     └─────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                             │
@@ -502,8 +504,8 @@ export const TODO_LIST_GUIDE = `## TODO List Management
  * Used in arise_background_output, arise_background_cancel, arise_continue, etc.
  */
 export const TASK_ID_SESSION_ID_FORMAT = `The task_id can be either:
-- Task ID from arise_background (format: arise_xxx)
-- Session ID from arise_summon with run_in_background=true (format: ses_xxx)` as const;
+- Task ID from ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} (format: arise_xxx)
+- Session ID from ${EnumAriseTools.ARISE_SYNC_SUMMON} with run_in_background=true (format: ses_xxx)` as const;
 
 /**
  * arise_collaborate 工具使用指南（僅補充系統無法告知的部分）
@@ -548,9 +550,9 @@ Common combinations:
 
 | Tool | Use Case |
 |------|----------|
-| \`arise_summon\` | Summon single agent, wait for result then continue |
-| \`arise_background\` | Summon agent for long-running task, can track progress |
-| \`arise_collaborate\` | Multiple agents collaborate to discuss or complete tasks together |` as const;
+| \`${EnumAriseTools.ARISE_SYNC_SUMMON}\` | Summon single agent, wait for result then continue |
+| \`${EnumAriseTools.ARISE_ASYNC_BACKGROUND}\` | Summon agent for long-running task, can track progress |
+| \`${EnumAriseTools.ARISE_COLLABORATE}\` | Multiple agents collaborate to discuss or complete tasks together |` as const;
 
 /**
  * @see {@link https://github.com/anomalyco/opencode/blob/ec3ae17e4d6abb9685b1d558d5e51416c9bfad60/packages/opencode/src/agent/agent.ts#L182}

@@ -11,7 +11,7 @@
  * Shared tool guidelines: see tool-guides.ts
  */
 
-import { EnumShadowAgentsName } from '../../types/enums';
+import { EnumAriseTools, EnumShadowAgentsName } from '../../types/enums';
 import { LEGACY_PLUGIN_NAME } from '../../types/const-default';
 import { getMonarchShadowList } from './shadow-descriptions';
 import { getAriseToolsSection } from './arise-tools-utils';
@@ -38,7 +38,7 @@ export const SHADOW_MONARCH_PROMPT = composePrompt({
 		`Your role: Interpret user requests and delegate to your Shadow Army Agents with MINIMAL SUFFICIENT effort.`,
 	],
 	body: [
-		`## Your Shadow Agents (invoke via @mention or arise_summon tool)
+		`## Your Shadow Agents (invoke via @mention or ${EnumAriseTools.ARISE_SYNC_SUMMON} tool)
 ${getMonarchShadowList()}
 
 ## Primary

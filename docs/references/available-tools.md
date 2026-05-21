@@ -438,9 +438,9 @@ type context7_query-docs = (_: {
 
 | 情境 | 使用方式 |
 |------|----------|
-| 需要結果 NOW | `arise_summon`（同步，阻塞等待） |
-| 需要結果 LATER（平行） | `arise_background`（非同步，beru/tank/bellion） |
-| 不需要結果（fire-and-forget） | `arise_summon` + `run_in_background=true` |
+| 通用任務 | `arise_summon`（不包含 `run_in_background`） |
+| 任務 >20 分鐘、需並行、需要結果 | `arise_background`（非同步，beru/tank/bellion） |
+| 任務 >20 分鐘、需並行、不需要結果 | `arise_summon` + `run_in_background=true` |
 
 ---
 

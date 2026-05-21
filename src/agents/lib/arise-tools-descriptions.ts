@@ -18,8 +18,8 @@ import { EnumAriseTools, ALL_ARISE_TOOLS } from '../../types/enums';
  * Unified using ARISE_TOOLS.shortDescription content
  */
 export const TOOL_SHORT_DESCRIPTIONS: Record<EnumAriseTools, string> = {
-	[EnumAriseTools.ARISE_SYNC_SUMMON]: "Summon a shadow agent - sync (returns result) or background (fire-and-forget)",
-	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: "Launch background shadow agent - trackable, retrievable results",
+	[EnumAriseTools.ARISE_SYNC_SUMMON]: "Summon a shadow agent - sync (returns result) or background (fire-and-forget, only for 20+ min tasks with parallel execution)",
+	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: "Launch background shadow agent for 20+ min tasks with parallel execution (trackable, retrievable results)",
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT]: "Retrieve the completed output from a background shadow agent task",
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS]: "List all background shadow agent tasks and their current status",
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND_CANCEL]: "Cancel a currently running background shadow agent task.",

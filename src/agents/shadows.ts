@@ -154,7 +154,7 @@ export const ARISE_TOOLS = {
 	[EnumAriseTools.ARISE_SYNC_SUMMON]: {
 		description: composePrompt({
 			header: [
-				"Summon a shadow agent - sync (returns result) or background (fire-and-forget)." as const,
+				"Summon a shadow agent - sync (returns result) or background (fire-and-forget, only for 20+ min tasks with parallel execution)." as const,
 			],
 			body: [
 				`Available shadow agents:
@@ -168,9 +168,13 @@ ${ALLOWED_SHADOWS.map((name) =>
 
 				`IMPORTANT - run_in_background behavior:
 - run_in_background=false (DEFAULT): Blocks and returns the result directly. Use when you NEED the result.
-- run_in_background=true: ⚠️ NOT RECOMMENDED - Returns immediately with Task ID and Session ID, but prefer arise_background for tasks that don't require file editing.
+- run_in_background=true: ⚠️ Use ONLY when tasks need 20+ minutes to execute AND other tasks need parallel execution. Returns immediately with Task ID and Session ID.
 
-⚠️ For tasks that don't need file editing and require retrievable results, use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} instead (only ${BACKGROUND_SHADOWS.join('/')}).` as const,
+⚠️ MENTAL PREPARATION: Once you use run_in_background=true, you MUST NOT try to retrieve results within 15 steps or before the next conversation round. If you think you might want to actively check on the result, do NOT use run_in_background=true — use ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background) instead.
+
+⚠️ ERROR HANDLING: If the summon returns an error message, do NOT retry — it means run_in_background should not be used for this task.
+
+⚠️ For general tasks, use ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background) instead.` as const,
 			],
 			footer: [
 				createSummoningStrategy(EnumAriseTools.ARISE_SYNC_SUMMON),
@@ -184,10 +188,10 @@ ${ALLOWED_SHADOWS.map((name) =>
 				.enum(ALLOWED_SHADOWS)
 				.meta({ description: "Which shadow agent to summon" }),
 			...SHARED_SUMMON_ARGS,
-			run_in_background: z
+				run_in_background: z
 				.boolean()
 				.meta({
-					description: "NOT RECOMMENDED: For tasks that don't need file editing and require retrievable results, use arise_background instead. true = fire-and-forget, returns Task ID + Session ID.",
+					description: "⚠️ Use ONLY when tasks need 20+ minutes to execute AND other tasks need parallel execution. If any chance you'd want to check on the result, do NOT use this — use ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background) instead. If the summon errors, do not retry. true = fire-and-forget, returns Task ID + Session ID.",
 					title: "Run in Background",
 				})
 				.optional()
@@ -197,17 +201,20 @@ ${ALLOWED_SHADOWS.map((name) =>
 	[EnumAriseTools.ARISE_ASYNC_BACKGROUND]: {
 		description: composePrompt({
 			header: [
-				"Launch background shadow agent - trackable, retrievable results." as const,
+				"Launch background shadow agent for 20+ min tasks with parallel execution (trackable, retrievable results)." as const,
 			],
 			body: [
-				`Best for:
+				`⚠️ Only for tasks need 20+ minutes to execute AND other tasks need parallel execution.
+Best for:
 ${BACKGROUND_SHADOWS.map((name) => `- ${name}: ${getShortDescription(name)}`).join("\n")}`,
 
-				`Returns a task_id immediately. Use arise_background_status to check status, and arise_background_output to get results.
+				`Returns a task_id immediately. Use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS} to check status, and ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT} to get results.
 
-The 'description' arg will be shown in arise_background_status output for task identification.
+The 'description' arg will be shown in ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS} output for task identification.
 
-✅ USE THIS (not arise_summon with run_in_background=true) when you need parallel execution AND want to retrieve results later.` as const,
+⚠️ MENTAL PREPARATION: Once dispatched, you MUST NOT try to retrieve results within 15 steps or before the next conversation round. If you think you might want to actively poll for results, do NOT use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} — use ${EnumAriseTools.ARISE_SYNC_SUMMON} (without run_in_background) instead. If the summon returns an error, do not retry.
+
+✅ USE THIS when tasks need 20+ minutes to execute AND other tasks need parallel execution AND you need to retrieve results later.` as const,
 			],
 			footer: [
 				createSummoningStrategy(EnumAriseTools.ARISE_ASYNC_BACKGROUND),
@@ -230,7 +237,7 @@ The 'description' arg will be shown in arise_background_status output for task i
 		description: `Retrieve the completed output from a background shadow agent task.
 
 Returns the shadow agent's final response after task completion. 
-Use arise_background_status first to check if the task is done.
+Use ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS} first to check if the task is done.
 
 ${TASK_ID_SESSION_ID_FORMAT}` as const,
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT],
@@ -246,7 +253,7 @@ ${TASK_ID_SESSION_ID_FORMAT}` as const,
 
 Shows task_id, shadow name, status (running/completed/error/cancelled), description, and duration for each task.
 
-Use this to check which tasks are still running before calling arise_background_output. Supports filtering to current session only.` as const,
+Use this to check which tasks are still running before calling ${EnumAriseTools.ARISE_ASYNC_BACKGROUND_OUTPUT}. Supports filtering to current session only.` as const,
 		shortDescription: TOOL_SHORT_DESCRIPTIONS[EnumAriseTools.ARISE_ASYNC_BACKGROUND_STATUS],
 
 		args: {
@@ -301,8 +308,8 @@ Returns a formatted list of all available models in the format provider/modelID.
 		description: `Actively continue/resume a failed background task.
 
 The task_id can be either:
-- Task ID from arise_background (format: arise_xxx)
-- Session ID from arise_summon with run_in_background=true (format: ses_xxx)
+- Task ID from ${EnumAriseTools.ARISE_ASYNC_BACKGROUND} (format: arise_xxx)
+- Session ID from ${EnumAriseTools.ARISE_SYNC_SUMMON} with run_in_background=true (format: ses_xxx)
 
 This tool allows agents to manually trigger a retry for a failed task, instead of waiting for passive auto-resume.
 
@@ -563,7 +570,7 @@ Returns a formatted summary suitable for quick repository state assessment.` as 
 			block_subagent_tools: z
 				.boolean()
 				.meta({
-					description: "Block sub-agents from using arise_summon, arise_background, or task tools",
+					description: `Block sub-agents from using ${EnumAriseTools.ARISE_SYNC_SUMMON}, ${EnumAriseTools.ARISE_ASYNC_BACKGROUND}, or task tools`,
 					title: "Block Sub-agent Tools",
 				})
 				.optional(),

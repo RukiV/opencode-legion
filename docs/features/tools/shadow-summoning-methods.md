@@ -8,12 +8,12 @@ Tested and verified through actual invocation, documenting behavioral difference
 
 ## 召喚方式總覽
 
-| 方式 | 支援暗影 | 阻塞？ | 結果回傳 | 追蹤方式 |
-|------|---------|--------|---------|---------|
-| `arise_summon(false)` | 全部 6 隻 | ✅ 阻塞 | ✅ 直接回傳 | 無需追蹤（同步等待） |
-| `arise_summon` (省略) | 全部 6 隻 | ✅ 阻塞 | ✅ 直接回傳 | 無需追蹤（預設同 false） |
-| `arise_background` | beru, tank, bellion | ❌ 不阻塞 | ✅ 需手動取回 | `arise_background_status` / `arise_background_output` |
-| `arise_summon(true)` | 全部 6 隻 | ❌ 不阻塞 | ❌ 無法取回 | 無對應工具 |
+| 方式 | 支援暗影 | 阻塞？ | 結果回傳 | 追蹤方式 | 使用條件 |
+|------|---------|--------|---------|---------|---------|
+| `arise_summon(false)` | 全部 6 隻 | ✅ 阻塞 | ✅ 直接回傳 | 無需追蹤（同步等待） | 通用 |
+| `arise_summon` (省略) | 全部 6 隻 | ✅ 阻塞 | ✅ 直接回傳 | 無需追蹤（預設同 false） | 通用 |
+| `arise_background` | beru, tank, bellion | ❌ 不阻塞 | ✅ 需手動取回 | `arise_background_status` / `arise_background_output` | ⚠️ 任務 >20 分鐘 + 需並行 |
+| `arise_summon(true)` | 全部 6 隻 | ❌ 不阻塞 | ❌ 無法取回 | 無對應工具 | ⚠️ 任務 >20 分鐘 + 需並行 + 不需結果 |
 
 ---
 
@@ -77,6 +77,8 @@ Tested and verified through actual invocation, documenting behavioral difference
 
 ### 3. `arise_background` — 專用後台工具
 
+**⚠️ 使用條件：僅當任務需要 20 分鐘以上執行時間，且同時有其他任務需要並行執行時才使用。**
+
 **行為：** 立即返回 Task ID，暗影在背景執行。
 
 **返回格式：**
@@ -100,9 +102,13 @@ arise_background_output("arise_mng281q5_8yce")
 
 **限制：** 僅支援 `beru`、`tank`、`bellion` 三隻 shadow（偵查/研究型）。
 
-**適用場景：** 需要並行執行多個探索/研究任務，之後再取回結果。
+**適用場景：** 任務預估超過 20 分鐘，需要並行執行多個探索/研究任務，之後再取回結果。
+
+**不適用場景：** 一般通用任務（請使用 `arise_summon` 即可）。
 
 ### 4. `arise_summon(run_in_background=true)` — 失聯後台
+
+**⚠️ 使用條件：僅當任務需要 20 分鐘以上執行時間，且同時有其他任務需要並行執行，且不需要取回結果時才使用。**
 
 **行為：** 立即返回 Session ID，暗影在背景執行。
 
@@ -122,7 +128,9 @@ The shadow is working. Continue with your work.
 - `arise_background_output("ses_xxx")` → `Task not found`
 - `arise_background_status()` → 列表中不顯示 Session ID
 
-**適用場景：** 觸發暗影執行，但不需要結果（fire-and-forget）。
+**適用場景：** 任務預估超過 20 分鐘，需要並行執行，且完全不需要取回結果（fire-and-forget）。
+
+**不適用場景：** 通用任務請使用 `arise_summon`（不包含 `run_in_background`）。
 
 ---
 
@@ -171,9 +179,10 @@ arise_summon(true):
 
 ### 結論
 
+- **通用任務（預設首選）** → `arise_summon`（不包含 `run_in_background`）
 - **需要結果 + 願意等** → `arise_summon(false)`
-- **需要結果 + 想先做別的事** → `arise_background`
-- **不需要結果** → `arise_summon(true)`
+- **任務 >20 分鐘 + 需並行 + 需要結果** → `arise_background`
+- **任務 >20 分鐘 + 需並行 + 不需要結果** → `arise_summon(true)`
 
 ---
 
@@ -181,10 +190,10 @@ arise_summon(true):
 
 | 需求 | 推薦方式 | 原因 |
 |------|---------|------|
+| 通用任務 | `arise_summon`（不包含 `run_in_background`） | 同步直接取回結果，最簡單 |
 | 需要結果、願意等待 | `arise_summon(false)` 或省略 | 結果直接回傳 |
-| 需要結果、不想等待 | `arise_background` | 可之後用 task_id 取回結果 |
-| 不在乎結果、只想觸發 | `arise_summon(true)` | fire-and-forget |
-| 需要並行多任務 | `arise_background` | 可追蹤每個任務狀態 |
+| 任務 >20 分鐘、需並行、需要結果 | `arise_background` | 可之後用 task_id 取回結果 |
+| 任務 >20 分鐘、需並行、不在乎結果 | `arise_summon(true)` | fire-and-forget |
 | 召喚 igris/tusk/shadow-sovereign | `arise_summon` | `arise_background` 不支援這些 shadow |
 
 ---
@@ -268,9 +277,11 @@ arise_summon(true):
 這種不對稱是 agent 最容易犯錯的地方：**直覺上選擇「支援全部 shadow」的 `arise_summon(true)`，卻發現結果無法取回**。
 
 正確的決策邏輯：
-1. 需要結果嗎？→ 不需要 → `arise_summon(true)`
-2. 需要結果 + 是 beru/tank/bellation？→ `arise_background`
-3. 需要結果 + 是 igris/tusk/shadow-sovereign？→ `arise_summon(false)`（只能同步等）
+1. 任務 >20 分鐘 + 需並行？→ 否 → `arise_summon`（一般任務直接用）
+2. 任務 >20 分鐘 + 需並行？→ 是 → 需要結果嗎？
+   - 需要結果 + 是 beru/tank/bellion？→ `arise_background`
+   - 需要結果 + 是 igris/tusk/shadow-sovereign？→ `arise_summon(false)`（只能同步等）
+   - 不需要結果 → `arise_summon(true)`
 
 ### Source of Truth
 
