@@ -1,3 +1,6 @@
+allowBuilds:
+  bun: true
+
 ignoreWorkspaceRootCheck: true
 
 linkWorkspacePackages: true
