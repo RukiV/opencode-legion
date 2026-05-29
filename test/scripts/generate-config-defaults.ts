@@ -5,6 +5,32 @@
  * 在構建前從 AriseConfigSchema 提取默認值並寫入 src/types/config-defaults.ts
  * Extract default values from AriseConfigSchema and write to src/types/config-defaults.ts before build
  *
+ * === 事實來源圖 / Source of Truth Diagram ===
+ *
+ *    ┌─ src/types/const-default.ts ───────────┐
+ *    │  DEFAULT_SAFETY_PROMPT = `...`         │ ← 唯一 source of truth
+ *    │  DEFAULT_POLL_INTERVAL = 2000          │    (所有常數定義於此)
+ *    └──────────────┬─────────────────────────┘
+ *                   │ import
+ *    ┌──────────────▼─────────────────────────┐
+ *    │  src/config/schema.ts                  │
+ *    │  safety_prompt: z.string()             │
+ *    │    .default(DEFAULT_SAFETY_PROMPT)     │ ← 引用常數作為 schema 預設值
+ *    │  poll_interval: z.number()             │
+ *    │    .default(DEFAULT_POLL_INTERVAL)     │
+ *    └──────────────┬─────────────────────────┘
+ *                   │ extractDefaultsFromJSONSchema()
+ *    ┌──────────────▼─────────────────────────┐
+ *    │  test/scripts/generate-config-defaults │ ← 本腳本
+ *    │  → JSON.stringify() 提取並內嵌預設值    │    執行期快照生成
+ *    └──────────────┬─────────────────────────┘
+ *                   │ writeFileSync
+ *    ┌──────────────▼─────────────────────────┐
+ *    │  src/types/config-defaults.ts          │
+ *    │  "safety_prompt": "This is an..."      │ ← 生成快照（非獨立來源）
+ *    │  "poll_interval": 2000                 │    請勿手動編輯！
+ *    └────────────────────────────────────────┘
+ *
  * 運行方式 / Usage:
  *   bun test/scripts/generate-config-defaults.ts
  *   tsx test/scripts/generate-config-defaults.ts

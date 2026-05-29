@@ -4,6 +4,9 @@ exports[`從 JSON Schema 提取默認值 應該與 DEFAULT_CONFIG 等價 1`] = `
 {
   "background": {
     "auto_resume": {
+      "backoff_max_delay": 300000,
+      "backoff_multiplier": 2,
+      "backoff_strategy": "fixed",
       "enabled": false,
       "max_retries": 3,
       "on_error": "ignore",
@@ -52,6 +55,9 @@ exports[`從 Zod Schema 直接提取默認值 應該與 DEFAULT_CONFIG 等價 1`
 {
   "background": {
     "auto_resume": {
+      "backoff_max_delay": 300000,
+      "backoff_multiplier": 2,
+      "backoff_strategy": "fixed",
       "enabled": false,
       "max_retries": 3,
       "on_error": "ignore",

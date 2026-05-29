@@ -16,6 +16,8 @@ export interface IBackgroundTask
 	sessionId: string;
 	/** 父 Session ID（發起任務的 session）/ Parent session ID (session that launched the task) */
 	parentSessionId: string;
+	/** 是否為背景任務（明確標記）/ Whether it's a background task (explicit flag) */
+	isBackground: boolean;
 	/** Shadow 名稱 / Shadow name */
 	shadow: string;
 	/** 任務描述 / Task description */

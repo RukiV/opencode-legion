@@ -46,9 +46,12 @@ export function createDefaultConfig(): IAriseConfig
 				"enabled": false,
 				"max_retries": 3,
 				"retry_delay": 5000,
+				"backoff_strategy": "fixed",
+				"backoff_multiplier": 2,
+				"backoff_max_delay": 300000,
 				"on_error": "ignore",
 				"target": "background",
-				"safety_prompt": "請依序檢查：\n1. 若後續任務明確可行，繼續執行\n2. 若存在潛在風險（如破壞性變更、資料遺失、安全疑慮、或將更動專案外檔案），請先停止並說明風險，請求用戶確認\n3. 若需求模糊或資訊不足，請停止並說明疑點，請求用戶澄清\n4. 若非用戶明確要求撤銷更改或刪除檔案，請先詢問用戶，獲得許可後才執行\n\n**若任務已完成，請複查並總結結果後結束**\n\nCheck in order:\n1. If the next step is clear and actionable, proceed.\n2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.\n3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.\n4. Unless the user explicitly requests to revert changes or delete files, always ask for permission first and only proceed after obtaining user consent.\n\n**If the task is complete, review and summarize the results, then end.**"
+				"safety_prompt": "This is an automatic retry. Follow these steps:\n\n1. If the next step is clear and actionable, proceed.\n2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.\n3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.\n4. Unless the user explicitly requests to revert changes or delete files, always ask for permission first and only proceed after obtaining user consent.\n\n**If the task is complete, review and summarize the results, then end.**"
 			}
 		},
 		"debug": {

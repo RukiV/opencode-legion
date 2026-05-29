@@ -1,9 +1,22 @@
 /**
- * 預設常數定義
- * Default constants definition
+ * 預設常數定義 / Default constants definition
  *
  * 定義模型解析和配置相關的預設常數值
  * Defines default constant values for model resolution and configuration
+ *
+ * === 事實來源 / Source of Truth ===
+ * 此檔案是所有預設常數的**唯一來源**。
+ * This file is the **single source of truth** for all default constants.
+ *
+ * 修改流程 / Update flow:
+ *   1. 修改此處常數值
+ *   2. schema.ts 透過 import 自動繼承
+ *   3. 執行 generate-config-defaults 腳本同步 config-defaults.ts
+ *
+ *   const-default.ts ──import──→ schema.ts ──extract──→ generate-config-defaults ──→ config-defaults.ts
+ *       (唯一來源)                (預設值)              (腳本)                         (生成快照，勿手動編輯)
+ *
+ * @see test/scripts/generate-config-defaults.ts
  */
 
 import { z } from "zod";
@@ -127,15 +140,8 @@ export const COLLABORATE_ROUND_TIMEOUT_MS_MAX = 600000 as const;
 /**
  * @see {@link https://github.com/anomalyco/opencode/blob/2cc738fb1794470d28b6795f2267b9b756d4be88/packages/opencode/src/session/compaction.ts#L320}
  */
-export const DEFAULT_SAFETY_PROMPT = `請依序檢查：
-1. 若後續任務明確可行，繼續執行
-2. 若存在潛在風險（如破壞性變更、資料遺失、安全疑慮、或將更動專案外檔案），請先停止並說明風險，請求用戶確認
-3. 若需求模糊或資訊不足，請停止並說明疑點，請求用戶澄清
-4. 若非用戶明確要求撤銷更改或刪除檔案，請先詢問用戶，獲得許可後才執行
+export const DEFAULT_SAFETY_PROMPT = `This is an automatic retry. Follow these steps:
 
-**若任務已完成，請複查並總結結果後結束**
-
-Check in order:
 1. If the next step is clear and actionable, proceed.
 2. If potential risks exist (e.g., destructive changes, data loss, security concerns, or modifying files outside the project), stop, explain the risks, and request confirmation.
 3. If requirements are ambiguous or information is insufficient, stop, state the uncertainty, and request clarification.

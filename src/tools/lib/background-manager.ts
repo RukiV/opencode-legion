@@ -29,7 +29,7 @@ import {
 	formatAriseMsgTitleCustom,
 } from "../../utils/string/arise-message";
 import { logArise2WithLevel } from "../../utils/debug-control";
-import { isHighLoadError } from "../../utils/string/regexp";
+import { isContinuationPrompt, isHighLoadError, isPermanentError, isStepLimitCutoff } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
 import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
 import { EnumOpenCodeEventType, isEventWithType } from '../../types/opencode/enum-event';
@@ -233,13 +233,22 @@ export class BackgroundManager
 	protected checkAutoResume(task: IBackgroundTask): { should: boolean, reason: string }
 	{
 		/**
+		 * 防止重複觸發：若任務已在等待 auto-resume 重試中，拒絕
+		 * Prevent duplicate triggers: reject if task is already pending auto-resume retry
+		 */
+		if (task.resumePending)
+		{
+			return { should: false, reason: "task is already pending auto-resume retry" };
+		}
+
+		/**
 		 * 檢查是否為背景任務
 		 * Check if it's a background task
 		 *
-		 * 背景任務：parentSessionId !== sessionId
-		 * Background task: parentSessionId !== sessionId
+		 * 使用 task.isBackground 明確標記，避免因 sessionId 更新而誤判
+		 * Uses task.isBackground explicit flag to avoid misjudgment from sessionId changes
 		 */
-		const isBackgroundTask = task.parentSessionId !== task.sessionId;
+		const isBackgroundTask = task.isBackground;
 
 		let enabled: boolean;
 
@@ -311,6 +320,22 @@ export class BackgroundManager
 		}
 
 		/**
+		 * 檢查是否為永久性錯誤（無法透過重試解決）
+		 * Check if error is permanent (cannot be resolved by retrying)
+		 *
+		 * 語法錯誤、認證失敗、資源不存在等永久性錯誤，重試無意義
+		 * Syntax errors, auth failures, not found — retrying is pointless
+		 */
+		if (isPermanentError(task.error))
+		{
+			logArise2WithLevel("debug", () => [
+				`[background-manager]`,
+				`shouldAutoResume: permanent error detected, skipping auto-resume, error: ${task.error?.slice(0, 100)}`,
+			]);
+			return { should: false, reason: "permanent error detected — cannot be resolved by retrying" };
+		}
+
+		/**
 		 * 檢查目標類型是否符合
 		 * Check if target type matches
 		 *
@@ -321,13 +346,15 @@ export class BackgroundManager
 		 */
 		if (autoResumeConfig.target === EnumAutoResumeTarget.Background)
 		{
-			// 背景任務的 parentSessionId 不同於 sessionId
-			// Background task has different parentSessionId from sessionId
-			if (task.parentSessionId === task.sessionId)
+			/**
+			 * 使用 isBackground explicit flag 判斷，避免 sessionId 更新後誤判
+			 * Uses isBackground explicit flag to avoid misjudgment after sessionId updates
+			 */
+			if (!isBackgroundTask)
 			{
 				logArise2WithLevel("debug", () => [
 					`[background-manager]`,
-					`shouldAutoResume: target=background but parentSessionId === sessionId (foreground task), returning false`,
+					`shouldAutoResume: target=background but task is foreground, returning false`,
 				]);
 				return { should: false, reason: "target=background but task is foreground" };
 			}
@@ -438,6 +465,17 @@ export class BackgroundManager
 		const autoResumeConfig = getAutoResumeConfig(this.config, task.shadow as IAllShadowAgentsName);
 
 		/**
+		 * 在 reset 前擷取本次錯誤（用於 retry context 和 permanent error 檢查）
+		 * Capture current error before reset (used for retry context and permanent error check)
+		 *
+		 * performAutoResume 會在後續設定 task.error = undefined，
+		 * 因此必須在此時擷取
+		 * performAutoResume will set task.error = undefined later,
+		 * so it must be captured here
+		 */
+		const previousError: string | undefined = task.error;
+
+		/**
 		 * 標記任務為即將重試
 		 * Mark task as about to retry
 		 *
@@ -477,17 +515,42 @@ export class BackgroundManager
 		}));
 
 		/**
-		 * 等待配置的重試延遲（偵測高負載時額外增加 10 秒）
-		 * Wait for configured retry delay (add 10s bonus when high load detected)
+		 * 計算重試延遲（支援 exponential backoff）
+		 * Calculate retry delay (supports exponential backoff)
 		 *
-		 * 若錯誤訊息包含 "under high load"、"retry after"、"please wait" 等模式，
-		 * 則在基礎延遲上額外增加 HIGH_LOAD_BONUS_DELAY_MS
-		 * If error message contains high load indicators,
-		 * add HIGH_LOAD_BONUS_DELAY_MS on top of base delay
+		 * fixed: 每次使用相同延遲 / same delay every retry
+		 * exponential: delay * multiplier^(attempt-1)，上限 max_delay
 		 */
+		const currentAttempt = task.resumeRetryCount ?? 0;
 		const baseRetryDelay = autoResumeConfig.retry_delay ?? DEFAULT_RETRY_DELAY_INCREMENT;
-		let totalRetryDelay = baseRetryDelay;
+		let totalRetryDelay: number;
 
+		if (autoResumeConfig.backoff_strategy === "exponential")
+		{
+			const multiplier = autoResumeConfig.backoff_multiplier ?? 2;
+			const maxDelay = autoResumeConfig.backoff_max_delay ?? 300000;
+
+			/**
+			 * 計算 exponential delay：base * multiplier^attempt
+			 * 第一次重試 (attempt=0) 時 delay = base * 1 = base
+			 */
+			const exponentialDelay = baseRetryDelay * Math.pow(multiplier, currentAttempt);
+			totalRetryDelay = Math.min(exponentialDelay, maxDelay);
+
+			logArise2WithLevel("debug", () => [
+				`[background-manager]`,
+				`performAutoResume: exponential backoff, attempt=${currentAttempt}, base=${baseRetryDelay}ms, multiplier=${multiplier}, raw=${exponentialDelay}ms, capped=${totalRetryDelay}ms`,
+			]);
+		}
+		else
+		{
+			totalRetryDelay = baseRetryDelay;
+		}
+
+		/**
+		 * 偵測高負載時額外增加延遲
+		 * Add bonus delay when high load detected
+		 */
 		if (isHighLoadError(task.error))
 		{
 			totalRetryDelay += HIGH_LOAD_BONUS_DELAY_MS;
@@ -573,14 +636,34 @@ export class BackgroundManager
 			 * 組合最終執行的 prompt
 			 * Compose final prompt to execute
 			 *
-			 * 如果有 safety_prompt，則前置於任務描述
-			 * 使用 \n\n---\n\n 作為分隔符號，清晰區分安全檢查提示與實際任務
-			 * If safety_prompt exists, prepend to task description
-			 * Use \n\n---\n\n as separator to clearly separate safety check from actual task
+			 * 結構：
+			 * 1. safety_prompt (config 中的安全檢查提示，可選)
+			 * 2. Retry context (動態注入的錯誤上下文 — 英文 only 以節省 token)
+			 * 3. 原始任務描述
+			 *
+			 * Structure:
+			 * 1. safety_prompt (safety check prompt from config, optional)
+			 * 2. Retry context (dynamically injected error context — English only to save tokens)
+			 * 3. Original task description
 			 */
-			const finalPrompt = safetyPrompt
-				? `${safetyPrompt}\n\n---\n\n${task.description}`
-				: task.description;
+			const currentRetry = task.resumeRetryCount ?? 0;
+			const maxRetries = autoResumeConfig.max_retries ?? 3;
+			/**
+			 * 取得截斷的錯誤訊息（防止 prompt 過長）
+			 * Get truncated error message (prevent overly long prompts)
+			 */
+			const errorSnippet = previousError?.slice(0, 500) ?? "(No error details available)";
+			const retryContext = [
+				`AUTO-RETRY CONTEXT (attempt ${currentRetry}/${maxRetries}):`,
+				`Previous attempt failed. Review the error below and adjust your approach accordingly.`,
+				`Previous error: ${errorSnippet}`,
+			].join("\n");
+
+			const parts: string[] = [];
+			if (safetyPrompt) parts.push(safetyPrompt);
+			parts.push(retryContext);
+			parts.push(task.description);
+			const finalPrompt = parts.join("\n\n---\n\n");
 
 			/**
 			 * 重新執行 prompt（非同步）
@@ -638,25 +721,48 @@ export class BackgroundManager
 					}
 					else if (autoResumeCfg?.on_error === EnumAutoResumeOnError.Retry)
 					{
-						// 遞迴嘗試 auto-resume（會再次檢查 shouldAutoResume）
-						// Recursively attempt auto-resume (will check shouldAutoResume again)
-						await log2OpenCode(this.ctx, () => ({
-							body: formatAriseMsgLogBody({
-								label: "Auto-resume",
-								message: `Task ${task.id} retry failed: ${task.error}. Will retry again...`,
-								level: EnumLogLevel.Warn,
-							}),
-						}));
-						await this.performAutoResume(task).catch((e) =>
+						/**
+						 * 遞迴嘗試 auto-resume
+						 * Recursively attempt auto-resume
+						 *
+						 * ⚠️ 必須先通過 checkAutoResume 守衛，防止無限重試
+						 * ⚠️ Must pass checkAutoResume guard first to prevent infinite retry
+						 *
+						 * checkAutoResume 會檢查：max_retries、resumePending、permanent error
+						 * checkAutoResume checks: max_retries, resumePending, permanent error
+						 */
+						const resumeCheck = this.checkAutoResume(task);
+
+						if (resumeCheck.should)
 						{
-							return log2OpenCode(this.ctx, () => ({
+							await log2OpenCode(this.ctx, () => ({
 								body: formatAriseMsgLogBody({
 									label: "Auto-resume",
-									message: `Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
-									level: EnumLogLevel.Error,
+									message: `Task ${task.id} retry failed: ${task.error}. Will retry again...`,
+									level: EnumLogLevel.Warn,
 								}),
 							}));
-						});
+							await this.performAutoResume(task).catch((e) =>
+							{
+								return log2OpenCode(this.ctx, () => ({
+									body: formatAriseMsgLogBody({
+										label: "Auto-resume",
+										message: `Failed to retry task ${task.id}: ${getErrorMessage(e)}`,
+										level: EnumLogLevel.Error,
+									}),
+								}));
+							});
+						}
+						else
+						{
+							await log2OpenCode(this.ctx, () => ({
+								body: formatAriseMsgLogBody({
+									label: "Auto-resume",
+									message: `Task ${task.id} retry stopped: ${resumeCheck.reason}`,
+									level: EnumLogLevel.Warn,
+								}),
+							}));
+						}
 					}
 				});
 		}
@@ -665,6 +771,9 @@ export class BackgroundManager
 			/**
 			 * 處理 session 建立失敗
 			 * Handle session creation failure
+			 *
+			 * 若為暫時性錯誤（網路、限流等），遞迴重試
+			 * For transient errors (network, rate limit, etc.), retry recursively
 			 */
 			task.status = BackgroundTaskStatus.Error;
 			task.error = getErrorMessage(error);
@@ -675,13 +784,43 @@ export class BackgroundManager
 				`performAutoResume: failed to create retry session for taskId=${task.id}, error=${task.error}`,
 			]);
 
-			await log2OpenCode(this.ctx, () => ({
-				body: formatAriseMsgLogBody({
-					label: "Auto-resume",
-					message: `Failed to create retry session for task ${task.id}: ${task.error}`,
-					level: EnumLogLevel.Error,
-				}),
-			}));
+			/**
+			 * 檢查是否需要再次執行 auto-resume
+			 * Check if auto-resume should be attempted again
+			 *
+			 * session.create 失敗通常是暫時性錯誤，透過 checkAutoResume 決定是否重試
+			 * session.create failures are usually transient, use checkAutoResume to decide
+			 */
+			const resumeCheck = this.checkAutoResume(task);
+
+			if (resumeCheck.should)
+			{
+				logArise2WithLevel("debug", () => [
+					`[background-manager]`,
+					`performAutoResume: session.create failed, but auto-resume is still valid, retrying`,
+				]);
+
+				await this.performAutoResume(task).catch((e) =>
+				{
+					return log2OpenCode(this.ctx, () => ({
+						body: formatAriseMsgLogBody({
+							label: "Auto-resume",
+							message: `Failed to retry session creation for task ${task.id}: ${getErrorMessage(e)}`,
+							level: EnumLogLevel.Error,
+						}),
+					}));
+				});
+			}
+			else
+			{
+				await log2OpenCode(this.ctx, () => ({
+					body: formatAriseMsgLogBody({
+						label: "Auto-resume",
+						message: `Failed to create retry session for task ${task.id}: ${task.error}. Auto-resume skipped: ${resumeCheck.reason}`,
+						level: EnumLogLevel.Error,
+					}),
+				}));
+			}
 		}
 	}
 
@@ -764,6 +903,14 @@ export class BackgroundManager
 			id: taskId,
 			sessionId,
 			parentSessionId: opts.parentSessionId,
+			/**
+			 * 明確標記是否為背景任務
+			 * Explicitly mark whether it's a background task
+			 *
+			 * 背景任務的 sessionId 不同於 parentSessionId
+			 * A background task has sessionId different from parentSessionId
+			 */
+			isBackground: opts.parentSessionId !== sessionId,
 			shadow: opts.shadow,
 			description: opts.description,
 			status: BackgroundTaskStatus.Running,
@@ -971,6 +1118,105 @@ export class BackgroundManager
 	}
 
 	/**
+	 * 檢查 agent 回應結尾是否有「需要繼續嗎？」提示，若有則觸發 auto-resume
+	 * Check if agent response ends with "should I continue?" prompt, trigger auto-resume if found
+	 *
+	 * 只檢查 extractResult 截取的最後一段 assistant 文字結尾 300 字
+	 * Only checks the last 300 characters of the extracted assistant text
+	 *
+	 * @param task - 任務物件
+	 * @returns true 表示已觸發 auto-resume（不應再標記 completed），false 表示無繼續提示
+	 */
+	protected async checkAndHandleContinuationPrompt(task: IBackgroundTask): Promise<boolean>
+	{
+		/**
+		 * 檢查兩種需要自動繼續的場景：
+		 * Check two scenarios that require auto-continuation:
+		 *
+		 * 1. 明確的繼續提示（agent 問「需要繼續嗎？」）
+		 *    Explicit continuation prompt (agent asks "should I continue?")
+		 * 2. 步驟限制截斷（系統強制中斷，如 "Maximum Steps Reached"）
+		 *    Step limit cutoff (system forced interrupt, e.g. "Maximum Steps Reached")
+		 */
+		const isContinuation = isContinuationPrompt(task.result);
+		const isCutoff = isStepLimitCutoff(task.result);
+
+		if (!isContinuation && !isCutoff)
+		{
+			return false;
+		}
+
+		/**
+		 * 根據偵測類型設定適當的錯誤訊息
+		 * Set appropriate error message based on detection type
+		 */
+		if (isCutoff)
+		{
+			task.status = BackgroundTaskStatus.Error;
+			task.error = `Agent was cut off by step limit. Remaining work detected. Response tail: "${task.result?.slice(-200)}"`;
+			task.completedAt = Date.now();
+
+			logArise2WithLevel("info", () => [
+				`[background-manager]`,
+				`checkAndHandleContinuationPrompt: step limit cutoff detected for taskId=${task.id}, triggering auto-resume`,
+			]);
+		}
+		else
+		{
+			task.status = BackgroundTaskStatus.Error;
+			task.error = `Agent requested continuation: task may be incomplete. Original response: "${task.result?.slice(0, 200)}"`;
+			task.completedAt = Date.now();
+
+			logArise2WithLevel("info", () => [
+				`[background-manager]`,
+				`checkAndHandleContinuationPrompt: continuation prompt detected for taskId=${task.id}, triggering auto-resume`,
+			]);
+		}
+
+		await showToastOpenCode(this.ctx, () => ({
+			body: {
+				title: isCutoff ? "Auto-continue (Step Limit Cutoff)" : "Auto-continue Triggered",
+				message: isCutoff
+					? `Task ${task.id} (${task.shadow}) was cut off by step limit — auto-resuming...`
+					: `Task ${task.id} (${task.shadow}) asked to continue — auto-resuming...`,
+				variant: "info",
+				duration: 5000,
+			},
+		}));
+
+		const resumeCheck = this.checkAutoResume(task);
+		if (resumeCheck.should)
+		{
+			await log2OpenCode(this.ctx, () => ({
+				body: formatAriseMsgLogBody({
+					label: "Auto-continue",
+					message: isCutoff
+						? `Task ${task.id} was cut off by step limit. Triggering auto-resume attempt ${(task.resumeRetryCount ?? 0) + 1}.`
+						: `Task ${task.id} asked to continue. Triggering auto-resume attempt ${(task.resumeRetryCount ?? 0) + 1}.`,
+					level: EnumLogLevel.Info,
+				}),
+			}));
+
+			await this.performAutoResume(task).catch((e) =>
+			{
+				return log2OpenCode(this.ctx, () => ({
+					body: formatAriseMsgLogBody({
+						label: "Auto-continue",
+						message: `Failed to auto-resume task ${task.id}: ${getErrorMessage(e)}`,
+						level: EnumLogLevel.Error,
+					}),
+				}));
+			});
+		}
+		else
+		{
+			await this.notifyAutoResumeSkipped(task, resumeCheck.reason);
+		}
+
+		return true;
+	}
+
+	/**
 	 * 輪詢檢查任務完成狀態
 	 * Poll to check task completion status
 	 *
@@ -1009,6 +1255,19 @@ export class BackgroundManager
 				if (status.type === EnumSessionStatusType.Idle)
 				{
 					await this.extractResult(task);
+
+					/**
+					 * 檢查 agent 回應是否有「需要繼續嗎？」提示
+					 * Check if agent response contains "should I continue?" prompt
+					 *
+					 * 若有則不標記為 completed，改為觸發 auto-resume
+					 * If found, don't mark as completed, trigger auto-resume instead
+					 */
+					if (await this.checkAndHandleContinuationPrompt(task))
+					{
+						return;
+					}
+
 					task.status = BackgroundTaskStatus.Completed;
 					task.completedAt = Date.now();
 
@@ -1045,6 +1304,16 @@ export class BackgroundManager
 				 * This is a fault tolerance mechanism to avoid tasks never completing due to status query failures
 				 */
 				await this.extractResult(task);
+
+				/**
+				 * 容錯路徑也檢查繼續提示
+				 * Also check continuation prompt in fault tolerance path
+				 */
+				if (await this.checkAndHandleContinuationPrompt(task))
+				{
+					return;
+				}
+
 				task.status = BackgroundTaskStatus.Completed;
 				task.completedAt = Date.now();
 				await this.notifyParent(task);
@@ -1420,11 +1689,45 @@ export class BackgroundManager
 					},
 				})
 				.then(() => this._publicSchedulePolling(task.id))
-				.catch((err) =>
+				.catch(async (err) =>
 				{
 					task.status = BackgroundTaskStatus.Error;
 					task.error = getErrorMessage(err);
 					task.completedAt = Date.now();
+
+					/**
+					 * 檢查是否需要執行 auto-resume
+					 * Check if auto-resume should be executed
+					 *
+					 * 與 pollTaskCompletion 和 performAutoResume 的錯誤處理一致
+					 * Consistent with error handling in pollTaskCompletion and performAutoResume
+					 */
+					const resumeCheck = this.checkAutoResume(task);
+
+					logArise2WithLevel("error", () => [
+						`[background-manager]`,
+						`manualRetry: promptAsync error, taskId=${taskId}, error=${getErrorMessage(err)}, shouldAutoResume=${resumeCheck.should}${resumeCheck.reason
+							? `, reason: ${resumeCheck.reason}`
+							: ""}`,
+					]);
+
+					if (resumeCheck.should)
+					{
+						this.performAutoResume(task).catch((e) =>
+						{
+							return log2OpenCode(this.ctx, () => ({
+								body: formatAriseMsgLogBody({
+									label: "Auto-resume",
+									message: `Unexpected error in performAutoResume after manual retry: ${getErrorMessage(e)}`,
+									level: EnumLogLevel.Error,
+								}),
+							}));
+						});
+					}
+					else
+					{
+						await this.notifyAutoResumeSkipped(task, resumeCheck.reason);
+					}
 				});
 
 			/** 建構 auto-resume 設定狀態訊息 / Build auto-resume setting status message */

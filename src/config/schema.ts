@@ -135,6 +135,30 @@ export const AutoResumeConfig = z
 				description: "重試延遲（毫秒）/ Retry delay in milliseconds",
 				title: "Retry Delay",
 			}).default(5000).optional(),
+		/**
+		 * Backoff 策略 (預設 fixed)
+		 * Backoff strategy (default fixed)
+		 *
+		 * fixed: 每次重試使用相同延遲 / same delay for each retry
+		 * exponential: 每次重試延遲倍增：delay * multiplier^attempt / delay doubles each retry
+		 */
+		backoff_strategy: z.enum(["fixed", "exponential"])
+			.meta({
+				description: "Backoff 策略：fixed=固定延遲、exponential=指數倍增 / Backoff strategy: fixed=fixed delay, exponential=exponential increase",
+				title: "Backoff Strategy",
+			}).default("fixed").optional(),
+		/** Backoff 倍增因子（預設 2，僅 exponential 策略使用） / Backoff multiplier (default 2, only for exponential strategy) */
+		backoff_multiplier: z.number()
+			.meta({
+				description: "Backoff 倍增因子（僅 exponential 策略）/ Backoff multiplier (only for exponential strategy)",
+				title: "Backoff Multiplier",
+			}).default(2).optional(),
+		/** Backoff 最大延遲（毫秒，預設 300000 = 5 分鐘）/ Max backoff delay in ms (default 300000 = 5 min) */
+		backoff_max_delay: z.number()
+			.meta({
+				description: "Backoff 最大延遲（毫秒）/ Maximum backoff delay in milliseconds",
+				title: "Backoff Max Delay",
+			}).default(300000).optional(),
 		/** 錯誤時的行為（預設 ignore）/ Behavior on error (default ignore) */
 		on_error: AutoResumeOnError
 			.meta({
