@@ -215,12 +215,15 @@ export const STEP_LIMIT_REACHED_PATTERN: RegExp = new zhRegExpWithPluginEnabled(
 		/** 中文 / Chinese */
 		'已達最大步驟',
 		'步驟限制',
+		'步驟上限已達',
 		/** 日文 / Japanese */
 		'最大ステップ',
 		'ステップ制限',
+		'ステップ上限',
 		/** 韓文 / Korean */
 		'최대\\s*단계',
 		'단계\\s*제한',
+		'단계\\s*상한',
 	].join('|'),
 	'i',
 );
@@ -246,12 +249,17 @@ export const STEP_LIMIT_REMAINING_PATTERN: RegExp = new zhRegExpWithPluginEnable
 		'剩餘\\s*(?:任務|步驟|工作)',
 		'下一步',
 		'待完成(?:\\s*(?:任務|工作|項目))?',
+		'尚未完成',
 		/** 日文 / Japanese */
 		'残り\\s*(?:タスク|ステップ|作業)',
 		'次のステップ',
+		'未完了',
+		'まだ完了していません',
 		/** 韓文 / Korean */
 		'남은\\s*(?:작업|단계|할\\s*일)',
 		'다음\\s*단계',
+		'미완료',
+		'아직\\s*완료되지\\s*않',
 	].join('|'),
 	'i',
 );
