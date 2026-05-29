@@ -31,6 +31,7 @@ import {
 import { logArise2WithLevel } from "../../utils/debug-control";
 import { isContinuationPrompt, isHighLoadError, isPermanentError, isStepLimitCutoff } from "../../utils/string/regexp";
 import { runtimeCache } from '../../utils/session/session-cache';
+import { getSessionStatuses, getSessionStatus } from '../../utils/session/session-status';
 import { log2OpenCode, showToastOpenCode } from '../../utils/log/opencode-log';
 import { EnumOpenCodeEventType, isEventWithType } from '../../types/opencode/enum-event';
 import { IBackgroundTask, IBackgroundTaskLaunchParams } from './types/types-summon';
@@ -1238,16 +1239,17 @@ export class BackgroundManager
 		try
 		{
 			/**
-			 * 檢查 session 狀態
-			 * Check session status
+			 * 取得所有 session 狀態（型別安全封裝）
+			 * Get all session statuses (type-safe wrapper)
+			 *
+			 * 注意：idle session 已被 OpenCode 內部自動移除，回應只含 busy/retry
+			 * Note: idle sessions auto-removed internally, response only contains busy/retry
 			 */
-			const statusResult = await this.ctx.client.session.status({});
-			const statuses = statusResult.data;
+			const statuses = await getSessionStatuses(this.ctx.client, this.ctx.directory);
+			const status = getSessionStatus(statuses, task.sessionId);
 
-			if (statuses && task.sessionId in statuses)
+			if (status)
 			{
-				const status = statuses[task.sessionId];
-
 				/**
 				 * Session idle = 任務完成
 				 * Session idle = task completed

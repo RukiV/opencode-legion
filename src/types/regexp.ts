@@ -245,6 +245,7 @@ export const STEP_LIMIT_REMAINING_PATTERN: RegExp = new zhRegExpWithPluginEnable
 		/** 中文 / Chinese */
 		'剩餘\\s*(?:任務|步驟|工作)',
 		'下一步',
+		'待完成(?:\\s*(?:任務|工作|項目))?',
 		/** 日文 / Japanese */
 		'残り\\s*(?:タスク|ステップ|作業)',
 		'次のステップ',
