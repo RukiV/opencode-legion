@@ -29,7 +29,7 @@ import { z } from "zod";
  * When used, background tasks will automatically use the parent task's model
  *
  * 使用時機：
- * - opencode-arise.json 中 agents.<agent>.model 設為 AUTO_MODEL
+ * - opencode-legion.json 中 agents.<agent>.model 設為 AUTO_MODEL
  * - 呼叫 arise_summon 工具時 model 參數設為 AUTO_MODEL
  * - shadows.ts 中 Shadow 預設模型設為 AUTO_MODEL
  */
@@ -57,25 +57,25 @@ export const DEFAULT_MODEL = 'opencode/big-pickle' as const;
  * Arise 訊息前綴常數
  * Arise message prefix constant
  */
-export const ARISE_PREFIX = "[opencode-arise]" as const;
+export const ARISE_PREFIX = "[opencode-legion]" as const;
 
 /**
  * OpenCode 插件名稱
  * OpenCode plugin name
  */
-export const PLUGIN_NAME = "@bluelovers/opencode-arise" as const;
+export const PLUGIN_NAME = "@RukiV/opencode-legion" as const;
 
 /**
  * 舊版 OpenCode 插件名稱（向後相容）
  * Legacy OpenCode plugin name (backward compatibility)
  */
-export const LEGACY_PLUGIN_NAME = "opencode-arise" as const;
+export const LEGACY_PLUGIN_NAME = "opencode-legion" as const;
 
 /**
  * Arise 配置檔案名稱
  * Arise config file name
  */
-export const CONFIG_FILENAME = "opencode-arise.json";
+export const CONFIG_FILENAME = "opencode-legion.json";
 
 /**
  * 輪詢間隔預設值（毫秒）

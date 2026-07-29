@@ -41,10 +41,10 @@ export interface IShadowDescription
  * Shadow Agents descriptions map
  */
 export const SHADOW_DESCRIPTIONS = {
-	[EnumShadowSubAgentsName.Beru]: {
-		name: EnumShadowSubAgentsName.Beru,
-		displayName: "Beru",
-		title: "Ant King Scout",
+	[EnumShadowSubAgentsName.Nightmare]: {
+		name: EnumShadowSubAgentsName.Nightmare,
+		displayName: "Nightmare",
+		title: "Shadow Scout",
 		emoji: "🐜",
 		role: "Fastest scout",
 		capabilities: "Codebase exploration, grep, file discovery",
@@ -58,10 +58,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: true,
 	},
 
-	[EnumShadowSubAgentsName.Igris]: {
-		name: EnumShadowSubAgentsName.Igris,
-		displayName: "Igris (伊格利特)",
-		title: "Loyal Knight",
+	[EnumShadowSubAgentsName.Saint]: {
+		name: EnumShadowSubAgentsName.Saint,
+		displayName: "Saint",
+		title: "Saint of the Legion",
 		emoji: "⚔️",
 		role: "Precise implementer + Style enforcer",
 		capabilities: "Code changes, running commands, test verification, naming/convention enforcement",
@@ -91,10 +91,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: false,
 	},
 
-	[EnumShadowSubAgentsName.Bellion]: {
-		name: EnumShadowSubAgentsName.Bellion,
-		displayName: "Bellion (貝利昂)",
-		title: "Grand Marshal",
+	[EnumShadowSubAgentsName.Cassie]: {
+		name: EnumShadowSubAgentsName.Cassie,
+		displayName: "Cassie",
+		title: "Master Strategist",
 		emoji: "🎖️",
 		role: "Master strategist",
 		capabilities: "Strategic planning, architecture analysis, complex problem decomposition",
@@ -108,10 +108,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: true,
 	},
 
-	[EnumShadowSubAgentsName.Tusk]: {
-		name: EnumShadowSubAgentsName.Tusk,
-		displayName: "Tusk (塔斯克)",
-		title: "Creative Shadow",
+	[EnumShadowSubAgentsName.Fiend]: {
+		name: EnumShadowSubAgentsName.Fiend,
+		displayName: "Fiend",
+		title: "UI Artificer",
 		emoji: "🎨",
 		role: "UI/UX specialist",
 		capabilities: "Styling, components, animations",
@@ -125,10 +125,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: false,
 	},
 
-	[EnumShadowSubAgentsName.Tank]: {
-		name: EnumShadowSubAgentsName.Tank,
-		displayName: "Tank",
-		title: "Research Shadow",
+	[EnumShadowSubAgentsName.Slayer]: {
+		name: EnumShadowSubAgentsName.Slayer,
+		displayName: "Slayer",
+		title: "Knowledge Seeker",
 		emoji: "🛡️",
 		role: "External knowledge gatherer",
 		capabilities: "Web search, documentation lookup, examples, best practices research",
@@ -142,10 +142,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: true,
 	},
 
-	[EnumShadowSubAgentsName.ShadowSovereign]: {
-		name: EnumShadowSubAgentsName.ShadowSovereign,
-		displayName: "Shadow Sovereign (闇影君主)",
-		title: "Full Power",
+	[EnumShadowSubAgentsName.Weaver]: {
+		name: EnumShadowSubAgentsName.Weaver,
+		displayName: "Weaver",
+		title: "Fateweaver",
 		emoji: "👁️",
 		role: "Deep reasoning + Skeptical reviewer",
 		capabilities: "Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery",
@@ -172,10 +172,10 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: false,
 	},
 
-	[EnumShadowSubAgentsName.EsilRadiru]: {
-		name: EnumShadowSubAgentsName.EsilRadiru,
-		displayName: "Esil Radiru (艾希．拉迪勒)",
-		title: "Demon Noble Lady",
+	[EnumShadowSubAgentsName.Effie]: {
+		name: EnumShadowSubAgentsName.Effie,
+		displayName: "Effie",
+		title: "Heartwarden",
 		emoji: "🔥",
 		role: "Chat companion",
 		capabilities: "Emotional understanding, thoughtful exchange",

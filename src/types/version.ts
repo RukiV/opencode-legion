@@ -37,4 +37,4 @@ export const PLUGIN_VERSION_STRING = "v0.1.40" as const;
  *
  * @type {string}
  */
-export const PLUGIN_VERSION_HOMEPAGE = "https://github.com/bluelovers/opencode-arise#readme" as const;
+export const PLUGIN_VERSION_HOMEPAGE = "https://github.com/RukiV/opencode-legion#readme" as const;

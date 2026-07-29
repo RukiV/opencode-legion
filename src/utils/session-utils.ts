@@ -184,7 +184,7 @@ export function findMessageById(
  * ```typescript
  * const lastUser = findLastUserMessage(messages);
  * const config = extractResumeConfig(lastUser, sessionId);
- * // { sessionID: "abc123", agent: "monarch", model: "gpt-4" }
+ * // { sessionID: "abc123", agent: "sunless", model: "gpt-4" }
  * ```
  */
 export function extractResumeConfig(

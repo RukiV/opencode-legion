@@ -66,11 +66,11 @@ export function getOpencodeConfigDir(): string
  * 取得 Arise 配置目錄路徑
  * Get Arise config directory path
  *
- * @returns 配置目錄路徑 ~/.config/opencode-arise
+ * @returns 配置目錄路徑 ~/.config/opencode-legion
  */
 export function getHomeConfigDirArise(): string
 {
-	return resolve(_getHomeConfigDir(), "opencode-arise");
+	return resolve(_getHomeConfigDir(), "opencode-legion");
 }
 
 /**

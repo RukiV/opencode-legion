@@ -4,8 +4,8 @@
  * OpenCode Arise CLI 工具
  * OpenCode Arise CLI tool
  *
- * 提供命令行介面用於安裝和維護 opencode-arise 插件
- * Provides command line interface for installing and maintaining opencode-arise plugin
+ * 提供命令行介面用於安裝和維護 opencode-legion 插件
+ * Provides command line interface for installing and maintaining opencode-legion plugin
  */
 
 import { existsSync, readFileSync } from "fs-extra";
@@ -46,7 +46,7 @@ function createDefaultAriseConfigHandler(): void
 	}
 	else
 	{
-		console.log(`✓ opencode-arise.json already exists at ${configPath}`);
+		console.log(`✓ opencode-legion.json already exists at ${configPath}`);
 	}
 }
 
@@ -69,7 +69,7 @@ function createDefaultAriseConfigHandler(): void
 function install(): void
 {
 	console.yellow.log(getBanner());
-	console.log("\n🌑 Installing opencode-arise...\n");
+	console.log("\n🌑 Installing opencode-legion...\n");
 
 	const configPath = findOpencodeConfig();
 	if (!configPath)
@@ -154,7 +154,7 @@ function install(): void
  */
 function doctor(): void
 {
-	console.log("🔍 Checking opencode-arise installation...\n");
+	console.log("🔍 Checking opencode-legion installation...\n");
 
 	const configPath = findOpencodeConfig();
 	if (!configPath)
@@ -192,7 +192,7 @@ function doctor(): void
 		else
 		{
 			console.log(`✗ ${PLUGIN_NAME} is NOT registered`);
-			console.log(`  Run: bunx opencode-arise install`);
+			console.log(`  Run: bunx opencode-legion install`);
 		}
 
 		/** 顯示舊版插件警告 / Show legacy plugin warning */
@@ -210,11 +210,11 @@ function doctor(): void
 	const ariseConfigPath = getAriseConfigPath();
 	if (existsSync(ariseConfigPath))
 	{
-		console.log(`✓ opencode-arise.json exists: ${ariseConfigPath}`);
+		console.log(`✓ opencode-legion.json exists: ${ariseConfigPath}`);
 	}
 	else
 	{
-		console.log(`○ opencode-arise.json not found (optional): ${ariseConfigPath}`);
+		console.log(`○ opencode-legion.json not found (optional): ${ariseConfigPath}`);
 	}
 
 	console.log("\n✅ Doctor check complete");
@@ -238,7 +238,7 @@ function doctor(): void
  */
 function validateConfig(): void
 {
-	console.log("🔍 Validating opencode-arise configuration...\n");
+	console.log("🔍 Validating opencode-legion configuration...\n");
 
 	const paths = getAriseConfigPaths();
 	let hasConfig = false;
@@ -301,7 +301,7 @@ function validateConfig(): void
 	{
 		console.log(`○ No configuration file found (optional)`);
 		console.log(`  Default configuration will be used.`);
-		console.log(`  Run 'bunx opencode-arise install' to create a default config.`);
+		console.log(`  Run 'bunx opencode-legion install' to create a default config.`);
 	}
 
 	console.log("\n" + (hasErrors ? "❌ Validation failed" : "✅ Validation complete"));
@@ -314,7 +314,7 @@ function validateConfig(): void
  */
 function showVersion(): void
 {
-	console.log(`opencode-arise@${PLUGIN_VERSION}`);
+	console.log(`opencode-legion@${PLUGIN_VERSION}`);
 }
 
 /**
@@ -325,7 +325,7 @@ function showHelp(): void
 {
 	console.yellow.log(getBanner());
 	console.log(`
-Usage: opencode-arise <command>
+Usage: opencode-legion <command>
 
 Commands:
   install   Register plugin with OpenCode and create default config
@@ -335,8 +335,8 @@ Commands:
   help      Show this help message
 
 Examples:
-  bunx opencode-arise install
-  npx opencode-arise install
+  bunx opencode-legion install
+  npx opencode-legion install
 `);
 }
 

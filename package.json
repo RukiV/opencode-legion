@@ -1,29 +1,30 @@
 {
-  "name": "@bluelovers/opencode-arise",
+  "name": "@RukiV/opencode-legion",
   "version": "0.1.40",
   "private": false,
-  "description": "Solo Leveling themed orchestrator harness for OpenCode - Arise, Shadow Army!",
+  "description": "Shadow Slave themed orchestrator harness for OpenCode - Legion, rise!",
   "keywords": [
     "opencode",
     "plugin",
     "ai",
     "agent",
     "orchestrator",
-    "solo-leveling",
-    "arise"
+    "shadow-slave",
+    "legion"
   ],
-  "homepage": "https://github.com/bluelovers/opencode-arise#readme",
+  "homepage": "https://github.com/RukiV/opencode-legion#readme",
   "bugs": {
-    "url": "https://github.com/bluelovers/opencode-arise/issues"
+    "url": "https://github.com/RukiV/opencode-legion/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bluelovers/opencode-arise.git"
+    "url": "git+https://github.com/RukiV/opencode-legion.git"
   },
   "license": "MIT",
   "author": "moinulmoin",
   "contributors": [
-    "bluelovers"
+    "bluelovers",
+    "RukiV"
   ],
   "type": "module",
   "exports": {
@@ -35,10 +36,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "opencode-arise": "dist/cli/index.js"
+    "opencode-legion": "dist/cli/index.js"
   },
   "files": [
-    "opencode-arise.schema.json",
+    "opencode-legion.schema.json",
     "dist",
     "assets/arise-banner.txt"
   ],

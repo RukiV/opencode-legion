@@ -137,7 +137,7 @@ export const HISTORY_THRESHOLD_MS = 30 * 60 * 1000;
  * 取得緩存檔案完整路徑
  * Get cache file full path
  *
- * @returns 緩存檔案路徑 ~/.config/opencode-arise/providers-cache.json
+ * @returns 緩存檔案路徑 ~/.config/opencode-legion/providers-cache.json
  */
 function getProvidersCacheFilePath(): string
 {
@@ -148,7 +148,7 @@ function getProvidersCacheFilePath(): string
  * 取得歷史紀錄檔案完整路徑
  * Get history file full path
  *
- * @returns 歷史紀錄檔案路徑 ~/.config/opencode-arise/providers-history.json
+ * @returns 歷史紀錄檔案路徑 ~/.config/opencode-legion/providers-history.json
  */
 function getProvidersHistoryFilePath(): string
 {
@@ -526,8 +526,8 @@ export function generateProviderCacheReport(stats: IHistoryUpdateStats, timestam
 		`     🔴 Removed / 移除: ${stats.removedModels} models`,
 		`     🟡 Changed / 變動: ${stats.changedModels} models`,
 		"",
-		`  💾 Cache saved to: ~/.config/opencode-arise/${PROVIDERS_CACHE_FILENAME}`,
-		`  📜 History saved to: ~/.config/opencode-arise/${PROVIDERS_HISTORY_FILENAME}`,
+		`  💾 Cache saved to: ~/.config/opencode-legion/${PROVIDERS_CACHE_FILENAME}`,
+		`  📜 History saved to: ~/.config/opencode-legion/${PROVIDERS_HISTORY_FILENAME}`,
 		timestampStr,
 		"=".repeat(50),
 	];

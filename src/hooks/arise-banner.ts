@@ -110,7 +110,7 @@ export function createAriseBannerHook(ctx: PluginInput)
 				bannerShownThisProcess = true;
 				await showToastOpenCode(ctx, () => ({
 					body: {
-						title: "opencode-arise",
+						title: "opencode-legion",
 						message: TOAST_MESSAGE,
 						variant: "info",
 						duration: 4000,

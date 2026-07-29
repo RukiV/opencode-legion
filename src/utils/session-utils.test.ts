@@ -40,7 +40,7 @@ describe("Session Utils", () =>
 			role,
 			sessionID: "session-123",
 			parentID: "parent-456",
-			agent: EnumShadowAgentsName.ShadowMonarch,
+			agent: EnumShadowAgentsName.Sunless,
 			model: "gpt-4",
 			tools: ["tool1", "tool2"],
 		},
@@ -154,7 +154,7 @@ describe("Session Utils", () =>
 
 			expect(result).toMatchObject({
 				sessionID: "session-abc",
-				agent: EnumShadowAgentsName.ShadowMonarch,
+				agent: EnumShadowAgentsName.Sunless,
 				model: "gpt-4",
 				tools: ["tool1", "tool2"],
 			});

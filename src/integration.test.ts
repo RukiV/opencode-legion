@@ -102,7 +102,7 @@ describe("Plugin Integration", () =>
 		const mockConfig: Record<string, unknown> = {};
 		await hooks.config!(mockConfig);
 
-		expect(mockConfig.default_agent).toBe(EnumShadowAgentsName.ShadowMonarch);
+		expect(mockConfig.default_agent).toBe(EnumShadowAgentsName.Sunless);
 	});
 
 	it("config hook creates all shadow agents", async () =>
@@ -116,13 +116,13 @@ describe("Plugin Integration", () =>
 		const agents = mockConfig.agent as Record<string, unknown>;
 
 		// All shadows should be registered
-		expect(agents[EnumShadowAgentsName.ShadowMonarch]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.Beru]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.Igris]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.Bellion]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.Tusk]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.Tank]).toBeDefined();
-		expect(agents[EnumShadowSubAgentsName.ShadowSovereign]).toBeDefined();
+		expect(agents[EnumShadowAgentsName.Sunless]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Nightmare]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Saint]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Cassie]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Fiend]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Slayer]).toBeDefined();
+		expect(agents[EnumShadowSubAgentsName.Weaver]).toBeDefined();
 	});
 
 	it("config hook sets correct modes for agents", async () =>
@@ -136,12 +136,12 @@ describe("Plugin Integration", () =>
 		const agents = mockConfig.agent as Record<string, any>;
 
 		// Monarch is primary
-		expect(agents[EnumShadowAgentsName.ShadowMonarch].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
+		expect(agents[EnumShadowAgentsName.Sunless].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
 
 		// Others are subagents
-		expect(agents[EnumShadowSubAgentsName.Beru].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
-		expect(agents[EnumShadowSubAgentsName.Igris].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
-		expect(agents[EnumShadowSubAgentsName.Bellion].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+		expect(agents[EnumShadowSubAgentsName.Nightmare].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+		expect(agents[EnumShadowSubAgentsName.Saint].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
+		expect(agents[EnumShadowSubAgentsName.Cassie].mode).toBe(EnumOpencodeAgentMode.SUBAGENT);
 	});
 
 	it("compaction hook injects context", async () =>
@@ -177,7 +177,7 @@ describe("Error Handling", () =>
 	it("plugin handles missing config gracefully", async () =>
 	{
 		const ctx = createMockCtx();
-		// Plugin should work even without opencode-arise.json
+		// Plugin should work even without opencode-legion.json
 		const hooks = await OpencodeArise(ctx as any);
 
 		expect(hooks).toBeDefined();

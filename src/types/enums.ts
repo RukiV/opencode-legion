@@ -1,21 +1,21 @@
 import type { ITSTypeAndStringLiteral } from 'ts-type';
 
 /**
- * Shadow Monarch 名稱列舉
+ * Sunless (Monarch) 名稱列舉
  * 用於識別主要協調者
  *
- * Shadow Monarch name enum
+ * Sunless (Monarch) name enum
  * Used to identify the primary orchestrator
  */
 export const enum EnumShadowAgentsName
 {
 	/**
-	 * 👑 Shadow Monarch
+	 * 👑 Sunless
 	 *
 	 * 負責任務協調與分配
 	 * Orchestration, delegation decisions
 	 */
-	ShadowMonarch = 'monarch',
+	Sunless = 'sunless',
 }
 
 /**
@@ -28,65 +28,63 @@ export const enum EnumShadowAgentsName
 export const enum EnumShadowSubAgentsName
 {
 	/**
-	 * 🐜 Ant King Scout
+	 * 🐜 Nightmare
 	 *
 	 * 快速的程式碼探索
 	 * Fast codebase exploration, grep, file discovery
 	 */
-	Beru = "beru",
+	Nightmare = "nightmare",
 
 	/**
-	 * ⚔️ Loyal Knight
+	 * ⚔️ Saint
 	 *
 	 * 精確的程式碼實作
 	 * Precise implementation, code changes
 	 */
-	Igris = "igris",
+	Saint = "saint",
 
 	/**
-	 * 🎖️ Grand Marshal
+	 * 🎖️ Cassie
 	 *
 	 * 策略規劃與架構分析
 	 * Strategic planning, architecture analysis
 	 */
-	Bellion = "bellion",
+	Cassie = "cassie",
 
 	/**
-	 * 🎨 Creative Shadow
+	 * 🎨 Fiend
 	 *
 	 * UI/UX與前端
 	 * UI/UX, frontend, styling
 	 */
-	Tusk = "tusk",
+	Fiend = "fiend",
 
 	/**
-	 * 🛡️ Research Shadow
+	 * 🛡️ Slayer
 	 *
 	 * 外部文檔與網路搜尋
 	 * External docs, web search, examples
 	 */
-	Tank = "tank",
+	Slayer = "slayer",
 
 	/**
-	 * 👁️ Full Power
+	 * 👁️ Weaver
 	 *
 	 * 深度推理與複雜Debug
 	 * Deep reasoning, complex debugging
 	 */
-	ShadowSovereign = "shadow-sovereign",
+	Weaver = "weaver",
 
 	/**
-	 * 🔥 Esil Radiru
+	 * 🔥 Effie
 	 *
-	 * 惡魔貴族少女，聊天模式顧問
-	 * Demon noble lady, chat mode companion
+	 * 聊天模式顧問
+	 * Chat companion
 	 *
-	 * 渴望理解人類情感，特別是「思念」與「愛」
 	 * 善於傾聽、對話、情感交流
-	 * Longing for understanding human emotions, especially "longing" and "love"
 	 * Good at listening, conversation, emotional exchange
 	 */
-	EsilRadiru = "esil-radiru",
+	Effie = "effie",
 }
 
 /**
@@ -94,19 +92,19 @@ export const enum EnumShadowSubAgentsName
  * Shadow agents array - using enum values
  */
 export const ALLOWED_SHADOWS = [
-	EnumShadowSubAgentsName.Beru,
-	EnumShadowSubAgentsName.Igris,
-	EnumShadowSubAgentsName.Bellion,
-	EnumShadowSubAgentsName.Tusk,
-	EnumShadowSubAgentsName.Tank,
-	EnumShadowSubAgentsName.ShadowSovereign,
-	EnumShadowSubAgentsName.EsilRadiru,
+	EnumShadowSubAgentsName.Nightmare,
+	EnumShadowSubAgentsName.Saint,
+	EnumShadowSubAgentsName.Cassie,
+	EnumShadowSubAgentsName.Fiend,
+	EnumShadowSubAgentsName.Slayer,
+	EnumShadowSubAgentsName.Weaver,
+	EnumShadowSubAgentsName.Effie,
 ] as const satisfies readonly EnumShadowSubAgentsName[];
 
 export const BACKGROUND_SHADOWS = [
-	EnumShadowSubAgentsName.Beru,
-	EnumShadowSubAgentsName.Tank,
-	EnumShadowSubAgentsName.Bellion,
+	EnumShadowSubAgentsName.Nightmare,
+	EnumShadowSubAgentsName.Slayer,
+	EnumShadowSubAgentsName.Cassie,
 ] as const satisfies readonly EnumShadowSubAgentsName[];
 
 export type IBackgroundShadowAgentsName = typeof BACKGROUND_SHADOWS[number];
@@ -114,7 +112,7 @@ export type IBackgroundShadowAgentsName = typeof BACKGROUND_SHADOWS[number];
 export type IAllShadowAgentsName = EnumShadowAgentsName | EnumShadowSubAgentsName;
 
 export const ALL_SHADOW_AGENTS_NAME = [
-	EnumShadowAgentsName.ShadowMonarch as const,
+	EnumShadowAgentsName.Sunless as const,
 	...ALLOWED_SHADOWS,
 ] as const satisfies IAllShadowAgentsName[];
 

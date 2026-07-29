@@ -119,7 +119,7 @@ describe("getShortDescription", () =>
 	 */
 	it("short description contains emoji and capabilities", () =>
 	{
-		const result = getShortDescription(EnumShadowSubAgentsName.Beru);
+		const result = getShortDescription(EnumShadowSubAgentsName.Nightmare);
 		expect(result).toMatch(/[\p{Emoji}]/u);
 		expect(result).toContain("scout");
 		expect(result).toContain("exploration");
@@ -152,7 +152,7 @@ describe("getFullDescription", () =>
 	 */
 	it("full description contains necessary blocks", () =>
 	{
-		const result = getFullDescription(EnumShadowSubAgentsName.Beru);
+		const result = getFullDescription(EnumShadowSubAgentsName.Nightmare);
 
 		expect(result).toContain("Role:");
 		expect(result).toContain("Capabilities:");
@@ -166,8 +166,8 @@ describe("getFullDescription", () =>
 	 */
 	it("full description contains all bestFor items", () =>
 	{
-		const desc = SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Beru];
-		const result = getFullDescription(EnumShadowSubAgentsName.Beru);
+		const desc = SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Nightmare];
+		const result = getFullDescription(EnumShadowSubAgentsName.Nightmare);
 
 		for (const item of desc.bestFor)
 		{
@@ -255,7 +255,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests beru for search tasks", () =>
 	{
 		const result = suggestShadowAgent("find files");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.Beru);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Nightmare);
 	});
 
 	/**
@@ -265,7 +265,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests igris for implementation tasks", () =>
 	{
 		const result = suggestShadowAgent("implement this feature");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.Igris);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Saint);
 	});
 
 	/**
@@ -275,7 +275,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests tusk for UI tasks", () =>
 	{
 		const result = suggestShadowAgent("build this UI component");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.Tusk);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Fiend);
 	});
 
 	/**
@@ -285,7 +285,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests tank for research tasks", () =>
 	{
 		const result = suggestShadowAgent("find documentation for this API");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.Tank);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Slayer);
 	});
 
 	/**
@@ -295,7 +295,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests bellion for planning tasks", () =>
 	{
 		const result = suggestShadowAgent("plan a migration strategy");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.Bellion);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Cassie);
 	});
 
 	/**
@@ -305,7 +305,7 @@ describe("suggestShadowAgent", () =>
 	it("suggests shadow-sovereign for debugging tasks", () =>
 	{
 		const result = suggestShadowAgent("debug this complex issue");
-		expect(result[0]).toBe(EnumShadowSubAgentsName.ShadowSovereign);
+		expect(result[0]).toBe(EnumShadowSubAgentsName.Weaver);
 	});
 
 	/**

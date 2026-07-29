@@ -886,10 +886,10 @@ exports[`resolveModelContext 使用 Shadow 預設模型 1`] = `
   "name": "使用 Shadow 預設模型",
   "parentModel": "anthropic/claude-3",
   "result": {
-    "modelID": "claude-haiku-4-5",
-    "providerID": "anthropic",
+    "modelID": "big-pickle",
+    "providerID": "opencode",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": undefined,
 }
 `;
@@ -898,7 +898,7 @@ exports[`resolveModelContext config 模型優先 1`] = `
 {
   "config": {
     "agents": {
-      "beru": {
+      "nightmare": {
         "model": "config/model",
       },
     },
@@ -909,7 +909,7 @@ exports[`resolveModelContext config 模型優先 1`] = `
     "modelID": "model",
     "providerID": "config",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": undefined,
 }
 `;
@@ -918,7 +918,7 @@ exports[`resolveModelContext config AUTO → parentModel 1`] = `
 {
   "config": {
     "agents": {
-      "beru": {
+      "nightmare": {
         "model": "AUTO",
       },
     },
@@ -929,7 +929,7 @@ exports[`resolveModelContext config AUTO → parentModel 1`] = `
     "modelID": "claude-3",
     "providerID": "anthropic",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": undefined,
 }
 `;
@@ -938,7 +938,7 @@ exports[`resolveModelContext userModel 優先 1`] = `
 {
   "config": {
     "agents": {
-      "beru": {
+      "nightmare": {
         "model": "config/model",
       },
     },
@@ -949,7 +949,7 @@ exports[`resolveModelContext userModel 優先 1`] = `
     "modelID": "model",
     "providerID": "user",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": "user/model",
 }
 `;
@@ -958,7 +958,7 @@ exports[`resolveModelContext userModel AUTO → parentModel 1`] = `
 {
   "config": {
     "agents": {
-      "beru": {
+      "nightmare": {
         "model": "config/model",
       },
     },
@@ -969,7 +969,7 @@ exports[`resolveModelContext userModel AUTO → parentModel 1`] = `
     "modelID": "claude-3",
     "providerID": "anthropic",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": "AUTO",
 }
 `;
@@ -980,10 +980,10 @@ exports[`resolveModelContext 無 config 無 userModel 1`] = `
   "name": "無 config 無 userModel",
   "parentModel": "anthropic/claude-3",
   "result": {
-    "modelID": "claude-haiku-4-5",
-    "providerID": "anthropic",
+    "modelID": "big-pickle",
+    "providerID": "opencode",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": undefined,
 }
 `;
@@ -1006,7 +1006,7 @@ exports[`resolveModelContext 多段 modelID 1`] = `
 {
   "config": {
     "agents": {
-      "beru": {
+      "nightmare": {
         "model": "azure/openai/gpt-4",
       },
     },
@@ -1017,7 +1017,7 @@ exports[`resolveModelContext 多段 modelID 1`] = `
     "modelID": "openai/gpt-4",
     "providerID": "azure",
   },
-  "shadow": "beru",
+  "shadow": "nightmare",
   "userModel": undefined,
 }
 `;

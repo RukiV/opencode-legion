@@ -2,8 +2,8 @@
  * 配置檔案讀寫操作
  * Configuration file I/O operations
  *
- * 集中管理 opencode-arise.json 與 opencode.json 的檔案讀寫邏輯
- * Centralized management of file read/write operations for opencode-arise.json and opencode.json
+ * 集中管理 opencode-legion.json 與 opencode.json 的檔案讀寫邏輯
+ * Centralized management of file read/write operations for opencode-legion.json and opencode.json
  */
 
 import { existsSync, readFileSync, writeFileSync } from "fs-extra";
@@ -116,8 +116,8 @@ export interface IPluginRegistrationResult
  * 其中 name 為正規化後的套件名稱（不包含版本）
  *
  * 例如：
- * - npaToDepsValue('@bluelovers/opencode-arise').name => '@bluelovers/opencode-arise'
- * - npaToDepsValue('opencode-arise').name => 'opencode-arise'
+ * - npaToDepsValue('@bluelovers/opencode-legion').name => '@bluelovers/opencode-legion'
+ * - npaToDepsValue('opencode-legion').name => 'opencode-legion'
  *
  * 這確保即使是攜帶版本號的插件名稱也能正確匹配
  * This ensures plugin names with version numbers can be matched correctly
@@ -501,8 +501,8 @@ function _readAndMergeConfigsSync(paths: string[]): JsonObject
  * Load Arise config using Bun.file() (async version)
  *
  * 依序搜尋以下路徑並深度合併：
- * 1. ~/.config/opencode/opencode-arise.json (全域)
- * 2. {worktree}/.opencode/opencode-arise.json (局部，優先)
+ * 1. ~/.config/opencode/opencode-legion.json (全域)
+ * 2. {worktree}/.opencode/opencode-legion.json (局部，優先)
  *
  * 使用路徑反轉確保局部設定優先於全域設定
  * Uses path reversal to ensure local settings take precedence over global settings

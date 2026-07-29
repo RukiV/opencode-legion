@@ -23,7 +23,7 @@ describe("AriseConfigSchema", () =>
 	test("validates config with disabled shadows", () =>
 	{
 		const config = {
-			disabled_shadows: [EnumShadowSubAgentsName.Beru, EnumShadowSubAgentsName.Tank],
+			disabled_shadows: [EnumShadowSubAgentsName.Nightmare, EnumShadowSubAgentsName.Slayer],
 		};
 		const result = AriseConfigSchema.safeParse(config);
 		expect(result.success).toBe(true);

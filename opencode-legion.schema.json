@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
-  "title": "Arise Config",
-  "description": "Arise 主配置結構 / Arise main configuration schema",
+  "title": "Legion Config",
+  "description": "Legion 主配置結構 / Legion main configuration schema",
   "additionalProperties": false,
   "properties": {
     "$schema": {
@@ -19,14 +19,14 @@
         "title": "Shadow Agent Name",
         "description": "Shadow Agent 名稱 / Shadow Agent name",
         "enum": [
-          "monarch",
-          "beru",
-          "igris",
-          "bellion",
-          "tusk",
-          "tank",
-          "shadow-sovereign",
-          "esil-radiru"
+          "sunless",
+          "nightmare",
+          "saint",
+          "cassie",
+          "fiend",
+          "slayer",
+          "weaver",
+          "effie"
         ]
       }
     },
@@ -226,28 +226,28 @@
         }
       },
       "required": [
-        "monarch",
-        "beru",
-        "igris",
-        "bellion",
-        "tusk",
-        "tank",
-        "shadow-sovereign",
-        "esil-radiru"
+        "sunless",
+        "nightmare",
+        "saint",
+        "cassie",
+        "fiend",
+        "slayer",
+        "weaver",
+        "effie"
       ],
       "propertyNames": {
         "type": "string",
         "title": "Shadow Agent Name",
         "description": "Shadow Agent 名稱 / Shadow Agent name",
         "enum": [
-          "monarch",
-          "beru",
-          "igris",
-          "bellion",
-          "tusk",
-          "tank",
-          "shadow-sovereign",
-          "esil-radiru"
+          "sunless",
+          "nightmare",
+          "saint",
+          "cassie",
+          "fiend",
+          "slayer",
+          "weaver",
+          "effie"
         ]
       }
     },

@@ -33,7 +33,7 @@ describe("CONFIG_FILENAME", () =>
 {
 	test("is opencode-arise.json", () =>
 	{
-		expect(CONFIG_FILENAME).toBe("opencode-arise.json");
+		expect(CONFIG_FILENAME).toBe("opencode-legion.json");
 	});
 });
 

@@ -103,12 +103,12 @@ describe("getPollInterval", () =>
 				retry_delay_max: 30000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Beru]: {
+				[EnumShadowSubAgentsName.Nightmare]: {
 					poll_interval: 1000,
 				},
 			},
 		} as IAriseConfig;
-		const result = getPollInterval(config, EnumShadowSubAgentsName.Beru);
+		const result = getPollInterval(config, EnumShadowSubAgentsName.Nightmare);
 		expect(result).toBe(1000);
 	});
 
@@ -122,12 +122,12 @@ describe("getPollInterval", () =>
 				retry_delay_max: 30000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Igris]: {
+				[EnumShadowSubAgentsName.Saint]: {
 					poll_interval: 1000,
 				},
 			},
 		} as IAriseConfig;
-		const result = getPollInterval(config, EnumShadowSubAgentsName.Beru);
+		const result = getPollInterval(config, EnumShadowSubAgentsName.Nightmare);
 		expect(result).toBe(5000);
 	});
 });
@@ -167,12 +167,12 @@ describe("getRetryDelayIncrement", () =>
 				retry_delay_max: 60000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Tank]: {
+				[EnumShadowSubAgentsName.Slayer]: {
 					retry_delay_increment: 2000,
 				},
 			},
 		} as IAriseConfig;
-		const result = getRetryDelayIncrement(config, EnumShadowSubAgentsName.Tank);
+		const result = getRetryDelayIncrement(config, EnumShadowSubAgentsName.Slayer);
 		expect(result).toBe(2000);
 	});
 });
@@ -212,12 +212,12 @@ describe("getRetryDelayMax", () =>
 				retry_delay_max: 120000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Bellion]: {
+				[EnumShadowSubAgentsName.Cassie]: {
 					retry_delay_max: 30000,
 				},
 			},
 		} as IAriseConfig;
-		const result = getRetryDelayMax(config, EnumShadowSubAgentsName.Bellion);
+		const result = getRetryDelayMax(config, EnumShadowSubAgentsName.Cassie);
 		expect(result).toBe(30000);
 	});
 });
@@ -240,15 +240,15 @@ describe("Priority order", () =>
 				retry_delay_max: 30000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Tusk]: {
+				[EnumShadowSubAgentsName.Fiend]: {
 					poll_interval: 500,
 				},
 			},
 		} as IAriseConfig;
 		/** Tusk 有 agent 設定，使用該設定 / Tusk has agent setting, use that */
-		expect(getPollInterval(config, EnumShadowSubAgentsName.Tusk)).toBe(500);
+		expect(getPollInterval(config, EnumShadowSubAgentsName.Fiend)).toBe(500);
 		/** Beru 沒有 agent 設定，回退至 background / Beru has no agent setting, fall back to background */
-		expect(getPollInterval(config, EnumShadowSubAgentsName.Beru)).toBe(5000);
+		expect(getPollInterval(config, EnumShadowSubAgentsName.Nightmare)).toBe(5000);
 		/** 空配置使用預設值 / Empty config uses default */
 		expect(getPollInterval({})).toBe(DEFAULT_POLL_INTERVAL);
 	});
@@ -262,13 +262,13 @@ describe("Priority order", () =>
 				retry_delay_max: 60000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.ShadowSovereign]: {
+				[EnumShadowSubAgentsName.Weaver]: {
 					retry_delay_increment: 3000,
 				},
 			},
 		} as IAriseConfig;
-		expect(getRetryDelayIncrement(config, EnumShadowSubAgentsName.ShadowSovereign)).toBe(3000);
-		expect(getRetryDelayIncrement(config, EnumShadowSubAgentsName.Beru)).toBe(10000);
+		expect(getRetryDelayIncrement(config, EnumShadowSubAgentsName.Weaver)).toBe(3000);
+		expect(getRetryDelayIncrement(config, EnumShadowSubAgentsName.Nightmare)).toBe(10000);
 		expect(getRetryDelayIncrement({})).toBe(DEFAULT_RETRY_DELAY_INCREMENT);
 	});
 
@@ -281,13 +281,13 @@ describe("Priority order", () =>
 				retry_delay_max: 120000,
 			},
 			agents: {
-				[EnumShadowSubAgentsName.Igris]: {
+				[EnumShadowSubAgentsName.Saint]: {
 					retry_delay_max: 15000,
 				},
 			},
 		} as IAriseConfig;
-		expect(getRetryDelayMax(config, EnumShadowSubAgentsName.Igris)).toBe(15000);
-		expect(getRetryDelayMax(config, EnumShadowSubAgentsName.Tank)).toBe(120000);
+		expect(getRetryDelayMax(config, EnumShadowSubAgentsName.Saint)).toBe(15000);
+		expect(getRetryDelayMax(config, EnumShadowSubAgentsName.Slayer)).toBe(120000);
 		expect(getRetryDelayMax({})).toBe(DEFAULT_RETRY_DELAY_MAX);
 	});
 });

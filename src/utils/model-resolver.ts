@@ -63,7 +63,7 @@ export function formatModelBodyDescription(modelBody: IModelBody): string
  * @returns 配置中指定的模型字串，若無則回傳 undefined / Model string from config, or undefined
  *
  * @example
- * getModelFromConfig(config, EnumShadowSubAgentsName.Beru);
+ * getModelFromConfig(config, EnumShadowSubAgentsName.Nightmare);
  * // Returns: "anthropic/claude-sonnet-4" 或 undefined
  */
 export function getModelFromConfig(
@@ -560,7 +560,7 @@ export function parseModelBody(
  * // 完整解析：用戶指定模型
  * resolveModelContext(
  *   "anthropic/claude-sonnet-4",  // parentModel
- *   EnumShadowSubAgentsName.Beru, // shadow
+ *   EnumShadowSubAgentsName.Nightmare, // shadow
  *   config,                       // config
  *   "openai/gpt-4o"              // userModel (最高優先級)
  * );
@@ -569,7 +569,7 @@ export function parseModelBody(
  * // AUTO 模型：沿用父會話模型
  * resolveModelContext(
  *   "anthropic/claude-sonnet-4",  // parentModel
- *   EnumShadowSubAgentsName.Beru,
+ *   EnumShadowSubAgentsName.Nightmare,
  *   config,
  *   "AUTO"                        // userModel = AUTO → 使用 parentModel
  * );
@@ -776,7 +776,7 @@ export function _resolveAutoModelCore(model?: string, parentModel?: string, defa
  *    │          （不檢查 configModel，AUTO 表示「沿用父會話模型」）
  *    └─ undefined/空值 → 往下檢查
  *    ▼
- * 2. configModel（opencode-arise.json 中 agents.<agent>.model）
+ * 2. configModel（opencode-legion.json 中 agents.<agent>.model）
  *    │
  *    ├─ 有效模型 → 直接回傳
  *    ├─ AUTO → 回退到 parentModel → defaultModel

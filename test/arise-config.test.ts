@@ -37,7 +37,7 @@ describe("Shadow Agents Configuration", () =>
 	it("ALLOWED_SHADOWS matches SHADOW_AGENTS keys", () =>
 	{
 		const agentKeys = Object.keys(SHADOW_AGENTS).filter(
-			(key) => key !== EnumShadowAgentsName.ShadowMonarch,
+			(key) => key !== EnumShadowAgentsName.Sunless,
 		) as EnumShadowSubAgentsName[];
 
 		expect(agentKeys.length).toBe(ALLOWED_SHADOWS.length);
@@ -66,7 +66,7 @@ describe("Shadow Agents Configuration", () =>
 	 */
 	it("ALL_SHADOW_AGENTS_NAME includes all agents", () =>
 	{
-		expect(ALL_SHADOW_AGENTS_NAME).toContain(EnumShadowAgentsName.ShadowMonarch);
+		expect(ALL_SHADOW_AGENTS_NAME).toContain(EnumShadowAgentsName.Sunless);
 		expect((ALL_SHADOW_AGENTS_NAME.length as number)).toBe((ALLOWED_SHADOWS.length as number) + 1);
 	});
 
@@ -209,7 +209,7 @@ describe("Tool Description Functions", () =>
 	it("getShortDescription matches tool-names SHADOW_SHORT_DESCRIPTIONS", () =>
 	{
 		// 這個測試驗證兩邊的描述格式保持一致
-		const shortDesc = getShortDescription(EnumShadowSubAgentsName.Beru);
+		const shortDesc = getShortDescription(EnumShadowSubAgentsName.Nightmare);
 		expect(shortDesc).toContain("Fastest scout");
 		expect(shortDesc).toContain("Codebase exploration");
 	});

@@ -1,76 +1,76 @@
 // Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`getMonarchShadowList generates correctly formatted list 1`] = `
-"- @beru - Fastest scout. Codebase exploration, grep, file discovery (supports background)
-- @igris - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement
-- @bellion - Master strategist. Strategic planning, architecture analysis, complex problem decomposition (supports background)
-- @tusk - UI/UX specialist. Styling, components, animations
-- @tank - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
-- @shadow-sovereign - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
-- @esil-radiru - Chat companion. Emotional understanding, thoughtful exchange"
+"- @nightmare - Fastest scout. Codebase exploration, grep, file discovery (supports background)
+- @saint - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement
+- @cassie - Master strategist. Strategic planning, architecture analysis, complex problem decomposition (supports background)
+- @fiend - UI/UX specialist. Styling, components, animations
+- @slayer - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
+- @weaver - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
+- @effie - Chat companion. Emotional understanding, thoughtful exchange"
 `;
 
 exports[`suggestShadowAgent snapshot test complex query 1`] = `
 [
-  "tusk",
-  "beru",
-  "igris",
+  "fiend",
+  "nightmare",
+  "saint",
 ]
 `;
 
 exports[`getShadowAgentsMarkdownTable generates correct Markdown table 1`] = `
 "| Shadow Agent | Role | Best For |
 | --- | --- | --- |
-| 🐜 **beru** | Fastest scout | Finding files by name or pattern, Searching code for patterns or functions |
-| ⚔️ **igris** | Precise implementer + Style enforcer | Implementing code changes, Editing files with precision |
-| 🎖️ **bellion** | Master strategist | Planning complex refactoring, Architecture design decisions |
-| 🎨 **tusk** | UI/UX specialist | Building UI components, Styling and layouts |
-| 🛡️ **tank** | External knowledge gatherer | Finding external documentation, Researching best practices |
-| 👁️ **shadow-sovereign** | Deep reasoning + Skeptical reviewer | Complex architectural decisions, Skeptical review after implementation |
-| 🔥 **esil-radiru** | Chat companion | Casual conversation and chat, Understanding user intent and feelings |"
+| 🐜 **nightmare** | Fastest scout | Finding files by name or pattern, Searching code for patterns or functions |
+| ⚔️ **saint** | Precise implementer + Style enforcer | Implementing code changes, Editing files with precision |
+| 🎖️ **cassie** | Master strategist | Planning complex refactoring, Architecture design decisions |
+| 🎨 **fiend** | UI/UX specialist | Building UI components, Styling and layouts |
+| 🛡️ **slayer** | External knowledge gatherer | Finding external documentation, Researching best practices |
+| 👁️ **weaver** | Deep reasoning + Skeptical reviewer | Complex architectural decisions, Skeptical review after implementation |
+| 🔥 **effie** | Chat companion | Casual conversation and chat, Understanding user intent and feelings |"
 `;
 
 exports[`getAllShadowNames snapshot test 1`] = `
 [
-  "beru",
-  "igris",
-  "bellion",
-  "tusk",
-  "tank",
-  "shadow-sovereign",
-  "esil-radiru",
+  "nightmare",
+  "saint",
+  "cassie",
+  "fiend",
+  "slayer",
+  "weaver",
+  "effie",
 ]
 `;
 
 exports[`Snapshot tests for description outputs getShortDescription outputs are stable 1`] = `
 [
   {
-    "description": "🐜 Ant King Scout - Fastest scout. Codebase exploration, grep, file discovery",
-    "name": "beru",
+    "description": "🐜 Shadow Scout - Fastest scout. Codebase exploration, grep, file discovery",
+    "name": "nightmare",
   },
   {
-    "description": "⚔️ Loyal Knight - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement",
-    "name": "igris",
+    "description": "⚔️ Saint of the Legion - Precise implementer + Style enforcer. Code changes, running commands, test verification, naming/convention enforcement",
+    "name": "saint",
   },
   {
-    "description": "🎖️ Grand Marshal - Master strategist. Strategic planning, architecture analysis, complex problem decomposition",
-    "name": "bellion",
+    "description": "🎖️ Master Strategist - Master strategist. Strategic planning, architecture analysis, complex problem decomposition",
+    "name": "cassie",
   },
   {
-    "description": "🎨 Creative Shadow - UI/UX specialist. Styling, components, animations",
-    "name": "tusk",
+    "description": "🎨 UI Artificer - UI/UX specialist. Styling, components, animations",
+    "name": "fiend",
   },
   {
-    "description": "🛡️ Research Shadow - External knowledge gatherer. Web search, documentation lookup, examples, best practices research",
-    "name": "tank",
+    "description": "🛡️ Knowledge Seeker - External knowledge gatherer. Web search, documentation lookup, examples, best practices research",
+    "name": "slayer",
   },
   {
-    "description": "👁️ Full Power - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery",
-    "name": "shadow-sovereign",
+    "description": "👁️ Fateweaver - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery",
+    "name": "weaver",
   },
   {
-    "description": "🔥 Demon Noble Lady - Chat companion. Emotional understanding, thoughtful exchange",
-    "name": "esil-radiru",
+    "description": "🔥 Heartwarden - Chat companion. Emotional understanding, thoughtful exchange",
+    "name": "effie",
   },
 ]
 `;
@@ -79,7 +79,7 @@ exports[`Snapshot tests for description outputs getFullDescription outputs are s
 [
   {
     "description": 
-"🐜 Beru - Ant King Scout
+"🐜 Nightmare - Shadow Scout
 Role: Fastest scout
 Capabilities: Codebase exploration, grep, file discovery
 Best for:
@@ -89,11 +89,11 @@ Best for:
   • Quick codebase reconnaissance
 Background: Supported"
 ,
-    "name": "beru",
+    "name": "nightmare",
   },
   {
     "description": 
-"⚔️ Igris - Loyal Knight
+"⚔️ Saint - Saint of the Legion
 Role: Precise implementer + Style enforcer
 Capabilities: Code changes, running commands, test verification, naming/convention enforcement
 Best for:
@@ -105,11 +105,11 @@ Best for:
   • Applying comment format rules
 Background: Not supported"
 ,
-    "name": "igris",
+    "name": "saint",
   },
   {
     "description": 
-"🎖️ Bellion - Grand Marshal
+"🎖️ Cassie - Master Strategist
 Role: Master strategist
 Capabilities: Strategic planning, architecture analysis, complex problem decomposition
 Best for:
@@ -119,11 +119,11 @@ Best for:
   • Breaking down large tasks
 Background: Supported"
 ,
-    "name": "bellion",
+    "name": "cassie",
   },
   {
     "description": 
-"🎨 Tusk - Creative Shadow
+"🎨 Fiend - UI Artificer
 Role: UI/UX specialist
 Capabilities: Styling, components, animations
 Best for:
@@ -133,11 +133,11 @@ Best for:
   • Design system work
 Background: Not supported"
 ,
-    "name": "tusk",
+    "name": "fiend",
   },
   {
     "description": 
-"🛡️ Tank - Research Shadow
+"🛡️ Slayer - Knowledge Seeker
 Role: External knowledge gatherer
 Capabilities: Web search, documentation lookup, examples, best practices research
 Best for:
@@ -147,11 +147,11 @@ Best for:
   • Learning new libraries/frameworks
 Background: Supported"
 ,
-    "name": "tank",
+    "name": "slayer",
   },
   {
     "description": 
-"👁️ Shadow-sovereign - Full Power
+"👁️ Weaver - Fateweaver
 Role: Deep reasoning + Skeptical reviewer
 Capabilities: Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
 Best for:
@@ -163,11 +163,11 @@ Best for:
   • Recovery strategies
 Background: Not supported"
 ,
-    "name": "shadow-sovereign",
+    "name": "weaver",
   },
   {
     "description": 
-"🔥 Esil-radiru - Demon Noble Lady
+"🔥 Effie - Heartwarden
 Role: Chat companion
 Capabilities: Emotional understanding, thoughtful exchange
 Best for:
@@ -177,7 +177,7 @@ Best for:
   • Emotional support and encouragement
 Background: Not supported"
 ,
-    "name": "esil-radiru",
+    "name": "effie",
   },
 ]
 `;

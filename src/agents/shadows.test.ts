@@ -9,7 +9,7 @@ import { EnumOpencodeAgentMode, EnumOpencodeAgentPermission, EnumReasoningEffort
  * 包含 Monarch 和所有子代理
  * Includes Monarch and all subagents
  */
-const ALL_SHADOW_AGENTS_NAME = [EnumShadowAgentsName.ShadowMonarch, ...ALLOWED_SHADOWS] as const;
+const ALL_SHADOW_AGENTS_NAME = [EnumShadowAgentsName.Sunless, ...ALLOWED_SHADOWS] as const;
 
 /**
  * Shadow Agents 測試
@@ -45,7 +45,7 @@ describe("Shadow Agents", () =>
 	 */
 	test("monarch is primary mode", () =>
 	{
-		expect(SHADOW_AGENTS[EnumShadowAgentsName.ShadowMonarch].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
+		expect(SHADOW_AGENTS[EnumShadowAgentsName.Sunless].mode).toBe(EnumOpencodeAgentMode.PRIMARY);
 	});
 
 	/**
@@ -60,7 +60,7 @@ describe("Shadow Agents", () =>
 		const subagents = ALLOWED_SHADOWS;
 		for (const name of subagents)
 		{
-			if (name === EnumShadowSubAgentsName.EsilRadiru)
+			if (name === EnumShadowSubAgentsName.Effie)
 			{
 				expect(SHADOW_AGENTS[name].mode).toBeDefined();
 			}
@@ -80,8 +80,8 @@ describe("Shadow Agents", () =>
 	 */
 	test("beru and bellion have edit denied", () =>
 	{
-		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Beru].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
-		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Bellion].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
+		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Nightmare].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
+		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Cassie].permission?.edit).toBe(EnumOpencodeAgentPermission.DENY);
 	});
 
 	/**
@@ -93,7 +93,7 @@ describe("Shadow Agents", () =>
 	 */
 	test("shadow-sovereign has high reasoning effort", () =>
 	{
-		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.ShadowSovereign].options?.reasoningEffort)
+		expect(SHADOW_AGENTS[EnumShadowSubAgentsName.Weaver].options?.reasoningEffort)
 			.toBe(EnumReasoningEffort.High);
 	});
 

@@ -59,12 +59,12 @@ describe("arise_summon tool", () =>
 	{
 		const tool = createAgentToolAriseSyncSummon(mockCtx);
 
-		expect(tool.description).toContain("beru");
-		expect(tool.description).toContain("igris");
-		expect(tool.description).toContain("bellion");
-		expect(tool.description).toContain("tusk");
-		expect(tool.description).toContain("tank");
-		expect(tool.description).toContain("shadow-sovereign");
+		expect(tool.description).toContain("nightmare");
+		expect(tool.description).toContain("saint");
+		expect(tool.description).toContain("cassie");
+		expect(tool.description).toContain("fiend");
+		expect(tool.description).toContain("slayer");
+		expect(tool.description).toContain("weaver");
 	});
 });
 

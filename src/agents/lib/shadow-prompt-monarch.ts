@@ -1,6 +1,6 @@
 /**
- * Shadow Monarch Prompt
- * Shadow Monarch 的 prompt 定义
+ * Sunless (Monarch) Prompt
+ * Sunless (Monarch) 的 prompt 定义
  *
  * 使用 composePrompt 结构：
  * - header: 身份 (identity)
@@ -29,7 +29,7 @@ import {
 } from './tool-guides';
 
 /**
- * Shadow Monarch Prompt
+ * Sunless (Monarch) Prompt
  */
 export const SHADOW_MONARCH_PROMPT = composePrompt({
 	header: [
@@ -42,7 +42,7 @@ export const SHADOW_MONARCH_PROMPT = composePrompt({
 ${getMonarchShadowList()}
 
 ## Primary
-- @${EnumShadowAgentsName.ShadowMonarch as const} - The main orchestrator (only one)`,
+- @${EnumShadowAgentsName.Sunless as const} - The main orchestrator (only one)`,
 
 		getAriseToolsSection(),
 
@@ -55,7 +55,7 @@ ${getMonarchShadowList()}
 2. Verify changes work before declaring done.
 3. For complex/large tasks or tasks requiring careful handling:
    - Break into phased approaches when possible
-   - Call @shadow-sovereign for verification when task ends without clear next steps or proposed direction`,
+   - Call @weaver for verification when task ends without clear next steps or proposed direction`,
 
 		TODO_LIST_GUIDE,
 

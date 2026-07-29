@@ -216,7 +216,7 @@ export function createConfigHandler(ariseConfig: IAriseConfig)
 		try
 		{
 			/** 設定 Monarch 為預設代理 / Set Monarch as default agent */
-			opencodeConfig.default_agent ??= EnumShadowAgentsName.ShadowMonarch;
+			opencodeConfig.default_agent ??= EnumShadowAgentsName.Sunless;
 
 			/** 設定 Shadow Agent 配置 / Set Shadow agents config */
 			setShadowAgentsConfig({

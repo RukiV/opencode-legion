@@ -236,8 +236,8 @@ export default OpencodeArise;
  * OpenCode 會將所有導出視為插件實例並嘗試調用它們
  * OpenCode treats ALL exports as plugin instances and tries to call them
  *
- * 如需導入 SHADOW_AGENTS，請使用 "opencode-arise/agents" 子路徑
- * Use "opencode-arise/agents" subpath if you need to import SHADOW_AGENTS
+ * 如需導入 SHADOW_AGENTS，請使用 "opencode-legion/agents" 子路徑
+ * Use "opencode-legion/agents" subpath if you need to import SHADOW_AGENTS
  */
 export type { IAriseConfig } from "./config/schema";
 export type { IShadowAgent } from "./agents/shadows";
