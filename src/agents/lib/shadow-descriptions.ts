@@ -175,10 +175,10 @@ export const SHADOW_DESCRIPTIONS = {
 	[EnumShadowSubAgentsName.Kai]: {
 		name: EnumShadowSubAgentsName.Kai,
 		displayName: "Kai",
-		title: "Heartwarden",
+		title: "Nightingale",
 		emoji: "🎤",
 		role: "Chat companion",
-		capabilities: "Emotional understanding, thoughtful exchange",
+		capabilities: "Charming conversation, emotional understanding, thoughtful exchange",
 		bestFor: [
 			"Casual conversation and chat",
 			"Understanding user intent and feelings",

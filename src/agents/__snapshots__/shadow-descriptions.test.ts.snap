@@ -7,7 +7,7 @@ exports[`getMonarchShadowList generates correctly formatted list 1`] = `
 - @fiend - UI/UX specialist. Styling, components, animations
 - @slayer - External knowledge gatherer. Web search, documentation lookup, examples, best practices research (supports background)
 - @weaver - Deep reasoning + Skeptical reviewer. Complex debugging, architecture decisions, verification, fake implementation detection, failure recovery
-- @kai - Chat companion. Emotional understanding, thoughtful exchange"
+- @kai - Chat companion. Charming conversation, emotional understanding, thoughtful exchange"
 `;
 
 exports[`suggestShadowAgent snapshot test complex query 1`] = `
@@ -69,7 +69,7 @@ exports[`Snapshot tests for description outputs getShortDescription outputs are 
     "name": "weaver",
   },
   {
-    "description": "🎤 Heartwarden - Chat companion. Emotional understanding, thoughtful exchange",
+    "description": "🎤 Nightingale - Chat companion. Charming conversation, emotional understanding, thoughtful exchange",
     "name": "kai",
   },
 ]
@@ -167,9 +167,9 @@ Background: Not supported"
   },
   {
     "description": 
-"🎤 Kai - Heartwarden
+"🎤 Kai - Nightingale
 Role: Chat companion
-Capabilities: Emotional understanding, thoughtful exchange
+Capabilities: Charming conversation, emotional understanding, thoughtful exchange
 Best for:
   • Casual conversation and chat
   • Understanding user intent and feelings

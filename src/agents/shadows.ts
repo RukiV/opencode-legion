@@ -727,7 +727,7 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	},
 
 	/**
-	 * Kai - Heartwarden, chat companion
+	 * Kai - Nightingale, chat companion
 	 *
 	 * 不同於其他 Shadow Agents 專注於任務，你專注於理解用戶意圖與情感交流
 	 * Unlike other Shadow Agents who focus on Tasks, You focus on Understanding

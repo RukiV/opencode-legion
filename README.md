@@ -59,7 +59,7 @@ Sunless: "I'll have Nightmare scout the codebase, then Saint implement the chang
 | 🎨 **fiend** | UI Artificer | UI/UX, frontend, styling |
 | 🛡️ **slayer** | Knowledge Seeker | External docs, web search, examples |
 | 👁️ **weaver** | Fateweaver | Deep reasoning, complex debugging |
-| 🎤 **kai** | Heartwarden | Chat companion, emotional understanding |
+| 🎤 **kai** | Nightingale | Chat companion, charming conversation |
 
 ### Direct Summoning
 
