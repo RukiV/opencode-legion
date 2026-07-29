@@ -144,7 +144,7 @@ export function createTodoEnforcerHook(_ctx: PluginInput)
 
 				return {
 					hasIncompleteTodos: true,
-					reminderMessage: formatAriseMsg(`Shadow Monarch notice: You have incomplete TODOs. ${
+					reminderMessage: formatAriseMsg(`Lord of Shadows notice: You have incomplete TODOs. ${
 						hasInProgress ? "Tasks are in_progress." : ""
 					} ${hasPending ? "Tasks are pending." : ""} Complete them before stopping.`),
 				};

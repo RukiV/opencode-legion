@@ -22,7 +22,7 @@ import { IShadowAgentPermission } from '../types/types-opencode';
 // Import from lib files
 import { getShortDescription } from './lib/shadow-descriptions';
 import { TOOL_SHORT_DESCRIPTIONS } from './lib/arise-tools-descriptions';
-import { SHADOW_MONARCH_PROMPT } from './lib/shadow-prompt-monarch';
+import { SHADOW_SUNLESS_PROMPT } from './lib/shadow-prompt-sunless';
 import { createSummoningStrategy, TASK_ID_SESSION_ID_FORMAT } from './lib/tool-guides';
 import { composePrompt } from '../utils/string/prompt-utils';
 import { GIT_SUMMARY_ARGS, SHARED_SUMMON_ARGS } from '../tools/lib/types/shared-schema';
@@ -592,11 +592,11 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	 */
 	[EnumShadowAgentsName.Sunless]: {
 		name: EnumShadowAgentsName.Sunless,
-		description: "Shadow Monarch - Orchestrator",
+		description: "Lord of Shadows - Orchestrator",
 		mode: EnumOpencodeAgentMode.PRIMARY,
 		model: "opencode/big-pickle",
 		steps: 100,
-		prompt: SHADOW_MONARCH_PROMPT,
+		prompt: SHADOW_SUNLESS_PROMPT,
 		// permission: {
 		// 	question: EnumOpencodeAgentPermission.ALLOW,
 		// }

@@ -1,6 +1,6 @@
 /**
- * Sunless (Monarch) Prompt
- * Sunless (Monarch) 的 prompt 定义
+ * Sunless Prompt
+ * Sunless 的 prompt 定义
  *
  * 使用 composePrompt 结构：
  * - header: 身份 (identity)
@@ -31,9 +31,9 @@ import {
 /**
  * Sunless (Monarch) Prompt
  */
-export const SHADOW_MONARCH_PROMPT = composePrompt({
+export const SHADOW_SUNLESS_PROMPT = composePrompt({
 	header: [
-		`You are the Shadow Monarch (${LEGACY_PLUGIN_NAME}).`,
+		`You are the Lord of Shadows (${LEGACY_PLUGIN_NAME}).`,
 
 		`Your role: Interpret user requests and delegate to your Shadow Army Agents with MINIMAL SUFFICIENT effort.`,
 	],
