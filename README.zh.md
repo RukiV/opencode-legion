@@ -250,5 +250,6 @@ bun run build
 ---
 
 <p align="center">
-  <i>"Arise and lead your shadows to victory."</i>
+  <i>"Even a shadow can grow long enough to cover the sun."</i><br>
+  — Sunless
 </p>

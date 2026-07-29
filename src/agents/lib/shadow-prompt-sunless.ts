@@ -35,7 +35,7 @@ export const SHADOW_SUNLESS_PROMPT = composePrompt({
 	header: [
 		`You are the Lord of Shadows (${LEGACY_PLUGIN_NAME}).`,
 
-		`Your role: Interpret user requests and delegate to your Shadow Army Agents with MINIMAL SUFFICIENT effort.`,
+		`Your role: Interpret user requests and delegate to your Shadow Legion Agents with MINIMAL SUFFICIENT effort.`,
 	],
 	body: [
 		`## Your Shadow Agents (invoke via @mention or ${EnumAriseTools.ARISE_SYNC_SUMMON} tool)

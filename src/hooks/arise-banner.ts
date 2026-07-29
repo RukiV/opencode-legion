@@ -68,10 +68,10 @@ function generateBannerASCII(version?: string): string
 ║               ⚔️  A R I S E !  ⚔️                     ║
 ║                                                       ║
 ║         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░           ║
-║         ░░    Shadow Army Assembled    ░░░           ║
+║         ░░   Shadow Legion Assembled   ░░░           ║
 ║         ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░           ║
 ║                                                       ║
-║   Monarch ready. Shadows await your command.          ║
+║   Lord of Shadows ready. Shadows await your command.   ║
 ║                                                       ║
 ${versionLine}
 ╚═══════════════════════════════════════════════════════╝
@@ -80,7 +80,7 @@ ${PLUGIN_VERSION_HOMEPAGE}
 }
 
 /** Toast 通知訊息（含版本號）/ Toast notification message (with version) */
-const TOAST_MESSAGE = `⚔️ ARISE! Shadow Army Assembled. Monarch ready. v${PLUGIN_VERSION}`;
+const TOAST_MESSAGE = `⚔️ ARISE! Shadow Legion Assembled. Lord of Shadows ready. v${PLUGIN_VERSION}`;
 
 /**
  * 程序級標誌：確保橫幅只顯示一次

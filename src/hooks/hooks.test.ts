@@ -20,8 +20,8 @@ describe("arise-banner hook", () =>
 		const banner = getBanner();
 
 		expect(banner).toContain("A R I S E"); // Spaced out in banner
-		expect(banner).toContain("Shadow Army");
-		expect(banner).toContain("Monarch");
+		expect(banner).toContain("Shadow Legion");
+		expect(banner).toContain("Lord of Shadows");
 	});
 
 	it("creates hook with onSessionCreated", () =>
