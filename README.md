@@ -1,16 +1,15 @@
-# opencode-arise
+# opencode-legion
 
-> ⚔️ **ARISE!** A Solo Leveling themed orchestrator harness for OpenCode
+> ⚔️ **ARISE!** A Shadow Slave themed orchestrator harness for OpenCode
 
-[![npm version](https://img.shields.io/npm/v/opencode-arise.svg)](https://www.npmjs.com/package/opencode-arise)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A lightweight, token-efficient orchestrator layer that extends [OpenCode](https://opencode.ai) with a shadow army of specialized AI agents. Inspired by Solo Leveling's Shadow Monarch, Sung Jinwoo.
+A lightweight, token-efficient orchestrator layer that extends [OpenCode](https://opencode.ai) with a legion of specialized Shadow Agents. Inspired by Shadow Slave.
 
 ## Features
 
-- **Shadow Army** - 7 specialized agents for different tasks
-- **Smart Delegation** - Monarch orchestrates with minimal token usage
+- **Shadow Legion** - 8 specialized agents for different tasks
+- **Smart Delegation** - Sunless orchestrates with minimal token usage
 - **Parallel Execution** - Background tasks for concurrent exploration
 - **Quality-Safe Output** - Never truncates errors or stack traces
 - **Configurable** - Customize models, disable shadows, tweak behavior
@@ -18,26 +17,19 @@ A lightweight, token-efficient orchestrator layer that extends [OpenCode](https:
 ## Installation
 
 ```bash
-bunx @bluelovers/opencode-arise install
+opencode plugin @RukiV/opencode-legion
 ```
 
 This registers the plugin with OpenCode and creates a default config.
 
-or
-
-`~/.config/opencode/opencode.jsonc`
+Or add manually to `~/.config/opencode/opencode.jsonc`:
 
 ```jsonc
 {
-  "plugins": [
-    "@bluelovers/opencode-arise@latest"
+  "plugin": [
+    "@RukiV/opencode-legion"
   ]
 }
-```
-
-**Verify installation:**
-```bash
-bunx @bluelovers/opencode-arise doctor
 ```
 
 ## Quick Start
@@ -48,36 +40,37 @@ After installation, just run OpenCode as usual:
 opencode
 ```
 
-You'll see the "ARISE!" banner, and the **Monarch** becomes your default agent. Talk naturally - the Monarch decides when to delegate to shadows.
+You'll see the "ARISE!" banner, and **Sunless** becomes your default agent. Talk naturally — Sunless decides when to delegate to shadows.
 
 ```
 You: "Find all React components using useState and add error boundaries"
 
-Monarch: "I'll have Beru scout the codebase, then Igris implement the changes."
+Sunless: "I'll have Nightmare scout the codebase, then Saint implement the changes."
 ```
 
-## Shadow Army
+## Shadow Legion
 
 | Shadow | Role | Best For |
 |--------|------|----------|
-| 👑 **monarch** | Shadow Monarch | Orchestration, delegation decisions |
-| 🐜 **beru** | Ant King Scout | Fast codebase exploration, grep, file discovery |
-| ⚔️ **igris** | Loyal Knight | Precise implementation, code changes |
-| 🎖️ **bellion** | Grand Marshal | Strategic planning, architecture analysis |
-| 🎨 **tusk** | Creative Shadow | UI/UX, frontend, styling |
-| 🛡️ **tank** | Research Shadow | External docs, web search, examples |
-| 👁️ **shadow-sovereign** | Full Power | Deep reasoning, complex debugging |
+| ☀️ **sunless** | Lord of Shadows | Orchestration, delegation decisions |
+| 🐜 **nightmare** | Shadow Scout | Fast codebase exploration, grep, file discovery |
+| ⚔️ **saint** | Saint of the Legion | Precise implementation, code changes |
+| 🎖️ **cassie** | Master Strategist | Strategic planning, architecture analysis |
+| 🎨 **fiend** | UI Artificer | UI/UX, frontend, styling |
+| 🛡️ **slayer** | Knowledge Seeker | External docs, web search, examples |
+| 👁️ **weaver** | Fateweaver | Deep reasoning, complex debugging |
+| 🔥 **effie** | Heartwarden | Chat companion, emotional understanding |
 
 ### Direct Summoning
 
-You can bypass the Monarch and summon shadows directly:
+You can bypass Sunless and summon shadows directly:
 
 ```
-@beru find all TODO comments in src/
+@nightmare find all TODO comments in src/
 
-@bellion plan a migration from REST to GraphQL
+@cassie plan a migration from REST to GraphQL
 
-@shadow-sovereign why is this recursive function causing a stack overflow?
+@weaver why is this recursive function causing a stack overflow?
 ```
 
 ## How It Works
@@ -88,30 +81,32 @@ You can bypass the Monarch and summon shadows directly:
 │                          │                               │
 │                          ▼                               │
 │    ┌─────────────────────────────────────────────────┐  │
-│    │                👑 MONARCH                        │  │
-│    │           (Primary Orchestrator)                 │  │
+│    │              ☀️ SUNLESS                          │  │
+│    │         (Lord of Shadows / Orchestrator)          │  │
 │    │                                                  │  │
 │    │     Assesses task → Delegates or handles        │  │
 │    └──────────────────────┬──────────────────────────┘  │
 │                           │                              │
-│       ┌───────┬───────────┼───────────┬───────┐         │
-│       ▼       ▼           ▼           ▼       ▼         │
-│     🐜      ⚔️          🎖️          🛡️      👁️        │
-│    BERU   IGRIS      BELLION       TANK   SOVEREIGN    │
-│    scout  implement    plan       research  reason      │
+│       ┌──────┬──────┬─────┼──────┬──────┬──────┐        │
+│       ▼      ▼      ▼     ▼      ▼      ▼      ▼        │
+│      🐜     ⚔️     🎖️    🎨     🛡️     👁️     🔥     │
+│   NIGHT-  SAINT  CASSIE FIEND  SLAYER WEAVER  EFFIE    │
+│   MARE                                                     │
+│   scout  imple-  plan   UI    search reason  chat       │
+│          ment                                           │
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Monarch's Principles:**
-1. Assess intent before acting - don't over-delegate
+**Sunless's Principles:**
+1. Assess intent before acting — don't over-delegate
 2. Handle trivial tasks directly
 3. Use parallel background tasks for exploration
-4. Only summon shadow-sovereign for complex problems
+4. Only summon weaver for complex problems
 5. Verify changes work before declaring done
 
 ## Custom Tools
 
-The plugin provides these tools to the Monarch:
+The plugin provides these tools to Sunless:
 
 | Tool | Description |
 |------|-------------|
@@ -132,7 +127,7 @@ The plugin provides these tools to the Monarch:
 
 ## Configuration
 
-Create `~/.config/opencode/opencode-arise.json`:
+Create `~/.config/opencode/opencode-legion.json`:
 
 ```json
 {
@@ -140,25 +135,28 @@ Create `~/.config/opencode/opencode-arise.json`:
   "disabled_shadows": [],
   "disabled_hooks": [],
   "agents": {
-    "monarch": {
+    "sunless": {
       "model": "opencode/big-pickle"
     },
-    "beru": {
+    "nightmare": {
       "model": "opencode/big-pickle"
     },
-    "igris": {
+    "saint": {
+      "model": "opencode/deepseek-v4-flash-free"
+    },
+    "cassie": {
+      "model": "opencode/mimo-v2.5-free"
+    },
+    "fiend": {
+      "model": "opencode/mimo-v2.5-free"
+    },
+    "slayer": {
       "model": "opencode/big-pickle"
     },
-    "bellion": {
+    "weaver": {
       "model": "opencode/big-pickle"
     },
-    "tusk": {
-      "model": "opencode/big-pickle"
-    },
-    "tank": {
-      "model": "opencode/big-pickle"
-    },
-    "shadow-sovereign": {
+    "effie": {
       "model": "opencode/big-pickle"
     }
   },
@@ -179,7 +177,7 @@ Create `~/.config/opencode/opencode-arise.json`:
 |--------|------|---------|-------------|
 | `show_banner` | boolean | `true` | Show "ARISE!" toast on session start |
 | `banner_every_session` | boolean | `false` | Show banner for every session (not just first) |
-| `disabled_shadows` | string[] | `[]` | Shadows to disable (e.g., `["tusk", "tank"]`) |
+| `disabled_shadows` | string[] | `[]` | Shadows to disable (e.g., `["fiend", "slayer"]`) |
 | `disabled_hooks` | string[] | `[]` | Hooks to disable |
 | `agents.<name>.model` | string | varies | Override model for a shadow |
 | `agents.<name>.disabled` | boolean | `false` | Disable specific shadow |
@@ -190,19 +188,20 @@ Create `~/.config/opencode/opencode-arise.json`:
 
 ### Project-Level Config
 
-You can also create `.opencode/opencode-arise.json` in your project root. Project config merges with (and overrides) global config.
+You can also create `.opencode/opencode-legion.json` in your project root. Project config merges with (and overrides) global config.
 
 ## Default Models
 
 | Shadow | Default Model |
 |--------|---------------|
-| monarch | `anthropic/claude-opus-4-5` |
-| beru | `anthropic/claude-haiku-4-5` |
-| igris | `zai-coding-plan/glm-4.7` |
-| bellion | `openai/gpt-5.2` |
-| tusk | `google/gemini-3-pro-preview` |
-| tank | `zai-coding-plan/glm-4.7` |
-| shadow-sovereign | `openai/gpt-5.2` (high reasoning) |
+| sunless | `opencode/big-pickle` |
+| nightmare | `opencode/big-pickle` |
+| saint | `opencode/deepseek-v4-flash-free` |
+| cassie | `opencode/mimo-v2.5-free` |
+| fiend | `opencode/mimo-v2.5-free` |
+| slayer | `opencode/big-pickle` |
+| weaver | `opencode/big-pickle` |
+| effie | `opencode/big-pickle` |
 
 ## Examples
 
@@ -211,8 +210,8 @@ You can also create `.opencode/opencode-arise.json` in your project root. Projec
 ```
 You: "I need to understand how authentication works and find security best practices"
 
-Monarch: *launches beru (codebase) and tank (research) in background*
-         "Beru is exploring the auth implementation while Tank researches
+Sunless: *launches nightmare (codebase) and slayer (research) in background*
+         "Nightmare is exploring the auth implementation while Slayer researches
           security best practices. I'll compile their findings."
 ```
 
@@ -221,13 +220,13 @@ Monarch: *launches beru (codebase) and tank (research) in background*
 ```
 You: "Refactor the payment module to use the new Stripe API"
 
-Monarch: "This requires planning. Let me consult Bellion first."
+Sunless: "This requires planning. Let me consult Cassie first."
 
-Bellion: *analyzes codebase, creates migration plan*
+Cassie: *analyzes codebase, creates migration plan*
 
-Monarch: "Bellion's plan looks good. Igris will implement it step by step."
+Sunless: "Cassie's plan looks good. Saint will implement it step by step."
 
-Igris: *implements changes, runs tests after each step*
+Saint: *implements changes, runs tests after each step*
 ```
 
 ### Deep Debugging
@@ -235,10 +234,10 @@ Igris: *implements changes, runs tests after each step*
 ```
 You: "This async function is causing race conditions but I can't figure out why"
 
-Monarch: "This needs deep analysis. Summoning the Shadow Sovereign."
+Sunless: "This needs deep analysis. Summoning Weaver."
 
-Shadow-Sovereign: *deep reasoning analysis*
-                  "The issue is a closure capturing a stale reference..."
+Weaver: *deep reasoning analysis*
+       "The issue is a closure capturing a stale reference..."
 ```
 
 ## Uninstall
@@ -246,14 +245,15 @@ Shadow-Sovereign: *deep reasoning analysis*
 Remove from OpenCode config:
 
 ```bash
-# Edit ~/.config/opencode/opencode.json
-# Remove "opencode-arise" from the "plugin" array
+# Edit ~/.config/opencode/opencode.jsonc
+# Remove "@RukiV/opencode-legion" from the "plugin" array
 ```
 
 Or manually:
+
 ```bash
 # Remove config
-rm ~/.config/opencode/opencode-arise.json
+rm ~/.config/opencode/opencode-legion.json
 ```
 
 ## Requirements
@@ -263,10 +263,10 @@ rm ~/.config/opencode/opencode-arise.json
 
 ## Philosophy
 
-- **Minimal sufficient delegation** - Don't over-delegate simple tasks
-- **Parallel exploration** - Use background tasks for concurrent scouting
-- **Quality-safe truncation** - Never lose errors, tracebacks, or critical output
-- **Token efficiency** - Lean prompts, smart delegation patterns
+- **Minimal sufficient delegation** — Don't over-delegate simple tasks
+- **Parallel exploration** — Use background tasks for concurrent scouting
+- **Quality-safe truncation** — Never lose errors, tracebacks, or critical output
+- **Token efficiency** — Lean prompts, smart delegation patterns
 
 ## Contributing
 
@@ -274,8 +274,8 @@ Contributions are welcome! Please read the contributing guidelines first.
 
 ```bash
 # Clone the repo
-git clone https://github.com/bluelovers/opencode-arise.git
-cd opencode-arise
+git clone https://github.com/RukiV/opencode-legion.git
+cd opencode-legion
 
 # Install dependencies
 bun install
@@ -289,10 +289,10 @@ bun run build
 
 ## License
 
-[MIT](LICENSE) © moinulmoin
+[MIT](LICENSE) © RukiV
 
 ---
 
 <p align="center">
-  <i>"I alone level up."</i> - Sung Jinwoo
+  <i>"Arise and lead your shadows to victory."</i>
 </p>
