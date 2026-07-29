@@ -45,7 +45,7 @@ export const SHADOW_DESCRIPTIONS = {
 		name: EnumShadowSubAgentsName.Nightmare,
 		displayName: "Nightmare",
 		title: "Shadow Scout",
-		emoji: "🐜",
+		emoji: "🐎",
 		role: "Fastest scout",
 		capabilities: "Codebase exploration, grep, file discovery",
 		bestFor: [
@@ -95,7 +95,7 @@ export const SHADOW_DESCRIPTIONS = {
 		name: EnumShadowSubAgentsName.Cassie,
 		displayName: "Cassie",
 		title: "Master Strategist",
-		emoji: "🎖️",
+		emoji: "🔮",
 		role: "Master strategist",
 		capabilities: "Strategic planning, architecture analysis, complex problem decomposition",
 		bestFor: [
@@ -129,7 +129,7 @@ export const SHADOW_DESCRIPTIONS = {
 		name: EnumShadowSubAgentsName.Slayer,
 		displayName: "Slayer",
 		title: "Knowledge Seeker",
-		emoji: "🛡️",
+		emoji: "📚",
 		role: "External knowledge gatherer",
 		capabilities: "Web search, documentation lookup, examples, best practices research",
 		bestFor: [
@@ -172,11 +172,11 @@ export const SHADOW_DESCRIPTIONS = {
 		supportsBackground: false,
 	},
 
-	[EnumShadowSubAgentsName.Effie]: {
-		name: EnumShadowSubAgentsName.Effie,
-		displayName: "Effie",
+	[EnumShadowSubAgentsName.Kai]: {
+		name: EnumShadowSubAgentsName.Kai,
+		displayName: "Kai",
 		title: "Heartwarden",
-		emoji: "🔥",
+		emoji: "🎤",
 		role: "Chat companion",
 		capabilities: "Emotional understanding, thoughtful exchange",
 		bestFor: [

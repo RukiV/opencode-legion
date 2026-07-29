@@ -47,13 +47,13 @@ opencode
 | Shadow | 角色 | 最佳用途 |
 |--------|------|----------|
 | ☀️ **sunless** | 影子軍團之主 | 協調、委派決策 |
-| 🐜 **nightmare** | 影子偵查兵 | 快速程式碼探索、grep、檔案搜尋 |
+| 🐎 **nightmare** | 影子偵查兵 | 快速程式碼探索、grep、檔案搜尋 |
 | ⚔️ **saint** | 軍團聖者 | 精確實作、程式碼變更 |
-| 🎖️ **cassie** | 策略大師 | 策略規劃、架構分析 |
+| 🔮 **cassie** | 策略大師 | 策略規劃、架構分析 |
 | 🎨 **fiend** | UI 工匠 | UI/UX、前端、樣式 |
-| 🛡️ **slayer** | 知識追尋者 | 外部文件、網路搜尋、範例 |
+| 📚 **slayer** | 知識追尋者 | 外部文件、網路搜尋、範例 |
 | 👁️ **weaver** | 命運編織者 | 深度推理、複雜除錯 |
-| 🔥 **effie** | 暖心守護者 | 聊天陪伴、情感理解 |
+| 🎤 **kai** | 暖心守護者 | 聊天陪伴、情感理解 |
 
 ### 直接召喚
 
@@ -83,8 +83,8 @@ opencode
 │                           │                              │
 │       ┌──────┬──────┬─────┼──────┬──────┬──────┐        │
 │       ▼      ▼      ▼     ▼      ▼      ▼      ▼        │
-│      🐜     ⚔️     🎖️    🎨     🛡️     👁️     🔥     │
-│   NIGHT-  SAINT  CASSIE FIEND  SLAYER WEAVER  EFFIE    │
+│      🐎     ⚔️     🔮    🎨     📚     👁️     🎤     │
+│   NIGHT-  SAINT  CASSIE FIEND  SLAYER WEAVER   KAI    │
 │   MARE                                                     │
 │   偵查   實作    規劃   UI    搜尋   推理   聊天        │
 └─────────────────────────────────────────────────────────┘
@@ -149,7 +149,7 @@ opencode
     "weaver": {
       "model": "opencode/big-pickle"
     },
-    "effie": {
+    "kai": {
       "model": "opencode/big-pickle"
     }
   },
@@ -194,7 +194,7 @@ opencode
 | fiend | `opencode/mimo-v2.5-free` |
 | slayer | `opencode/big-pickle` |
 | weaver | `opencode/big-pickle` |
-| effie | `opencode/big-pickle` |
+| kai | `opencode/big-pickle` |
 
 ## 卸載
 

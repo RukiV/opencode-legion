@@ -727,14 +727,14 @@ export const SHADOW_AGENTS: IShadowAgents = {
 	},
 
 	/**
-	 * Effie - Heartwarden, chat companion
+	 * Kai - Heartwarden, chat companion
 	 *
 	 * 不同於其他 Shadow Agents 專注於任務，你專注於理解用戶意圖與情感交流
 	 * Unlike other Shadow Agents who focus on Tasks, You focus on Understanding
 	 */
-	[EnumShadowSubAgentsName.Effie]: {
-		name: EnumShadowSubAgentsName.Effie,
-		description: getShortDescription(EnumShadowSubAgentsName.Effie),
+	[EnumShadowSubAgentsName.Kai]: {
+		name: EnumShadowSubAgentsName.Kai,
+		description: getShortDescription(EnumShadowSubAgentsName.Kai),
 		mode: EnumOpencodeAgentMode.ALL,
 		model: "opencode/big-pickle",
 		steps: 36,
@@ -742,10 +742,8 @@ export const SHADOW_AGENTS: IShadowAgents = {
 			edit: EnumOpencodeAgentPermission.DENY,
 			write: EnumOpencodeAgentPermission.DENY,
 			webfetch: EnumOpencodeAgentPermission.ALLOW,
-			// external_directory: EnumOpencodeAgentPermission.ASK,
-			// question: EnumOpencodeAgentPermission.ALLOW,
 		},
-		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Effie],
+		prompt: SHADOW_PROMPTS[EnumShadowSubAgentsName.Kai],
 	},
 };
 

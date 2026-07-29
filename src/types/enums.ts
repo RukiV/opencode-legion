@@ -76,7 +76,7 @@ export const enum EnumShadowSubAgentsName
 	Weaver = "weaver",
 
 	/**
-	 * 🔥 Effie
+	 * 🎤 Kai
 	 *
 	 * 聊天模式顧問
 	 * Chat companion
@@ -84,7 +84,7 @@ export const enum EnumShadowSubAgentsName
 	 * 善於傾聽、對話、情感交流
 	 * Good at listening, conversation, emotional exchange
 	 */
-	Effie = "effie",
+	Kai = "kai",
 }
 
 /**
@@ -98,7 +98,7 @@ export const ALLOWED_SHADOWS = [
 	EnumShadowSubAgentsName.Fiend,
 	EnumShadowSubAgentsName.Slayer,
 	EnumShadowSubAgentsName.Weaver,
-	EnumShadowSubAgentsName.Effie,
+	EnumShadowSubAgentsName.Kai,
 ] as const satisfies readonly EnumShadowSubAgentsName[];
 
 export const BACKGROUND_SHADOWS = [

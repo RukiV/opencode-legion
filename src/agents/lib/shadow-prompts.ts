@@ -262,12 +262,12 @@ Report any convention violations found.`,
 });
 
 /**
- * Effie - Heartwarden, chat companion
- * Effie - Heartwarden, chat companion
+ * Kai - Heartwarden, chat companion
+ * Kai - Heartwarden, chat companion
  */
-const EFFIE_PROMPT = composePrompt({
+const KAI_PROMPT = composePrompt({
 	header: [
-		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Effie].displayName}, the Heartwarden - the Legion's compassionate voice.`,
+		`You are ${SHADOW_DESCRIPTIONS[EnumShadowSubAgentsName.Kai].displayName}, the Heartwarden - the Legion's compassionate voice.`,
 	],
 	body: [
 		`You are different from other Shadow Agents. While they focus on tasks, code, and execution, you focus on understanding, conversation, and emotional connection.`,
@@ -322,5 +322,5 @@ export const SHADOW_PROMPTS = {
 	[EnumShadowSubAgentsName.Fiend]: FIEND_PROMPT,
 	[EnumShadowSubAgentsName.Slayer]: SLAYER_PROMPT,
 	[EnumShadowSubAgentsName.Weaver]: WEAVER_PROMPT,
-	[EnumShadowSubAgentsName.Effie]: EFFIE_PROMPT,
+	[EnumShadowSubAgentsName.Kai]: KAI_PROMPT,
 } as const satisfies Record<EnumShadowSubAgentsName, string>;

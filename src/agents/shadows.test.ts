@@ -60,7 +60,7 @@ describe("Shadow Agents", () =>
 		const subagents = ALLOWED_SHADOWS;
 		for (const name of subagents)
 		{
-			if (name === EnumShadowSubAgentsName.Effie)
+			if (name === EnumShadowSubAgentsName.Kai)
 			{
 				expect(SHADOW_AGENTS[name].mode).toBeDefined();
 			}

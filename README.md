@@ -59,7 +59,7 @@ Sunless: "I'll have Nightmare scout the codebase, then Saint implement the chang
 | 🎨 **fiend** | UI Artificer | UI/UX, frontend, styling |
 | 🛡️ **slayer** | Knowledge Seeker | External docs, web search, examples |
 | 👁️ **weaver** | Fateweaver | Deep reasoning, complex debugging |
-| 🔥 **effie** | Heartwarden | Chat companion, emotional understanding |
+| 🎤 **kai** | Heartwarden | Chat companion, emotional understanding |
 
 ### Direct Summoning
 
@@ -89,8 +89,8 @@ You can bypass Sunless and summon shadows directly:
 │                           │                              │
 │       ┌──────┬──────┬─────┼──────┬──────┬──────┐        │
 │       ▼      ▼      ▼     ▼      ▼      ▼      ▼        │
-│      🐜     ⚔️     🎖️    🎨     🛡️     👁️     🔥     │
-│   NIGHT-  SAINT  CASSIE FIEND  SLAYER WEAVER  EFFIE    │
+│      🐎     ⚔️     🔮    🎨     📚     👁️     🎤     │
+│   NIGHT-  SAINT  CASSIE FIEND  SLAYER WEAVER   KAI    │
 │   MARE                                                     │
 │   scout  imple-  plan   UI    search reason  chat       │
 │          ment                                           │
@@ -156,7 +156,7 @@ Create `~/.config/opencode/opencode-legion.json`:
     "weaver": {
       "model": "opencode/big-pickle"
     },
-    "effie": {
+    "kai": {
       "model": "opencode/big-pickle"
     }
   },
@@ -201,7 +201,7 @@ You can also create `.opencode/opencode-legion.json` in your project root. Proje
 | fiend | `opencode/mimo-v2.5-free` |
 | slayer | `opencode/big-pickle` |
 | weaver | `opencode/big-pickle` |
-| effie | `opencode/big-pickle` |
+| kai | `opencode/big-pickle` |
 
 ## Examples
 
