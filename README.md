@@ -289,7 +289,7 @@ bun run build
 
 ## License
 
-[MIT](LICENSE) © RukiV
+[MIT](LICENSE) © moinulmoin
 
 ---
 
